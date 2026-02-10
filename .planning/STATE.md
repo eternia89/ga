@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 1 of 9 (Database Schema & Supabase Setup)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-10 -- Completed 01-01-PLAN.md (Database schema initialization)
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-10 -- Completed 01-02-PLAN.md (RLS policies & audit triggers)
 
-Progress: [█.........] 10%
+Progress: [██........] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 49 min
-- Total execution time: 0.82 hours
+- Total plans completed: 2
+- Average duration: 28 min
+- Total execution time: 0.92 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-database-schema-supabase-setup | 1/2 | 49min | 49min |
+| 01-database-schema-supabase-setup | 2/2 | 55min | 28min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (49min)
-- Trend: Starting baseline
+- Last 5 plans: 01-01 (49min), 01-02 (6min)
+- Trend: Accelerating (01-02 was 8x faster than 01-01)
 
 *Updated after each plan completion*
 
@@ -50,6 +50,11 @@ Recent decisions affecting current work:
 - [01-01]: Deferred unique constraints (DEFERRABLE INITIALLY DEFERRED) to handle FK relationships during soft-delete operations
 - [01-01]: audit_logs table has NO deleted_at, NO updated_at - ensures immutable audit trail for compliance
 - [01-01]: Pushed migration to remote Supabase first; local Docker setup deferred (not blocking)
+- [01-02]: Placed JWT helper functions in public schema (Supabase doesn't allow custom functions in auth schema)
+- [01-02]: UPDATE policies omit deleted_at check to enable soft-delete operations
+- [01-02]: No DELETE policies = hard deletes blocked at RLS level (soft delete only)
+- [01-02]: Notifications are user-scoped (user_id = auth.uid()) not company-scoped
+- [01-02]: Audit triggers use SECURITY DEFINER to bypass RLS for immutable audit log writes
 
 ### Pending Todos
 
@@ -64,6 +69,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-10
-Stopped at: Completed 01-01-PLAN.md execution (Database schema & Supabase setup)
-Resume file: .planning/phases/01-database-schema-supabase-setup/01-01-SUMMARY.md
-Next: Execute 01-02-PLAN.md (RLS policies and tenant isolation)
+Stopped at: Completed 01-02-PLAN.md execution (RLS policies & audit triggers) - Phase 1 complete
+Resume file: .planning/phases/01-database-schema-supabase-setup/01-02-SUMMARY.md
+Next: Plan Phase 2 (Auth & RBAC)
