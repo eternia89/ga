@@ -35,11 +35,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. RLS helper functions (auth.user_company_id, auth.user_division_id, auth.user_role) are deployed and return correct values from JWT claims
   4. Every table has deleted_at column and all SELECT RLS policies filter on deleted_at IS NULL
   5. An audit_log table exists with a trigger or function pattern ready to capture create/update/delete/transition events
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: Supabase project setup, schema design, and migration for all domain tables
-- [ ] 01-02: RLS policies, helper functions, soft-delete filters, and audit log infrastructure
+- [ ] 01-01-PLAN.md — Supabase project initialization, all 16 domain tables, indexes, utility functions
+- [ ] 01-02-PLAN.md — RLS helper functions, baseline RLS policies (company isolation + soft-delete), audit trigger infrastructure
 
 ### Phase 2: Auth & RBAC
 **Goal**: Users can log in (Google OAuth or email/password), sessions persist across browser reloads, unauthenticated users are redirected, and the application enforces role-based permissions at every layer.
