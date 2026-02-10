@@ -1,0 +1,11 @@
+{
+  "mode": "interactive",
+  "depth": "comprehensive",
+  "parallelization": true,
+  "gitTracking": true,
+  "researchAgents": true,
+  "planChecker": true,
+  "verifier": true,
+  "modelProfile": "quality",
+  "createdAt": "2026-02-10"
+}
