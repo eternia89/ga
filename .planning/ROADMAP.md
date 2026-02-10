@@ -114,18 +114,18 @@ Plans:
 ### Phase 6: Inventory
 **Goal**: GA Staff can manage a complete asset registry with tracked movements between locations, including receiver confirmation, so the organization has accurate visibility into what assets exist and where they are.
 **Depends on**: Phase 3
-**Requirements**: REQ-INV-001, REQ-INV-002, REQ-INV-003, REQ-INV-004, REQ-INV-005, REQ-INV-006, REQ-INV-007, REQ-INV-008, REQ-INV-009, REQ-INV-010
+**Requirements**: REQ-INV-001, REQ-INV-002, REQ-INV-003, REQ-INV-004, REQ-INV-005, REQ-INV-006, REQ-INV-007, REQ-INV-008, REQ-INV-009, REQ-INV-010, REQ-INV-011
 **Estimated Complexity**: Medium
 **Success Criteria** (what must be TRUE):
-  1. GA Staff can create, edit, and view assets with auto-generated AST-YYYY-NNNN IDs, including fields for name, category, location, status, warranty info, and invoice upload
-  2. Assets follow a status lifecycle (Active -> Under Repair -> Broken -> Sold/Disposed) and status changes are tracked
+  1. GA Staff can create, edit, and view assets with auto-generated AST-YYYY-NNNN IDs, including fields for name, category, location, status, warranty info, invoice upload, and condition photos
+  2. Assets follow a status lifecycle (Active -> Under Repair -> Broken -> Sold/Disposed) and status changes are tracked with condition images
   3. The asset list supports search, filtering by status/category/location, and sorting
   4. GA Staff can transfer an asset to a new location, and the receiver must accept the transfer before it completes
   5. When an asset is marked broken or sold, any linked maintenance schedules are automatically paused
 **Plans**: TBD
 
 Plans:
-- [ ] 06-01: Asset CRUD, status lifecycle, list and detail pages
+- [ ] 06-01: Asset CRUD, status lifecycle, condition images, list and detail pages
 - [ ] 06-02: Movement tracking, receiver acceptance workflow, maintenance auto-pause trigger
 
 ### Phase 7: Preventive Maintenance
@@ -264,6 +264,7 @@ Every v1 requirement mapped to exactly one phase. No orphans.
 | REQ-INV-008 | Invoice upload for assets | 6 | Should |
 | REQ-INV-009 | Warranty info visible on asset detail | 6 | Should |
 | REQ-INV-010 | Broken/sold status auto-pauses linked maintenance | 6 | Must |
+| REQ-INV-011 | Condition images for assets | 6 | Must |
 | REQ-PM-001 | Category-specific maintenance templates (linear form builder) | 7 | Must |
 | REQ-PM-002 | Template checklist item types | 7 | Must |
 | REQ-PM-003 | Multiple templates per asset category | 7 | Must |
@@ -307,7 +308,7 @@ Every v1 requirement mapped to exactly one phase. No orphans.
 | REQ-UI-006 | Breadcrumb navigation | 9 | Should |
 | REQ-UI-007 | Mobile-responsive for field workflows | 9 | Must |
 
-**Coverage: 82/82 v1 requirements mapped. No orphans.**
+**Coverage: 83/83 v1 requirements mapped. No orphans.**
 
 ## v2 Requirements (Not in Scope)
 

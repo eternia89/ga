@@ -100,6 +100,7 @@ All requirements below are scoped for v1 unless marked otherwise.
 | REQ-INV-008 | Invoice upload for assets (PDF/image) | v1 | Should |
 | REQ-INV-009 | Warranty info visible on asset detail (expiry date) | v1 | Should |
 | REQ-INV-010 | Broken/sold status auto-pauses linked maintenance schedules | v1 | Must |
+| REQ-INV-011 | Condition images — upload photos to document asset condition (create, status change, movement) | v1 | Must |
 
 ## Preventive Maintenance
 
@@ -185,9 +186,9 @@ All requirements below are scoped for v1 unless marked otherwise.
 
 | Scope | Must | Should | Could | Total |
 |-------|------|--------|-------|-------|
-| v1 | 62 | 18 | 2 | 82 |
+| v1 | 63 | 18 | 2 | 83 |
 | v2 | 0 | 1 | 6 | 7 |
-| **Total** | **62** | **19** | **8** | **89** |
+| **Total** | **63** | **19** | **8** | **90** |
 
 ## Out of Scope (Do Not Build)
 
@@ -203,3 +204,109 @@ All requirements below are scoped for v1 unless marked otherwise.
 - Custom approval chains (beyond CEO approval)
 - Meter-based or condition-based maintenance
 - Push notifications / SMS / WhatsApp integration
+
+---
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| REQ-AUTH-001 | Phase 2 | Pending |
+| REQ-AUTH-002 | Phase 2 | Pending |
+| REQ-AUTH-003 | Phase 2 | Pending |
+| REQ-AUTH-004 | Phase 2 | Pending |
+| REQ-AUTH-005 | Phase 2 | Pending |
+| REQ-AUTH-006 | Phase 2 | Pending |
+| REQ-AUTH-007 | Phase 2 | Pending |
+| REQ-AUTH-008 | Phase 2 | Pending |
+| REQ-RBAC-001 | Phase 2 | Pending |
+| REQ-RBAC-002 | Phase 2 | Pending |
+| REQ-RBAC-003 | Phase 2 | Pending |
+| REQ-RBAC-004 | Phase 1 | Pending |
+| REQ-RBAC-005 | Phase 1 | Pending |
+| REQ-RBAC-006 | Phase 2 | Pending |
+| REQ-RBAC-007 | Phase 2 | Pending |
+| REQ-RBAC-008 | Phase 1 | Pending |
+| REQ-ADMIN-001 | Phase 3 | Pending |
+| REQ-ADMIN-002 | Phase 3 | Pending |
+| REQ-ADMIN-003 | Phase 3 | Pending |
+| REQ-ADMIN-004 | Phase 3 | Pending |
+| REQ-ADMIN-005 | Phase 3 | Pending |
+| REQ-ADMIN-006 | Phase 3 | Pending |
+| REQ-ADMIN-007 | Phase 3 | Pending |
+| REQ-REQ-001 | Phase 4 | Pending |
+| REQ-REQ-002 | Phase 4 | Pending |
+| REQ-REQ-003 | Phase 4 | Pending |
+| REQ-REQ-004 | Phase 4 | Pending |
+| REQ-REQ-005 | Phase 4 | Pending |
+| REQ-REQ-006 | Phase 4 | Pending |
+| REQ-REQ-007 | Phase 4 | Pending |
+| REQ-REQ-008 | Phase 5 | Pending |
+| REQ-REQ-009 | Phase 5 | Pending |
+| REQ-REQ-010 | Phase 5 | Pending |
+| REQ-JOB-001 | Phase 5 | Pending |
+| REQ-JOB-002 | Phase 5 | Pending |
+| REQ-JOB-003 | Phase 5 | Pending |
+| REQ-JOB-004 | Phase 5 | Pending |
+| REQ-JOB-005 | Phase 5 | Pending |
+| REQ-JOB-006 | Phase 5 | Pending |
+| REQ-JOB-007 | Phase 5 | Pending |
+| REQ-JOB-008 | Phase 5 | Pending |
+| REQ-JOB-009 | Phase 5 | Pending |
+| REQ-JOB-010 | Phase 9 | Pending |
+| REQ-APR-001 | Phase 5 | Pending |
+| REQ-APR-002 | Phase 5 | Pending |
+| REQ-APR-003 | Phase 5 | Pending |
+| REQ-APR-004 | Phase 5 | Pending |
+| REQ-INV-001 | Phase 6 | Pending |
+| REQ-INV-002 | Phase 6 | Pending |
+| REQ-INV-003 | Phase 6 | Pending |
+| REQ-INV-004 | Phase 6 | Pending |
+| REQ-INV-005 | Phase 6 | Pending |
+| REQ-INV-006 | Phase 6 | Pending |
+| REQ-INV-007 | Phase 6 | Pending |
+| REQ-INV-008 | Phase 6 | Pending |
+| REQ-INV-009 | Phase 6 | Pending |
+| REQ-INV-010 | Phase 6 | Pending |
+| REQ-PM-001 | Phase 7 | Pending |
+| REQ-PM-002 | Phase 7 | Pending |
+| REQ-PM-003 | Phase 7 | Pending |
+| REQ-PM-004 | Phase 7 | Pending |
+| REQ-PM-005 | Phase 7 | Pending |
+| REQ-PM-006 | Phase 7 | Pending |
+| REQ-PM-007 | Phase 7 | Pending |
+| REQ-PM-008 | Phase 7 | Pending |
+| REQ-PM-009 | Phase 7 | Pending |
+| REQ-PM-010 | Phase 7 | Pending |
+| REQ-MEDIA-001 | Phase 8 | Pending |
+| REQ-MEDIA-002 | Phase 8 | Pending |
+| REQ-MEDIA-003 | Phase 8 | Pending |
+| REQ-MEDIA-004 | Phase 8 | Pending |
+| REQ-MEDIA-005 | Phase 8 | Pending |
+| REQ-MEDIA-006 | Phase 8 | Pending |
+| REQ-NOTIF-001 | Phase 8 | Pending |
+| REQ-NOTIF-002 | Phase 8 | Pending |
+| REQ-NOTIF-003 | Phase 8 | Pending |
+| REQ-NOTIF-004 | Phase 8 | Pending |
+| REQ-NOTIF-005 | Phase 8 | Pending |
+| REQ-NOTIF-006 | Phase 8 | Pending |
+| REQ-NOTIF-007 | Phase 8 | Pending |
+| REQ-DASH-001 | Phase 8 | Pending |
+| REQ-DASH-002 | Phase 8 | Pending |
+| REQ-DASH-003 | Phase 8 | Pending |
+| REQ-DASH-004 | Phase 8 | Pending |
+| REQ-DASH-005 | Phase 8 | Pending |
+| REQ-DASH-006 | Phase 8 | Pending |
+| REQ-DASH-007 | Phase 8 | Pending |
+| REQ-DATA-001 | Phase 1 | Pending |
+| REQ-DATA-002 | Phase 8 | Pending |
+| REQ-DATA-003 | Phase 1 | Pending |
+| REQ-DATA-004 | Phase 4 | Pending |
+| REQ-DATA-005 | Phase 9 | Pending |
+| REQ-UI-001 | Phase 3 | Pending |
+| REQ-UI-002 | Phase 3 | Pending |
+| REQ-UI-003 | Phase 9 | Pending |
+| REQ-UI-004 | Phase 9 | Pending |
+| REQ-UI-005 | Phase 3 | Pending |
+| REQ-UI-006 | Phase 9 | Pending |
+| REQ-UI-007 | Phase 9 | Pending |
