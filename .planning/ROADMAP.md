@@ -12,7 +12,7 @@ This roadmap delivers a complete GA operations tool in 9 phases, progressing fro
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Database Schema & Supabase Setup** - Foundation tables, RLS infrastructure, and project configuration
+- [x] **Phase 1: Database Schema & Supabase Setup** - Foundation tables, RLS infrastructure, and project configuration *(completed 2026-02-10)*
 - [ ] **Phase 2: Auth & RBAC** - User authentication, role-based access control, and session management
 - [ ] **Phase 3: Admin & System Configuration** - Company, division, location, category, and user management
 - [ ] **Phase 4: Requests** - Request submission, triage, listing, and detail views
@@ -38,8 +38,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Supabase project initialization, all 16 domain tables, indexes, utility functions
-- [ ] 01-02-PLAN.md — RLS helper functions, baseline RLS policies (company isolation + soft-delete), audit trigger infrastructure
+- [x] 01-01-PLAN.md — Supabase project initialization, all 16 domain tables, indexes, utility functions
+- [x] 01-02-PLAN.md — RLS helper functions, baseline RLS policies (company isolation + soft-delete), audit trigger infrastructure
 
 ### Phase 2: Auth & RBAC
 **Goal**: Users can log in (Google OAuth or email/password), sessions persist across browser reloads, unauthenticated users are redirected, and the application enforces role-based permissions at every layer.
@@ -191,7 +191,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Database Schema & Supabase Setup | 0/2 | Not started | - |
+| 1. Database Schema & Supabase Setup | 2/2 | ✓ Complete | 2026-02-10 |
 | 2. Auth & RBAC | 0/2 | Not started | - |
 | 3. Admin & System Configuration | 0/3 | Not started | - |
 | 4. Requests | 0/2 | Not started | - |
