@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Centralize GA operations -- requests, jobs, inventory, maintenance -- with full traceability and real-time visibility for a corporate group.
-**Current focus:** Phase 2 - Auth & RBAC
+**Current focus:** Phase 3 - Admin & System Configuration
 
 ## Current Position
 

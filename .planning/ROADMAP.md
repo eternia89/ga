@@ -13,7 +13,7 @@ This roadmap delivers a complete GA operations tool in 9 phases, progressing fro
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Database Schema & Supabase Setup** - Foundation tables, RLS infrastructure, and project configuration *(completed 2026-02-10)*
-- [ ] **Phase 2: Auth & RBAC** - User authentication, role-based access control, and session management
+- [x] **Phase 2: Auth & RBAC** - User authentication, role-based access control, and session management *(completed 2026-02-11)*
 - [ ] **Phase 3: Admin & System Configuration** - Company, division, location, category, and user management
 - [ ] **Phase 4: Requests** - Request submission, triage, listing, and detail views
 - [ ] **Phase 5: Jobs & Approvals** - Job creation/execution, CEO approval workflow, completion, and auto-accept
@@ -55,8 +55,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Supabase Auth integration, login page (Google OAuth + email/password), password reset, auth middleware, session management
-- [ ] 02-02-PLAN.md — RBAC permission map, role-specific RLS refinements, app shell with sidebar, UI permission gates, seed script
+- [x] 02-01-PLAN.md — Supabase Auth integration, login page (Google OAuth + email/password), password reset, auth middleware, session management
+- [x] 02-02-PLAN.md — RBAC permission map, role-specific RLS refinements, app shell with sidebar, UI permission gates, seed script
 
 ### Phase 3: Admin & System Configuration
 **Goal**: Admins can manage the organizational hierarchy (companies, divisions, locations, categories) and create/edit/deactivate users, providing the reference data that all operational workflows depend on.
@@ -192,7 +192,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Database Schema & Supabase Setup | 2/2 | ✓ Complete | 2026-02-10 |
-| 2. Auth & RBAC | 0/2 | Not started | - |
+| 2. Auth & RBAC | 2/2 | ✓ Complete | 2026-02-11 |
 | 3. Admin & System Configuration | 0/3 | Not started | - |
 | 4. Requests | 0/2 | Not started | - |
 | 5. Jobs & Approvals | 0/3 | Not started | - |
