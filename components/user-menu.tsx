@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useUser } from '@/lib/auth/hooks';
 import { signOut } from '@/lib/auth/actions';
+import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions';
 
 export function UserMenu() {
   const { profile } = useUser();
@@ -100,20 +101,22 @@ export function UserMenu() {
       {/* Dropdown menu - positioned upward */}
       {isOpen && (
         <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden z-50">
-          <Link
-            href="/profile"
+          <button
+            data-profile-trigger
             onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             Profile
-          </Link>
-          <Link
-            href="/settings"
-            onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          >
-            Settings
-          </Link>
+          </button>
+          {hasPermission(profile.role, PERMISSIONS.ADMIN_PANEL) && (
+            <Link
+              href="/admin/settings"
+              onClick={() => setIsOpen(false)}
+              className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              Settings
+            </Link>
+          )}
           <hr className="border-gray-200 dark:border-gray-700" />
           <button
             onClick={async () => {

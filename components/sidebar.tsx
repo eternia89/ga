@@ -6,6 +6,7 @@ import { useUser } from '@/lib/auth/hooks';
 import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions';
 import type { Permission } from '@/lib/auth/types';
 import { UserMenu } from './user-menu';
+import { Badge } from '@/components/ui/badge';
 
 type NavItem = {
   label: string;
@@ -13,6 +14,7 @@ type NavItem = {
   permission: Permission;
   built: boolean;
   icon: string;
+  badge?: number | null;
 };
 
 type NavSection = {
@@ -92,25 +94,33 @@ const NAV_SECTIONS: NavSection[] = [
         label: 'Users',
         href: '/admin/users',
         permission: PERMISSIONS.ADMIN_PANEL,
-        built: false,
+        built: true,
         icon: '👥',
       },
       {
-        label: 'Company Settings',
-        href: '/admin/company',
+        label: 'Settings',
+        href: '/admin/settings',
         permission: PERMISSIONS.ADMIN_PANEL,
-        built: false,
+        built: true,
         icon: '⚙',
       },
     ],
   },
 ];
 
-type SidebarProps = {
-  companyName: string;
+type EntityCounts = {
+  divisions?: number;
+  locations?: number;
+  categories?: number;
+  users?: number;
 };
 
-export function Sidebar({ companyName }: SidebarProps) {
+type SidebarProps = {
+  companyName: string;
+  entityCounts?: EntityCounts;
+};
+
+export function Sidebar({ companyName, entityCounts }: SidebarProps) {
   const { profile } = useUser();
   const pathname = usePathname();
 
@@ -176,6 +186,11 @@ export function Sidebar({ companyName }: SidebarProps) {
                       >
                         <span className="text-base">{item.icon}</span>
                         <span>{item.label}</span>
+                        {item.badge !== undefined && item.badge !== null && (
+                          <Badge variant="secondary" className="ml-auto">
+                            {item.badge}
+                          </Badge>
+                        )}
                       </Link>
                     </li>
                   );

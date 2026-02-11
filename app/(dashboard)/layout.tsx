@@ -35,10 +35,28 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
   const companyName = company?.name || 'Company';
 
+  // Fetch entity counts for admin users (for sidebar badges)
+  let entityCounts;
+  if (profile.role === 'admin') {
+    const [divisionsResult, locationsResult, categoriesResult, usersResult] = await Promise.all([
+      supabase.from('divisions').select('*', { count: 'exact', head: true }).is('deleted_at', null),
+      supabase.from('locations').select('*', { count: 'exact', head: true }).is('deleted_at', null),
+      supabase.from('categories').select('*', { count: 'exact', head: true }).is('deleted_at', null),
+      supabase.from('user_profiles').select('*', { count: 'exact', head: true }).is('deleted_at', null),
+    ]);
+
+    entityCounts = {
+      divisions: divisionsResult.count ?? 0,
+      locations: locationsResult.count ?? 0,
+      categories: categoriesResult.count ?? 0,
+      users: usersResult.count ?? 0,
+    };
+  }
+
   return (
     <AuthProvider initialProfile={profile}>
       <div className="flex h-screen">
-        <Sidebar companyName={companyName} />
+        <Sidebar companyName={companyName} entityCounts={entityCounts} />
         <main className="flex-1 overflow-auto p-6 bg-white dark:bg-gray-950">
           {children}
         </main>
