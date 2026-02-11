@@ -52,11 +52,11 @@ Plans:
   3. Visiting any protected route while unauthenticated redirects to the login page
   4. A General User can only see data from their own division; GA Staff/Lead/Admin see all company data
   5. UI elements are conditionally shown/hidden based on the logged-in user's role (e.g., Admin sees user management nav, General User does not)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Supabase Auth configuration, Google OAuth, email/password login, session management
-- [ ] 02-02: RBAC implementation (role definitions, permission map, RLS role policies, UI permission gates)
+- [ ] 02-01-PLAN.md — Supabase Auth integration, login page (Google OAuth + email/password), password reset, auth middleware, session management
+- [ ] 02-02-PLAN.md — RBAC permission map, role-specific RLS refinements, app shell with sidebar, UI permission gates, seed script
 
 ### Phase 3: Admin & System Configuration
 **Goal**: Admins can manage the organizational hierarchy (companies, divisions, locations, categories) and create/edit/deactivate users, providing the reference data that all operational workflows depend on.
