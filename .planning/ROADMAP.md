@@ -69,12 +69,12 @@ Plans:
   3. An Admin can deactivate a user and that user can no longer access the system
   4. A user can edit their own profile (name, avatar, notification preferences)
   5. The application has a desktop-first sidebar layout using shadcn/ui with breadcrumb navigation, toast notifications for action feedback, and responsive behavior
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: App shell layout (sidebar, breadcrumbs, toasts, responsive structure)
-- [ ] 03-02: Company, division, location, and category CRUD pages
-- [ ] 03-03: User management and user profile pages
+- [ ] 03-01-PLAN.md — shadcn/ui setup, reusable data table components, Settings page with tab navigation, sidebar updates
+- [ ] 03-02-PLAN.md — Company, division, location, and category CRUD (Zod schemas, Server Actions, data tables, modal forms)
+- [ ] 03-03-PLAN.md — User management page and self-service profile drawer with password change
 
 ### Phase 4: Requests
 **Goal**: General Users can submit maintenance requests with minimal friction, GA Leads can triage and manage them, and everyone with access can track request status through a complete workflow.
@@ -193,7 +193,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 |-------|---------------|--------|-----------|
 | 1. Database Schema & Supabase Setup | 2/2 | ✓ Complete | 2026-02-10 |
 | 2. Auth & RBAC | 2/2 | ✓ Complete | 2026-02-11 |
-| 3. Admin & System Configuration | 0/3 | Not started | - |
+| 3. Admin & System Configuration | 0/3 | Planned | - |
 | 4. Requests | 0/2 | Not started | - |
 | 5. Jobs & Approvals | 0/3 | Not started | - |
 | 6. Inventory | 0/2 | Not started | - |
