@@ -47,6 +47,7 @@ interface DataTableProps<TData, TValue> {
   pageSize?: number;
   createButton?: React.ReactNode;
   emptyMessage?: string;
+  meta?: Record<string, unknown>;
 }
 
 export function DataTable<TData, TValue>({
@@ -62,6 +63,7 @@ export function DataTable<TData, TValue>({
   pageSize = 10,
   createButton,
   emptyMessage = "No items found",
+  meta,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -93,6 +95,7 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    meta,
   });
 
   const selectedRowCount = table.getFilteredSelectedRowModel().rows.length;
