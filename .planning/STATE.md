@@ -10,28 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 2 of 9 (Auth & RBAC)
-Plan: 0 of 2 in current phase
-Status: Ready to plan
-Last activity: 2026-02-10 -- Phase 1 verified and complete (5/5 must-haves passed)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-11 -- Completed 02-01-PLAN.md (Supabase Auth Integration)
 
-Progress: [██........] 20%
+Progress: [██▓.......] 25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 28 min
-- Total execution time: 0.92 hours
+- Total plans completed: 3
+- Average duration: 20 min
+- Total execution time: 1.00 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-database-schema-supabase-setup | 2/2 | 55min | 28min |
+| 02-auth-rbac | 1/2 | 5min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (49min), 01-02 (6min)
-- Trend: Accelerating (01-02 was 8x faster than 01-01)
+- Last 5 plans: 01-01 (49min), 01-02 (6min), 02-01 (5min)
+- Trend: Accelerating rapidly (02-01 was 10x faster than average)
 
 *Updated after each plan completion*
 
@@ -56,6 +57,10 @@ Recent decisions affecting current work:
 - [01-02]: Notifications are user-scoped (user_id = auth.uid()) not company-scoped
 - [01-02]: Audit triggers use SECURITY DEFINER to bypass RLS for immutable audit log writes
 - [UAT-01]: Request title is NOT a user-facing field. Keep column in DB but auto-generate it (e.g., from description or category+location). Users only fill description, location, photos on the submit form. Affects Phase 4 UI.
+- [02-01]: Used Supabase auth.getUser() instead of getSession() for server-side JWT validation
+- [02-01]: Google OAuth as primary auth method with prominent placement above email/password
+- [02-01]: Deactivation check queries user_profiles.deleted_at on every protected route navigation
+- [02-01]: Rate limiting handled by Supabase built-in (60 req/min per IP) with progressive slowdown
 
 ### Pending Todos
 
@@ -69,7 +74,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-10
-Stopped at: Phase 1 complete and verified — ready for Phase 2 planning
-Resume file: .planning/phases/01-database-schema-supabase-setup/01-VERIFICATION.md
-Next: /gsd:plan-phase 2
+Last session: 2026-02-11
+Stopped at: Completed Plan 02-01 (Supabase Auth Integration) — ready for Plan 02-02
+Resume file: .planning/phases/02-auth-rbac/02-01-SUMMARY.md
+Next: /gsd:execute-phase 02 --plan 02
