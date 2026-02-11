@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Database Schema & Supabase Setup** - Foundation tables, RLS infrastructure, and project configuration *(completed 2026-02-10)*
 - [x] **Phase 2: Auth & RBAC** - User authentication, role-based access control, and session management *(completed 2026-02-11)*
-- [ ] **Phase 3: Admin & System Configuration** - Company, division, location, category, and user management
+- [x] **Phase 3: Admin & System Configuration** - Company, division, location, category, and user management *(completed 2026-02-11)*
 - [ ] **Phase 4: Requests** - Request submission, triage, listing, and detail views
 - [ ] **Phase 5: Jobs & Approvals** - Job creation/execution, CEO approval workflow, completion, and auto-accept
 - [ ] **Phase 6: Inventory** - Asset registry, movement tracking, and receiver acceptance
@@ -72,9 +72,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — shadcn/ui setup, reusable data table components, Settings page with tab navigation, sidebar updates
-- [ ] 03-02-PLAN.md — Company, division, location, and category CRUD (Zod schemas, Server Actions, data tables, modal forms)
-- [ ] 03-03-PLAN.md — User management page and self-service profile drawer with password change
+- [x] 03-01-PLAN.md — shadcn/ui setup, reusable data table components, Settings page with tab navigation, sidebar updates
+- [x] 03-02-PLAN.md — Company, division, location, and category CRUD (Zod schemas, Server Actions, data tables, modal forms)
+- [x] 03-03-PLAN.md — User management page and self-service profile drawer with password change
 
 ### Phase 4: Requests
 **Goal**: General Users can submit maintenance requests with minimal friction, GA Leads can triage and manage them, and everyone with access can track request status through a complete workflow.
@@ -193,7 +193,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 |-------|---------------|--------|-----------|
 | 1. Database Schema & Supabase Setup | 2/2 | ✓ Complete | 2026-02-10 |
 | 2. Auth & RBAC | 2/2 | ✓ Complete | 2026-02-11 |
-| 3. Admin & System Configuration | 0/3 | Planned | - |
+| 3. Admin & System Configuration | 3/3 | ✓ Complete | 2026-02-11 |
 | 4. Requests | 0/2 | Not started | - |
 | 5. Jobs & Approvals | 0/3 | Not started | - |
 | 6. Inventory | 0/2 | Not started | - |
