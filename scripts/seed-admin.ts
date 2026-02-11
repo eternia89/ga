@@ -15,7 +15,11 @@
  *   - SUPABASE_SERVICE_ROLE_KEY (NOT the anon key - requires service_role for admin operations)
  */
 
+import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
+
+// Load .env.local (Next.js convention, not auto-loaded outside Next.js)
+config({ path: '.env.local' });
 
 // Parse command-line arguments
 function parseArgs() {

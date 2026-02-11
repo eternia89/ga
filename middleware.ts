@@ -19,10 +19,7 @@ export async function middleware(request: NextRequest) {
   // Unauthenticated user trying to access protected route
   if (!user && isProtectedRoute) {
     const redirectUrl = new URL('/login', request.url)
-    redirectUrl.searchParams.set(
-      'redirect',
-      encodeURIComponent(pathname + url.search)
-    )
+    redirectUrl.searchParams.set('redirect', pathname + url.search)
     return NextResponse.redirect(redirectUrl)
   }
 
@@ -60,22 +57,18 @@ export async function middleware(request: NextRequest) {
 
     // If profile has deleted_at, the user is deactivated
     if (profile?.deleted_at) {
-      // Sign out the user
       await supabase.auth.signOut()
-
-      // Redirect to login with deactivation error
-      const redirectUrl = new URL('/login', request.url)
-      redirectUrl.searchParams.set('error', 'deactivated')
-      return NextResponse.redirect(redirectUrl)
+      const redirectResponse = NextResponse.redirect(new URL('/login', request.url))
+      redirectResponse.cookies.set('auth_error', 'deactivated', { maxAge: 10, path: '/' })
+      return redirectResponse
     }
 
     // If no profile found (shouldn't happen with proper OAuth flow), also block
     if (error && error.code === 'PGRST116') {
-      // PGRST116 = no rows returned
       await supabase.auth.signOut()
-      const redirectUrl = new URL('/login', request.url)
-      redirectUrl.searchParams.set('error', 'no_account')
-      return NextResponse.redirect(redirectUrl)
+      const redirectResponse = NextResponse.redirect(new URL('/login', request.url))
+      redirectResponse.cookies.set('auth_error', 'no_account', { maxAge: 10, path: '/' })
+      return redirectResponse
     }
   }
 

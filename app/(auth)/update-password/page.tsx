@@ -12,7 +12,7 @@ export default function UpdatePasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [hasSession, setHasSession] = useState(false)
+  const [hasSession, setHasSession] = useState<boolean | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -55,9 +55,10 @@ export default function UpdatePasswordPage() {
         return
       }
 
-      // Success
+      // Success — sign out so user must log in with new password
       setSuccess(true)
       setIsLoading(false)
+      await supabase.auth.signOut()
 
       // Redirect to login after 2 seconds
       setTimeout(() => {
@@ -67,6 +68,20 @@ export default function UpdatePasswordPage() {
       setError('An unexpected error occurred.')
       setIsLoading(false)
     }
+  }
+
+  // Loading state while checking session
+  if (hasSession === null) {
+    return (
+      <div className="mx-auto max-w-md">
+        <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-800 dark:bg-gray-950">
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+            <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+            Verifying reset link...
+          </div>
+        </div>
+      </div>
+    )
   }
 
   // If no valid session, show error

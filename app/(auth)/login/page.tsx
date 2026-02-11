@@ -1,32 +1,68 @@
 'use client'
 
-import { useState, FormEvent, Suspense } from 'react'
+import { useState, useEffect, FormEvent, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
+
+const ERROR_MESSAGES: Record<string, string> = {
+  no_account:
+    'No account found for this email. Contact your administrator to get access.',
+  deactivated:
+    'Your account has been deactivated. Contact your administrator.',
+  auth_callback_failed: 'Authentication failed. Please try again.',
+  session_expired: 'Session expired, please log in again.',
+}
+
+function getAuthErrorCookie(): string | null {
+  const match = document.cookie.match(/(?:^|;\s*)auth_error=([^;]*)/)
+  if (match) {
+    // Delete the cookie immediately after reading (flash message)
+    document.cookie = 'auth_error=; path=/; max-age=0'
+    return match[1]
+  }
+  return null
+}
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isEmailLoading, setIsEmailLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [alertMessage, setAlertMessage] = useState<string | null>(null)
   const supabase = createClient()
 
   const redirectParam = searchParams.get('redirect') || '/'
 
-  // Get error message from URL params
-  const errorParam = searchParams.get('error')
-  const errorMessages: Record<string, string> = {
-    no_account:
-      'No account found for this email. Contact your administrator to get access.',
-    deactivated:
-      'Your account has been deactivated. Contact your administrator.',
-    auth_callback_failed: 'Authentication failed. Please try again.',
-    session_expired: 'Session expired, please log in again.',
-  }
-  const alertMessage = errorParam ? errorMessages[errorParam] || 'An error occurred.' : null
+  // Read flash error from cookie or URL hash on mount
+  useEffect(() => {
+    // Check cookie first (from middleware/callback redirects)
+    const errorCode = getAuthErrorCookie()
+    if (errorCode) {
+      setAlertMessage(ERROR_MESSAGES[errorCode] || 'An error occurred.')
+      return
+    }
+
+    // Check URL hash fragment (Supabase returns OAuth errors here)
+    if (window.location.hash) {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1))
+      const hashError = hashParams.get('error_code') || hashParams.get('error')
+      if (hashError) {
+        if (hashError === 'signup_disabled') {
+          setAlertMessage(ERROR_MESSAGES.no_account)
+        } else if (hashError === 'access_denied') {
+          setAlertMessage(ERROR_MESSAGES.auth_callback_failed)
+        } else {
+          setAlertMessage(hashParams.get('error_description')?.replace(/\+/g, ' ') || 'An error occurred.')
+        }
+        // Clean the hash from URL
+        window.history.replaceState(null, '', window.location.pathname + window.location.search)
+      }
+    }
+  }, [])
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true)
@@ -72,6 +108,27 @@ function LoginForm() {
         } else {
           setError(signInError.message)
         }
+        setIsEmailLoading(false)
+        return
+      }
+
+      // Check if user profile is deactivated before navigating
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('deleted_at')
+        .eq('id', (await supabase.auth.getUser()).data.user?.id ?? '')
+        .single()
+
+      if (profileError?.code === 'PGRST116') {
+        await supabase.auth.signOut()
+        setError('No account found for this email. Contact your administrator to get access.')
+        setIsEmailLoading(false)
+        return
+      }
+
+      if (profile?.deleted_at) {
+        await supabase.auth.signOut()
+        setError('Your account has been deactivated. Contact your administrator.')
         setIsEmailLoading(false)
         return
       }
@@ -189,15 +246,36 @@ function LoginForm() {
             >
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
-              placeholder="••••••••"
-            />
+            <div className="relative mt-1">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="block w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
             <div className="mt-1 text-right">
               <a
                 href="/reset-password"
