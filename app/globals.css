@@ -124,3 +124,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Row highlight animation for inline feedback */
+@keyframes row-highlight {
+  0% {
+    background-color: rgba(34, 197, 94, 0.2);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.row-highlight {
+  animation: row-highlight 1s ease-out;
+}
