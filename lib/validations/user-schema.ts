@@ -1,0 +1,19 @@
+import { z } from "zod";
+
+export const createUserSchema = z.object({
+  email: z.string().email("Valid email is required"),
+  full_name: z.string().min(1, "Name is required").max(100),
+  role: z.enum(["general_user", "ga_staff", "ga_lead", "finance_approver", "admin"]),
+  company_id: z.string().uuid("Company is required"),
+  division_id: z.string().uuid("Division is required").optional().or(z.literal("")),
+});
+
+export const updateUserSchema = z.object({
+  full_name: z.string().min(1, "Name is required").max(100),
+  role: z.enum(["general_user", "ga_staff", "ga_lead", "finance_approver", "admin"]),
+  company_id: z.string().uuid("Company is required"),
+  division_id: z.string().uuid("Division is required").optional().or(z.literal("")),
+});
+
+export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type UpdateUserInput = z.infer<typeof updateUserSchema>;

@@ -1,0 +1,221 @@
+'use server';
+
+import { adminActionClient } from '@/lib/safe-action';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createUserSchema, updateUserSchema } from '@/lib/validations/user-schema';
+import { revalidatePath } from 'next/cache';
+import { z } from 'zod';
+
+// Get users with joined data
+export const getUsers = adminActionClient
+  .action(async ({ ctx }) => {
+    const adminSupabase = createAdminClient();
+
+    // Fetch all user profiles with joined division and company names
+    const { data: profiles, error: profilesError } = await adminSupabase
+      .from('user_profiles')
+      .select('*, division:divisions(name), company:companies(name)')
+      .order('full_name');
+
+    if (profilesError) {
+      throw new Error(`Failed to fetch users: ${profilesError.message}`);
+    }
+
+    // Fetch auth users to get last_sign_in_at
+    const { data: { users: authUsers }, error: authError } = await adminSupabase.auth.admin.listUsers();
+
+    if (authError) {
+      throw new Error(`Failed to fetch auth users: ${authError.message}`);
+    }
+
+    // Create a map of auth user data by id
+    const authUserMap = new Map(
+      authUsers.map(u => [u.id, { last_sign_in_at: u.last_sign_in_at }])
+    );
+
+    // Merge last_sign_in_at into profiles
+    const usersWithAuth = profiles.map(profile => ({
+      ...profile,
+      last_sign_in_at: authUserMap.get(profile.id)?.last_sign_in_at || null,
+    }));
+
+    return { users: usersWithAuth };
+  });
+
+// Create user
+export const createUser = adminActionClient
+  .schema(createUserSchema)
+  .action(async ({ parsedInput: input }) => {
+    const adminSupabase = createAdminClient();
+
+    try {
+      // 1. Create auth user with Supabase Admin API
+      const { data: authUser, error: authError } = await adminSupabase.auth.admin.createUser({
+        email: input.email,
+        email_confirm: true,
+      });
+
+      if (authError) {
+        throw new Error(`Failed to create auth user: ${authError.message}`);
+      }
+
+      if (!authUser.user) {
+        throw new Error('Auth user creation returned no user');
+      }
+
+      try {
+        // 2. Insert user_profiles row
+        const { error: profileError } = await adminSupabase
+          .from('user_profiles')
+          .insert({
+            id: authUser.user.id,
+            email: input.email,
+            full_name: input.full_name,
+            role: input.role,
+            company_id: input.company_id,
+            division_id: input.division_id || null,
+            is_active: true,
+          });
+
+        if (profileError) {
+          // Rollback: delete auth user
+          await adminSupabase.auth.admin.deleteUser(authUser.user.id);
+          throw new Error(`Failed to create user profile: ${profileError.message}`);
+        }
+
+        // 3. Set app_metadata on auth user (for RLS helper functions)
+        const { error: metadataError } = await adminSupabase.auth.admin.updateUserById(
+          authUser.user.id,
+          {
+            app_metadata: {
+              role: input.role,
+              company_id: input.company_id,
+              division_id: input.division_id || null,
+            },
+          }
+        );
+
+        if (metadataError) {
+          // Don't rollback for metadata error, just log it
+          console.error('Failed to set app_metadata:', metadataError);
+        }
+
+        revalidatePath('/admin/users');
+
+        return {
+          success: true,
+          user: {
+            id: authUser.user.id,
+            email: input.email,
+            full_name: input.full_name,
+            role: input.role,
+          },
+        };
+      } catch (error) {
+        // If anything fails after auth user creation, try to delete it
+        await adminSupabase.auth.admin.deleteUser(authUser.user.id);
+        throw error;
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error('Failed to create user');
+    }
+  });
+
+// Update user
+export const updateUser = adminActionClient
+  .schema(z.object({ id: z.string().uuid() }).merge(updateUserSchema))
+  .action(async ({ parsedInput: input }) => {
+    const adminSupabase = createAdminClient();
+
+    // 1. Update user_profiles row
+    const { error: profileError } = await adminSupabase
+      .from('user_profiles')
+      .update({
+        full_name: input.full_name,
+        role: input.role,
+        company_id: input.company_id,
+        division_id: input.division_id || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', input.id);
+
+    if (profileError) {
+      throw new Error(`Failed to update user profile: ${profileError.message}`);
+    }
+
+    // 2. Update auth user app_metadata
+    const { error: metadataError } = await adminSupabase.auth.admin.updateUserById(
+      input.id,
+      {
+        app_metadata: {
+          role: input.role,
+          company_id: input.company_id,
+          division_id: input.division_id || null,
+        },
+      }
+    );
+
+    if (metadataError) {
+      console.error('Failed to update app_metadata:', metadataError);
+      // Don't fail the entire operation for metadata error
+    }
+
+    revalidatePath('/admin/users');
+
+    return { success: true };
+  });
+
+// Deactivate user
+export const deactivateUser = adminActionClient
+  .schema(z.object({
+    id: z.string().uuid(),
+    reason: z.string().optional(),
+  }))
+  .action(async ({ parsedInput: input }) => {
+    const adminSupabase = createAdminClient();
+
+    // Set deleted_at to deactivate the user
+    const { error } = await adminSupabase
+      .from('user_profiles')
+      .update({
+        deleted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', input.id);
+
+    if (error) {
+      throw new Error(`Failed to deactivate user: ${error.message}`);
+    }
+
+    revalidatePath('/admin/users');
+
+    return { success: true };
+  });
+
+// Reactivate user
+export const reactivateUser = adminActionClient
+  .schema(z.object({ id: z.string().uuid() }))
+  .action(async ({ parsedInput: input }) => {
+    const adminSupabase = createAdminClient();
+
+    // Clear deleted_at and ensure is_active is true
+    const { error } = await adminSupabase
+      .from('user_profiles')
+      .update({
+        deleted_at: null,
+        is_active: true,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', input.id);
+
+    if (error) {
+      throw new Error(`Failed to reactivate user: ${error.message}`);
+    }
+
+    revalidatePath('/admin/users');
+
+    return { success: true };
+  });
