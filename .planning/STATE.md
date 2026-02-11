@@ -55,6 +55,7 @@ Recent decisions affecting current work:
 - [01-02]: No DELETE policies = hard deletes blocked at RLS level (soft delete only)
 - [01-02]: Notifications are user-scoped (user_id = auth.uid()) not company-scoped
 - [01-02]: Audit triggers use SECURITY DEFINER to bypass RLS for immutable audit log writes
+- [UAT-01]: Request title is NOT a user-facing field. Keep column in DB but auto-generate it (e.g., from description or category+location). Users only fill description, location, photos on the submit form. Affects Phase 4 UI.
 
 ### Pending Todos
 
