@@ -1,83 +1,38 @@
-"use client";
+import { createClient } from "@/lib/supabase/server";
+import { SettingsContent } from "./settings-content";
+import { Company, Division, Location, Category } from "@/lib/types/database";
 
-import { useQueryState } from "nuqs";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+export default async function SettingsPage() {
+  const supabase = await createClient();
 
-export default function SettingsPage() {
-  const [tab, setTab] = useQueryState("tab", { defaultValue: "companies" });
-  const [categoryType, setCategoryType] = useQueryState("categoryType", {
-    defaultValue: "request",
-  });
+  // Fetch all data in parallel
+  // Note: Including deleted items so admin can see them with the toggle
+  const [companiesResult, divisionsResult, locationsResult, categoriesResult] =
+    await Promise.all([
+      supabase.from("companies").select("*").order("name"),
+      supabase
+        .from("divisions")
+        .select("*, company:companies(name)")
+        .order("name"),
+      supabase
+        .from("locations")
+        .select("*, company:companies(name)")
+        .order("name"),
+      // CRITICAL: Categories are GLOBAL - fetch ALL regardless of company_id
+      supabase.from("categories").select("*").order("name"),
+    ]);
+
+  const companies = (companiesResult.data as Company[]) || [];
+  const divisions = (divisionsResult.data as Division[]) || [];
+  const locations = (locationsResult.data as Location[]) || [];
+  const categories = (categoriesResult.data as Category[]) || [];
 
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your organization's configuration
-        </p>
-      </div>
-
-      {/* Main tabs */}
-      <Tabs value={tab} onValueChange={setTab}>
-        <TabsList>
-          <TabsTrigger value="companies">Companies</TabsTrigger>
-          <TabsTrigger value="divisions">Divisions</TabsTrigger>
-          <TabsTrigger value="locations">Locations</TabsTrigger>
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="companies" className="space-y-4">
-          <div className="rounded-lg border border-dashed p-8 text-center">
-            <p className="text-muted-foreground">
-              Companies table coming in next plan
-            </p>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="divisions" className="space-y-4">
-          <div className="rounded-lg border border-dashed p-8 text-center">
-            <p className="text-muted-foreground">
-              Divisions table coming in next plan
-            </p>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="locations" className="space-y-4">
-          <div className="rounded-lg border border-dashed p-8 text-center">
-            <p className="text-muted-foreground">
-              Locations table coming in next plan
-            </p>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="categories" className="space-y-4">
-          {/* Category sub-tabs */}
-          <Tabs value={categoryType} onValueChange={setCategoryType}>
-            <TabsList>
-              <TabsTrigger value="request">Request Categories</TabsTrigger>
-              <TabsTrigger value="asset">Asset Categories</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="request" className="space-y-4">
-              <div className="rounded-lg border border-dashed p-8 text-center">
-                <p className="text-muted-foreground">
-                  Request Categories table coming in next plan
-                </p>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="asset" className="space-y-4">
-              <div className="rounded-lg border border-dashed p-8 text-center">
-                <p className="text-muted-foreground">
-                  Asset Categories table coming in next plan
-                </p>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </TabsContent>
-      </Tabs>
-    </div>
+    <SettingsContent
+      companies={companies}
+      divisions={divisions}
+      locations={locations}
+      categories={categories}
+    />
   );
 }

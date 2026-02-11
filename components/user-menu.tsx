@@ -6,10 +6,12 @@ import Image from 'next/image';
 import { useUser } from '@/lib/auth/hooks';
 import { signOut } from '@/lib/auth/actions';
 import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions';
+import { ProfileSheet } from '@/components/profile/profile-sheet';
 
 export function UserMenu() {
   const { profile } = useUser();
   const [isOpen, setIsOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -103,7 +105,10 @@ export function UserMenu() {
         <div className="absolute bottom-full left-0 right-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden z-50">
           <button
             data-profile-trigger
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+              setProfileOpen(true);
+            }}
             className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             Profile
@@ -129,6 +134,9 @@ export function UserMenu() {
           </button>
         </div>
       )}
+
+      {/* Profile Sheet */}
+      <ProfileSheet open={profileOpen} onOpenChange={setProfileOpen} />
     </div>
   );
 }

@@ -14,10 +14,10 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     redirect('/login');
   }
 
-  // Fetch user profile
+  // Fetch user profile with joined division and company names
   const { data: profile, error: profileError } = await supabase
     .from('user_profiles')
-    .select('*')
+    .select('*, division:divisions(name), company:companies(name)')
     .eq('id', user.id)
     .single();
 
@@ -26,14 +26,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     redirect('/login?error=deactivated');
   }
 
-  // Fetch company name
-  const { data: company } = await supabase
-    .from('companies')
-    .select('name')
-    .eq('id', profile.company_id)
-    .single();
-
-  const companyName = company?.name || 'Company';
+  const companyName = profile.company?.name || 'Company';
 
   // Fetch entity counts for admin users (for sidebar badges)
   let entityCounts;
