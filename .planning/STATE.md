@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 3 of 9 (Admin & System Configuration)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-11 -- Completed 03-01-PLAN.md (Admin UI Foundation)
+Last activity: 2026-02-11 -- Completed 03-02-PLAN.md (Admin Entity CRUD)
 
-Progress: [███░......] 33%
+Progress: [████░.....] 67%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 14 min
-- Total execution time: 1.23 hours
+- Total plans completed: 6
+- Average duration: 13 min
+- Total execution time: 1.37 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [███░......] 33%
 |-------|-------|-------|----------|
 | 01-database-schema-supabase-setup | 2/2 | 55min | 28min |
 | 02-auth-rbac | 2/2 | 11min | 6min |
-| 03-admin-system-configuration | 1/3 | 8min | 8min |
+| 03-admin-system-configuration | 2/3 | 16min | 8min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (6min), 02-01 (5min), 02-02 (6min), 03-01 (8min)
+- Last 5 plans: 02-01 (5min), 02-02 (6min), 03-01 (8min), 03-02 (8min)
 - Trend: Stabilizing at 6-8 min per plan (excellent velocity)
 
 *Updated after each plan completion*
@@ -74,6 +74,10 @@ Recent decisions affecting current work:
 - [03-01]: Inline feedback over toasts for action feedback (simpler pattern, minimal UI noise)
 - [03-01]: DeleteConfirmDialog blocks deletion when dependencyCount > 0 (no text input shown, button disabled entirely)
 - [03-01]: Entity counts fetched in dashboard layout and passed to sidebar for admin users only (badge display capability)
+- [03-02]: Categories are GLOBAL (shared across companies per LOCKED decision) - company_id used only for audit, ALL SELECT queries fetch all categories without company filter
+- [03-02]: Category type (request/asset) is immutable after creation to prevent data integrity issues
+- [03-02]: Soft-delete with dependency checking prevents deletion when active references exist; error shows count and type (e.g., "Cannot delete -- 5 users assigned")
+- [03-02]: Settings page split into server component (parallel data fetching) and client component (tab navigation)
 
 ### Pending Todos
 
@@ -88,6 +92,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed 03-01-PLAN.md (Admin UI Foundation) — ready for 03-02
-Resume file: .planning/phases/03-admin-system-configuration/03-01-SUMMARY.md
-Next: /gsd:execute-phase 03 --plan 02
+Stopped at: Completed 03-02-PLAN.md (Admin Entity CRUD) — ready for 03-03
+Resume file: .planning/phases/03-admin-system-configuration/03-02-SUMMARY.md
+Next: /gsd:execute-phase 03 --plan 03
