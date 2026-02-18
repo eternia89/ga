@@ -147,7 +147,7 @@ export function PasswordChangeDialog({ open, onOpenChange }: PasswordChangeDialo
             />
 
             {feedback && (
-              <InlineFeedback type={feedback.type} message={feedback.message} />
+              <InlineFeedback type={feedback.type} message={feedback.message} onDismiss={() => setFeedback(null)} />
             )}
 
             <DialogFooter>

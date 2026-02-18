@@ -3,17 +3,31 @@
 import { revalidatePath } from "next/cache";
 import { adminActionClient } from "@/lib/safe-action";
 import { locationSchema } from "@/lib/validations/location-schema";
+import { emptyToNull } from "@/lib/utils";
 import { z } from "zod";
 
 // Create location
 export const createLocation = adminActionClient
   .schema(locationSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
+
+    // Check for duplicate name within the same company
+    const { data: existing } = await supabase
+      .from("locations")
+      .select("id")
+      .ilike("name", parsedInput.name)
+      .eq("company_id", parsedInput.company_id)
+      .is("deleted_at", null)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      throw new Error(`A location named "${parsedInput.name}" already exists in this company`);
+    }
 
     const { data, error } = await supabase
       .from("locations")
-      .insert([parsedInput])
+      .insert([emptyToNull(parsedInput)])
       .select()
       .single();
 
@@ -34,12 +48,28 @@ export const updateLocation = adminActionClient
     })
   )
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { id, data } = parsedInput;
+
+    // Check for duplicate name within the same company (excluding self)
+    if (data.name) {
+      const { data: existing } = await supabase
+        .from("locations")
+        .select("id")
+        .ilike("name", data.name)
+        .eq("company_id", data.company_id)
+        .is("deleted_at", null)
+        .neq("id", id)
+        .limit(1);
+
+      if (existing && existing.length > 0) {
+        throw new Error(`A location named "${data.name}" already exists in this company`);
+      }
+    }
 
     const { data: updated, error } = await supabase
       .from("locations")
-      .update(data)
+      .update(emptyToNull(data))
       .eq("id", id)
       .select()
       .single();
@@ -56,7 +86,7 @@ export const updateLocation = adminActionClient
 export const deleteLocation = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
     // Check for active dependencies (requests, inventory_items)
@@ -102,8 +132,31 @@ export const deleteLocation = adminActionClient
 export const restoreLocation = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
+
+    const { data: location } = await supabase
+      .from("locations")
+      .select("name, company_id")
+      .eq("id", id)
+      .single();
+
+    if (!location) {
+      throw new Error("Location not found");
+    }
+
+    const { data: existing } = await supabase
+      .from("locations")
+      .select("id")
+      .ilike("name", location.name)
+      .eq("company_id", location.company_id)
+      .is("deleted_at", null)
+      .neq("id", id)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      throw new Error(`Cannot restore -- an active location named "${location.name}" already exists in this company`);
+    }
 
     const { error } = await supabase
       .from("locations")
@@ -122,7 +175,7 @@ export const restoreLocation = adminActionClient
 export const bulkDeleteLocations = adminActionClient
   .schema(z.object({ ids: z.array(z.string().uuid()) }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { ids } = parsedInput;
 
     const blocked: string[] = [];

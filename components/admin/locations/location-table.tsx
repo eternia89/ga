@@ -157,7 +157,7 @@ export function LocationTable({ data, companies }: LocationTableProps) {
   return (
     <div className="space-y-4">
       {feedback && (
-        <InlineFeedback type={feedback.type} message={feedback.message} />
+        <InlineFeedback type={feedback.type} message={feedback.message} onDismiss={() => setFeedback(null)} />
       )}
 
       <DataTable

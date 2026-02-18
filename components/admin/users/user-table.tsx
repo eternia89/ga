@@ -30,23 +30,21 @@ type UserTableProps = {
 
 export function UserTable({ users, companies, divisions, defaultCompanyId }: UserTableProps) {
   const [showDeactivated, setShowDeactivated] = useState(false);
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string>(defaultCompanyId);
   const [formOpen, setFormOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRow | undefined>(undefined);
   const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
   const [deactivatingUser, setDeactivatingUser] = useState<UserRow | null>(null);
+  const [reactivateDialogOpen, setReactivateDialogOpen] = useState(false);
+  const [reactivatingUser, setReactivatingUser] = useState<UserRow | null>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Filter users based on showDeactivated toggle and selected company
-  let filteredUsers = showDeactivated
+  // Filter users based on showDeactivated toggle
+  const filteredUsers = showDeactivated
     ? users
     : users.filter(u => !u.deleted_at);
 
-  // Further filter by selected company if a company is selected
-  if (selectedCompanyId) {
-    filteredUsers = filteredUsers.filter(u => u.company_id === selectedCompanyId);
-  }
+  const companyFilterOptions = companies.map(c => ({ label: c.name, value: c.id }));
 
   const handleCreate = () => {
     setEditingUser(undefined);
@@ -88,14 +86,23 @@ export function UserTable({ users, companies, divisions, defaultCompanyId }: Use
     }
   };
 
-  const handleReactivate = async (user: UserRow) => {
+  const handleReactivate = (user: UserRow) => {
+    setReactivatingUser(user);
+    setReactivateDialogOpen(true);
+  };
+
+  const handleReactivateConfirm = async (reason?: string) => {
+    if (!reactivatingUser) return;
+
     setIsProcessing(true);
     setFeedback(null);
 
     try {
-      const result = await reactivateUser({ id: user.id });
+      const result = await reactivateUser({ id: reactivatingUser.id, reason });
       if (result?.data?.success) {
         setFeedback({ type: 'success', message: 'User reactivated successfully' });
+        setReactivateDialogOpen(false);
+        setReactivatingUser(null);
       } else {
         setFeedback({ type: 'error', message: result?.serverError || 'Failed to reactivate user' });
       }
@@ -175,31 +182,17 @@ export function UserTable({ users, companies, divisions, defaultCompanyId }: Use
 
   return (
     <div className="space-y-4">
-      {/* Company filter */}
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Company:</label>
-          <select
-            value={selectedCompanyId}
-            onChange={(e) => setSelectedCompanyId(e.target.value)}
-            className="h-9 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-3 text-sm"
-          >
-            <option value="">All Companies</option>
-            {companies.map(company => (
-              <option key={company.id} value={company.id}>
-                {company.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {feedback && <InlineFeedback type={feedback.type} message={feedback.message} />}
+      {feedback && <InlineFeedback type={feedback.type} message={feedback.message} onDismiss={() => setFeedback(null)} />}
 
       <DataTable
         columns={columns}
         data={filteredUsers}
         searchKey="full_name"
+        filterableColumns={[
+          { id: 'company_id', title: 'Company', options: companyFilterOptions },
+        ]}
+        defaultColumnFilters={[]}
+        columnVisibility={{ company_id: false }}
         showDeactivatedToggle
         showDeactivated={showDeactivated}
         onDeactivatedToggleChange={setShowDeactivated}
@@ -229,6 +222,15 @@ export function UserTable({ users, companies, divisions, defaultCompanyId }: Use
         onOpenChange={setDeactivateDialogOpen}
         user={deactivatingUser}
         onConfirm={handleDeactivateConfirm}
+        mode="deactivate"
+      />
+
+      <UserDeactivateDialog
+        open={reactivateDialogOpen}
+        onOpenChange={setReactivateDialogOpen}
+        user={reactivatingUser}
+        onConfirm={handleReactivateConfirm}
+        mode="reactivate"
       />
     </div>
   );

@@ -1,12 +1,17 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { SettingsContent } from "./settings-content";
 import { Company, Division, Location, Category } from "@/lib/types/database";
 
-export default async function SettingsPage() {
-  const supabase = await createClient();
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
+  const { tab: initialTab } = await searchParams;
+  // Use admin client to bypass RLS — admin needs full visibility across all companies
+  // including soft-deleted items (for the deactivated toggle)
+  const supabase = createAdminClient();
 
-  // Fetch all data in parallel
-  // Note: Including deleted items so admin can see them with the toggle
   const [companiesResult, divisionsResult, locationsResult, categoriesResult] =
     await Promise.all([
       supabase.from("companies").select("*").order("name"),
@@ -33,6 +38,7 @@ export default async function SettingsPage() {
       divisions={divisions}
       locations={locations}
       categories={categories}
+      initialTab={initialTab}
     />
   );
 }

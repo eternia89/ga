@@ -73,12 +73,27 @@ export function DivisionFormDialog({
         },
   });
 
-  // Update form when profile loads or dialog opens
+  // Reset form when dialog opens/closes or division changes
   useEffect(() => {
-    if (!division && profile?.company_id) {
-      form.setValue("company_id", profile.company_id);
+    if (open) {
+      form.reset(
+        division
+          ? {
+              company_id: division.company_id,
+              name: division.name,
+              code: division.code || "",
+              description: division.description || "",
+            }
+          : {
+              company_id: profile?.company_id || "",
+              name: "",
+              code: "",
+              description: "",
+            }
+      );
+      setError(null);
     }
-  }, [profile, division, form]);
+  }, [open, division, profile, form]);
 
   const onSubmit = async (data: DivisionFormData) => {
     setIsSubmitting(true);
@@ -132,7 +147,7 @@ export function DivisionFormDialog({
                   </FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -163,7 +178,7 @@ export function DivisionFormDialog({
                     Name <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Engineering" {...field} />
+                    <Input placeholder="Engineering" maxLength={100} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -177,7 +192,7 @@ export function DivisionFormDialog({
                 <FormItem>
                   <FormLabel>Code</FormLabel>
                   <FormControl>
-                    <Input placeholder="ENG" {...field} />
+                    <Input placeholder="ENG" maxLength={10} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -193,6 +208,7 @@ export function DivisionFormDialog({
                   <FormControl>
                     <Input
                       placeholder="Software and hardware engineering"
+                      maxLength={200}
                       {...field}
                     />
                   </FormControl>

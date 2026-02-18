@@ -105,6 +105,7 @@ export function getUserColumns(
           aria-label="Select row"
         />
       ),
+      size: 40,
       enableSorting: false,
       enableHiding: false,
     },
@@ -167,7 +168,15 @@ export function getUserColumns(
       },
     },
     {
-      accessorKey: 'company',
+      accessorKey: 'company_id',
+      header: () => null,
+      cell: () => null,
+      enableHiding: true,
+      enableSorting: false,
+    },
+    {
+      id: 'company_name',
+      accessorFn: (row) => row.company?.name || '—',
       header: ({ column }) => <DataTableColumnHeader column={column} title="Company" />,
       cell: ({ row }) => {
         const company = row.original.company;
@@ -180,7 +189,7 @@ export function getUserColumns(
       cell: ({ row }) => {
         const lastLogin = row.getValue('last_sign_in_at') as string | null;
         if (!lastLogin) return <span className="text-gray-500">Never</span>;
-        return <span>{format(new Date(lastLogin), 'MMM d, yyyy h:mm a')}</span>;
+        return <span>{format(new Date(lastLogin), 'dd-MM-yyyy, HH:mm:ss')}</span>;
       },
     },
     {
@@ -188,7 +197,7 @@ export function getUserColumns(
       header: ({ column }) => <DataTableColumnHeader column={column} title="Created" />,
       cell: ({ row }) => {
         const createdAt = row.getValue('created_at') as string;
-        return <span>{format(new Date(createdAt), 'MMM d, yyyy')}</span>;
+        return <span>{format(new Date(createdAt), 'dd-MM-yyyy')}</span>;
       },
     },
     {

@@ -197,7 +197,7 @@ export const deactivateUser = adminActionClient
 
 // Reactivate user
 export const reactivateUser = adminActionClient
-  .schema(z.object({ id: z.string().uuid() }))
+  .schema(z.object({ id: z.string().uuid(), reason: z.string().max(200).optional() }))
   .action(async ({ parsedInput: input }) => {
     const adminSupabase = createAdminClient();
 

@@ -35,6 +35,7 @@ export const locationColumns: ColumnDef<Location>[] = [
         aria-label="Select row"
       />
     ),
+    size: 40,
     enableSorting: false,
     enableHiding: false,
   },
@@ -88,7 +89,7 @@ export const locationColumns: ColumnDef<Location>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue("created_at") as string;
-      return format(new Date(date), "MMM d, yyyy");
+      return format(new Date(date), "dd-MM-yyyy");
     },
   },
   {

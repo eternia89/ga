@@ -157,6 +157,7 @@ export function CompanyTable({ data }: CompanyTableProps) {
         <InlineFeedback
           type={feedback.type}
           message={feedback.message}
+          onDismiss={() => setFeedback(null)}
         />
       )}
 

@@ -205,7 +205,7 @@ export function UserFormDialog({
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="user@example.com" {...field} />
+                      <Input type="email" placeholder="user@example.com" maxLength={255} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -228,7 +228,7 @@ export function UserFormDialog({
                 <FormItem>
                   <FormLabel>Full Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="John Doe" {...field} />
+                    <Input placeholder="John Doe" maxLength={100} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -295,8 +295,8 @@ export function UserFormDialog({
                 <FormItem>
                   <FormLabel>Division (Optional)</FormLabel>
                   <Select
-                    onValueChange={field.onChange}
-                    value={field.value || ''}
+                    onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
+                    value={field.value || "none"}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -304,7 +304,7 @@ export function UserFormDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {filteredDivisions.map(division => (
                         <SelectItem key={division.id} value={division.id}>
                           {division.name}
@@ -318,7 +318,7 @@ export function UserFormDialog({
             />
 
             {feedback && (
-              <InlineFeedback type={feedback.type} message={feedback.message} />
+              <InlineFeedback type={feedback.type} message={feedback.message} onDismiss={() => setFeedback(null)} />
             )}
 
             <DialogFooter>

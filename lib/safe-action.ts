@@ -1,5 +1,6 @@
 import { createSafeActionClient } from "next-safe-action";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const actionClient = createSafeActionClient({
   handleServerError(e) {
@@ -33,10 +34,11 @@ export const authActionClient = actionClient.use(async ({ next }) => {
   });
 });
 
-// Admin-only action client
+// Admin-only action client — provides adminSupabase (service_role) that bypasses RLS
 export const adminActionClient = authActionClient.use(async ({ ctx, next }) => {
   if (ctx.profile.role !== "admin") {
     throw new Error("Admin access required");
   }
-  return next({ ctx });
+  const adminSupabase = createAdminClient();
+  return next({ ctx: { ...ctx, adminSupabase } });
 });

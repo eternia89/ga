@@ -3,17 +3,29 @@
 import { revalidatePath } from "next/cache";
 import { adminActionClient } from "@/lib/safe-action";
 import { companySchema } from "@/lib/validations/company-schema";
+import { emptyToNull } from "@/lib/utils";
 import { z } from "zod";
 
 // Create company
 export const createCompany = adminActionClient
   .schema(companySchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
+
+    // Check for duplicate name (case-insensitive)
+    const { count } = await supabase
+      .from("companies")
+      .select("id", { count: "exact", head: true })
+      .ilike("name", parsedInput.name)
+      .is("deleted_at", null);
+
+    if (count && count > 0) {
+      throw new Error("A company with this name already exists");
+    }
 
     const { data, error } = await supabase
       .from("companies")
-      .insert([parsedInput])
+      .insert([emptyToNull(parsedInput)])
       .select()
       .single();
 
@@ -34,12 +46,24 @@ export const updateCompany = adminActionClient
     })
   )
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { id, data } = parsedInput;
+
+    // Check for duplicate name (case-insensitive, excluding self)
+    const { count } = await supabase
+      .from("companies")
+      .select("id", { count: "exact", head: true })
+      .ilike("name", data.name)
+      .neq("id", id)
+      .is("deleted_at", null);
+
+    if (count && count > 0) {
+      throw new Error("A company with this name already exists");
+    }
 
     const { data: updated, error } = await supabase
       .from("companies")
-      .update(data)
+      .update(emptyToNull(data))
       .eq("id", id)
       .select()
       .single();
@@ -56,7 +80,7 @@ export const updateCompany = adminActionClient
 export const deleteCompany = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
     // Check for active dependencies
@@ -111,8 +135,32 @@ export const deleteCompany = adminActionClient
 export const restoreCompany = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
+
+    // Get the company being restored
+    const { data: company } = await supabase
+      .from("companies")
+      .select("name")
+      .eq("id", id)
+      .single();
+
+    if (!company) {
+      throw new Error("Company not found");
+    }
+
+    // Check for duplicate name among active companies
+    const { data: existing } = await supabase
+      .from("companies")
+      .select("id")
+      .ilike("name", company.name)
+      .is("deleted_at", null)
+      .neq("id", id)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      throw new Error(`Cannot restore -- an active company named "${company.name}" already exists`);
+    }
 
     const { error } = await supabase
       .from("companies")
@@ -131,7 +179,7 @@ export const restoreCompany = adminActionClient
 export const bulkDeleteCompanies = adminActionClient
   .schema(z.object({ ids: z.array(z.string().uuid()) }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { ids } = parsedInput;
 
     const blocked: string[] = [];

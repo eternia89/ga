@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { adminActionClient } from "@/lib/safe-action";
 import { categorySchema } from "@/lib/validations/category-schema";
+import { emptyToNull } from "@/lib/utils";
 import { z } from "zod";
 
 // Create category
@@ -11,7 +12,20 @@ import { z } from "zod";
 export const createCategory = adminActionClient
   .schema(categorySchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase, profile } = ctx;
+    const { adminSupabase: supabase, profile } = ctx;
+
+    // Check for duplicate name+type among active categories
+    const { data: existing } = await supabase
+      .from("categories")
+      .select("id")
+      .ilike("name", parsedInput.name)
+      .eq("type", parsedInput.type)
+      .is("deleted_at", null)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      throw new Error(`A ${parsedInput.type} category named "${parsedInput.name}" already exists`);
+    }
 
     // Auto-fill company_id for audit purposes (not exposed to user)
     const insertData = {
@@ -21,7 +35,7 @@ export const createCategory = adminActionClient
 
     const { data, error } = await supabase
       .from("categories")
-      .insert([insertData])
+      .insert([emptyToNull(insertData)])
       .select()
       .single();
 
@@ -43,12 +57,36 @@ export const updateCategory = adminActionClient
     })
   )
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { id, data } = parsedInput;
+
+    // Check for duplicate name among active categories of same type (excluding self)
+    if (data.name) {
+      const { data: current } = await supabase
+        .from("categories")
+        .select("type")
+        .eq("id", id)
+        .single();
+
+      if (current) {
+        const { data: existing } = await supabase
+          .from("categories")
+          .select("id")
+          .ilike("name", data.name)
+          .eq("type", current.type)
+          .is("deleted_at", null)
+          .neq("id", id)
+          .limit(1);
+
+        if (existing && existing.length > 0) {
+          throw new Error(`A ${current.type} category named "${data.name}" already exists`);
+        }
+      }
+    }
 
     const { data: updated, error } = await supabase
       .from("categories")
-      .update(data)
+      .update(emptyToNull(data))
       .eq("id", id)
       .select()
       .single();
@@ -65,7 +103,7 @@ export const updateCategory = adminActionClient
 export const deleteCategory = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
     // Check for active dependencies (requests, inventory_items)
@@ -126,8 +164,31 @@ export const deleteCategory = adminActionClient
 export const restoreCategory = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
+
+    const { data: category } = await supabase
+      .from("categories")
+      .select("name, type")
+      .eq("id", id)
+      .single();
+
+    if (!category) {
+      throw new Error("Category not found");
+    }
+
+    const { data: existing } = await supabase
+      .from("categories")
+      .select("id")
+      .ilike("name", category.name)
+      .eq("type", category.type)
+      .is("deleted_at", null)
+      .neq("id", id)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      throw new Error(`Cannot restore -- an active ${category.type} category named "${category.name}" already exists`);
+    }
 
     const { error } = await supabase
       .from("categories")
@@ -146,7 +207,7 @@ export const restoreCategory = adminActionClient
 export const bulkDeleteCategories = adminActionClient
   .schema(z.object({ ids: z.array(z.string().uuid()) }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { ids } = parsedInput;
 
     const blocked: string[] = [];

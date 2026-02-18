@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createUserSchema = z.object({
-  email: z.string().email("Valid email is required"),
+  email: z.string().max(255).email("Valid email is required"),
   full_name: z.string().min(1, "Name is required").max(100),
   role: z.enum(["general_user", "ga_staff", "ga_lead", "finance_approver", "admin"]),
   company_id: z.string().uuid("Company is required"),

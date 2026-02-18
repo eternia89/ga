@@ -35,6 +35,7 @@ export const divisionColumns: ColumnDef<Division>[] = [
         aria-label="Select row"
       />
     ),
+    size: 40,
     enableSorting: false,
     enableHiding: false,
   },
@@ -93,7 +94,7 @@ export const divisionColumns: ColumnDef<Division>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue("created_at") as string;
-      return format(new Date(date), "MMM d, yyyy");
+      return format(new Date(date), "dd-MM-yyyy");
     },
   },
   {

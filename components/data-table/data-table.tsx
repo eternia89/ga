@@ -39,6 +39,8 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   searchKey?: string;
   filterableColumns?: FilterableColumn[];
+  defaultColumnFilters?: ColumnFiltersState;
+  columnVisibility?: VisibilityState;
   onBulkDelete?: (ids: string[]) => Promise<void>;
   onBulkExport?: (ids: string[]) => void;
   showDeactivatedToggle?: boolean;
@@ -55,6 +57,8 @@ export function DataTable<TData, TValue>({
   data,
   searchKey,
   filterableColumns,
+  defaultColumnFilters,
+  columnVisibility: initialColumnVisibility,
   onBulkDelete,
   onBulkExport,
   showDeactivatedToggle,
@@ -66,8 +70,8 @@ export function DataTable<TData, TValue>({
   meta,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(initialColumnVisibility || {});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(defaultColumnFilters || []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const table = useReactTable({
@@ -121,7 +125,15 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      style={
+                        header.column.columnDef.size
+                          ? { width: header.column.columnDef.size, minWidth: header.column.columnDef.size, maxWidth: header.column.columnDef.size }
+                          : undefined
+                      }
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -142,7 +154,14 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      style={
+                        cell.column.columnDef.size
+                          ? { width: cell.column.columnDef.size, minWidth: cell.column.columnDef.size, maxWidth: cell.column.columnDef.size }
+                          : undefined
+                      }
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

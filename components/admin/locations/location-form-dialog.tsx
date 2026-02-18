@@ -71,12 +71,25 @@ export function LocationFormDialog({
         },
   });
 
-  // Update form when profile loads or dialog opens
+  // Reset form when dialog opens/closes or location changes
   useEffect(() => {
-    if (!location && profile?.company_id) {
-      form.setValue("company_id", profile.company_id);
+    if (open) {
+      form.reset(
+        location
+          ? {
+              company_id: location.company_id,
+              name: location.name,
+              address: location.address || "",
+            }
+          : {
+              company_id: profile?.company_id || "",
+              name: "",
+              address: "",
+            }
+      );
+      setError(null);
     }
-  }, [profile, location, form]);
+  }, [open, location, profile, form]);
 
   const onSubmit = async (data: LocationFormData) => {
     setIsSubmitting(true);
@@ -130,7 +143,7 @@ export function LocationFormDialog({
                   </FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -161,7 +174,7 @@ export function LocationFormDialog({
                     Name <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Main Office" {...field} />
+                    <Input placeholder="Main Office" maxLength={100} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -177,6 +190,7 @@ export function LocationFormDialog({
                   <FormControl>
                     <Input
                       placeholder="123 Business St, City, State 12345"
+                      maxLength={200}
                       {...field}
                     />
                   </FormControl>

@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
@@ -46,6 +57,33 @@ export function DataTableToolbar<TData>({
   createButton,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
+  const [bulkDeleteOpen, setBulkDeleteOpen] = React.useState(false);
+  const [bulkDeleteConfirmText, setBulkDeleteConfirmText] = React.useState("");
+  const [isBulkDeleting, setIsBulkDeleting] = React.useState(false);
+  const [bulkDeleteItems, setBulkDeleteItems] = React.useState<{ ids: string[]; names: string[] }>({ ids: [], names: [] });
+
+  const handleBulkDeleteClick = () => {
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const ids = selectedRows.map((row) => (row.original as any).id);
+    const names = selectedRows.map((row) => (row.original as any).name || (row.original as any).full_name || (row.original as any).email || "Unknown");
+    setBulkDeleteItems({ ids, names });
+    setBulkDeleteOpen(true);
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    if (bulkDeleteConfirmText !== "DELETE" || !onBulkDelete) return;
+    setIsBulkDeleting(true);
+    try {
+      await onBulkDelete(bulkDeleteItems.ids);
+      table.resetRowSelection();
+      setBulkDeleteOpen(false);
+      setBulkDeleteConfirmText("");
+    } catch (error) {
+      console.error("Bulk delete failed:", error);
+    } finally {
+      setIsBulkDeleting(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-between gap-4 py-4">
@@ -145,11 +183,7 @@ export function DataTableToolbar<TData>({
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={async () => {
-                  const selectedRows = table.getFilteredSelectedRowModel().rows;
-                  const ids = selectedRows.map((row) => (row.original as any).id);
-                  await onBulkDelete(ids);
-                }}
+                onClick={handleBulkDeleteClick}
               >
                 Delete
               </Button>
@@ -159,6 +193,52 @@ export function DataTableToolbar<TData>({
           createButton
         )}
       </div>
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={(open) => {
+        setBulkDeleteOpen(open);
+        if (!open) {
+          setBulkDeleteConfirmText("");
+          setIsBulkDeleting(false);
+        }
+      }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {bulkDeleteItems.names.length} items?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4">
+                <p>The following items will be deleted:</p>
+                <ul className="list-disc pl-5 text-sm max-h-40 overflow-y-auto space-y-1">
+                  {bulkDeleteItems.names.map((name, i) => (
+                    <li key={i} className="font-medium text-foreground">{name}</li>
+                  ))}
+                </ul>
+                <div className="space-y-2">
+                  <Label htmlFor="bulk-confirm-text" className="text-sm font-medium">
+                    Type <span className="font-mono font-semibold">DELETE</span> to confirm:
+                  </Label>
+                  <Input
+                    id="bulk-confirm-text"
+                    value={bulkDeleteConfirmText}
+                    onChange={(e) => setBulkDeleteConfirmText(e.target.value)}
+                    placeholder="DELETE"
+                    autoComplete="off"
+                  />
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDeleteConfirm}
+              disabled={bulkDeleteConfirmText !== "DELETE" || isBulkDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isBulkDeleting ? "Deleting..." : "Delete All"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

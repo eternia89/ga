@@ -167,6 +167,7 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
         <InlineFeedback
           type={feedback.type}
           message={feedback.message}
+          onDismiss={() => setFeedback(null)}
         />
       )}
 

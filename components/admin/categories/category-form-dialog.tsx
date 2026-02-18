@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -69,6 +69,25 @@ export function CategoryFormDialog({
         },
   });
 
+  useEffect(() => {
+    if (open) {
+      form.reset(
+        category
+          ? {
+              name: category.name,
+              type: category.type,
+              description: category.description || "",
+            }
+          : {
+              name: "",
+              type: defaultType || "request",
+              description: "",
+            }
+      );
+      setError(null);
+    }
+  }, [open, category, defaultType, form]);
+
   const onSubmit = async (data: CategoryFormData) => {
     setIsSubmitting(true);
     setError(null);
@@ -121,7 +140,7 @@ export function CategoryFormDialog({
                     Name <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Maintenance" {...field} />
+                    <Input placeholder="Maintenance" maxLength={100} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -138,7 +157,7 @@ export function CategoryFormDialog({
                   </FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value}
                     disabled={!!category} // Type is immutable after creation
                   >
                     <FormControl>
@@ -170,6 +189,7 @@ export function CategoryFormDialog({
                   <FormControl>
                     <Input
                       placeholder="Equipment maintenance and repairs"
+                      maxLength={200}
                       {...field}
                     />
                   </FormControl>

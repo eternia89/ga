@@ -3,13 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { adminActionClient } from "@/lib/safe-action";
 import { divisionSchema } from "@/lib/validations/division-schema";
+import { emptyToNull } from "@/lib/utils";
 import { z } from "zod";
 
 // Get companies for dropdown
 export const getCompanies = adminActionClient
   .schema(z.object({}))
   .action(async ({ ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
 
     const { data, error } = await supabase
       .from("companies")
@@ -28,11 +29,24 @@ export const getCompanies = adminActionClient
 export const createDivision = adminActionClient
   .schema(divisionSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
+
+    // Check for duplicate name within the same company
+    const { data: existing } = await supabase
+      .from("divisions")
+      .select("id")
+      .ilike("name", parsedInput.name)
+      .eq("company_id", parsedInput.company_id)
+      .is("deleted_at", null)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      throw new Error(`A division named "${parsedInput.name}" already exists in this company`);
+    }
 
     const { data, error } = await supabase
       .from("divisions")
-      .insert([parsedInput])
+      .insert([emptyToNull(parsedInput)])
       .select()
       .single();
 
@@ -53,12 +67,28 @@ export const updateDivision = adminActionClient
     })
   )
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { id, data } = parsedInput;
+
+    // Check for duplicate name within the same company (excluding self)
+    if (data.name) {
+      const { data: existing } = await supabase
+        .from("divisions")
+        .select("id")
+        .ilike("name", data.name)
+        .eq("company_id", data.company_id)
+        .is("deleted_at", null)
+        .neq("id", id)
+        .limit(1);
+
+      if (existing && existing.length > 0) {
+        throw new Error(`A division named "${data.name}" already exists in this company`);
+      }
+    }
 
     const { data: updated, error } = await supabase
       .from("divisions")
-      .update(data)
+      .update(emptyToNull(data))
       .eq("id", id)
       .select()
       .single();
@@ -75,7 +105,7 @@ export const updateDivision = adminActionClient
 export const deleteDivision = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
     // Check for active users in this division
@@ -111,8 +141,31 @@ export const deleteDivision = adminActionClient
 export const restoreDivision = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
+
+    const { data: division } = await supabase
+      .from("divisions")
+      .select("name, company_id")
+      .eq("id", id)
+      .single();
+
+    if (!division) {
+      throw new Error("Division not found");
+    }
+
+    const { data: existing } = await supabase
+      .from("divisions")
+      .select("id")
+      .ilike("name", division.name)
+      .eq("company_id", division.company_id)
+      .is("deleted_at", null)
+      .neq("id", id)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      throw new Error(`Cannot restore -- an active division named "${division.name}" already exists in this company`);
+    }
 
     const { error } = await supabase
       .from("divisions")
@@ -131,7 +184,7 @@ export const restoreDivision = adminActionClient
 export const bulkDeleteDivisions = adminActionClient
   .schema(z.object({ ids: z.array(z.string().uuid()) }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase } = ctx;
+    const { adminSupabase: supabase } = ctx;
     const { ids } = parsedInput;
 
     const blocked: string[] = [];

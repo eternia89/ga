@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useQueryState } from "nuqs";
+import { useState } from "react";
 import { Category } from "@/lib/types/database";
 import { DataTable } from "@/components/data-table/data-table";
 import { categoryColumns } from "./category-columns";
@@ -15,16 +14,12 @@ import {
 } from "@/app/actions/category-actions";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface CategoryTableProps {
   data: Category[];
 }
 
 export function CategoryTable({ data }: CategoryTableProps) {
-  const [categoryType, setCategoryType] = useQueryState("categoryType", {
-    defaultValue: "request",
-  });
   const [showDeactivated, setShowDeactivated] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -36,14 +31,10 @@ export function CategoryTable({ data }: CategoryTableProps) {
     message: string;
   } | null>(null);
 
-  // Filter by type and deactivated status
-  const filteredData = useMemo(() => {
-    let filtered = data.filter((cat) => cat.type === categoryType);
-    if (!showDeactivated) {
-      filtered = filtered.filter((cat) => !cat.deleted_at);
-    }
-    return filtered;
-  }, [data, categoryType, showDeactivated]);
+  // Filter by deactivated status only (type filtering handled by DataTable's filterableColumns)
+  const filteredData = showDeactivated
+    ? data
+    : data.filter((cat) => !cat.deleted_at);
 
   const handleEdit = (category: Category) => {
     setEditingCategory(category);
@@ -122,7 +113,6 @@ export function CategoryTable({ data }: CategoryTableProps) {
   };
 
   const handleBulkExport = (selectedIds: string[]) => {
-    // Simple CSV export - map IDs to full category objects
     const selectedRows = data.filter((category) =>
       selectedIds.includes(category.id)
     );
@@ -144,7 +134,7 @@ export function CategoryTable({ data }: CategoryTableProps) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `categories-${categoryType}-${new Date().toISOString().split("T")[0]}.csv`;
+    a.download = `categories-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -166,45 +156,44 @@ export function CategoryTable({ data }: CategoryTableProps) {
   return (
     <div className="space-y-4">
       {feedback && (
-        <InlineFeedback type={feedback.type} message={feedback.message} />
+        <InlineFeedback type={feedback.type} message={feedback.message} onDismiss={() => setFeedback(null)} />
       )}
 
-      <Tabs value={categoryType} onValueChange={setCategoryType}>
-        <TabsList>
-          <TabsTrigger value="request">Request Categories</TabsTrigger>
-          <TabsTrigger value="asset">Asset Categories</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={categoryType} className="mt-4">
-          <DataTable
-            columns={categoryColumns}
-            data={filteredData}
-            searchKey="name"
-            showDeactivatedToggle
-            onDeactivatedToggleChange={setShowDeactivated}
-            showDeactivated={showDeactivated}
-            onBulkDelete={handleBulkDelete}
-            onBulkExport={handleBulkExport}
-            createButton={
-              <Button onClick={handleCreateClick} size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Create {categoryType === "request" ? "Request" : "Asset"}{" "}
-                Category
-              </Button>
-            }
-            meta={{
-              onEdit: handleEdit,
-              onDelete: handleDelete,
-              onRestore: handleRestore,
-            }}
-          />
-        </TabsContent>
-      </Tabs>
+      <DataTable
+        columns={categoryColumns}
+        data={filteredData}
+        searchKey="name"
+        filterableColumns={[
+          {
+            id: "type",
+            title: "Type",
+            options: [
+              { label: "Request", value: "request" },
+              { label: "Asset", value: "asset" },
+            ],
+          },
+        ]}
+        showDeactivatedToggle
+        onDeactivatedToggleChange={setShowDeactivated}
+        showDeactivated={showDeactivated}
+        onBulkDelete={handleBulkDelete}
+        onBulkExport={handleBulkExport}
+        createButton={
+          <Button onClick={handleCreateClick} size="sm">
+            <Plus className="mr-2 h-4 w-4" />
+            Create Category
+          </Button>
+        }
+        meta={{
+          onEdit: handleEdit,
+          onDelete: handleDelete,
+          onRestore: handleRestore,
+        }}
+      />
 
       <CategoryFormDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
-        defaultType={categoryType as "request" | "asset"}
         onSuccess={handleSuccess}
       />
 

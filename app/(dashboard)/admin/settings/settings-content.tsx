@@ -13,15 +13,20 @@ interface SettingsContentProps {
   divisions: Division[];
   locations: Location[];
   categories: Category[];
+  initialTab?: string;
 }
+
+const VALID_TABS = ["companies", "divisions", "locations", "categories"];
 
 export function SettingsContent({
   companies,
   divisions,
   locations,
   categories,
+  initialTab,
 }: SettingsContentProps) {
-  const [tab, setTab] = useQueryState("tab", { defaultValue: "companies" });
+  const defaultTab = initialTab && VALID_TABS.includes(initialTab) ? initialTab : "companies";
+  const [tab, setTab] = useQueryState("tab", { defaultValue: defaultTab });
 
   return (
     <div className="space-y-6">

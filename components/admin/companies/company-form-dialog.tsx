@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -61,6 +61,29 @@ export function CompanyFormDialog({
         },
   });
 
+  useEffect(() => {
+    if (open) {
+      form.reset(
+        company
+          ? {
+              name: company.name,
+              code: company.code || "",
+              address: company.address || "",
+              phone: company.phone || "",
+              email: company.email || "",
+            }
+          : {
+              name: "",
+              code: "",
+              address: "",
+              phone: "",
+              email: "",
+            }
+      );
+      setError(null);
+    }
+  }, [open, company, form]);
+
   const onSubmit = async (data: CompanyFormData) => {
     setIsSubmitting(true);
     setError(null);
@@ -112,7 +135,7 @@ export function CompanyFormDialog({
                     Name <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Acme Corporation" {...field} />
+                    <Input placeholder="Acme Corporation" maxLength={100} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -126,7 +149,7 @@ export function CompanyFormDialog({
                 <FormItem>
                   <FormLabel>Code</FormLabel>
                   <FormControl>
-                    <Input placeholder="ACME" {...field} />
+                    <Input placeholder="ACME" maxLength={10} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -143,6 +166,7 @@ export function CompanyFormDialog({
                     <Input
                       type="email"
                       placeholder="contact@acme.com"
+                      maxLength={255}
                       {...field}
                     />
                   </FormControl>
@@ -158,7 +182,7 @@ export function CompanyFormDialog({
                 <FormItem>
                   <FormLabel>Phone</FormLabel>
                   <FormControl>
-                    <Input placeholder="+1 (555) 123-4567" {...field} />
+                    <Input placeholder="+62 812-3456-7890" maxLength={20} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -174,6 +198,7 @@ export function CompanyFormDialog({
                   <FormControl>
                     <Input
                       placeholder="123 Business St, City, State 12345"
+                      maxLength={200}
                       {...field}
                     />
                   </FormControl>
