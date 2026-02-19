@@ -18,7 +18,7 @@ import { STATUS_LABELS, PRIORITY_LABELS } from '@/lib/constants/request-status';
 
 interface RequestFiltersProps {
   categories: { id: string; name: string }[];
-  currentUserId: string;
+  currentUserId?: string;
   currentUserRole: string;
 }
 
@@ -34,7 +34,6 @@ const filterParsers = {
 
 export function RequestFilters({
   categories,
-  currentUserId,
   currentUserRole,
 }: RequestFiltersProps) {
   const [filters, setFilters] = useQueryStates(filterParsers, { shallow: false });

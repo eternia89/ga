@@ -1,0 +1,329 @@
+import { createClient } from '@/lib/supabase/server';
+import { redirect, notFound } from 'next/navigation';
+import { format } from 'date-fns';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { RequestStatusBadge } from '@/components/requests/request-status-badge';
+import { RequestPriorityBadge } from '@/components/requests/request-priority-badge';
+import { RequestDetailClient } from '@/components/requests/request-detail-client';
+import type { TimelineEvent } from '@/components/requests/request-timeline';
+import { RequestWithRelations } from '@/lib/types/database';
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function RequestDetailPage({ params }: PageProps) {
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  // Fetch user profile
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('id, company_id, role, division_id, deleted_at')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile || profile.deleted_at) {
+    redirect('/login');
+  }
+
+  // Fetch request with all joins
+  const { data: request } = await supabase
+    .from('requests')
+    .select(
+      '*, location:locations(name), category:categories(name), requester:user_profiles!requester_id(name, email), assigned_user:user_profiles!assigned_to(name, email), division:divisions(name)'
+    )
+    .eq('id', id)
+    .is('deleted_at', null)
+    .single();
+
+  if (!request) {
+    notFound();
+  }
+
+  // Fetch all data in parallel
+  const [photosResult, auditLogsResult, categoriesResult, usersResult, locationsResult] =
+    await Promise.all([
+      // Photos: media_attachments for this request (non-deleted)
+      supabase
+        .from('media_attachments')
+        .select('id, file_name, file_path, mime_type, sort_order')
+        .eq('entity_type', 'request')
+        .eq('entity_id', id)
+        .is('deleted_at', null)
+        .order('sort_order', { ascending: true }),
+
+      // Audit logs for timeline
+      supabase
+        .from('audit_logs')
+        .select('*')
+        .eq('table_name', 'requests')
+        .eq('record_id', id)
+        .order('performed_at', { ascending: true }),
+
+      // Categories for triage inline form
+      supabase
+        .from('categories')
+        .select('id, name')
+        .eq('type', 'request')
+        .is('deleted_at', null)
+        .order('name'),
+
+      // Active users in same company for PIC
+      supabase
+        .from('user_profiles')
+        .select('id, name')
+        .eq('company_id', profile.company_id)
+        .is('deleted_at', null)
+        .order('name'),
+
+      // Locations for edit form
+      supabase
+        .from('locations')
+        .select('id, name')
+        .eq('company_id', profile.company_id)
+        .is('deleted_at', null)
+        .order('name'),
+    ]);
+
+  // Generate signed URLs for photos
+  const attachments = photosResult.data ?? [];
+  let photoUrls: { id: string; url: string; fileName: string }[] = [];
+
+  if (attachments.length > 0) {
+    const { data: signedUrls } = await supabase.storage
+      .from('request-photos')
+      .createSignedUrls(
+        attachments.map((a) => a.file_path),
+        21600 // 6 hours
+      );
+
+    photoUrls = attachments.map((attachment, index) => ({
+      id: attachment.id,
+      url: signedUrls?.[index]?.signedUrl ?? '',
+      fileName: attachment.file_name,
+    }));
+  }
+
+  // Process audit logs into timeline events
+  const auditLogs = auditLogsResult.data ?? [];
+
+  // Batch-fetch user info for all performed_by IDs
+  const performedByIds = [...new Set(auditLogs.map((log) => log.performed_by).filter(Boolean))];
+  let userMap: Record<string, string> = {};
+
+  if (performedByIds.length > 0) {
+    const { data: performers } = await supabase
+      .from('user_profiles')
+      .select('id, name, email')
+      .in('id', performedByIds);
+
+    if (performers) {
+      userMap = Object.fromEntries(
+        performers.map((p) => [p.id, p.name ?? p.email ?? p.id])
+      );
+    }
+  }
+
+  const timelineEvents: TimelineEvent[] = [];
+
+  for (const log of auditLogs) {
+    const byUser = userMap[log.performed_by] ?? log.performed_by ?? 'System';
+    const newData = log.new_data as Record<string, unknown> | null;
+    const oldData = log.old_data as Record<string, unknown> | null;
+    const changedFields = log.changed_fields as string[] | null;
+
+    if (log.operation === 'INSERT') {
+      timelineEvents.push({
+        type: 'created',
+        at: log.performed_at,
+        by: byUser,
+      });
+      continue;
+    }
+
+    if (log.operation !== 'UPDATE' || !changedFields) continue;
+
+    // Check for rejection (has rejection_reason in new_data)
+    if (
+      changedFields.includes('rejection_reason') &&
+      newData?.rejection_reason
+    ) {
+      timelineEvents.push({
+        type: 'rejection',
+        at: log.performed_at,
+        by: byUser,
+        details: { reason: newData.rejection_reason as string },
+      });
+      continue;
+    }
+
+    // Check for cancellation (status changed to 'cancelled')
+    if (
+      changedFields.includes('status') &&
+      newData?.status === 'cancelled'
+    ) {
+      timelineEvents.push({
+        type: 'cancellation',
+        at: log.performed_at,
+        by: byUser,
+      });
+      continue;
+    }
+
+    // Check for triage (category_id, priority, or assigned_to changed)
+    const triageFields = ['category_id', 'priority', 'assigned_to'];
+    const isTriageEvent = triageFields.some((f) => changedFields.includes(f));
+    if (isTriageEvent) {
+      // Resolve category and user names
+      let categoryName: string | undefined;
+      let priorityLabel: string | undefined;
+      let picName: string | undefined;
+
+      if (changedFields.includes('category_id') && newData?.category_id) {
+        const { data: cat } = await supabase
+          .from('categories')
+          .select('name')
+          .eq('id', newData.category_id as string)
+          .single();
+        categoryName = cat?.name;
+      }
+
+      if (changedFields.includes('priority') && newData?.priority) {
+        priorityLabel = newData.priority as string;
+      }
+
+      if (changedFields.includes('assigned_to') && newData?.assigned_to) {
+        const picData = userMap[newData.assigned_to as string];
+        if (picData) {
+          picName = picData;
+        } else {
+          const { data: pic } = await supabase
+            .from('user_profiles')
+            .select('name')
+            .eq('id', newData.assigned_to as string)
+            .single();
+          picName = pic?.name;
+        }
+      }
+
+      timelineEvents.push({
+        type: 'triage',
+        at: log.performed_at,
+        by: byUser,
+        details: {
+          category: categoryName,
+          priority: priorityLabel,
+          pic: picName,
+        },
+      });
+      continue;
+    }
+
+    // Check for status change (non-cancel, non-rejection)
+    if (changedFields.includes('status')) {
+      timelineEvents.push({
+        type: 'status_change',
+        at: log.performed_at,
+        by: byUser,
+        details: {
+          old_status: oldData?.status,
+          new_status: newData?.status,
+        },
+      });
+      continue;
+    }
+
+    // Generic field update
+    const updatedField = changedFields[0];
+    timelineEvents.push({
+      type: 'field_update',
+      at: log.performed_at,
+      by: byUser,
+      details: {
+        field: updatedField,
+        old_value: oldData?.[updatedField] as string | undefined,
+        new_value: newData?.[updatedField] as string | undefined,
+      },
+    });
+  }
+
+  const req = request as RequestWithRelations;
+  const categories = categoriesResult.data ?? [];
+  const users = usersResult.data ?? [];
+  const locations = locationsResult.data ?? [];
+
+  return (
+    <div className="space-y-6 py-6">
+      {/* Breadcrumb */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/requests">Requests</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{req.display_id}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      {/* Header */}
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-bold tracking-tight font-mono">
+            {req.display_id}
+          </h1>
+          <RequestStatusBadge status={req.status} />
+          {req.priority && <RequestPriorityBadge priority={req.priority} />}
+        </div>
+
+        {/* Requester info */}
+        <p className="text-sm text-muted-foreground">
+          {req.requester?.name ?? 'Unknown'}
+          {req.division?.name && ` · ${req.division.name}`}
+          {' · '}Created {format(new Date(req.created_at), 'dd-MM-yyyy')}
+        </p>
+
+        {/* Rejection reason callout */}
+        {req.status === 'rejected' && req.rejection_reason && (
+          <div className="rounded-md border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30 p-4 mt-2">
+            <p className="text-sm font-medium text-red-700 dark:text-red-400">
+              Rejection Reason
+            </p>
+            <p className="text-sm text-red-600 dark:text-red-300 mt-1">
+              {req.rejection_reason}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Two-column layout */}
+      <RequestDetailClient
+        request={req}
+        photoUrls={photoUrls}
+        timelineEvents={timelineEvents}
+        categories={categories}
+        users={users}
+        locations={locations}
+        currentUserId={profile.id}
+        currentUserRole={profile.role}
+      />
+    </div>
+  );
+}
