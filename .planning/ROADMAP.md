@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Database Schema & Supabase Setup** - Foundation tables, RLS infrastructure, and project configuration *(completed 2026-02-10)*
 - [x] **Phase 2: Auth & RBAC** - User authentication, role-based access control, and session management *(completed 2026-02-11)*
 - [x] **Phase 3: Admin & System Configuration** - Company, division, location, category, and user management *(completed 2026-02-11)*
-- [ ] **Phase 4: Requests** - Request submission, triage, listing, and detail views
+- [x] **Phase 4: Requests** - Request submission, triage, listing, and detail views *(completed 2026-02-19)*
 - [ ] **Phase 5: Jobs & Approvals** - Job creation/execution, CEO approval workflow, completion, and auto-accept
 - [ ] **Phase 6: Inventory** - Asset registry, movement tracking, and receiver acceptance
 - [ ] **Phase 7: Preventive Maintenance** - Templates, scheduling, auto-job generation, and auto-pause
@@ -90,8 +90,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — DB migration (cancelled status, 2-digit-year ID function, storage bucket), server actions, photo upload API, Combobox, and request submission form at /requests/new
-- [ ] 04-02-PLAN.md — Request list page (filters, sorting, triage/reject/cancel dialogs) and request detail page (two-column layout, timeline, inline triage, edit form)
+- [x] 04-01-PLAN.md — DB migration (cancelled status, 2-digit-year ID function, storage bucket), server actions, photo upload API, Combobox, and request submission form at /requests/new
+- [x] 04-02-PLAN.md — Request list page (filters, sorting, triage/reject/cancel dialogs) and request detail page (two-column layout, timeline, inline triage, edit form)
 
 ### Phase 5: Jobs & Approvals
 **Goal**: GA Leads can create and assign jobs (from requests or standalone), GA Staff can execute them through a tracked workflow, the CEO can approve/reject budget-related requests, and completed work flows through the acceptance cycle.
@@ -194,7 +194,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 1. Database Schema & Supabase Setup | 2/2 | ✓ Complete | 2026-02-10 |
 | 2. Auth & RBAC | 2/2 | ✓ Complete | 2026-02-11 |
 | 3. Admin & System Configuration | 3/3 | ✓ Complete | 2026-02-11 |
-| 4. Requests | 0/2 | Not started | - |
+| 4. Requests | 2/2 | ✓ Complete | 2026-02-19 |
 | 5. Jobs & Approvals | 0/3 | Not started | - |
 | 6. Inventory | 0/2 | Not started | - |
 | 7. Preventive Maintenance | 0/3 | Not started | - |
