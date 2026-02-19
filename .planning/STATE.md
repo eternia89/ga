@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Centralize GA operations -- requests, jobs, inventory, maintenance -- with full traceability and real-time visibility for a corporate group.
-**Current focus:** Phase 3 - Admin & System Configuration
+**Current focus:** Phase 4 - Request Submission & Triage
 
 ## Current Position
 
-Phase: 3 of 9 (Admin & System Configuration)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-02-11 -- Completed 03-03-PLAN.md (User Management & Profile)
+Phase: 4 of 9 (Request Submission & Triage)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-19 -- Completed 04-01-PLAN.md (Request Submission Backend and Form)
 
-Progress: [█████.....] 100% (Phase 3 complete)
+Progress: [████████..] 27% (8/~30 plans estimated complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 12 min
-- Total execution time: 1.52 hours
+- Total plans completed: 8
+- Average duration: 11 min
+- Total execution time: 1.60 hours
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [█████.....] 100% (Phase 3 complete)
 | 01-database-schema-supabase-setup | 2/2 | 55min | 28min |
 | 02-auth-rbac | 2/2 | 11min | 6min |
 | 03-admin-system-configuration | 3/3 | 25min | 8min |
+| 04-requests | 1/3 | 5min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (6min), 03-01 (8min), 03-02 (8min), 03-03 (9min)
-- Trend: Stable at 8-9 min per plan (excellent velocity)
+- Last 5 plans: 03-01 (8min), 03-02 (8min), 03-03 (9min), 04-01 (5min)
+- Trend: Accelerating — 5 min per plan (excellent velocity)
 
 *Updated after each plan completion*
 
@@ -84,20 +85,25 @@ Recent decisions affecting current work:
 - [03-03]: Role changes take effect immediately without confirmation
 - [03-03]: User list defaults to admin's company with dropdown to select other companies
 - [03-03]: Supabase Admin client uses service_role key for user management operations that bypass RLS
+- [04-01]: Two-step photo upload: create request first (returns requestId), then upload photos via /api/uploads/request-photos — prevents orphaned files in Storage
+- [04-01]: API route used for file uploads (not server action) to handle multipart/form-data without body size limits
+- [04-01]: generate_request_display_id uses SECURITY DEFINER SET search_path = public for atomic counter updates across RLS boundaries
+- [04-01]: authActionClient for ALL request mutations; triage/reject check role inside action body (not adminActionClient)
+- [04-01]: STATUS_LABELS maps DB value 'submitted' to user-facing label 'New' — always use this for display
 
 ### Pending Todos
 
-None yet.
+- Push migration 00007_requests_phase4.sql to Supabase: `supabase db push`
 
 ### Blockers/Concerns
 
 - Verify pg_cron availability on chosen Supabase plan (needed for Phase 5 auto-accept and Phase 7 PM job generation)
 - Verify Supabase Auth hooks / JWT claims custom fields availability by plan tier
-- ~~Confirm shadcn/ui CLI compatibility with Tailwind v4~~ ✓ RESOLVED: shadcn/ui v3.8.4 works with Tailwind v4, detected v4 automatically during init
+- ~~Confirm shadcn/ui CLI compatibility with Tailwind v4~~ RESOLVED: shadcn/ui v3.8.4 works with Tailwind v4, detected v4 automatically during init
 
 ## Session Continuity
 
-Last session: 2026-02-11
-Stopped at: Completed 03-03-PLAN.md (User Management & Profile) — Phase 3 complete
-Resume file: .planning/phases/03-admin-system-configuration/03-03-SUMMARY.md
-Next: /gsd:plan-phase 4 (Request Submission & Triage)
+Last session: 2026-02-19
+Stopped at: Completed 04-01-PLAN.md (Request Submission Backend and Form)
+Resume file: .planning/phases/04-requests/04-01-SUMMARY.md
+Next: Execute 04-02-PLAN.md (Request List and Triage UI)
