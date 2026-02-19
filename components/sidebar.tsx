@@ -34,7 +34,7 @@ const NAV_SECTIONS: NavSection[] = [
         label: 'Requests',
         href: '/requests',
         permission: PERMISSIONS.REQUEST_VIEW_ALL,
-        built: false,
+        built: true,
         icon: '📄',
       },
       {
