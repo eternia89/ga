@@ -87,11 +87,11 @@ Plans:
   3. A GA Lead can triage a request by assigning category, priority (Low/Medium/High/Urgent), and PIC (person in charge)
   4. The request list page supports filtering by status, priority, category, and date range, with sorting
   5. A request detail page shows the full status history/timeline and all monetary values are formatted in IDR
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: Request submission form, auto-generated IDs, status workflow state machine
-- [ ] 04-02: Request list page (filters, sorting) and request detail page (timeline, triage actions)
+- [ ] 04-01-PLAN.md — DB migration (cancelled status, 2-digit-year ID function, storage bucket), server actions, photo upload API, Combobox, and request submission form at /requests/new
+- [ ] 04-02-PLAN.md — Request list page (filters, sorting, triage/reject/cancel dialogs) and request detail page (two-column layout, timeline, inline triage, edit form)
 
 ### Phase 5: Jobs & Approvals
 **Goal**: GA Leads can create and assign jobs (from requests or standalone), GA Staff can execute them through a tracked workflow, the CEO can approve/reject budget-related requests, and completed work flows through the acceptance cycle.
