@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 4 of 9 (Request Submission & Triage)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-19 -- Completed 04-01-PLAN.md (Request Submission Backend and Form)
+Last activity: 2026-02-19 -- Completed 04-02-PLAN.md (Request List and Triage UI)
 
-Progress: [████████..] 27% (8/~30 plans estimated complete)
+Progress: [█████████.] 30% (9/~30 plans estimated complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 11 min
-- Total execution time: 1.60 hours
+- Total plans completed: 9
+- Average duration: 10 min
+- Total execution time: 1.73 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [████████..] 27% (8/~30 plans estimated complete)
 | 01-database-schema-supabase-setup | 2/2 | 55min | 28min |
 | 02-auth-rbac | 2/2 | 11min | 6min |
 | 03-admin-system-configuration | 3/3 | 25min | 8min |
-| 04-requests | 1/3 | 5min | 5min |
+| 04-requests | 2/3 | 13min | 6.5min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (8min), 03-02 (8min), 03-03 (9min), 04-01 (5min)
-- Trend: Accelerating — 5 min per plan (excellent velocity)
+- Last 5 plans: 03-02 (8min), 03-03 (9min), 04-01 (5min), 04-02 (8min)
+- Trend: Consistent — 6-8 min per plan (excellent velocity)
 
 *Updated after each plan completion*
 
@@ -90,6 +90,10 @@ Recent decisions affecting current work:
 - [04-01]: generate_request_display_id uses SECURITY DEFINER SET search_path = public for atomic counter updates across RLS boundaries
 - [04-01]: authActionClient for ALL request mutations; triage/reject check role inside action body (not adminActionClient)
 - [04-01]: STATUS_LABELS maps DB value 'submitted' to user-facing label 'New' — always use this for display
+- [04-02]: Client-side filtering in request list (not server re-query) — data fetched once server-side, filtered in-memory via nuqs URL state
+- [04-02]: Audit log event classification: rejection check first (has rejection_reason), then cancellation (status=cancelled), then triage (category_id/priority/assigned_to changed), then status_change, then field_update
+- [04-02]: RequestDetailClient wrapper coordinates edit state between server component page and client component children (avoids server/client state mismatch)
+- [04-02]: Inline triage on detail page: GA Lead sees editable form on submitted requests rather than a separate dialog, matches CONTEXT.md locked decision
 
 ### Pending Todos
 
@@ -104,6 +108,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 04-01-PLAN.md (Request Submission Backend and Form)
-Resume file: .planning/phases/04-requests/04-01-SUMMARY.md
-Next: Execute 04-02-PLAN.md (Request List and Triage UI)
+Stopped at: Completed 04-02-PLAN.md (Request List and Triage UI)
+Resume file: .planning/phases/04-requests/04-02-SUMMARY.md
+Next: Execute 04-03-PLAN.md (if it exists) or move to Phase 5
