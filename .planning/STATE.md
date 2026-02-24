@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Centralize GA operations -- requests, jobs, inventory, maintenance -- with full traceability and real-time visibility for a corporate group.
-**Current focus:** Phase 4 - Requests (complete)
+**Current focus:** Phase 5 - Jobs & Approvals (in progress)
 
 ## Current Position
 
-Phase: 4 of 9 (Requests)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-19 -- Completed 04-02-PLAN.md (Request List and Triage UI)
+Phase: 5 of 9 (Jobs & Approvals)
+Plan: 1 of 5 in current phase
+Status: Plan 01 complete
+Last activity: 2026-02-25 -- Completed 05-01-PLAN.md (Data Foundation: migration, types, actions)
 
-Progress: [█████.....] 100% (Phase 4 complete)
+Progress: [██████....] 55% (Phase 5, plan 1/5 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 10 min
-- Total execution time: 1.73 hours
+- Total plans completed: 10
+- Average duration: 9.6 min
+- Total execution time: 1.80 hours
 
 **By Phase:**
 
@@ -31,10 +31,11 @@ Progress: [█████.....] 100% (Phase 4 complete)
 | 02-auth-rbac | 2/2 | 11min | 6min |
 | 03-admin-system-configuration | 3/3 | 25min | 8min |
 | 04-requests | 2/2 | 13min | 6.5min |
+| 05-jobs-approvals | 1/5 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (8min), 03-03 (9min), 04-01 (5min), 04-02 (8min)
-- Trend: Consistent — 6-8 min per plan (excellent velocity)
+- Last 5 plans: 03-03 (9min), 04-01 (5min), 04-02 (8min), 05-01 (4min)
+- Trend: Consistent — 4-8 min per plan (excellent velocity)
 
 *Updated after each plan completion*
 
@@ -94,20 +95,26 @@ Recent decisions affecting current work:
 - [04-02]: Audit log event classification: rejection check first (has rejection_reason), then cancellation (status=cancelled), then triage (category_id/priority/assigned_to changed), then status_change, then field_update
 - [04-02]: RequestDetailClient wrapper coordinates edit state between server component page and client component children (avoids server/client state mismatch)
 - [04-02]: Inline triage on detail page: GA Lead sees editable form on submitted requests rather than a separate dialog, matches CONTEXT.md locked decision
+- [05-01]: auto_accept_completed_requests sets status to 'accepted' (not 'completed') to match existing DB schema STATUS_LABELS
+- [05-01]: pg_cron schedule left as manual step with comments due to migration failure risk if extension not yet enabled
+- [05-01]: company_id added to job_requests join table for consistent RLS pattern (no subquery join needed in policies)
+- [05-01]: submitForApproval re-fetches company_settings in action body to prevent frontend bypass of threshold check
+- [05-01]: rejectJob sends job back to 'assigned' status (not 'created') so PIC is preserved after rejection
 
 ### Pending Todos
 
-- Push migration 00007_requests_phase4.sql to Supabase: `supabase db push`
+- Push migration 00007_requests_phase4.sql and 00008_jobs_phase5.sql to Supabase: `supabase db push`
+- Enable pg_cron extension in Supabase Dashboard and run schedule manually (see 05-01-SUMMARY.md)
 
 ### Blockers/Concerns
 
-- Verify pg_cron availability on chosen Supabase plan (needed for Phase 5 auto-accept and Phase 7 PM job generation)
+- ~~Verify pg_cron availability on chosen Supabase plan~~ RESOLVED: pg_cron available on all tiers but must be enabled manually in Dashboard before cron.schedule() can run
 - Verify Supabase Auth hooks / JWT claims custom fields availability by plan tier
 - ~~Confirm shadcn/ui CLI compatibility with Tailwind v4~~ RESOLVED: shadcn/ui v3.8.4 works with Tailwind v4, detected v4 automatically during init
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: Phase 4 complete — verification passed (5/5 must-haves)
-Resume file: .planning/phases/04-requests/04-VERIFICATION.md
-Next: /gsd:plan-phase 5 (Jobs & Approvals)
+Last session: 2026-02-25
+Stopped at: Completed 05-01-PLAN.md (Phase 5 data foundation)
+Resume file: .planning/phases/05-jobs-approvals/05-01-SUMMARY.md
+Next: Execute 05-02-PLAN.md (Job List and Create UI)
