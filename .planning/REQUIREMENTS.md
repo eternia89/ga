@@ -251,13 +251,13 @@ All requirements below are scoped for v1 unless marked otherwise.
 | REQ-JOB-005 | Phase 5 | Complete |
 | REQ-JOB-006 | Phase 5 | Complete |
 | REQ-JOB-007 | Phase 5 | Complete |
-| REQ-JOB-008 | Phase 5 | Pending |
+| REQ-JOB-008 | Phase 5 | Complete |
 | REQ-JOB-009 | Phase 5 | Complete |
 | REQ-JOB-010 | Phase 9 | Pending |
 | REQ-APR-001 | Phase 5 | Complete |
 | REQ-APR-002 | Phase 5 | Pending |
 | REQ-APR-003 | Phase 5 | Complete |
-| REQ-APR-004 | Phase 5 | Pending |
+| REQ-APR-004 | Phase 5 | Complete |
 | REQ-INV-001 | Phase 6 | Pending |
 | REQ-INV-002 | Phase 6 | Pending |
 | REQ-INV-003 | Phase 6 | Pending |
