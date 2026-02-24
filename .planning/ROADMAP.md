@@ -142,12 +142,13 @@ Plans:
   3. A daily cron job auto-generates PM jobs from schedules that are due, with deduplication (skips if previous PM job is still open)
   4. Schedules support both fixed and floating intervals, with floating as the default
   5. When an asset is broken or sold, linked schedules auto-pause; when repaired, schedules resume from the pause date. Overdue PM jobs are flagged prominently in the UI
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 07-01: Maintenance template builder (linear form with multiple field types)
-- [ ] 07-02: Schedule management, interval configuration, auto-pause/resume
-- [ ] 07-03: Auto-job generation cron, deduplication, overdue flagging
+- [ ] 07-01-PLAN.md — DB migration (checklist_responses, is_active, unique index, generate_pm_jobs cron function, RLS), types, constants, Zod schemas, template + schedule server actions
+- [ ] 07-02-PLAN.md — Template builder UI (dnd-kit sortable, 6 item types), template list/create/detail pages, sidebar Templates activation
+- [ ] 07-03-PLAN.md — Schedule form (category-filtered dropdowns, fixed/floating toggle), schedule list/detail pages, status badge (4 states), sidebar Schedules activation
+- [ ] 07-04-PLAN.md — PM job checklist completion UI (save-as-you-go, 6 input types), overdue badge, PM type badge, floating schedule advancement on completion
 
 ### Phase 8: Media, Notifications & Dashboards
 **Goal**: The application handles images intelligently (compression, annotation, AI descriptions), keeps users informed through in-app notifications, and provides management with operational dashboards and data exports.
@@ -200,7 +201,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 4. Requests | 2/2 | ✓ Complete | 2026-02-19 |
 | 5. Jobs & Approvals | 0/5 | Not started | - |
 | 6. Inventory | 0/3 | Not started | - |
-| 7. Preventive Maintenance | 0/3 | Not started | - |
+| 7. Preventive Maintenance | 0/4 | Not started | - |
 | 8. Media, Notifications & Dashboards | 0/4 | Not started | - |
 | 9. Polish & Integration | 0/3 | Not started | - |
 
