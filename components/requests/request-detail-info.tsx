@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
 import { triageSchema, TriageFormData } from '@/lib/validations/request-schema';
 import { RequestWithRelations } from '@/lib/types/database';
 import { triageRequest } from '@/app/actions/request-actions';
@@ -10,6 +11,8 @@ import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { PhotoLightbox } from './request-photo-lightbox';
 import { RequestEditForm } from './request-edit-form';
+import { FeedbackStarRating } from './feedback-star-rating';
+import { RequestStatusBadge } from './request-status-badge';
 import {
   Form,
   FormControl,
@@ -18,13 +21,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { PRIORITY_LABELS } from '@/lib/constants/request-status';
 
@@ -32,6 +28,13 @@ interface PhotoItem {
   id: string;
   url: string;
   fileName: string;
+}
+
+interface LinkedJob {
+  id: string;
+  display_id: string;
+  title: string;
+  status: string;
 }
 
 interface RequestDetailInfoProps {
@@ -45,6 +48,7 @@ interface RequestDetailInfoProps {
   isEditing: boolean;
   onEditToggle: () => void;
   onTriageSuccess: () => void;
+  linkedJobs: LinkedJob[];
 }
 
 export function RequestDetailInfo({
@@ -58,8 +62,9 @@ export function RequestDetailInfo({
   isEditing,
   onEditToggle,
   onTriageSuccess,
+  linkedJobs,
 }: RequestDetailInfoProps) {
-  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [triageSubmitting, setTriageSubmitting] = useState(false);
   const [triageFeedback, setTriageFeedback] = useState<{
     type: 'success' | 'error';
@@ -69,7 +74,7 @@ export function RequestDetailInfo({
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
   const isRequester = request.requester_id === currentUserId;
   const isEditable = isRequester && request.status === 'submitted';
-  const canTriage = isGaLeadOrAdmin && request.status === 'submitted';
+  const canTriage = isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request.status);
 
   const triageForm = useForm<TriageFormData>({
     resolver: zodResolver(triageSchema),
@@ -90,7 +95,13 @@ export function RequestDetailInfo({
         setTriageFeedback({ type: 'error', message: result.serverError });
         return;
       }
-      setTriageFeedback({ type: 'success', message: 'Request triaged successfully' });
+      setTriageFeedback({
+        type: 'success',
+        message:
+          request.status === 'submitted'
+            ? 'Request triaged successfully'
+            : 'Triage updated successfully',
+      });
       onTriageSuccess();
     } catch (err) {
       setTriageFeedback({
@@ -103,6 +114,10 @@ export function RequestDetailInfo({
   };
 
   const categoryOptions = categories.map((c) => ({ label: c.name, value: c.id }));
+  const priorityOptions = Object.entries(PRIORITY_LABELS).map(([value, label]) => ({
+    label,
+    value,
+  }));
   const userOptions = users.map((u) => ({ label: u.name, value: u.id }));
 
   // Show edit form when requester is editing a submitted request
@@ -116,8 +131,12 @@ export function RequestDetailInfo({
           onCancel={onEditToggle}
           onSuccess={onEditToggle}
         />
-        {lightboxSrc && (
-          <PhotoLightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
+        {lightboxIndex !== null && (
+          <PhotoLightbox
+            photos={photoUrls}
+            initialIndex={lightboxIndex}
+            onClose={() => setLightboxIndex(null)}
+          />
         )}
       </>
     );
@@ -131,9 +150,7 @@ export function RequestDetailInfo({
           <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-2">
             Description
           </h3>
-          <p className="text-sm whitespace-pre-wrap">
-            {request.description ?? '—'}
-          </p>
+          <p className="text-sm whitespace-pre-wrap">{request.description ?? '—'}</p>
         </div>
 
         {/* Location */}
@@ -142,7 +159,9 @@ export function RequestDetailInfo({
             Location
           </h3>
           <p className="text-sm">
-            {request.location?.name ?? <span className="text-muted-foreground">—</span>}
+            {request.location?.name ?? (
+              <span className="text-muted-foreground">—</span>
+            )}
           </p>
         </div>
 
@@ -153,11 +172,11 @@ export function RequestDetailInfo({
               Photos
             </h3>
             <div className="flex flex-wrap gap-2">
-              {photoUrls.map((photo) => (
+              {photoUrls.map((photo, index) => (
                 <button
                   key={photo.id}
                   type="button"
-                  onClick={() => setLightboxSrc(photo.url)}
+                  onClick={() => setLightboxIndex(index)}
                   className="w-20 h-20 shrink-0 rounded border border-border overflow-hidden hover:opacity-80 transition-opacity"
                   aria-label={`View photo: ${photo.fileName}`}
                 >
@@ -168,6 +187,66 @@ export function RequestDetailInfo({
                   />
                 </button>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Linked Jobs */}
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-2">
+            Linked Jobs
+          </h3>
+          {linkedJobs.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No linked jobs</p>
+          ) : (
+            <ul className="space-y-1.5">
+              {linkedJobs.map((job) => (
+                <li key={job.id} className="flex items-center gap-2 flex-wrap">
+                  <Link
+                    href={`/jobs/${job.id}`}
+                    className="text-sm font-mono font-medium text-primary hover:underline"
+                  >
+                    {job.display_id}
+                  </Link>
+                  <span className="text-sm text-muted-foreground">—</span>
+                  <span
+                    className="text-sm truncate max-w-[200px]"
+                    title={job.title}
+                  >
+                    {job.title}
+                  </span>
+                  <RequestStatusBadge status={job.status} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Acceptance rejection reason — shown when work was rejected back to in_progress */}
+        {request.acceptance_rejected_reason && (
+          <div className="rounded-md border border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950/30 p-3">
+            <p className="text-sm font-medium text-orange-700 dark:text-orange-400">
+              Work Rejection Reason
+            </p>
+            <p className="text-sm text-orange-600 dark:text-orange-300 mt-1">
+              {request.acceptance_rejected_reason}
+            </p>
+          </div>
+        )}
+
+        {/* Feedback — shown when feedback has been submitted */}
+        {request.feedback_rating != null && (
+          <div>
+            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-2">
+              Feedback
+            </h3>
+            <div className="space-y-2">
+              <FeedbackStarRating value={request.feedback_rating} readOnly size="md" />
+              {request.feedback_comment && (
+                <p className="text-sm text-muted-foreground italic">
+                  &ldquo;{request.feedback_comment}&rdquo;
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -190,7 +269,7 @@ export function RequestDetailInfo({
                     control={triageForm.control}
                     name="category_id"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="max-w-xs">
                         <FormLabel>
                           Category <span className="text-destructive">*</span>
                         </FormLabel>
@@ -213,27 +292,20 @@ export function RequestDetailInfo({
                     control={triageForm.control}
                     name="priority"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="max-w-xs">
                         <FormLabel>
                           Priority <span className="text-destructive">*</span>
                         </FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value ?? ''}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select priority..." />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
-                              <SelectItem key={value} value={value}>
-                                {label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <Combobox
+                            options={priorityOptions}
+                            value={field.value ?? ''}
+                            onValueChange={field.onChange}
+                            placeholder="Select priority..."
+                            searchPlaceholder="Search priorities..."
+                            emptyText="No priorities found."
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -243,7 +315,7 @@ export function RequestDetailInfo({
                     control={triageForm.control}
                     name="assigned_to"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="max-w-xs">
                         <FormLabel>
                           PIC <span className="text-destructive">*</span>
                         </FormLabel>
@@ -271,7 +343,13 @@ export function RequestDetailInfo({
                   )}
 
                   <Button type="submit" disabled={triageSubmitting}>
-                    {triageSubmitting ? 'Triaging...' : 'Save Triage'}
+                    {triageSubmitting
+                      ? request.status === 'submitted'
+                        ? 'Triaging...'
+                        : 'Updating...'
+                      : request.status === 'submitted'
+                        ? 'Save Triage'
+                        : 'Update Triage'}
                   </Button>
                 </form>
               </Form>
@@ -281,21 +359,29 @@ export function RequestDetailInfo({
                 <div>
                   <dt className="text-xs font-medium text-muted-foreground">Category</dt>
                   <dd className="text-sm mt-0.5">
-                    {request.category?.name ?? <span className="text-muted-foreground">—</span>}
+                    {request.category?.name ?? (
+                      <span className="text-muted-foreground">—</span>
+                    )}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-xs font-medium text-muted-foreground">Priority</dt>
                   <dd className="text-sm mt-0.5">
-                    {request.priority
-                      ? (PRIORITY_LABELS[request.priority] ?? request.priority)
-                      : <span className="text-muted-foreground">—</span>}
+                    {request.priority ? (
+                      PRIORITY_LABELS[request.priority] ?? request.priority
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs font-medium text-muted-foreground">Person in Charge (PIC)</dt>
+                  <dt className="text-xs font-medium text-muted-foreground">
+                    Person in Charge (PIC)
+                  </dt>
                   <dd className="text-sm mt-0.5">
-                    {request.assigned_user?.name ?? <span className="text-muted-foreground">—</span>}
+                    {request.assigned_user?.name ?? (
+                      <span className="text-muted-foreground">—</span>
+                    )}
                   </dd>
                 </div>
               </dl>
@@ -304,8 +390,12 @@ export function RequestDetailInfo({
         )}
       </div>
 
-      {lightboxSrc && (
-        <PhotoLightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
+      {lightboxIndex !== null && (
+        <PhotoLightbox
+          photos={photoUrls}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
       )}
     </>
   );

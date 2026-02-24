@@ -16,6 +16,8 @@ import { RequestFilters, filterParsers } from './request-filters';
 import { RequestTriageDialog } from './request-triage-dialog';
 import { RequestRejectDialog } from './request-reject-dialog';
 import { RequestCancelDialog } from './request-cancel-dialog';
+import { RequestAcceptanceDialog } from './request-acceptance-dialog';
+import { PhotoLightbox } from './request-photo-lightbox';
 
 interface PhotoItem {
   id: string;
@@ -29,6 +31,7 @@ interface RequestTableProps {
   users: { id: string; name: string }[];
   currentUserId: string;
   currentUserRole: string;
+  photosByRequest: Record<string, PhotoItem[]>;
 }
 
 export function RequestTable({
@@ -37,6 +40,7 @@ export function RequestTable({
   users,
   currentUserId,
   currentUserRole,
+  photosByRequest,
 }: RequestTableProps) {
   const router = useRouter();
   const [filters] = useQueryStates(filterParsers);
@@ -54,7 +58,17 @@ export function RequestTable({
   const [cancellingRequestId, setCancellingRequestId] = useState<string | null>(null);
   const [cancellingDisplayId, setCancellingDisplayId] = useState('');
 
+  // Acceptance dialog state (handles both accept and reject-work modes)
+  const [acceptanceOpen, setAcceptanceOpen] = useState(false);
+  const [acceptanceMode, setAcceptanceMode] = useState<'accept' | 'reject'>('accept');
+  const [acceptanceRequest, setAcceptanceRequest] = useState<RequestWithRelations | null>(null);
+
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Lightbox state
+  const [lightboxPhotos, setLightboxPhotos] = useState<PhotoItem[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   // Client-side filtering based on URL params
   const filteredData = useMemo(() => {
@@ -77,6 +91,9 @@ export function RequestTable({
         const toDate = endOfDay(parseISO(filters.to));
         if (isAfter(parseISO(req.created_at), toDate)) return false;
       }
+
+      // My Requests filter (submitted by me)
+      if (filters.my_requests === 'true' && req.requester_id !== currentUserId) return false;
 
       // My Assigned filter
       if (filters.mine === 'true' && req.assigned_to !== currentUserId) return false;
@@ -128,8 +145,26 @@ export function RequestTable({
     setCancelOpen(true);
   };
 
+  const handleAccept = (request: RequestWithRelations) => {
+    setAcceptanceRequest(request);
+    setAcceptanceMode('accept');
+    setAcceptanceOpen(true);
+  };
+
+  const handleRejectWork = (request: RequestWithRelations) => {
+    setAcceptanceRequest(request);
+    setAcceptanceMode('reject');
+    setAcceptanceOpen(true);
+  };
+
   const handleView = (request: RequestWithRelations) => {
     router.push(`/requests/${request.id}`);
+  };
+
+  const handlePhotoClick = (photos: PhotoItem[], index: number) => {
+    setLightboxPhotos(photos);
+    setLightboxIndex(index);
+    setLightboxOpen(true);
   };
 
   const handleTriageSuccess = () => {
@@ -142,6 +177,16 @@ export function RequestTable({
 
   const handleCancelSuccess = () => {
     setFeedback({ type: 'success', message: 'Request cancelled' });
+  };
+
+  const handleAcceptanceSuccess = () => {
+    setFeedback({
+      type: 'success',
+      message:
+        acceptanceMode === 'accept'
+          ? 'Work accepted successfully'
+          : 'Work rejected and sent back to In Progress',
+    });
   };
 
   return (
@@ -177,7 +222,11 @@ export function RequestTable({
           onTriage: handleTriage,
           onReject: handleReject,
           onCancel: handleCancel,
+          onAccept: handleAccept,
+          onRejectWork: handleRejectWork,
           onView: handleView,
+          onPhotoClick: handlePhotoClick,
+          photosByRequest,
           currentUserId,
           currentUserRole,
         }}
@@ -210,6 +259,25 @@ export function RequestTable({
         requestDisplayId={cancellingDisplayId}
         onSuccess={handleCancelSuccess}
       />
+
+      {acceptanceRequest && (
+        <RequestAcceptanceDialog
+          open={acceptanceOpen}
+          onOpenChange={setAcceptanceOpen}
+          mode={acceptanceMode}
+          requestId={acceptanceRequest.id}
+          requestDisplayId={acceptanceRequest.display_id}
+          onSuccess={handleAcceptanceSuccess}
+        />
+      )}
+
+      {lightboxOpen && lightboxPhotos.length > 0 && (
+        <PhotoLightbox
+          photos={lightboxPhotos}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </div>
   );
 }

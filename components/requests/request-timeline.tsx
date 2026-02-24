@@ -8,12 +8,26 @@ import {
   Pencil,
   XCircle,
   Ban,
+  CheckCircle,
+  Clock,
+  MessageSquare,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { STATUS_LABELS } from '@/lib/constants/request-status';
+import { FeedbackStarRating } from './feedback-star-rating';
 
 export type TimelineEvent = {
-  type: 'created' | 'status_change' | 'triage' | 'field_update' | 'rejection' | 'cancellation';
+  type:
+    | 'created'
+    | 'status_change'
+    | 'triage'
+    | 'field_update'
+    | 'rejection'
+    | 'cancellation'
+    | 'acceptance'
+    | 'acceptance_rejection'
+    | 'auto_acceptance'
+    | 'feedback';
   at: string;
   by: string;
   details?: Record<string, unknown>;
@@ -30,6 +44,10 @@ const EVENT_ICONS: Record<TimelineEvent['type'], React.ReactNode> = {
   field_update: <Pencil className="h-3.5 w-3.5" />,
   rejection: <XCircle className="h-3.5 w-3.5" />,
   cancellation: <Ban className="h-3.5 w-3.5" />,
+  acceptance: <CheckCircle className="h-3.5 w-3.5" />,
+  acceptance_rejection: <XCircle className="h-3.5 w-3.5" />,
+  auto_acceptance: <Clock className="h-3.5 w-3.5" />,
+  feedback: <MessageSquare className="h-3.5 w-3.5" />,
 };
 
 const EVENT_COLORS: Record<TimelineEvent['type'], string> = {
@@ -39,6 +57,10 @@ const EVENT_COLORS: Record<TimelineEvent['type'], string> = {
   field_update: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
   rejection: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
   cancellation: 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
+  acceptance: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300',
+  acceptance_rejection: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300',
+  auto_acceptance: 'bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300',
+  feedback: 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300',
 };
 
 function formatTimestamp(iso: string): string {
@@ -57,8 +79,8 @@ function EventContent({ event }: { event: TimelineEvent }) {
     case 'status_change': {
       const oldStatus = event.details?.old_status as string | undefined;
       const newStatus = event.details?.new_status as string | undefined;
-      const oldLabel = oldStatus ? STATUS_LABELS[oldStatus] ?? oldStatus : '?';
-      const newLabel = newStatus ? STATUS_LABELS[newStatus] ?? newStatus : '?';
+      const oldLabel = oldStatus ? (STATUS_LABELS[oldStatus] ?? oldStatus) : '?';
+      const newLabel = newStatus ? (STATUS_LABELS[newStatus] ?? newStatus) : '?';
       return (
         <span>
           <span className="font-medium">{event.by}</span> changed status from{' '}
@@ -125,6 +147,50 @@ function EventContent({ event }: { event: TimelineEvent }) {
         </span>
       );
 
+    case 'acceptance':
+      return (
+        <span>
+          <span className="font-medium">{event.by}</span> accepted the completed work
+        </span>
+      );
+
+    case 'acceptance_rejection': {
+      const reason = event.details?.reason as string | undefined;
+      return (
+        <span>
+          <span className="font-medium">{event.by}</span> rejected the completed work
+          {reason && (
+            <blockquote className="mt-1 border-l-2 border-orange-300 dark:border-orange-700 pl-3 text-sm text-muted-foreground italic">
+              {reason}
+            </blockquote>
+          )}
+        </span>
+      );
+    }
+
+    case 'auto_acceptance':
+      return <span>Auto-accepted — no response within 7 days</span>;
+
+    case 'feedback': {
+      const rating = event.details?.rating as number | undefined;
+      const comment = event.details?.comment as string | undefined;
+      return (
+        <span>
+          <span className="font-medium">{event.by}</span> submitted feedback
+          {rating != null && (
+            <div className="mt-1">
+              <FeedbackStarRating value={rating} readOnly size="sm" />
+            </div>
+          )}
+          {comment && (
+            <blockquote className="mt-1 border-l-2 border-amber-300 dark:border-amber-700 pl-3 text-sm text-muted-foreground italic">
+              {comment}
+            </blockquote>
+          )}
+        </span>
+      );
+    }
+
     default:
       return <span>{event.by} made a change</span>;
   }
@@ -157,12 +223,10 @@ export function RequestTimeline({ events }: RequestTimelineProps) {
 
               {/* Content */}
               <div className="min-w-0 flex-1 space-y-1">
-                <p className="text-sm leading-relaxed">
+                <div className="text-sm leading-relaxed">
                   <EventContent event={event} />
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {formatTimestamp(event.at)}
-                </p>
+                </div>
+                <p className="text-xs text-muted-foreground">{formatTimestamp(event.at)}</p>
               </div>
             </div>
           ))}
