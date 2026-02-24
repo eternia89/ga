@@ -64,7 +64,7 @@ export type Request = {
   title: string;
   description: string | null;
   priority: 'low' | 'medium' | 'high' | 'urgent' | null;
-  status: 'submitted' | 'triaged' | 'in_progress' | 'completed' | 'accepted' | 'rejected' | 'cancelled';
+  status: 'submitted' | 'triaged' | 'in_progress' | 'pending_approval' | 'approved' | 'completed' | 'pending_acceptance' | 'accepted' | 'closed' | 'rejected' | 'cancelled';
   estimated_cost: number | null;
   actual_cost: number | null;
   requires_approval: boolean;
@@ -78,6 +78,7 @@ export type Request = {
   auto_accepted: boolean;
   feedback_rating: number | null;
   feedback_comment: string | null;
+  acceptance_rejected_reason: string | null;
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
@@ -108,3 +109,67 @@ export type MediaAttachment = {
   deleted_at: string | null;
   created_at: string;
 };
+
+export interface Job {
+  id: string;
+  company_id: string;
+  display_id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  priority: string | null;
+  location_id: string | null;
+  category_id: string | null;
+  assigned_to: string | null;
+  created_by: string;
+  estimated_cost: number | null;
+  request_id: string | null; // Legacy single FK, kept for PM jobs
+  approval_submitted_at: string | null;
+  approved_at: string | null;
+  approved_by: string | null;
+  approval_rejected_at: string | null;
+  approval_rejected_by: string | null;
+  approval_rejection_reason: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JobWithRelations extends Job {
+  location?: { name: string } | null;
+  category?: { name: string } | null;
+  pic?: { full_name: string } | null;
+  created_by_user?: { full_name: string } | null;
+  job_requests?: Array<{
+    request: {
+      id: string;
+      display_id: string;
+      title: string;
+      status: string;
+      requester?: { full_name: string } | null;
+    };
+  }>;
+}
+
+export interface JobComment {
+  id: string;
+  job_id: string;
+  user_id: string;
+  content: string;
+  photo_url: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  user?: { full_name: string } | null;
+}
+
+export interface CompanySetting {
+  id: string;
+  company_id: string;
+  key: string;
+  value: string;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
