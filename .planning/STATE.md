@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 5 of 9 (Jobs & Approvals)
-Plan: 1 of 5 in current phase
-Status: Plan 01 complete
-Last activity: 2026-02-25 -- Completed 05-01-PLAN.md (Data Foundation: migration, types, actions)
+Plan: 2 of 5 in current phase
+Status: Plan 02 complete
+Last activity: 2026-02-25 -- Completed 05-02-PLAN.md (Job Create UI and Job List UI)
 
-Progress: [██████....] 55% (Phase 5, plan 1/5 complete)
+Progress: [███████...] 60% (Phase 5, plan 2/5 complete)
 
 ## Performance Metrics
 
@@ -31,10 +31,10 @@ Progress: [██████....] 55% (Phase 5, plan 1/5 complete)
 | 02-auth-rbac | 2/2 | 11min | 6min |
 | 03-admin-system-configuration | 3/3 | 25min | 8min |
 | 04-requests | 2/2 | 13min | 6.5min |
-| 05-jobs-approvals | 1/5 | 4min | 4min |
+| 05-jobs-approvals | 2/5 | 9min | 4.5min |
 
 **Recent Trend:**
-- Last 5 plans: 03-03 (9min), 04-01 (5min), 04-02 (8min), 05-01 (4min)
+- Last 5 plans: 04-01 (5min), 04-02 (8min), 05-01 (4min), 05-02 (5min)
 - Trend: Consistent — 4-8 min per plan (excellent velocity)
 
 *Updated after each plan completion*
@@ -100,6 +100,9 @@ Recent decisions affecting current work:
 - [05-01]: company_id added to job_requests join table for consistent RLS pattern (no subquery join needed in policies)
 - [05-01]: submitForApproval re-fetches company_settings in action body to prevent frontend bypass of threshold check
 - [05-01]: rejectJob sends job back to 'assigned' status (not 'created') so PIC is preserved after rejection
+- [05-02]: JobTimelineEvent uses { type, at, by, details } structure matching the jobs/[id]/page.tsx audit log processor
+- [05-02]: in_progress requests included in eligible requests dropdown annotated with linked job display_id
+- [05-02]: job-detail scaffold files (job-detail-*.tsx, job-timeline, job-comment-form, jobs/[id]/page.tsx) incorporated from pre-existing untracked state to resolve TS blocking errors
 
 ### Pending Todos
 
@@ -115,6 +118,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 05-01-PLAN.md (Phase 5 data foundation)
-Resume file: .planning/phases/05-jobs-approvals/05-01-SUMMARY.md
-Next: Execute 05-02-PLAN.md (Job List and Create UI)
+Stopped at: Completed 05-02-PLAN.md (Job Create UI and Job List UI)
+Resume file: .planning/phases/05-jobs-approvals/05-02-SUMMARY.md
+Next: Execute 05-03-PLAN.md (Job Detail UI)

@@ -250,7 +250,7 @@ All requirements below are scoped for v1 unless marked otherwise.
 | REQ-JOB-004 | Phase 5 | Complete |
 | REQ-JOB-005 | Phase 5 | Complete |
 | REQ-JOB-006 | Phase 5 | Complete |
-| REQ-JOB-007 | Phase 5 | Pending |
+| REQ-JOB-007 | Phase 5 | Complete |
 | REQ-JOB-008 | Phase 5 | Pending |
 | REQ-JOB-009 | Phase 5 | Complete |
 | REQ-JOB-010 | Phase 9 | Pending |
