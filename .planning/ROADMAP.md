@@ -161,13 +161,16 @@ Plans:
   3. Users see a bell icon with unread count, a notification dropdown (recent 10-20 items), and a full notification center page with filters and mark-all-read. Clicking a notification navigates to the relevant entity
   4. Notifications fire for: status changes, assignments, approvals, completions, and auto-accept warnings. The actor is never notified about their own action
   5. The GA Lead dashboard shows KPI cards (open requests, overdue jobs, untriaged count), request/job status distribution charts, staff workload view, maintenance due/overdue summary, inventory counts, and request aging. Excel export is available for requests, jobs, inventory, and maintenance data
-**Plans**: TBD
+**Plans**: 7 plans
 
 Plans:
-- [ ] 08-01: Image handling (compression, upload, gallery, annotation, Vision API)
-- [ ] 08-02: In-app notification system (database, polling, bell, dropdown, center page, event triggers)
-- [ ] 08-03: Dashboards (KPI cards, charts, workload, maintenance summary, inventory counts)
-- [ ] 08-04: Excel export for all major entities
+- [ ] 08-01-PLAN.md — Image compression (WebP), generalized entity upload route, freehand annotation dialog, reusable photo upload component
+- [ ] 08-02-PLAN.md — Google Vision API proxy, enhanced lightbox with AI descriptions, thumbnail grid component
+- [ ] 08-03-PLAN.md — Notification creation helper, server actions, polling hook, bell icon + dropdown in header
+- [ ] 08-04-PLAN.md — Notification center page with filters, notification event triggers in request server actions
+- [ ] 08-05-PLAN.md — Dashboard KPI cards with trend indicators, date range filter, dashboard page foundation
+- [ ] 08-06-PLAN.md — Status distribution charts, staff workload table, request aging, maintenance summary, inventory counts
+- [ ] 08-07-PLAN.md — Excel export for requests, jobs, inventory, maintenance with styled spreadsheets
 
 ### Phase 9: Polish & Integration
 **Goal**: All remaining cross-cutting quality requirements are addressed -- GPS accountability, audit trail visibility, loading states, mobile responsiveness for field workers, and overall UI consistency -- bringing the tool to production readiness.
@@ -202,7 +205,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 5. Jobs & Approvals | 0/5 | Not started | - |
 | 6. Inventory | 0/3 | Not started | - |
 | 7. Preventive Maintenance | 0/4 | Not started | - |
-| 8. Media, Notifications & Dashboards | 0/4 | Not started | - |
+| 8. Media, Notifications & Dashboards | 0/7 | Not started | - |
 | 9. Polish & Integration | 0/3 | Not started | - |
 
 ## Requirements Coverage Matrix
