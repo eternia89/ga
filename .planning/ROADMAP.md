@@ -180,15 +180,16 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Every job status change captures the user's GPS coordinates and this data is visible on the job detail timeline
   2. Admins can view a searchable audit trail of all create/update/delete/transition actions across the system
-  3. All data-loading pages display skeleton loading states, and the application supports light/dark mode
+  3. All data-loading pages display skeleton loading states (no dark mode -- REQ-UI-003 dropped)
   4. GA Staff can update job status and upload photos from a mobile device with a usable, responsive interface
   5. Breadcrumb navigation is present on all interior pages and the overall UI is consistent and polished
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 09-01: GPS capture on job status changes
-- [ ] 09-02: Audit trail viewer, loading skeletons, light/dark mode
-- [ ] 09-03: Mobile responsiveness for field workflows, breadcrumb navigation, final UI polish
+- [ ] 09-01-PLAN.md — GPS capture infrastructure (migration, useGeolocation hook, job status integration)
+- [ ] 09-02-PLAN.md — Audit trail viewer page with filterable DataTable and sidebar navigation
+- [ ] 09-03-PLAN.md — Dark mode cleanup (remove all dark: classes) and loading skeletons for all data pages
+- [ ] 09-04-PLAN.md — Mobile responsiveness (hamburger sidebar, full-screen dialogs, camera capture), breadcrumbs, UI polish
 
 ## Progress
 
@@ -206,7 +207,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 6. Inventory | 0/3 | Not started | - |
 | 7. Preventive Maintenance | 0/4 | Not started | - |
 | 8. Media, Notifications & Dashboards | 0/7 | Not started | - |
-| 9. Polish & Integration | 0/3 | Not started | - |
+| 9. Polish & Integration | 0/4 | Not started | - |
 
 ## Requirements Coverage Matrix
 
