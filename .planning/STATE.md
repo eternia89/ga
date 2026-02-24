@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 5 of 9 (Jobs & Approvals)
-Plan: 3 of 5 in current phase
-Status: Plan 03 complete
-Last activity: 2026-02-25 -- Completed 05-03-PLAN.md (Job Detail Page, Unified Timeline, Comment Form)
+Plan: 4 of 5 in current phase
+Status: Plan 04 complete
+Last activity: 2026-02-25 -- Completed 05-04-PLAN.md (Approval Queue UI, Company Settings Page)
 
-Progress: [████████..] 65% (Phase 5, plan 3/5 complete)
+Progress: [█████████.] 73% (Phase 5, plan 4/5 complete)
 
 ## Performance Metrics
 
@@ -31,13 +31,14 @@ Progress: [████████..] 65% (Phase 5, plan 3/5 complete)
 | 02-auth-rbac | 2/2 | 11min | 6min |
 | 03-admin-system-configuration | 3/3 | 25min | 8min |
 | 04-requests | 2/2 | 13min | 6.5min |
-| 05-jobs-approvals | 3/5 | 21min | 7min |
+| 05-jobs-approvals | 4/5 | 25min | 6.25min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (8min), 05-01 (4min), 05-02 (5min), 05-03 (12min)
+- Last 5 plans: 05-01 (4min), 05-02 (5min), 05-03 (12min), 05-04 (4min)
 - Trend: Consistent — 4-12 min per plan (excellent velocity)
 
 *Updated after each plan completion*
+| Phase 05-jobs-approvals P05 | 7 | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,9 @@ Recent decisions affecting current work:
 - [05-02]: job-detail scaffold files (job-detail-*.tsx, job-timeline, job-comment-form, jobs/[id]/page.tsx) incorporated from pre-existing untracked state to resolve TS blocking errors
 - [05-03]: addJobComment returns commentId for two-step photo upload — previously returned only success:true
 - [05-03]: JobTimeline upgraded with ScrollArea, date-fns formatting, type-specific icons, and PhotoLightbox for comment photo viewing
+- [05-04]: Approval queue uses simple shadcn Table (not TanStack) since data is pre-sorted server-side with no client filtering needed
+- [05-04]: updateCompanySetting uses select-then-insert/update pattern for explicit control; Company Settings page uses extensible card layout for future settings
+- [05-04]: LinkedJobRow type fix: Supabase returns FK relations as arrays via select('job:jobs(...)'), cast via unknown to handle polymorphic type
 
 ### Pending Todos
 
@@ -120,6 +124,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 05-03-PLAN.md (Job Detail Page, Unified Timeline, Comment Form)
-Resume file: .planning/phases/05-jobs-approvals/05-03-SUMMARY.md
-Next: Execute 05-04-PLAN.md (Approval Queue UI)
+Stopped at: Completed 05-04-PLAN.md (Approval Queue UI, Company Settings Page)
+Resume file: .planning/phases/05-jobs-approvals/05-04-SUMMARY.md
+Next: Execute 05-05-PLAN.md (Acceptance Cycle UI)

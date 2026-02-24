@@ -107,10 +107,10 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — DB migration (schema changes, job_requests join table, company_settings, display ID, auto-accept cron), types, constants, Zod schemas, server actions, photo upload API
-- [ ] 05-02-PLAN.md — Job creation form with multi-request linking and job list page with filters/data table
-- [ ] 05-03-PLAN.md — Job detail page with info panel, unified timeline (audit events + comments), comment form
-- [ ] 05-04-PLAN.md — Approval queue page (pending/history tabs), Company Settings page (budget threshold), sidebar activation
+- [x] 05-01-PLAN.md — DB migration (schema changes, job_requests join table, company_settings, display ID, auto-accept cron), types, constants, Zod schemas, server actions, photo upload API
+- [x] 05-02-PLAN.md — Job creation form with multi-request linking and job list page with filters/data table
+- [x] 05-03-PLAN.md — Job detail page with info panel, unified timeline (audit events + comments), comment form
+- [x] 05-04-PLAN.md — Approval queue page (pending/history tabs), Company Settings page (budget threshold), sidebar activation
 - [ ] 05-05-PLAN.md — Requester acceptance cycle (accept/reject completed work), feedback star rating, linked jobs on request detail
 
 ### Phase 6: Inventory
