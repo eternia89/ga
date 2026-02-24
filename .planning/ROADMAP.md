@@ -124,11 +124,12 @@ Plans:
   3. The asset list supports search, filtering by status/category/location, and sorting
   4. GA Staff can transfer an asset to a new location, and the receiver must accept the transfer before it completes
   5. When an asset is marked broken or sold, any linked maintenance schedules are automatically paused
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 06-01: Asset CRUD, status lifecycle, condition images, list and detail pages
-- [ ] 06-02: Movement tracking, receiver acceptance workflow, maintenance auto-pause trigger
+- [ ] 06-01-PLAN.md — DB migration (schema changes, display ID function, storage buckets, RLS), types, constants, schemas, server actions, photo/invoice upload API routes
+- [ ] 06-02-PLAN.md — Asset list page (columns, filters, sorting, In Transit indicator) and asset creation form (all fields, required condition photos, optional invoices)
+- [ ] 06-03-PLAN.md — Asset detail page (info panel, status change dialog, edit form, unified timeline), transfer dialogs (initiate, accept/reject, cancel), sidebar activation
 
 ### Phase 7: Preventive Maintenance
 **Goal**: GA Leads can define maintenance templates with flexible checklists, assign them to assets on configurable schedules, and the system auto-generates jobs when maintenance is due -- eliminating manual scheduling and missed maintenance.
@@ -198,7 +199,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 3. Admin & System Configuration | 3/3 | ✓ Complete | 2026-02-11 |
 | 4. Requests | 2/2 | ✓ Complete | 2026-02-19 |
 | 5. Jobs & Approvals | 0/5 | Not started | - |
-| 6. Inventory | 0/2 | Not started | - |
+| 6. Inventory | 0/3 | Not started | - |
 | 7. Preventive Maintenance | 0/3 | Not started | - |
 | 8. Media, Notifications & Dashboards | 0/4 | Not started | - |
 | 9. Polish & Integration | 0/3 | Not started | - |
