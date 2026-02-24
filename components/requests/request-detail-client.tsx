@@ -13,6 +13,13 @@ interface PhotoItem {
   fileName: string;
 }
 
+export interface LinkedJob {
+  id: string;
+  display_id: string;
+  title: string;
+  status: string;
+}
+
 interface RequestDetailClientProps {
   request: RequestWithRelations;
   photoUrls: PhotoItem[];
@@ -22,6 +29,7 @@ interface RequestDetailClientProps {
   locations: { id: string; name: string }[];
   currentUserId: string;
   currentUserRole: string;
+  linkedJobs: LinkedJob[];
 }
 
 export function RequestDetailClient({
@@ -33,6 +41,7 @@ export function RequestDetailClient({
   locations,
   currentUserId,
   currentUserRole,
+  linkedJobs,
 }: RequestDetailClientProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
@@ -42,7 +51,7 @@ export function RequestDetailClient({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr,380px] gap-6">
+    <div className="grid grid-cols-[1fr_380px] max-lg:grid-cols-1 gap-6">
       {/* Left column: info + actions */}
       <div className="space-y-6">
         <RequestDetailInfo
@@ -62,6 +71,7 @@ export function RequestDetailClient({
             }
           }}
           onTriageSuccess={handleActionSuccess}
+          linkedJobs={linkedJobs}
         />
 
         {!isEditing && (

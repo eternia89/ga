@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { requestSubmitSchema, requestEditSchema, triageSchema, rejectSchema } from '@/lib/validations/request-schema';
+import { feedbackSchema } from '@/lib/validations/job-schema';
 import { z } from 'zod';
 
 // ============================================================================
@@ -106,25 +107,31 @@ export const triageRequest = authActionClient
       throw new Error('Triage access required');
     }
 
-    // Verify request is in submitted status
+    // Verify request is in submitted or triaged status
     const { data: request } = await supabase
       .from('requests')
       .select('id, status')
       .eq('id', parsedInput.id)
       .single();
 
-    if (!request || request.status !== 'submitted') {
-      throw new Error('Request can only be triaged when in New status');
+    if (!request || !['submitted', 'triaged'].includes(request.status)) {
+      throw new Error('Request can only be triaged when in New or Triaged status');
+    }
+
+    const updateData: Record<string, string> = {
+      category_id: parsedInput.data.category_id,
+      priority: parsedInput.data.priority,
+      assigned_to: parsedInput.data.assigned_to,
+    };
+
+    // Only transition status if currently submitted
+    if (request.status === 'submitted') {
+      updateData.status = 'triaged';
     }
 
     const { error } = await supabase
       .from('requests')
-      .update({
-        category_id: parsedInput.data.category_id,
-        priority: parsedInput.data.priority,
-        assigned_to: parsedInput.data.assigned_to,
-        status: 'triaged',
-      })
+      .update(updateData)
       .eq('id', parsedInput.id);
 
     if (error) {
@@ -254,6 +261,151 @@ export const deleteMediaAttachment = authActionClient
     }
 
     revalidatePath('/requests');
+    return { success: true };
+  });
+
+// ============================================================================
+// acceptRequest — requester or admin only, request must be pending_acceptance
+// ============================================================================
+export const acceptRequest = authActionClient
+  .schema(z.object({ request_id: z.string().uuid() }))
+  .action(async ({ parsedInput, ctx }) => {
+    const { supabase, profile } = ctx;
+
+    const { data: request } = await supabase
+      .from('requests')
+      .select('id, status, requester_id')
+      .eq('id', parsedInput.request_id)
+      .single();
+
+    if (!request || request.status !== 'pending_acceptance') {
+      throw new Error('Request is not in Pending Acceptance status');
+    }
+
+    const isRequester = request.requester_id === profile.id;
+    const isAdmin = profile.role === 'admin';
+
+    if (!isRequester && !isAdmin) {
+      throw new Error('Only the requester or an admin can accept this request');
+    }
+
+    const { error } = await supabase
+      .from('requests')
+      .update({
+        status: 'accepted',
+        accepted_at: new Date().toISOString(),
+      })
+      .eq('id', parsedInput.request_id);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    revalidatePath('/requests');
+    revalidatePath(`/requests/${parsedInput.request_id}`);
+    return { success: true };
+  });
+
+// ============================================================================
+// rejectCompletedWork — requester or admin only, request must be pending_acceptance
+// Reverts linked jobs to in_progress so PIC can rework
+// ============================================================================
+export const rejectCompletedWork = authActionClient
+  .schema(z.object({ request_id: z.string().uuid(), reason: z.string().min(1).max(1000) }))
+  .action(async ({ parsedInput, ctx }) => {
+    const { supabase, profile } = ctx;
+
+    const { data: request } = await supabase
+      .from('requests')
+      .select('id, status, requester_id')
+      .eq('id', parsedInput.request_id)
+      .single();
+
+    if (!request || request.status !== 'pending_acceptance') {
+      throw new Error('Request is not in Pending Acceptance status');
+    }
+
+    const isRequester = request.requester_id === profile.id;
+    const isAdmin = profile.role === 'admin';
+
+    if (!isRequester && !isAdmin) {
+      throw new Error('Only the requester or an admin can reject this work');
+    }
+
+    // Update request: revert to in_progress with rejection reason
+    const { error: requestError } = await supabase
+      .from('requests')
+      .update({
+        status: 'in_progress',
+        acceptance_rejected_reason: parsedInput.reason,
+      })
+      .eq('id', parsedInput.request_id);
+
+    if (requestError) {
+      throw new Error(requestError.message);
+    }
+
+    // Revert linked jobs back to in_progress and clear completed_at
+    const { data: jobLinks } = await supabase
+      .from('job_requests')
+      .select('job_id')
+      .eq('request_id', parsedInput.request_id);
+
+    if (jobLinks && jobLinks.length > 0) {
+      const jobIds = jobLinks.map((jl) => jl.job_id);
+      await supabase
+        .from('jobs')
+        .update({
+          status: 'in_progress',
+          completed_at: null,
+        })
+        .in('id', jobIds)
+        .eq('status', 'completed');
+    }
+
+    revalidatePath('/requests');
+    revalidatePath(`/requests/${parsedInput.request_id}`);
+    return { success: true };
+  });
+
+// ============================================================================
+// submitFeedback — requester only, request must be in accepted status
+// Sets feedback_rating and feedback_comment, transitions to closed
+// ============================================================================
+export const submitFeedback = authActionClient
+  .schema(feedbackSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    const { supabase, profile } = ctx;
+
+    const { data: request } = await supabase
+      .from('requests')
+      .select('id, status, requester_id')
+      .eq('id', parsedInput.request_id)
+      .single();
+
+    if (!request || request.status !== 'accepted') {
+      throw new Error('Request must be in Accepted status to submit feedback');
+    }
+
+    if (request.requester_id !== profile.id) {
+      throw new Error('Only the requester can submit feedback');
+    }
+
+    const { error } = await supabase
+      .from('requests')
+      .update({
+        feedback_rating: parsedInput.rating,
+        feedback_comment: parsedInput.comment ?? null,
+        status: 'closed',
+      })
+      .eq('id', parsedInput.request_id);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    revalidatePath('/requests');
+    revalidatePath(`/requests/${parsedInput.request_id}`);
     return { success: true };
   });
 

@@ -46,7 +46,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
   const { data: request } = await supabase
     .from('requests')
     .select(
-      '*, location:locations(name), category:categories(name), requester:user_profiles!requester_id(name, email), assigned_user:user_profiles!assigned_to(name, email), division:divisions(name)'
+      '*, location:locations(name), category:categories(name), requester:user_profiles!requester_id(name:full_name, email), assigned_user:user_profiles!assigned_to(name:full_name, email), division:divisions(name)'
     )
     .eq('id', id)
     .is('deleted_at', null)
@@ -57,7 +57,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
   }
 
   // Fetch all data in parallel
-  const [photosResult, auditLogsResult, categoriesResult, usersResult, locationsResult] =
+  const [photosResult, auditLogsResult, categoriesResult, usersResult, locationsResult, linkedJobsResult] =
     await Promise.all([
       // Photos: media_attachments for this request (non-deleted)
       supabase
@@ -87,10 +87,10 @@ export default async function RequestDetailPage({ params }: PageProps) {
       // Active users in same company for PIC
       supabase
         .from('user_profiles')
-        .select('id, name')
+        .select('id, name:full_name')
         .eq('company_id', profile.company_id)
         .is('deleted_at', null)
-        .order('name'),
+        .order('full_name'),
 
       // Locations for edit form
       supabase
@@ -99,6 +99,12 @@ export default async function RequestDetailPage({ params }: PageProps) {
         .eq('company_id', profile.company_id)
         .is('deleted_at', null)
         .order('name'),
+
+      // Linked jobs via job_requests join table
+      supabase
+        .from('job_requests')
+        .select('job:jobs(id, display_id, title, status)')
+        .eq('request_id', id),
     ]);
 
   // Generate signed URLs for photos
@@ -124,13 +130,13 @@ export default async function RequestDetailPage({ params }: PageProps) {
   const auditLogs = auditLogsResult.data ?? [];
 
   // Batch-fetch user info for all performed_by IDs
-  const performedByIds = [...new Set(auditLogs.map((log) => log.performed_by).filter(Boolean))];
+  const performedByIds = [...new Set(auditLogs.map((log) => log.user_id).filter(Boolean))];
   let userMap: Record<string, string> = {};
 
   if (performedByIds.length > 0) {
     const { data: performers } = await supabase
       .from('user_profiles')
-      .select('id, name, email')
+      .select('id, name:full_name, email')
       .in('id', performedByIds);
 
     if (performers) {
@@ -143,7 +149,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
   const timelineEvents: TimelineEvent[] = [];
 
   for (const log of auditLogs) {
-    const byUser = userMap[log.performed_by] ?? log.performed_by ?? 'System';
+    const byUser = userMap[log.user_id] ?? log.user_email ?? 'System';
     const newData = log.new_data as Record<string, unknown> | null;
     const oldData = log.old_data as Record<string, unknown> | null;
     const changedFields = log.changed_fields as string[] | null;
@@ -186,6 +192,60 @@ export default async function RequestDetailPage({ params }: PageProps) {
       continue;
     }
 
+    // Check for acceptance (status changed to 'accepted' with accepted_at)
+    if (
+      changedFields.includes('status') &&
+      newData?.status === 'accepted' &&
+      changedFields.includes('accepted_at')
+    ) {
+      // Check if auto_accepted flag is set
+      if (newData?.auto_accepted === true) {
+        timelineEvents.push({
+          type: 'auto_acceptance',
+          at: log.performed_at,
+          by: 'System',
+        });
+      } else {
+        timelineEvents.push({
+          type: 'acceptance',
+          at: log.performed_at,
+          by: byUser,
+        });
+      }
+      continue;
+    }
+
+    // Check for acceptance rejection (has acceptance_rejected_reason in new_data)
+    if (
+      changedFields.includes('acceptance_rejected_reason') &&
+      newData?.acceptance_rejected_reason
+    ) {
+      timelineEvents.push({
+        type: 'acceptance_rejection',
+        at: log.performed_at,
+        by: byUser,
+        details: { reason: newData.acceptance_rejected_reason as string },
+      });
+      continue;
+    }
+
+    // Check for feedback submitted (has feedback_rating in new_data)
+    if (
+      changedFields.includes('feedback_rating') &&
+      newData?.feedback_rating != null
+    ) {
+      timelineEvents.push({
+        type: 'feedback',
+        at: log.performed_at,
+        by: byUser,
+        details: {
+          rating: newData.feedback_rating as number,
+          comment: newData.feedback_comment as string | undefined,
+        },
+      });
+      continue;
+    }
+
     // Check for triage (category_id, priority, or assigned_to changed)
     const triageFields = ['category_id', 'priority', 'assigned_to'];
     const isTriageEvent = triageFields.some((f) => changedFields.includes(f));
@@ -215,7 +275,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
         } else {
           const { data: pic } = await supabase
             .from('user_profiles')
-            .select('name')
+            .select('name:full_name')
             .eq('id', newData.assigned_to as string)
             .single();
           picName = pic?.name;
@@ -267,6 +327,19 @@ export default async function RequestDetailPage({ params }: PageProps) {
   const categories = categoriesResult.data ?? [];
   const users = usersResult.data ?? [];
   const locations = locationsResult.data ?? [];
+
+  // Extract linked jobs from join table result
+  // Supabase returns FK relations as arrays when using select('job:jobs(...)')
+  type LinkedJobItem = { id: string; display_id: string; title: string; status: string };
+  type LinkedJobRow = { job: LinkedJobItem | LinkedJobItem[] | null };
+  const linkedJobs = (linkedJobsResult.data ?? [])
+    .map((row) => {
+      const job = (row as unknown as LinkedJobRow).job;
+      if (!job) return null;
+      // Supabase may return the relation as an array (many) or object (one)
+      return Array.isArray(job) ? job[0] ?? null : job;
+    })
+    .filter((job): job is LinkedJobItem => job !== null);
 
   return (
     <div className="space-y-6 py-6">
@@ -323,6 +396,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
         locations={locations}
         currentUserId={profile.id}
         currentUserRole={profile.role}
+        linkedJobs={linkedJobs}
       />
     </div>
   );
