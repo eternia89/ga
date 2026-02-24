@@ -452,18 +452,20 @@ export const addJobComment = authActionClient
       throw new Error('Only GA Lead, Admin, or assigned PIC can post comments');
     }
 
-    const { error } = await supabase
+    const { data: comment, error } = await supabase
       .from('job_comments')
       .insert({
         job_id: parsedInput.job_id,
         user_id: profile.id,
         content: parsedInput.content,
-      });
+      })
+      .select('id')
+      .single();
 
-    if (error) {
-      throw new Error(error.message);
+    if (error || !comment) {
+      throw new Error(error?.message ?? 'Failed to create comment');
     }
 
     revalidatePath(`/jobs/${parsedInput.job_id}`);
-    return { success: true };
+    return { success: true, commentId: comment.id };
   });
