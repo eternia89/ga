@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 9 of 9 (Polish & Integration) — IN PROGRESS
-Plan: 1 of 4 in phase complete
-Status: Plan 01 complete — GPS infrastructure (migration, useGeolocation hook, entity routes) and GPS-integrated job status workflow
-Last activity: 2026-02-25 -- Completed 09-01-PLAN.md (GPS Job Status Changes)
+Plan: 2 of 4 in phase complete
+Status: Plan 02 complete — Filterable audit trail viewer at /admin/audit-trail with 5-column DataTable, sidebar navigation, and permission gating for admin/ga_lead
+Last activity: 2026-02-25 -- Completed 09-02-PLAN.md (Audit Trail Viewer)
 
-Progress: [█████████████████████] (Phase 9 in progress — 1/4 plans done)
+Progress: [██████████████████████] (Phase 9 in progress — 2/4 plans done)
 
 ## Performance Metrics
 
@@ -183,6 +183,9 @@ Recent decisions affecting current work:
 - [Phase 09-01]: GPS columns nullable in job_status_changes — pre-existing transitions (no GPS) handled gracefully by checking latitude != null in timeline
 - [Phase 09-01]: Timeline GPS correlation uses from_status->to_status string key map; latest record kept per pair for jobs with repeated transitions
 - [Phase 09-01]: ENTITY_ROUTES maps settings entities to /admin/settings base path (no individual detail pages); entities with no detail page return '#'
+- [Phase 09-02]: audit_logs table uses user_id (UUID) and user_email columns — AuditLogRow type uses user_id matching actual DB schema (not performed_by as plan suggested)
+- [Phase 09-02]: AUDIT_VIEW permission added to ga_lead role in permissions.ts — was missing despite being defined as a PERMISSIONS constant; admin already has all permissions
+- [Phase 09-02]: Audit trail sidebar item uses PERMISSIONS.AUDIT_VIEW (not PERMISSIONS.ADMIN_PANEL) so ga_lead users also see it
 
 ### Pending Todos
 
@@ -198,6 +201,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 09-01-PLAN.md (GPS Job Status Changes)
-Resume file: .planning/phases/09-polish-integration/09-01-SUMMARY.md
-Next: Execute Phase 9 Plan 02 (Audit Trail Viewer)
+Stopped at: Completed 09-02-PLAN.md (Audit Trail Viewer)
+Resume file: .planning/phases/09-polish-integration/09-02-SUMMARY.md
+Next: Execute Phase 9 Plan 03

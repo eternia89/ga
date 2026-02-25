@@ -302,7 +302,7 @@ All requirements below are scoped for v1 unless marked otherwise.
 | REQ-DATA-002 | Phase 8 | Complete |
 | REQ-DATA-003 | Phase 1 | Pending |
 | REQ-DATA-004 | Phase 4 | Pending |
-| REQ-DATA-005 | Phase 9 | Pending |
+| REQ-DATA-005 | Phase 9 | Complete |
 | REQ-UI-001 | Phase 3 | Pending |
 | REQ-UI-002 | Phase 3 | Pending |
 | REQ-UI-003 | Phase 9 | Pending |
