@@ -1,24 +1,24 @@
 import Link from 'next/link';
-import { ShieldX } from 'lucide-react';
+import { FileQuestion } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function UnauthorizedPage() {
+export default function NotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full text-center">
         {/* Icon */}
         <div className="mb-6 flex justify-center">
-          <ShieldX className="h-12 w-12 text-muted-foreground" />
+          <FileQuestion className="h-12 w-12 text-muted-foreground" />
         </div>
 
         {/* Heading */}
         <h1 className="text-2xl font-semibold text-foreground mb-2">
-          Access Denied
+          Page not found
         </h1>
 
         {/* Description */}
         <p className="text-muted-foreground mb-8">
-          You don&apos;t have permission to view this page.
+          The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
 
         {/* CTA */}

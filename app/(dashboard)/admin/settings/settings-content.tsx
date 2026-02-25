@@ -32,20 +32,22 @@ export function SettingsContent({
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+        <p className="text-muted-foreground mt-1">
           Manage your organization's configuration
         </p>
       </div>
 
       {/* Main tabs */}
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList>
-          <TabsTrigger value="companies">Companies</TabsTrigger>
-          <TabsTrigger value="divisions">Divisions</TabsTrigger>
-          <TabsTrigger value="locations">Locations</TabsTrigger>
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList>
+            <TabsTrigger value="companies">Companies</TabsTrigger>
+            <TabsTrigger value="divisions">Divisions</TabsTrigger>
+            <TabsTrigger value="locations">Locations</TabsTrigger>
+            <TabsTrigger value="categories">Categories</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="companies" className="space-y-4">
           <CompanyTable data={companies} />

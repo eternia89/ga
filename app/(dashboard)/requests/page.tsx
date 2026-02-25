@@ -1,6 +1,14 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { RequestTable } from '@/components/requests/request-table';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 export default async function RequestsPage() {
   const supabase = await createClient();
@@ -28,7 +36,7 @@ export default async function RequestsPage() {
   const requestQuery = supabase
     .from('requests')
     .select(
-      '*, location:locations(name), category:categories(name), requester:user_profiles!requester_id(name, email), assigned_user:user_profiles!assigned_to(name, email), division:divisions(name)'
+      '*, location:locations(name), category:categories(name), requester:user_profiles!requester_id(name:full_name, email), assigned_user:user_profiles!assigned_to(name:full_name, email), division:divisions(name)'
     )
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
@@ -50,18 +58,74 @@ export default async function RequestsPage() {
       .order('name'),
     supabase
       .from('user_profiles')
-      .select('id, name')
+      .select('id, name:full_name')
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
-      .order('name'),
+      .order('full_name'),
   ]);
 
   const requests = requestsResult.data ?? [];
   const categories = categoriesResult.data ?? [];
   const users = usersResult.data ?? [];
 
+  // Batch-fetch photos for all requests
+  const requestIds = requests.map((r) => r.id);
+  let photosByRequest: Record<string, { id: string; url: string; fileName: string }[]> = {};
+
+  if (requestIds.length > 0) {
+    const { data: attachments } = await supabase
+      .from('media_attachments')
+      .select('id, entity_id, file_name, file_path')
+      .eq('entity_type', 'request')
+      .in('entity_id', requestIds)
+      .is('deleted_at', null)
+      .order('sort_order', { ascending: true });
+
+    if (attachments && attachments.length > 0) {
+      const { data: signedUrls } = await supabase.storage
+        .from('request-photos')
+        .createSignedUrls(
+          attachments.map((a) => a.file_path),
+          21600
+        );
+
+      const photosWithUrls = attachments.map((a, i) => ({
+        id: a.id,
+        entityId: a.entity_id,
+        url: signedUrls?.[i]?.signedUrl ?? '',
+        fileName: a.file_name,
+      }));
+
+      // Group by request ID
+      photosByRequest = {};
+      for (const photo of photosWithUrls) {
+        if (!photosByRequest[photo.entityId]) {
+          photosByRequest[photo.entityId] = [];
+        }
+        photosByRequest[photo.entityId].push({
+          id: photo.id,
+          url: photo.url,
+          fileName: photo.fileName,
+        });
+      }
+    }
+  }
+
   return (
     <div className="space-y-6 py-6">
+      {/* Breadcrumb */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Requests</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Requests</h1>
         <p className="text-muted-foreground mt-1">
@@ -77,6 +141,7 @@ export default async function RequestsPage() {
         users={users}
         currentUserId={profile.id}
         currentUserRole={profile.role}
+        photosByRequest={photosByRequest}
       />
     </div>
   );

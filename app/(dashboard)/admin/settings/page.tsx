@@ -1,6 +1,14 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SettingsContent } from "./settings-content";
 import { Company, Division, Location, Category } from "@/lib/types/database";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 export default async function SettingsPage({
   searchParams,
@@ -33,12 +41,27 @@ export default async function SettingsPage({
   const categories = (categoriesResult.data as Category[]) || [];
 
   return (
-    <SettingsContent
-      companies={companies}
-      divisions={divisions}
-      locations={locations}
-      categories={categories}
-      initialTab={initialTab}
-    />
+    <div className="space-y-4">
+      {/* Breadcrumb */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Settings</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <SettingsContent
+        companies={companies}
+        divisions={divisions}
+        locations={locations}
+        categories={categories}
+        initialTab={initialTab}
+      />
+    </div>
   );
 }

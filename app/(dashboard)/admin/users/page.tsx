@@ -1,6 +1,14 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { UserTable } from '@/components/admin/users/user-table';
 import type { UserRow } from '@/components/admin/users/user-columns';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 export default async function UsersPage() {
   const adminSupabase = createAdminClient();
@@ -47,9 +55,22 @@ export default async function UsersPage() {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumb */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Users</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-2">
+        <h1 className="text-2xl font-bold tracking-tight">User Management</h1>
+        <p className="text-muted-foreground mt-1">
           Create and manage user accounts
         </p>
       </div>

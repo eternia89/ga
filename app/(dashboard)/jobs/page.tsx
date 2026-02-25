@@ -1,6 +1,14 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { JobTable } from '@/components/jobs/job-table';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 export default async function JobsPage() {
   const supabase = await createClient();
@@ -58,6 +66,19 @@ export default async function JobsPage() {
 
   return (
     <div className="space-y-6 py-6">
+      {/* Breadcrumb */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Jobs</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Jobs</h1>
         <p className="text-muted-foreground mt-1">
