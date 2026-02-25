@@ -5,6 +5,7 @@ import { authActionClient } from '@/lib/safe-action';
 import { requestSubmitSchema, requestEditSchema, triageSchema, rejectSchema } from '@/lib/validations/request-schema';
 import { feedbackSchema } from '@/lib/validations/job-schema';
 import { z } from 'zod';
+import { createNotifications } from '@/lib/notifications/helpers';
 
 // ============================================================================
 // createRequest — any authenticated user, auto-fills division from profile
@@ -107,10 +108,10 @@ export const triageRequest = authActionClient
       throw new Error('Triage access required');
     }
 
-    // Verify request is in submitted or triaged status
+    // Verify request is in submitted or triaged status — also fetch requester_id and display_id
     const { data: request } = await supabase
       .from('requests')
-      .select('id, status')
+      .select('id, status, requester_id, display_id, company_id')
       .eq('id', parsedInput.id)
       .single();
 
@@ -138,6 +139,27 @@ export const triageRequest = authActionClient
       throw new Error(error.message);
     }
 
+    // Fetch PIC name for notification body
+    const { data: assignedUser } = await supabase
+      .from('user_profiles')
+      .select('full_name')
+      .eq('id', parsedInput.data.assigned_to)
+      .single();
+
+    const picName = assignedUser?.full_name ?? 'the assigned staff';
+
+    // Non-blocking notification: notify requester and PIC (actor excluded automatically)
+    createNotifications({
+      companyId: request.company_id,
+      recipientIds: [request.requester_id, parsedInput.data.assigned_to],
+      actorId: profile.id,
+      title: `Request ${request.display_id} triaged`,
+      body: `Priority: ${parsedInput.data.priority}, assigned to ${picName}`,
+      type: 'status_change',
+      entityType: 'request',
+      entityId: request.id,
+    }).catch(() => {});
+
     revalidatePath('/requests');
     return { success: true };
   });
@@ -156,7 +178,7 @@ export const cancelRequest = authActionClient
       .eq('id', parsedInput.id)
       .eq('requester_id', profile.id)
       .eq('status', 'submitted')
-      .select('id');
+      .select('id, display_id, company_id');
 
     if (error) {
       throw new Error(error.message);
@@ -164,6 +186,29 @@ export const cancelRequest = authActionClient
 
     if (!data || data.length === 0) {
       throw new Error('Cannot cancel — request is not in New status or you are not the requester');
+    }
+
+    const cancelledRequest = data[0];
+
+    // Non-blocking notification: notify GA Lead and Admin users in the same company
+    const { data: gaUsers } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .in('role', ['ga_lead', 'admin'])
+      .eq('company_id', profile.company_id)
+      .is('deleted_at', null);
+
+    if (gaUsers && gaUsers.length > 0) {
+      createNotifications({
+        companyId: cancelledRequest.company_id,
+        recipientIds: gaUsers.map((u) => u.id),
+        actorId: profile.id,
+        title: `Request ${cancelledRequest.display_id} cancelled`,
+        body: `Cancelled by the requester`,
+        type: 'status_change',
+        entityType: 'request',
+        entityId: cancelledRequest.id,
+      }).catch(() => {});
     }
 
     revalidatePath('/requests');
@@ -183,10 +228,10 @@ export const rejectRequest = authActionClient
       throw new Error('Triage access required');
     }
 
-    // Verify request is in a rejectable status
+    // Verify request is in a rejectable status — also fetch requester_id, display_id, company_id
     const { data: request } = await supabase
       .from('requests')
-      .select('id, status')
+      .select('id, status, requester_id, display_id, company_id')
       .eq('id', parsedInput.id)
       .single();
 
@@ -207,6 +252,19 @@ export const rejectRequest = authActionClient
     if (error) {
       throw new Error(error.message);
     }
+
+    // Non-blocking notification: notify the requester
+    const truncatedReason = parsedInput.data.reason.substring(0, 100);
+    createNotifications({
+      companyId: request.company_id,
+      recipientIds: [request.requester_id],
+      actorId: profile.id,
+      title: `Request ${request.display_id} rejected`,
+      body: truncatedReason,
+      type: 'status_change',
+      entityType: 'request',
+      entityId: request.id,
+    }).catch(() => {});
 
     revalidatePath('/requests');
     return { success: true };

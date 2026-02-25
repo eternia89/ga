@@ -1,3 +1,9 @@
+// Usage pattern for adding notifications to server actions:
+// 1. Import: import { createNotifications } from '@/lib/notifications/helpers'
+// 2. After successful mutation, call (non-blocking):
+//    createNotifications({ companyId, recipientIds, actorId, title, body, type, entityType, entityId }).catch(() => {})
+// 3. Always set actorId to exclude the acting user from notifications
+
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export interface NotifyParams {
