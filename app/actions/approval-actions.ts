@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
+import { createNotifications } from '@/lib/notifications/helpers';
 
 // ============================================================================
 // submitForApproval — ga_lead or admin only
@@ -21,7 +22,7 @@ export const submitForApproval = authActionClient
     // Fetch the job
     const { data: job } = await supabase
       .from('jobs')
-      .select('id, status, estimated_cost, company_id')
+      .select('id, status, estimated_cost, company_id, display_id')
       .eq('id', parsedInput.job_id)
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
@@ -71,6 +72,28 @@ export const submitForApproval = authActionClient
     revalidatePath('/jobs');
     revalidatePath(`/jobs/${parsedInput.job_id}`);
     revalidatePath('/approvals');
+
+    // Non-blocking notification: notify finance approvers and admins
+    const { data: financeApprovers } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('company_id', job.company_id)
+      .in('role', ['finance_approver', 'admin'])
+      .is('deleted_at', null);
+
+    if (financeApprovers && financeApprovers.length > 0) {
+      createNotifications({
+        companyId: job.company_id,
+        recipientIds: financeApprovers.map((u) => u.id),
+        actorId: profile.id,
+        title: `Job ${job.display_id} requires approval`,
+        body: `Estimated cost: Rp ${(estimatedCost).toLocaleString('id-ID')}`,
+        type: 'approval',
+        entityType: 'job',
+        entityId: parsedInput.job_id,
+      });
+    }
+
     return { success: true };
   });
 
@@ -90,7 +113,7 @@ export const approveJob = authActionClient
 
     const { data: job } = await supabase
       .from('jobs')
-      .select('id, status, company_id')
+      .select('id, status, company_id, display_id, created_by, assigned_to')
       .eq('id', parsedInput.job_id)
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
@@ -116,6 +139,19 @@ export const approveJob = authActionClient
     if (error) {
       throw new Error(error.message);
     }
+
+    // Non-blocking notification: notify job creator and assigned PIC
+    const approvalRecipients = [job.created_by, job.assigned_to].filter(Boolean) as string[];
+    createNotifications({
+      companyId: job.company_id,
+      recipientIds: approvalRecipients,
+      actorId: profile.id,
+      title: `Job ${job.display_id} approved`,
+      body: 'Budget approval granted — work can proceed',
+      type: 'approval',
+      entityType: 'job',
+      entityId: parsedInput.job_id,
+    });
 
     revalidatePath('/jobs');
     revalidatePath(`/jobs/${parsedInput.job_id}`);
@@ -144,7 +180,7 @@ export const rejectJob = authActionClient
 
     const { data: job } = await supabase
       .from('jobs')
-      .select('id, status, company_id')
+      .select('id, status, company_id, display_id, created_by, assigned_to')
       .eq('id', parsedInput.job_id)
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
@@ -174,6 +210,20 @@ export const rejectJob = authActionClient
     if (error) {
       throw new Error(error.message);
     }
+
+    // Non-blocking notification: notify job creator and assigned PIC with reason
+    const rejectionRecipients = [job.created_by, job.assigned_to].filter(Boolean) as string[];
+    const truncatedReason = parsedInput.reason.substring(0, 100);
+    createNotifications({
+      companyId: job.company_id,
+      recipientIds: rejectionRecipients,
+      actorId: profile.id,
+      title: `Job ${job.display_id} approval rejected`,
+      body: truncatedReason,
+      type: 'approval',
+      entityType: 'job',
+      entityId: parsedInput.job_id,
+    });
 
     revalidatePath('/jobs');
     revalidatePath(`/jobs/${parsedInput.job_id}`);
