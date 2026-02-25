@@ -121,8 +121,8 @@ export function DataTable<TData, TValue>({
         createButton={createButton}
         exportUrl={exportUrl}
       />
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="min-w-[600px]">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

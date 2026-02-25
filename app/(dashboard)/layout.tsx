@@ -3,6 +3,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { createClient } from '@/lib/supabase/server';
 import { AuthProvider } from '@/lib/auth/hooks';
 import { Sidebar } from '@/components/sidebar';
+import { MobileMenu } from '@/components/mobile-menu';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import type { ReactNode } from 'react';
 
@@ -35,14 +36,26 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     <NuqsAdapter>
       <AuthProvider initialProfile={profile}>
         <div className="flex h-screen">
-          <Sidebar companyName={companyName} />
+          {/* Desktop sidebar — hidden on mobile */}
+          <div className="max-md:hidden">
+            <Sidebar companyName={companyName} />
+          </div>
+
           <div className="flex-1 flex flex-col min-h-0">
-            {/* Top header bar with notification bell */}
-            <header className="flex items-center justify-end px-6 py-3 border-b border-border bg-white dark:bg-gray-950 flex-shrink-0">
+            {/* Top header bar */}
+            <header className="flex items-center justify-between px-6 py-3 border-b border-border bg-white flex-shrink-0 max-md:px-4">
+              {/* Mobile hamburger + company name — hidden on desktop */}
+              <div className="hidden max-md:flex items-center gap-3">
+                <MobileMenu companyName={companyName} />
+                <span className="text-sm font-semibold truncate">{companyName}</span>
+              </div>
+              {/* Spacer on desktop (pushes bell to right) */}
+              <div className="max-md:hidden" />
               <NotificationBell />
             </header>
+
             {/* Scrollable content area */}
-            <main className="flex-1 overflow-auto p-6 bg-white dark:bg-gray-950">
+            <main className="flex-1 overflow-auto p-6 max-md:p-4 bg-white">
               {children}
             </main>
           </div>

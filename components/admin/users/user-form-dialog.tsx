@@ -185,7 +185,7 @@ export function UserFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="max-w-[500px] max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0">
         <DialogHeader>
           <DialogTitle>{isEditMode ? 'Edit User' : 'Create New User'}</DialogTitle>
           <DialogDescription>

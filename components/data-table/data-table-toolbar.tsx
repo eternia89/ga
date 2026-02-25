@@ -116,9 +116,9 @@ export function DataTableToolbar<TData>({
   };
 
   return (
-    <div className="flex items-center justify-between gap-4 py-4">
+    <div className="flex items-center justify-between gap-4 py-4 max-md:flex-wrap">
       {/* Left side: Search, filters, deactivated toggle */}
-      <div className="flex flex-1 items-center gap-2">
+      <div className="flex flex-1 items-center gap-2 flex-wrap">
         {/* Search input */}
         {searchKey && (
           <Input

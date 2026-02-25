@@ -133,7 +133,7 @@ export function ProfileSheet({ open, onOpenChange }: ProfileSheetProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="max-w-[480px] max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0">
         <DialogHeader>
           <DialogTitle>Profile</DialogTitle>
           <DialogDescription>

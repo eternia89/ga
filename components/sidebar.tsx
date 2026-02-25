@@ -108,15 +108,23 @@ const NAV_SECTIONS: NavSection[] = [
         built: true,
         icon: '⚙',
       },
+      {
+        label: 'Audit Trail',
+        href: '/admin/audit-trail',
+        permission: PERMISSIONS.AUDIT_VIEW,
+        built: true,
+        icon: '📜',
+      },
     ],
   },
 ];
 
 type SidebarProps = {
   companyName: string;
+  onNavigate?: () => void;
 };
 
-export function Sidebar({ companyName }: SidebarProps) {
+export function Sidebar({ companyName, onNavigate }: SidebarProps) {
   const { profile } = useUser();
   const pathname = usePathname();
 
@@ -172,6 +180,7 @@ export function Sidebar({ companyName }: SidebarProps) {
                     <li key={item.href}>
                       <Link
                         href={item.href}
+                        onClick={onNavigate}
                         className={`
                           flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors
                           ${

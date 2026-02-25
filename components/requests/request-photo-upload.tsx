@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { X, Plus } from 'lucide-react';
 
+
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -26,7 +27,10 @@ export function RequestPhotoUpload({
   maxPhotos = 3,
 }: RequestPhotoUploadProps) {
   const [previews, setPreviews] = useState<{ url: string; file: File }[]>([]);
-  const inputRef = useRef<HTMLInputElement>(null);
+  // Desktop input (no capture) — shown on desktop, hidden on mobile
+  const desktopInputRef = useRef<HTMLInputElement>(null);
+  // Mobile input (with camera capture) — shown on mobile, hidden on desktop
+  const mobileInputRef = useRef<HTMLInputElement>(null);
 
   const totalPhotos = existingPhotos.length + previews.length;
   const remainingSlots = maxPhotos - totalPhotos;
@@ -56,9 +60,12 @@ export function RequestPhotoUpload({
     setPreviews(combined);
     onChange(combined.map((p) => p.file));
 
-    // Reset file input so same file can be re-selected after removal
-    if (inputRef.current) {
-      inputRef.current.value = '';
+    // Reset file inputs so same file can be re-selected after removal
+    if (desktopInputRef.current) {
+      desktopInputRef.current.value = '';
+    }
+    if (mobileInputRef.current) {
+      mobileInputRef.current.value = '';
     }
   };
 
@@ -70,67 +77,85 @@ export function RequestPhotoUpload({
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
-        {/* Existing photos (read-only, no remove button) */}
-        {existingPhotos.map((photo) => (
-          <div key={photo.id} className="relative w-20 h-20 shrink-0">
-            <img
-              src={photo.url}
-              alt={photo.fileName}
-              className="w-full h-full object-cover rounded border border-border"
-            />
-          </div>
-        ))}
+    <>
+      {/* Existing photos (read-only, no remove button) */}
+      {existingPhotos.map((photo) => (
+        <div key={photo.id} className="relative w-20 h-20 shrink-0">
+          <img
+            src={photo.url}
+            alt={photo.fileName}
+            className="w-full h-full object-cover rounded border border-border"
+          />
+        </div>
+      ))}
 
-        {/* New preview thumbnails (removable) */}
-        {previews.map((preview, index) => (
-          <div key={index} className="relative w-20 h-20 shrink-0">
-            <img
-              src={preview.url}
-              alt={`Photo ${index + 1}`}
-              className="w-full h-full object-cover rounded border border-border"
-            />
-            {!disabled && (
-              <button
-                type="button"
-                onClick={() => removePreview(index)}
-                className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground rounded-full p-0.5 shadow-sm hover:opacity-90"
-                aria-label={`Remove photo ${index + 1}`}
-              >
-                <X className="w-3 h-3" />
-              </button>
-            )}
-          </div>
-        ))}
+      {/* New preview thumbnails (removable) */}
+      {previews.map((preview, index) => (
+        <div key={index} className="relative w-20 h-20 shrink-0">
+          <img
+            src={preview.url}
+            alt={`Photo ${index + 1}`}
+            className="w-full h-full object-cover rounded border border-border"
+          />
+          {!disabled && (
+            <button
+              type="button"
+              onClick={() => removePreview(index)}
+              className="absolute -top-1.5 -right-1.5 bg-destructive text-white rounded-full p-0.5 shadow-sm hover:opacity-90"
+              aria-label={`Remove photo ${index + 1}`}
+            >
+              <X className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+      ))}
 
-        {/* Add photo button — shown when slots remain */}
-        {remainingSlots > 0 && !disabled && (
+      {/* Add photo button — shown when slots remain */}
+      {remainingSlots > 0 && !disabled && (
+        <>
+          {/* Desktop button (no camera capture) */}
           <button
             type="button"
-            onClick={() => inputRef.current?.click()}
-            className="w-20 h-20 border-2 border-dashed border-border rounded flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors shrink-0"
+            onClick={() => desktopInputRef.current?.click()}
+            className="w-20 h-20 border-2 border-dashed border-border rounded flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors shrink-0 cursor-pointer max-md:hidden"
             aria-label="Add photo"
           >
             <Plus className="w-5 h-5" />
           </button>
-        )}
-      </div>
 
-      <p className="text-xs text-muted-foreground">
-        {totalPhotos}/{maxPhotos} photos. JPEG, PNG, or WebP. Max 5MB each.
-      </p>
+          {/* Mobile button (triggers camera capture) */}
+          <button
+            type="button"
+            onClick={() => mobileInputRef.current?.click()}
+            className="w-20 h-20 border-2 border-dashed border-border rounded items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors shrink-0 cursor-pointer hidden max-md:flex"
+            aria-label="Add photo"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+        </>
+      )}
 
+      {/* Desktop file input — no capture attribute */}
       <input
-        ref={inputRef}
+        ref={desktopInputRef}
         type="file"
         accept="image/jpeg,image/png,image/webp"
         className="sr-only"
         onChange={handleFileChange}
         multiple
         disabled={disabled}
-        aria-hidden="true"
       />
-    </div>
+
+      {/* Mobile file input — with camera capture */}
+      <input
+        ref={mobileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        capture="environment"
+        className="sr-only"
+        onChange={handleFileChange}
+        disabled={disabled}
+      />
+    </>
   );
 }

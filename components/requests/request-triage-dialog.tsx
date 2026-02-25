@@ -23,13 +23,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { PRIORITY_LABELS } from '@/lib/constants/request-status';
 
@@ -60,7 +53,7 @@ export function RequestTriageDialog({
 }: RequestTriageDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   const form = useForm<TriageFormData>({
@@ -121,12 +114,13 @@ export function RequestTriageDialog({
       : description;
 
   const categoryOptions = categories.map((c) => ({ label: c.name, value: c.id }));
+  const priorityOptions = Object.entries(PRIORITY_LABELS).map(([value, label]) => ({ label, value }));
   const userOptions = users.map((u) => ({ label: u.name, value: u.id }));
 
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[600px] max-h-[90vh] overflow-y-auto max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0">
           <DialogHeader>
             <DialogTitle>
               Triage Request{request ? ` — ${request.display_id}` : ''}
@@ -170,11 +164,11 @@ export function RequestTriageDialog({
                       Photos
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {photoUrls.map((photo) => (
+                      {photoUrls.map((photo, index) => (
                         <button
                           key={photo.id}
                           type="button"
-                          onClick={() => setLightboxSrc(photo.url)}
+                          onClick={() => setLightboxIndex(index)}
                           className="w-20 h-20 shrink-0 rounded border border-border overflow-hidden hover:opacity-80 transition-opacity"
                           aria-label={`View photo: ${photo.fileName}`}
                         >
@@ -224,20 +218,16 @@ export function RequestTriageDialog({
                         <FormLabel>
                           Priority <span className="text-destructive">*</span>
                         </FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value ?? ''}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select priority..." />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
-                              <SelectItem key={value} value={value}>
-                                {label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <Combobox
+                            options={priorityOptions}
+                            value={field.value ?? ''}
+                            onValueChange={field.onChange}
+                            placeholder="Select priority..."
+                            searchPlaceholder="Search priorities..."
+                            emptyText="No priorities found."
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -294,10 +284,11 @@ export function RequestTriageDialog({
         </DialogContent>
       </Dialog>
 
-      {lightboxSrc && (
+      {lightboxIndex !== null && (
         <PhotoLightbox
-          src={lightboxSrc}
-          onClose={() => setLightboxSrc(null)}
+          photos={photoUrls}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
         />
       )}
     </>
