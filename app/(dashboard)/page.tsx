@@ -14,7 +14,21 @@ import {
 } from 'lucide-react';
 import { KpiCard } from '@/components/dashboard/kpi-card';
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter';
-import { getDashboardKpis, calculateTrend } from '@/lib/dashboard/queries';
+import { StatusBarChart } from '@/components/dashboard/status-bar-chart';
+import { StaffWorkloadTable } from '@/components/dashboard/staff-workload-table';
+import { RequestAgingTable } from '@/components/dashboard/request-aging-table';
+import { MaintenanceSummary } from '@/components/dashboard/maintenance-summary';
+import { InventorySummary } from '@/components/dashboard/inventory-summary';
+import {
+  getDashboardKpis,
+  calculateTrend,
+  getRequestStatusDistribution,
+  getJobStatusDistribution,
+  getStaffWorkload,
+  getRequestAging,
+  getMaintenanceSummary,
+  getInventoryCounts,
+} from '@/lib/dashboard/queries';
 
 // Operational roles that see the full dashboard
 const OPERATIONAL_ROLES = ['ga_lead', 'admin', 'finance_approver'];
@@ -84,10 +98,28 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   const dateTo =
     resolvedParams.to ?? format(endOfMonth(new Date()), 'yyyy-MM-dd');
 
-  // Fetch KPI data for operational roles
-  const kpis = isOperational
-    ? await getDashboardKpis(supabase, { from: dateFrom, to: dateTo })
-    : [];
+  const dateRange = { from: dateFrom, to: dateTo };
+
+  // Fetch all dashboard data in parallel for operational roles
+  const [
+    kpis,
+    requestStatusData,
+    jobStatusData,
+    staffWorkloadData,
+    agingData,
+    maintenanceData,
+    inventoryData,
+  ] = isOperational
+    ? await Promise.all([
+        getDashboardKpis(supabase, dateRange),
+        getRequestStatusDistribution(supabase, dateRange),
+        getJobStatusDistribution(supabase, dateRange),
+        getStaffWorkload(supabase),
+        getRequestAging(supabase),
+        getMaintenanceSummary(supabase),
+        getInventoryCounts(supabase),
+      ])
+    : [[], [], [], [], [], [], { byStatus: [], byCategory: [] }];
 
   return (
     <div className="space-y-6">
@@ -112,9 +144,10 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         )}
       </div>
 
-      {/* Operational dashboard — KPI cards */}
+      {/* Operational dashboard */}
       {isOperational && (
         <>
+          {/* KPI cards */}
           <div className="grid grid-cols-5 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 gap-4">
             {kpis.map((kpi) => {
               const trend = calculateTrend(kpi.value, kpi.previousValue);
@@ -132,11 +165,33 @@ export default async function DashboardPage({ searchParams }: PageProps) {
             })}
           </div>
 
-          {/* Charts placeholder — will be built in plan 08-06 */}
-          <div className="rounded-lg border border-dashed border-border p-8 text-center">
-            <p className="text-sm text-muted-foreground">
-              Charts will appear here
-            </p>
+          {/* Two-column: charts + tables */}
+          <div className="grid grid-cols-2 max-lg:grid-cols-1 gap-6">
+            {/* Left column: Request Status chart + Job Status chart */}
+            <div className="space-y-6">
+              <StatusBarChart
+                data={requestStatusData}
+                entityPath="requests"
+                title="Request Status Distribution"
+              />
+              <StatusBarChart
+                data={jobStatusData}
+                entityPath="jobs"
+                title="Job Status Distribution"
+              />
+            </div>
+
+            {/* Right column: Staff Workload + Request Aging */}
+            <div className="space-y-6">
+              <StaffWorkloadTable data={staffWorkloadData} />
+              <RequestAgingTable data={agingData} />
+            </div>
+          </div>
+
+          {/* Full-width row: Maintenance + Inventory side by side */}
+          <div className="grid grid-cols-2 max-lg:grid-cols-1 gap-6">
+            <MaintenanceSummary data={maintenanceData} />
+            <InventorySummary data={inventoryData} />
           </div>
         </>
       )}
