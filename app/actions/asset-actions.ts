@@ -12,6 +12,11 @@ import {
   transferCancelSchema,
 } from '@/lib/validations/asset-schema';
 import { ASSET_STATUS_TRANSITIONS } from '@/lib/constants/asset-status';
+import {
+  pauseSchedulesForAsset,
+  resumeSchedulesForAsset,
+  deactivateSchedulesForAsset,
+} from '@/app/actions/schedule-actions';
 import { z } from 'zod';
 
 // ============================================================================
@@ -173,18 +178,18 @@ export const changeAssetStatus = authActionClient
       throw new Error(error.message);
     }
 
-    // Auto-pause maintenance schedules when asset is broken or sold_disposed
-    if (parsedInput.new_status === 'broken' || parsedInput.new_status === 'sold_disposed') {
-      await supabase
-        .from('maintenance_schedules')
-        .update({
-          is_paused: true,
-          paused_at: new Date().toISOString(),
-          paused_reason: `Asset status: ${parsedInput.new_status}`,
-        })
-        .eq('item_id', parsedInput.asset_id)
-        .eq('is_paused', false)
-        .is('deleted_at', null);
+    // Maintenance schedule hooks based on new status
+    if (parsedInput.new_status === 'sold_disposed') {
+      // Terminal status: permanently deactivate (soft-delete) all schedules
+      // Historical PM jobs remain per CONTEXT.md
+      await deactivateSchedulesForAsset(supabase, parsedInput.asset_id);
+    } else if (['broken', 'under_repair'].includes(parsedInput.new_status)) {
+      // Auto-pause all active schedules, cancel open PM jobs
+      await pauseSchedulesForAsset(supabase, parsedInput.asset_id, parsedInput.new_status);
+    } else if (parsedInput.new_status === 'active') {
+      // Auto-resume schedules that were auto-paused (paused_reason starts with 'auto:')
+      // Manual pauses are NOT resumed automatically
+      await resumeSchedulesForAsset(supabase, parsedInput.asset_id);
     }
 
     revalidatePath('/inventory');
