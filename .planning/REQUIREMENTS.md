@@ -284,13 +284,13 @@ All requirements below are scoped for v1 unless marked otherwise.
 | REQ-MEDIA-004 | Phase 8 | Pending |
 | REQ-MEDIA-005 | Phase 8 | Complete |
 | REQ-MEDIA-006 | Phase 8 | Pending |
-| REQ-NOTIF-001 | Phase 8 | Pending |
-| REQ-NOTIF-002 | Phase 8 | Pending |
-| REQ-NOTIF-003 | Phase 8 | Pending |
+| REQ-NOTIF-001 | Phase 8 | Complete |
+| REQ-NOTIF-002 | Phase 8 | Complete |
+| REQ-NOTIF-003 | Phase 8 | Complete |
 | REQ-NOTIF-004 | Phase 8 | Pending |
-| REQ-NOTIF-005 | Phase 8 | Pending |
+| REQ-NOTIF-005 | Phase 8 | Complete |
 | REQ-NOTIF-006 | Phase 8 | Pending |
-| REQ-NOTIF-007 | Phase 8 | Pending |
+| REQ-NOTIF-007 | Phase 8 | Complete |
 | REQ-DASH-001 | Phase 8 | Pending |
 | REQ-DASH-002 | Phase 8 | Pending |
 | REQ-DASH-003 | Phase 8 | Pending |
@@ -299,7 +299,7 @@ All requirements below are scoped for v1 unless marked otherwise.
 | REQ-DASH-006 | Phase 8 | Pending |
 | REQ-DASH-007 | Phase 8 | Pending |
 | REQ-DATA-001 | Phase 1 | Pending |
-| REQ-DATA-002 | Phase 8 | Pending |
+| REQ-DATA-002 | Phase 8 | Complete |
 | REQ-DATA-003 | Phase 1 | Pending |
 | REQ-DATA-004 | Phase 4 | Pending |
 | REQ-DATA-005 | Phase 9 | Pending |

@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 8 of 9 (Media, Notifications & Dashboards) — IN PROGRESS
-Plan: 1 of 4 in phase complete
-Status: Plan 01 complete — media infrastructure: compression, annotation, generic upload route, PhotoUpload component
-Last activity: 2026-02-25 -- Completed 08-01-PLAN.md (Media Infrastructure)
+Plan: 5 of 7 in phase complete
+Status: Plan 05 complete — operational dashboard with KPI cards, trend indicators, date range filter
+Last activity: 2026-02-25 -- Completed 08-05-PLAN.md (Dashboard KPI Cards)
 
-Progress: [████████████████░] (Phase 8 in progress — 1/4 plans done)
+Progress: [██████████████████░] (Phase 8 in progress — 5/7 plans done)
 
 ## Performance Metrics
 
@@ -48,6 +48,9 @@ Progress: [████████████████░] (Phase 8 in prog
 | Phase 07-preventive-maintenance P03 | 6 | 2 tasks | 9 files |
 | Phase 07-preventive-maintenance P04 | 4 | 2 tasks | 11 files |
 | Phase 08-media-notifications-dashboards P01 | 8 | 2 tasks | 7 files |
+| Phase 08-media-notifications-dashboards P07 | 3 | 2 tasks | 8 files |
+| Phase 08 P03 | 3 | 2 tasks | 7 files |
+| Phase 08-media-notifications-dashboards P05 | 3 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -149,6 +152,16 @@ Recent decisions affecting current work:
 - [Phase 08-01]: Freehand-only annotation (ReactSketchCanvas) — no text overlay, shapes, or arrows per phase decision
 - [Phase 08-01]: Compression runs client-side via useWebWorker:true (non-blocking WebP conversion before preview)
 - [Phase 08-01]: job_comment shares job-photos bucket with maxFiles:3; existing RequestPhotoUpload left untouched for backward compat
+- [Phase 08-07]: ExcelJS on Node.js runtime only — no edge runtime on export routes
+- [Phase 08-07]: Export always fetches ALL data regardless of active client-side filters
+- [Phase 08-07]: fetch+blob+createObjectURL pattern for browser download in toolbar export button
+- [Phase 08-03]: createNotifications uses admin client for INSERT - notifications table has no INSERT RLS policy for regular users
+- [Phase 08-03]: Actor always excluded from recipients via filter in createNotifications (REQ-NOTIF-007)
+- [Phase 08-03]: Notification polling uses 30s interval with useCallback+clearInterval cleanup to prevent memory leaks
+- [Phase 08-05]: KpiCard uses trendIsGood prop to invert color coding — up=red for backlog metrics (Open Requests, Untriaged, Overdue, Open Jobs), up=green for completion metrics
+- [Phase 08-05]: getDashboardKpis runs 10 parallel Supabase count queries for 5 KPIs (current + previous period each)
+- [Phase 08-05]: Previous period = same duration shifted back from dateRange.from; Overdue Jobs heuristic = in_progress jobs older than 7 days
+- [Phase 08-05]: DateRangeFilter syncs from/to to URL via nuqs; server component reads them from searchParams with This Month default
 
 ### Pending Todos
 
@@ -164,6 +177,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 08-01-PLAN.md (Media Infrastructure) — Phase 8 in progress (1/4 plans)
-Resume file: .planning/phases/08-media-notifications-dashboards/08-01-SUMMARY.md
-Next: Execute Phase 8 Plan 02 (Notifications)
+Stopped at: Completed 08-05-PLAN.md (Dashboard KPI Cards) — Phase 8 in progress (5/7 plans)
+Resume file: .planning/phases/08-media-notifications-dashboards/08-05-SUMMARY.md
+Next: Execute Phase 8 Plan 06 (Dashboard Charts)
