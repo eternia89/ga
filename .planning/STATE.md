@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Centralize GA operations -- requests, jobs, inventory, maintenance -- with full traceability and real-time visibility for a corporate group.
-**Current focus:** Phase 6 - Inventory (next)
+**Current focus:** Phase 6 - Inventory
 
 ## Current Position
 
-Phase: 5 of 9 (Jobs & Approvals)
-Plan: 5 of 5 in current phase
-Status: Plan 05 complete — Phase 5 COMPLETE
-Last activity: 2026-02-25 -- Completed 05-05-PLAN.md (Requester Acceptance Cycle)
+Phase: 6 of 9 (Inventory)
+Plan: 1 of 3 in current phase
+Status: Plan 01 complete — backend foundation done
+Last activity: 2026-02-25 -- Completed 06-01-PLAN.md (Inventory Backend Foundation)
 
-Progress: [██████████] 100% (Phase 5 complete — all 5/5 plans done)
+Progress: [████████████] (Phase 6 in progress — 1/3 plans done)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 9.6 min
-- Total execution time: 1.80 hours
+- Total plans completed: 11
+- Average duration: 9.2 min
+- Total execution time: 1.87 hours
 
 **By Phase:**
 
@@ -32,12 +32,14 @@ Progress: [██████████] 100% (Phase 5 complete — all 5/5 pl
 | 03-admin-system-configuration | 3/3 | 25min | 8min |
 | 04-requests | 2/2 | 13min | 6.5min |
 | 05-jobs-approvals | 5/5 | 32min | 6.4min |
+| 06-inventory | 1/3 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (4min), 05-02 (5min), 05-03 (12min), 05-04 (4min), 05-05 (7min)
+- Last 5 plans: 05-02 (5min), 05-03 (12min), 05-04 (4min), 05-05 (7min), 06-01 (4min)
 - Trend: Consistent — 4-12 min per plan (excellent velocity)
 
 *Updated after each plan completion*
+| Phase 06-inventory P01 | 4 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -111,10 +113,14 @@ Recent decisions affecting current work:
 - [Phase 05-05]: RequestAcceptanceDialog uses mode prop (accept/reject) to dual-purpose one component instead of two
 - [Phase 05-05]: submitFeedback transitions request to closed status — final terminal state indicating feedback received
 - [Phase 05-05]: acceptance_rejected_reason field distinguishes work-rejection from GA-level request rejection
+- [Phase 06-inventory]: sold_disposed is single terminal state merging old sold+disposed; movements use pending/accepted/rejected/cancelled
+- [Phase 06-inventory]: unique partial index idx_one_pending_movement enforces one pending transfer per asset at DB level plus code-level guard for clean error messages
+- [Phase 06-inventory]: maintenance_schedules auto-pause fires on both broken and sold_disposed status transitions from changeAssetStatus action
+- [Phase 06-inventory]: photo upload API uses photo_type field mapped to 5 distinct entity_types for polymorphic media_attachments (asset_creation, asset_status_change, asset_transfer_send, asset_transfer_receive, asset_transfer_reject)
 
 ### Pending Todos
 
-- Push migration 00007_requests_phase4.sql and 00008_jobs_phase5.sql to Supabase: `supabase db push`
+- Push migrations 00007 through 00009 to Supabase: `supabase db push`
 - Enable pg_cron extension in Supabase Dashboard and run schedule manually (see 05-01-SUMMARY.md)
 
 ### Blockers/Concerns
@@ -126,6 +132,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 05-05-PLAN.md (Requester Acceptance Cycle) — Phase 5 COMPLETE
-Resume file: .planning/phases/05-jobs-approvals/05-05-SUMMARY.md
-Next: Execute Phase 6 (Inventory)
+Stopped at: Completed 06-01-PLAN.md (Inventory Backend Foundation) — Phase 6 Plan 1 of 3 done
+Resume file: .planning/phases/06-inventory/06-01-SUMMARY.md
+Next: Execute Phase 6 Plan 2 (Asset List + Detail UI)
