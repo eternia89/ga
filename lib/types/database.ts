@@ -124,6 +124,9 @@ export interface Job {
   created_by: string;
   estimated_cost: number | null;
   request_id: string | null; // Legacy single FK, kept for PM jobs
+  job_type: 'standard' | 'preventive_maintenance' | null;
+  maintenance_schedule_id: string | null;
+  checklist_responses: import('@/lib/types/maintenance').PMJobChecklist | null;
   approval_submitted_at: string | null;
   approved_at: string | null;
   approved_by: string | null;
@@ -151,6 +154,12 @@ export interface JobWithRelations extends Job {
       requester?: { full_name: string } | null;
     };
   }>;
+  maintenance_schedule?: {
+    id: string;
+    next_due_at: string | null;
+    interval_type: 'fixed' | 'floating';
+    interval_days: number;
+  } | null;
 }
 
 export interface JobComment {

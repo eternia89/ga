@@ -47,9 +47,10 @@ export type ChecklistResponse = {
 };
 
 export type PMJobChecklist = {
-  template_name: string;     // Snapshot of template name at time of PM job generation
-  template_id: string;       // Reference to source template (for audit)
+  template_name: string;         // Snapshot of template name at time of PM job generation
+  template_id: string;           // Reference to source template (for audit)
   items: ChecklistResponse[];
+  checklist_completed_at?: string; // ISO timestamp when all items were completed
 };
 
 // ============================================================================

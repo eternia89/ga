@@ -338,6 +338,17 @@ export const updateJobStatus = authActionClient
       throw new Error(error.message);
     }
 
+    // TODO(PM-INTEGRATION): When completing a PM job, call advanceFloatingSchedule.
+    // Example integration:
+    //   if (parsedInput.status === 'completed') {
+    //     const { data: fullJob } = await supabase.from('jobs').select('job_type').eq('id', parsedInput.id).single();
+    //     if (fullJob?.job_type === 'preventive_maintenance') {
+    //       await advanceFloatingSchedule({ jobId: parsedInput.id }); // from pm-job-actions.ts
+    //     }
+    //   }
+    // This advances floating schedule next_due_at from completion date (not generation date).
+    // Fixed schedule next_due_at is already advanced by the cron at job generation time.
+
     // When completing, move all linked requests to pending_acceptance
     if (parsedInput.status === 'completed') {
       const { data: linkedJobRequests } = await supabase
