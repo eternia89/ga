@@ -1,5 +1,37 @@
 import { type SupabaseClient } from '@supabase/supabase-js';
-import { subDays } from 'date-fns';
+import { subDays, differenceInDays, startOfMonth } from 'date-fns';
+import { STATUS_LABELS, REQUEST_STATUSES } from '@/lib/constants/request-status';
+
+// Hex color palette for status distribution charts (recharts needs hex, not Tailwind classes)
+const STATUS_HEX_COLORS: Record<string, string> = {
+  submitted: '#9ca3af',       // gray
+  triaged: '#60a5fa',         // blue
+  in_progress: '#fbbf24',     // amber
+  pending_approval: '#c084fc', // purple
+  approved: '#2dd4bf',        // teal
+  completed: '#4ade80',       // green
+  pending_acceptance: '#a78bfa', // violet
+  accepted: '#34d399',        // emerald
+  closed: '#94a3b8',          // slate
+  rejected: '#f87171',        // red
+  cancelled: '#a8a29e',       // stone
+};
+
+const JOB_STATUS_HEX_COLORS: Record<string, string> = {
+  created: '#9ca3af',         // gray
+  assigned: '#60a5fa',        // blue
+  in_progress: '#fbbf24',     // amber
+  completed: '#4ade80',       // green
+  cancelled: '#a8a29e',       // stone
+};
+
+const JOB_STATUS_LABELS: Record<string, string> = {
+  created: 'Created',
+  assigned: 'Assigned',
+  in_progress: 'In Progress',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+};
 
 export interface DashboardDateRange {
   from: string; // ISO date string (yyyy-MM-dd)
@@ -215,4 +247,354 @@ export async function getDashboardKpis(
       trendIsGood: true, // up is good (more completions = better)
     },
   ];
+}
+
+// -------------------------------------------------------------------------
+// Status Distribution
+// -------------------------------------------------------------------------
+
+export interface StatusDistributionItem {
+  status: string;
+  label: string;
+  count: number;
+  color: string;
+}
+
+export async function getRequestStatusDistribution(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient<any>,
+  dateRange: DashboardDateRange
+): Promise<StatusDistributionItem[]> {
+  const from = `${dateRange.from}T00:00:00.000Z`;
+  const to = `${dateRange.to}T23:59:59.999Z`;
+
+  const { data, error } = await supabase
+    .from('requests')
+    .select('status')
+    .is('deleted_at', null)
+    .gte('created_at', from)
+    .lte('created_at', to);
+
+  if (error || !data) return [];
+
+  // Count per status
+  const counts: Record<string, number> = {};
+  for (const row of data) {
+    counts[row.status] = (counts[row.status] ?? 0) + 1;
+  }
+
+  // Map to display items, filter to statuses with count > 0
+  return REQUEST_STATUSES
+    .map((status) => ({
+      status,
+      label: STATUS_LABELS[status] ?? status,
+      count: counts[status] ?? 0,
+      color: STATUS_HEX_COLORS[status] ?? '#9ca3af',
+    }))
+    .filter((item) => item.count > 0);
+}
+
+export async function getJobStatusDistribution(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient<any>,
+  dateRange: DashboardDateRange
+): Promise<StatusDistributionItem[]> {
+  const from = `${dateRange.from}T00:00:00.000Z`;
+  const to = `${dateRange.to}T23:59:59.999Z`;
+
+  const jobStatuses = ['created', 'assigned', 'in_progress', 'completed', 'cancelled'] as const;
+
+  const { data, error } = await supabase
+    .from('jobs')
+    .select('status')
+    .is('deleted_at', null)
+    .gte('created_at', from)
+    .lte('created_at', to);
+
+  if (error || !data) return [];
+
+  const counts: Record<string, number> = {};
+  for (const row of data) {
+    counts[row.status] = (counts[row.status] ?? 0) + 1;
+  }
+
+  return jobStatuses
+    .map((status) => ({
+      status,
+      label: JOB_STATUS_LABELS[status] ?? status,
+      count: counts[status] ?? 0,
+      color: JOB_STATUS_HEX_COLORS[status] ?? '#9ca3af',
+    }))
+    .filter((item) => item.count > 0);
+}
+
+// -------------------------------------------------------------------------
+// Staff Workload
+// -------------------------------------------------------------------------
+
+export interface StaffWorkloadItem {
+  staffId: string;
+  staffName: string;
+  activeJobs: number;
+  completedThisMonth: number;
+  overdue: number;
+}
+
+export async function getStaffWorkload(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient<any>
+): Promise<StaffWorkloadItem[]> {
+  // Fetch GA staff/leads
+  const { data: staff, error: staffError } = await supabase
+    .from('user_profiles')
+    .select('id, full_name')
+    .in('role', ['ga_staff', 'ga_lead'])
+    .is('deleted_at', null);
+
+  if (staffError || !staff || staff.length === 0) return [];
+
+  // Fetch all non-deleted jobs with assigned_to + status + created_at
+  const overdueThreshold = subDays(new Date(), 7).toISOString();
+  const monthStart = startOfMonth(new Date()).toISOString();
+
+  const { data: jobs, error: jobsError } = await supabase
+    .from('jobs')
+    .select('assigned_to, status, created_at')
+    .is('deleted_at', null)
+    .in(
+      'assigned_to',
+      staff.map((s: { id: string }) => s.id)
+    );
+
+  if (jobsError || !jobs) return [];
+
+  // Aggregate per staff member
+  const staffMap = new Map<string, { full_name: string }>();
+  for (const s of staff) {
+    staffMap.set(s.id, { full_name: s.full_name });
+  }
+
+  const workload = new Map<
+    string,
+    { activeJobs: number; completedThisMonth: number; overdue: number }
+  >();
+
+  for (const s of staff) {
+    workload.set(s.id, { activeJobs: 0, completedThisMonth: 0, overdue: 0 });
+  }
+
+  for (const job of jobs) {
+    if (!job.assigned_to || !workload.has(job.assigned_to)) continue;
+    const w = workload.get(job.assigned_to)!;
+
+    if (['created', 'assigned', 'in_progress'].includes(job.status)) {
+      w.activeJobs += 1;
+      // Overdue: in_progress and older than 7 days
+      if (job.status === 'in_progress' && job.created_at < overdueThreshold) {
+        w.overdue += 1;
+      }
+    }
+
+    if (job.status === 'completed' && job.created_at >= monthStart) {
+      w.completedThisMonth += 1;
+    }
+  }
+
+  return staff.map((s: { id: string; full_name: string }) => ({
+    staffId: s.id,
+    staffName: s.full_name,
+    ...workload.get(s.id)!,
+  }));
+}
+
+// -------------------------------------------------------------------------
+// Request Aging
+// -------------------------------------------------------------------------
+
+export interface AgingBucket {
+  bucket: string;
+  count: number;
+}
+
+export async function getRequestAging(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient<any>
+): Promise<AgingBucket[]> {
+  // Open requests only
+  const { data, error } = await supabase
+    .from('requests')
+    .select('created_at')
+    .in('status', ['submitted', 'triaged', 'in_progress'])
+    .is('deleted_at', null);
+
+  if (error || !data) {
+    return [
+      { bucket: '0-3 days', count: 0 },
+      { bucket: '4-7 days', count: 0 },
+      { bucket: '8-14 days', count: 0 },
+      { bucket: '15+ days', count: 0 },
+    ];
+  }
+
+  const now = new Date();
+  const buckets = { '0-3': 0, '4-7': 0, '8-14': 0, '15+': 0 };
+
+  for (const row of data) {
+    const age = differenceInDays(now, new Date(row.created_at));
+    if (age <= 3) buckets['0-3'] += 1;
+    else if (age <= 7) buckets['4-7'] += 1;
+    else if (age <= 14) buckets['8-14'] += 1;
+    else buckets['15+'] += 1;
+  }
+
+  return [
+    { bucket: '0-3 days', count: buckets['0-3'] },
+    { bucket: '4-7 days', count: buckets['4-7'] },
+    { bucket: '8-14 days', count: buckets['8-14'] },
+    { bucket: '15+ days', count: buckets['15+'] },
+  ];
+}
+
+// -------------------------------------------------------------------------
+// Maintenance Summary
+// -------------------------------------------------------------------------
+
+export interface MaintenanceItem {
+  id: string;
+  assetName: string;
+  templateName: string;
+  dueDate: string;
+  urgency: 'overdue' | 'due_this_week' | 'due_this_month';
+}
+
+export async function getMaintenanceSummary(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient<any>
+): Promise<MaintenanceItem[]> {
+  const now = new Date();
+  const nowIso = now.toISOString();
+  const in7Days = subDays(now, -7).toISOString(); // 7 days from now
+  const in30Days = subDays(now, -30).toISOString(); // 30 days from now
+
+  const { data, error } = await supabase
+    .from('maintenance_schedules')
+    .select('id, next_due_at, assets(name), maintenance_templates(name)')
+    .eq('is_active', true)
+    .lte('next_due_at', in30Days)
+    .order('next_due_at', { ascending: true });
+
+  if (error || !data) return [];
+
+  const items: MaintenanceItem[] = [];
+
+  for (const row of data) {
+    const dueAt = row.next_due_at;
+    if (!dueAt) continue;
+
+    let urgency: MaintenanceItem['urgency'];
+    if (dueAt < nowIso) {
+      urgency = 'overdue';
+    } else if (dueAt <= in7Days) {
+      urgency = 'due_this_week';
+    } else {
+      urgency = 'due_this_month';
+    }
+
+    const assetName =
+      Array.isArray(row.assets) ? row.assets[0]?.name : (row.assets as { name?: string } | null)?.name;
+    const templateName =
+      Array.isArray(row.maintenance_templates)
+        ? row.maintenance_templates[0]?.name
+        : (row.maintenance_templates as { name?: string } | null)?.name;
+
+    items.push({
+      id: row.id,
+      assetName: assetName ?? 'Unknown Asset',
+      templateName: templateName ?? 'Unknown Template',
+      dueDate: dueAt,
+      urgency,
+    });
+  }
+
+  // Sort: overdue first, then due_this_week, then due_this_month
+  const urgencyOrder = { overdue: 0, due_this_week: 1, due_this_month: 2 };
+  items.sort((a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
+
+  return items;
+}
+
+// -------------------------------------------------------------------------
+// Inventory Counts
+// -------------------------------------------------------------------------
+
+export interface InventoryStatusCount {
+  status: string;
+  count: number;
+}
+
+export interface InventoryCategoryCount {
+  category: string;
+  count: number;
+}
+
+export interface InventoryCounts {
+  byStatus: InventoryStatusCount[];
+  byCategory: InventoryCategoryCount[];
+}
+
+const ASSET_STATUS_LABELS: Record<string, string> = {
+  active: 'Active',
+  under_repair: 'Under Repair',
+  broken: 'Broken',
+  sold_disposed: 'Sold/Disposed',
+};
+
+export async function getInventoryCounts(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: SupabaseClient<any>
+): Promise<InventoryCounts> {
+  const [statusResult, categoryResult] = await Promise.all([
+    supabase
+      .from('inventory_items')
+      .select('status')
+      .is('deleted_at', null),
+    supabase
+      .from('inventory_items')
+      .select('categories(name)')
+      .is('deleted_at', null),
+  ]);
+
+  // By status
+  const statusCounts: Record<string, number> = {};
+  if (statusResult.data) {
+    for (const row of statusResult.data) {
+      statusCounts[row.status] = (statusCounts[row.status] ?? 0) + 1;
+    }
+  }
+
+  const byStatus: InventoryStatusCount[] = Object.entries(ASSET_STATUS_LABELS).map(
+    ([status, label]) => ({
+      status: label,
+      count: statusCounts[status] ?? 0,
+    })
+  );
+
+  // By category
+  const categoryCounts: Record<string, number> = {};
+  if (categoryResult.data) {
+    for (const row of categoryResult.data) {
+      const catName =
+        Array.isArray(row.categories)
+          ? row.categories[0]?.name
+          : (row.categories as { name?: string } | null)?.name;
+      const key = catName ?? 'Uncategorized';
+      categoryCounts[key] = (categoryCounts[key] ?? 0) + 1;
+    }
+  }
+
+  const byCategory: InventoryCategoryCount[] = Object.entries(categoryCounts)
+    .map(([category, count]) => ({ category, count }))
+    .sort((a, b) => b.count - a.count);
+
+  return { byStatus, byCategory };
 }
