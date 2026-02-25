@@ -80,12 +80,12 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
   // Role badge color
   const roleColors: Record<string, string> = {
-    admin: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
-    ga_lead: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-    ga_staff: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    admin: 'bg-purple-100 text-purple-700',
+    ga_lead: 'bg-blue-100 text-blue-700',
+    ga_staff: 'bg-green-100 text-green-700',
     finance_approver:
-      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
-    general_user: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+      'bg-yellow-100 text-yellow-700',
+    general_user: 'bg-gray-100 text-gray-700',
   };
 
   const roleColor = roleColors[profile.role] || roleColors.general_user;

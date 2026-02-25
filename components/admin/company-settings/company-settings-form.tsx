@@ -79,7 +79,7 @@ export function CompanySettingsForm({ budgetThreshold }: CompanySettingsFormProp
               />
             </div>
             {form.formState.errors.budget_threshold && (
-              <p className="text-sm text-red-600 dark:text-red-400">
+              <p className="text-sm text-red-600">
                 {form.formState.errors.budget_threshold.message}
               </p>
             )}

@@ -51,7 +51,7 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
         <div className="space-y-0.5 max-w-[240px]">
           <div className="flex items-center gap-1.5 flex-wrap">
             {isPM && (
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 shrink-0">
+              <span className="inline-flex items-center rounded-full bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700 shrink-0">
                 PM
               </span>
             )}

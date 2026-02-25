@@ -17,12 +17,12 @@ interface TemplateBuilderItemProps {
 }
 
 const TYPE_COLORS: Record<ChecklistItem['type'], string> = {
-  checkbox:  'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  pass_fail: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-  numeric:   'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
-  text:      'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300',
-  photo:     'bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300',
-  dropdown:  'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+  checkbox:  'bg-blue-100 text-blue-700',
+  pass_fail: 'bg-green-100 text-green-700',
+  numeric:   'bg-purple-100 text-purple-700',
+  text:      'bg-orange-100 text-orange-700',
+  photo:     'bg-pink-100 text-pink-700',
+  dropdown:  'bg-yellow-100 text-yellow-700',
 };
 
 export function TemplateBuilderItem({ item, onUpdate, onDelete }: TemplateBuilderItemProps) {

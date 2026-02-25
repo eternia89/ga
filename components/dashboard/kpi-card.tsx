@@ -37,10 +37,10 @@ export function KpiCard({
     const isPositiveChange = trend.direction === 'up';
     if (trendIsGood) {
       // For metrics where up is good (e.g., Completed): up = green, down = red
-      return isPositiveChange ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+      return isPositiveChange ? 'text-green-600' : 'text-red-600';
     } else {
       // For metrics where up is bad (e.g., Open Requests, Overdue): up = red, down = green
-      return isPositiveChange ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400';
+      return isPositiveChange ? 'text-red-600' : 'text-green-600';
     }
   };
 

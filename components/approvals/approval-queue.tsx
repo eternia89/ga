@@ -227,7 +227,7 @@ export function ApprovalQueue({ pendingJobs, historyJobs }: ApprovalQueueProps) 
                       <TableCell>
                         <div className="font-medium">{job.title}</div>
                         {!isApproved && job.approval_rejection_reason && (
-                          <div className="text-xs text-red-600 dark:text-red-400 mt-0.5 max-w-xs truncate">
+                          <div className="text-xs text-red-600 mt-0.5 max-w-xs truncate">
                             Reason: {job.approval_rejection_reason}
                           </div>
                         )}
@@ -237,11 +237,11 @@ export function ApprovalQueue({ pendingJobs, historyJobs }: ApprovalQueueProps) 
                       </TableCell>
                       <TableCell>
                         {isApproved ? (
-                          <Badge className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 border-0">
+                          <Badge className="bg-green-100 text-green-700 border-0">
                             Approved
                           </Badge>
                         ) : (
-                          <Badge className="bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 border-0">
+                          <Badge className="bg-red-100 text-red-700 border-0">
                             Rejected
                           </Badge>
                         )}

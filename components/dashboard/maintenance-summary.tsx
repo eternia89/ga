@@ -8,8 +8,8 @@ interface MaintenanceSummaryProps {
 }
 
 const URGENCY_STYLES: Record<MaintenanceItem['urgency'], string> = {
-  overdue: 'bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800',
-  due_this_week: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-800',
+  overdue: 'bg-red-50 border-red-200',
+  due_this_week: 'bg-yellow-50 border-yellow-200',
   due_this_month: 'bg-background border-border',
 };
 
@@ -20,9 +20,9 @@ const URGENCY_LABEL: Record<MaintenanceItem['urgency'], string> = {
 };
 
 const URGENCY_BADGE_STYLES: Record<MaintenanceItem['urgency'], string> = {
-  overdue: 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300',
-  due_this_week: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300',
-  due_this_month: 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
+  overdue: 'bg-red-100 text-red-700',
+  due_this_week: 'bg-yellow-100 text-yellow-700',
+  due_this_month: 'bg-blue-100 text-blue-700',
 };
 
 export function MaintenanceSummary({ data }: MaintenanceSummaryProps) {

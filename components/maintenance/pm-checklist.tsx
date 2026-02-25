@@ -81,7 +81,7 @@ export function PMChecklist({ jobId, checklist, jobStatus, canEdit }: PMChecklis
             className={[
               'h-full rounded-full transition-all duration-300',
               allComplete
-                ? 'bg-green-500 dark:bg-green-400'
+                ? 'bg-green-500'
                 : 'bg-primary',
             ].join(' ')}
             style={{ width: `${progressPct}%` }}
@@ -92,9 +92,9 @@ export function PMChecklist({ jobId, checklist, jobStatus, canEdit }: PMChecklis
 
       {/* All complete success state */}
       {allComplete && (
-        <div className="flex items-center gap-2 rounded-md bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 px-4 py-3">
-          <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
-          <p className="text-sm font-medium text-green-700 dark:text-green-300">
+        <div className="flex items-center gap-2 rounded-md bg-green-50 border border-green-200 px-4 py-3">
+          <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+          <p className="text-sm font-medium text-green-700">
             All {totalCount} checklist items completed
           </p>
         </div>

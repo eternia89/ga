@@ -12,10 +12,10 @@ export const ASSET_STATUS_LABELS: Record<AssetStatus, string> = {
 
 // Badge color classes (Tailwind) for each status
 export const ASSET_STATUS_COLORS: Record<AssetStatus, string> = {
-  active: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-  under_repair: 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300',
-  broken: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
-  sold_disposed: 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
+  active: 'bg-green-100 text-green-700',
+  under_repair: 'bg-amber-100 text-amber-700',
+  broken: 'bg-red-100 text-red-700',
+  sold_disposed: 'bg-stone-100 text-stone-600',
 };
 
 // Valid transitions from each status.

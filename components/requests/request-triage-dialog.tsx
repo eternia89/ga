@@ -142,7 +142,7 @@ export function RequestTriageDialog({
                     <button
                       type="button"
                       onClick={() => setShowFullDescription(!showFullDescription)}
-                      className="text-xs text-blue-600 dark:text-blue-400 mt-1 hover:underline"
+                      className="text-xs text-blue-600 mt-1 hover:underline"
                     >
                       {showFullDescription ? 'Show less' : 'Show more'}
                     </button>

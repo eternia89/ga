@@ -37,12 +37,12 @@ const JOB_STATUS_LABELS: Record<string, string> = {
 
 function jobStatusColor(status: string): string {
   switch (status) {
-    case 'created':     return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
-    case 'assigned':    return 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300';
-    case 'in_progress': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300';
-    case 'completed':   return 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300';
-    case 'cancelled':   return 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300';
-    default:            return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+    case 'created':     return 'bg-gray-100 text-gray-700';
+    case 'assigned':    return 'bg-blue-100 text-blue-700';
+    case 'in_progress': return 'bg-yellow-100 text-yellow-700';
+    case 'completed':   return 'bg-green-100 text-green-700';
+    case 'cancelled':   return 'bg-red-100 text-red-700';
+    default:            return 'bg-gray-100 text-gray-700';
   }
 }
 
@@ -235,9 +235,9 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
 
       {/* Auto-pause notice */}
       {isAutoPaused && (
-        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
-          <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-700 dark:text-amber-300">
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-700">
             {getAutoPauseMessage()} Activate the schedule once the asset returns to active status.
           </p>
         </div>
@@ -276,7 +276,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
                   {schedule.template?.name ? (
                     <a
                       href={`/maintenance/templates/${schedule.template_id}`}
-                      className="text-blue-600 hover:underline dark:text-blue-400"
+                      className="text-blue-600 hover:underline"
                     >
                       {schedule.template.name}
                     </a>
@@ -289,7 +289,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
                   {schedule.asset?.name ? (
                     <a
                       href={`/inventory/${schedule.item_id}`}
-                      className="text-blue-600 hover:underline dark:text-blue-400"
+                      className="text-blue-600 hover:underline"
                     >
                       {schedule.asset.name}
                       {schedule.asset.display_id && (
@@ -311,11 +311,11 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Type</p>
                 <p className="text-sm capitalize">
                   {schedule.interval_type === 'fixed' ? (
-                    <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                    <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700">
                       Fixed
                     </span>
                   ) : (
-                    <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900 dark:text-purple-300">
+                    <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-700">
                       Floating
                     </span>
                   )}
@@ -323,7 +323,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
               </div>
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Next Due</p>
-                <p className={`text-sm font-medium ${isOverdue ? 'text-red-600 dark:text-red-400' : ''}`}>
+                <p className={`text-sm font-medium ${isOverdue ? 'text-red-600' : ''}`}>
                   {!schedule.is_active || schedule.is_paused
                     ? <span className="text-muted-foreground font-normal">N/A</span>
                     : nextDue
@@ -367,7 +367,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
                       className="flex items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2.5 hover:bg-muted/50 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                        <span className="text-sm font-medium text-blue-600">
                           {job.display_id}
                         </span>
                         <span

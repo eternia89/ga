@@ -39,7 +39,7 @@ export function RequestAgingTable({ data }: RequestAgingTableProps) {
                   className={cn(
                     'text-center text-lg font-bold',
                     bucket.bucket === '15+ days' && bucket.count > 0
-                      ? 'text-red-600 dark:text-red-400'
+                      ? 'text-red-600'
                       : ''
                   )}
                 >

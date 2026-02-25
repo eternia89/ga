@@ -224,11 +224,11 @@ export function RequestDetailInfo({
 
         {/* Acceptance rejection reason — shown when work was rejected back to in_progress */}
         {request.acceptance_rejected_reason && (
-          <div className="rounded-md border border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950/30 p-3">
-            <p className="text-sm font-medium text-orange-700 dark:text-orange-400">
+          <div className="rounded-md border border-orange-200 bg-orange-50 p-3">
+            <p className="text-sm font-medium text-orange-700">
               Work Rejection Reason
             </p>
-            <p className="text-sm text-orange-600 dark:text-orange-300 mt-1">
+            <p className="text-sm text-orange-600 mt-1">
               {request.acceptance_rejected_reason}
             </p>
           </div>

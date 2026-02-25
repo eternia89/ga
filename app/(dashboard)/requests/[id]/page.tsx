@@ -375,11 +375,11 @@ export default async function RequestDetailPage({ params }: PageProps) {
 
         {/* Rejection reason callout */}
         {req.status === 'rejected' && req.rejection_reason && (
-          <div className="rounded-md border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30 p-4 mt-2">
-            <p className="text-sm font-medium text-red-700 dark:text-red-400">
+          <div className="rounded-md border border-red-200 bg-red-50 p-4 mt-2">
+            <p className="text-sm font-medium text-red-700">
               Rejection Reason
             </p>
-            <p className="text-sm text-red-600 dark:text-red-300 mt-1">
+            <p className="text-sm text-red-600 mt-1">
               {req.rejection_reason}
             </p>
           </div>

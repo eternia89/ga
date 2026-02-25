@@ -51,16 +51,16 @@ const EVENT_ICONS: Record<TimelineEvent['type'], React.ReactNode> = {
 };
 
 const EVENT_COLORS: Record<TimelineEvent['type'], string> = {
-  created: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-  status_change: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  triage: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  field_update: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-  rejection: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
-  cancellation: 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
-  acceptance: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300',
-  acceptance_rejection: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300',
-  auto_acceptance: 'bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300',
-  feedback: 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300',
+  created: 'bg-green-100 text-green-700',
+  status_change: 'bg-blue-100 text-blue-700',
+  triage: 'bg-blue-100 text-blue-700',
+  field_update: 'bg-gray-100 text-gray-600',
+  rejection: 'bg-red-100 text-red-700',
+  cancellation: 'bg-stone-100 text-stone-600',
+  acceptance: 'bg-emerald-100 text-emerald-700',
+  acceptance_rejection: 'bg-orange-100 text-orange-700',
+  auto_acceptance: 'bg-teal-100 text-teal-700',
+  feedback: 'bg-amber-100 text-amber-700',
 };
 
 function formatTimestamp(iso: string): string {
@@ -132,7 +132,7 @@ function EventContent({ event }: { event: TimelineEvent }) {
         <span>
           <span className="font-medium">{event.by}</span> rejected this request
           {reason && (
-            <blockquote className="mt-1 border-l-2 border-red-300 dark:border-red-700 pl-3 text-sm text-muted-foreground italic">
+            <blockquote className="mt-1 border-l-2 border-red-300 pl-3 text-sm text-muted-foreground italic">
               {reason}
             </blockquote>
           )}
@@ -160,7 +160,7 @@ function EventContent({ event }: { event: TimelineEvent }) {
         <span>
           <span className="font-medium">{event.by}</span> rejected the completed work
           {reason && (
-            <blockquote className="mt-1 border-l-2 border-orange-300 dark:border-orange-700 pl-3 text-sm text-muted-foreground italic">
+            <blockquote className="mt-1 border-l-2 border-orange-300 pl-3 text-sm text-muted-foreground italic">
               {reason}
             </blockquote>
           )}
@@ -183,7 +183,7 @@ function EventContent({ event }: { event: TimelineEvent }) {
             </div>
           )}
           {comment && (
-            <blockquote className="mt-1 border-l-2 border-amber-300 dark:border-amber-700 pl-3 text-sm text-muted-foreground italic">
+            <blockquote className="mt-1 border-l-2 border-amber-300 pl-3 text-sm text-muted-foreground italic">
               {comment}
             </blockquote>
           )}

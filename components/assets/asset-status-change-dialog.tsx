@@ -164,9 +164,9 @@ export function AssetStatusChangeDialog({
 
           {/* Irreversibility warning for sold_disposed */}
           {isSoldDisposed && (
-            <div className="rounded-md border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30 p-3 flex items-start gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
-              <p className="text-sm text-amber-700 dark:text-amber-300">
+            <div className="rounded-md border border-amber-200 bg-amber-50 p-3 flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+              <p className="text-sm text-amber-700">
                 <span className="font-medium">This action is irreversible.</span> The asset will
                 be permanently marked as Sold/Disposed and cannot be changed again.
               </p>

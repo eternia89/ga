@@ -116,7 +116,7 @@ export function StaffWorkloadTable({ data }: StaffWorkloadTableProps) {
                   <TableCell
                     className={cn(
                       'text-right font-medium',
-                      row.overdue > 0 ? 'text-red-600 dark:text-red-400' : ''
+                      row.overdue > 0 ? 'text-red-600' : ''
                     )}
                   >
                     {row.overdue}

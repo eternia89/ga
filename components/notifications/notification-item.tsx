@@ -61,7 +61,7 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
       onClick={handleClick}
       className={cn(
         'w-full text-left flex items-start gap-3 px-4 py-3 hover:bg-muted/50 transition-colors',
-        !notification.is_read && 'bg-blue-50/50 dark:bg-blue-950/20'
+        !notification.is_read && 'bg-blue-50/50'
       )}
     >
       {/* Unread indicator */}

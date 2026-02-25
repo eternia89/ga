@@ -21,7 +21,7 @@ export function OverdueBadge({ nextDueAt, jobStatus }: OverdueBadgeProps) {
   if (!isOverdue) return null;
 
   return (
-    <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
+    <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
       Overdue
     </span>
   );

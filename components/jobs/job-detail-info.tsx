@@ -184,8 +184,8 @@ export function JobDetailInfo({
 
       {/* Rejection reason callout */}
       {job.approval_rejection_reason && (
-        <div className="rounded-md border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30 p-4">
-          <p className="text-sm font-medium text-red-700 dark:text-red-400">
+        <div className="rounded-md border border-red-200 bg-red-50 p-4">
+          <p className="text-sm font-medium text-red-700">
             Approval Rejected
             {approvalRejectedByName && (
               <span className="font-normal"> by {approvalRejectedByName}</span>
@@ -196,7 +196,7 @@ export function JobDetailInfo({
               </span>
             )}
           </p>
-          <p className="text-sm text-red-600 dark:text-red-300 mt-1">
+          <p className="text-sm text-red-600 mt-1">
             {job.approval_rejection_reason}
           </p>
         </div>

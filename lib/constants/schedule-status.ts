@@ -40,8 +40,8 @@ export const SCHEDULE_STATUS_LABELS: Record<ScheduleDisplayStatus, string> = {
 // ============================================================================
 
 export const SCHEDULE_STATUS_COLORS: Record<ScheduleDisplayStatus, string> = {
-  active:         'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-  paused_auto:    'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300',
-  paused_manual:  'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
-  deactivated:    'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
+  active:         'bg-green-100 text-green-700',
+  paused_auto:    'bg-amber-100 text-amber-700',
+  paused_manual:  'bg-yellow-100 text-yellow-700',
+  deactivated:    'bg-stone-100 text-stone-600',
 };

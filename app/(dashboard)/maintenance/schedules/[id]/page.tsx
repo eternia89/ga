@@ -133,7 +133,7 @@ export default async function ScheduleDetailPage({ params }: PageProps) {
             Asset:{' '}
             <Link
               href={`/inventory/${schedule.item_id}`}
-              className="text-blue-600 hover:underline dark:text-blue-400"
+              className="text-blue-600 hover:underline"
             >
               {assetName}
               {schedule.asset?.display_id && (

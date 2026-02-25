@@ -27,12 +27,12 @@ import { CHECKLIST_TYPES } from '@/lib/constants/checklist-types';
 import type { MaintenanceTemplate, ChecklistItem } from '@/lib/types/maintenance';
 
 const TYPE_COLORS: Record<ChecklistItem['type'], string> = {
-  checkbox:  'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  pass_fail: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-  numeric:   'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
-  text:      'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300',
-  photo:     'bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300',
-  dropdown:  'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+  checkbox:  'bg-blue-100 text-blue-700',
+  pass_fail: 'bg-green-100 text-green-700',
+  numeric:   'bg-purple-100 text-purple-700',
+  text:      'bg-orange-100 text-orange-700',
+  photo:     'bg-pink-100 text-pink-700',
+  dropdown:  'bg-yellow-100 text-yellow-700',
 };
 
 interface Category {
@@ -139,11 +139,11 @@ export function TemplateDetail({ template, categories, userRole }: TemplateDetai
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
           {template.is_active ? (
-            <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700 dark:bg-green-900 dark:text-green-300">
+            <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
               Active
             </span>
           ) : (
-            <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+            <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">
               Inactive
             </span>
           )}

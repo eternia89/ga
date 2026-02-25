@@ -24,7 +24,7 @@ export const templateColumns: ColumnDef<MaintenanceTemplate>[] = [
       return (
         <Link
           href={`/maintenance/templates/${id}`}
-          className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline max-w-[260px] truncate block"
+          className="font-medium text-blue-600 hover:text-blue-800 hover:underline max-w-[260px] truncate block"
           title={name}
         >
           {name}
@@ -80,11 +80,11 @@ export const templateColumns: ColumnDef<MaintenanceTemplate>[] = [
     cell: ({ row }) => {
       const isActive = row.getValue('is_active') as boolean;
       return isActive ? (
-        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900 dark:text-green-300">
+        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
           Active
         </span>
       ) : (
-        <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+        <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
           Inactive
         </span>
       );

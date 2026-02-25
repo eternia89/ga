@@ -435,7 +435,7 @@ export function JobForm({
                     <span className="font-mono text-xs text-muted-foreground">{req.display_id}</span>
                     <span className="max-w-[180px] truncate">{req.title}</span>
                     {jobLink && (
-                      <span className="text-xs text-amber-600 dark:text-amber-400">
+                      <span className="text-xs text-amber-600">
                         ({jobLink})
                       </span>
                     )}

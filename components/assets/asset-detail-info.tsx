@@ -108,17 +108,17 @@ export function AssetDetailInfo({
 
           {/* In Transit details */}
           {pendingTransfer && (
-            <div className="rounded-md border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 p-3 flex items-start gap-2">
-              <Truck className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+            <div className="rounded-md border border-blue-200 bg-blue-50 p-3 flex items-start gap-2">
+              <Truck className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
               <div className="text-sm">
-                <p className="font-medium text-blue-700 dark:text-blue-300">Transfer in Progress</p>
-                <p className="text-blue-600 dark:text-blue-400 mt-0.5">
+                <p className="font-medium text-blue-700">Transfer in Progress</p>
+                <p className="text-blue-600 mt-0.5">
                   {pendingTransfer.from_location?.name ?? '—'} &rarr; {pendingTransfer.to_location?.name ?? '—'}
                 </p>
-                <p className="text-blue-600 dark:text-blue-400">
+                <p className="text-blue-600">
                   Receiver: {pendingTransfer.receiver?.full_name ?? '—'}
                 </p>
-                <p className="text-blue-500 dark:text-blue-500 text-xs mt-0.5">
+                <p className="text-blue-500 text-xs mt-0.5">
                   Initiated: {format(new Date(pendingTransfer.created_at), 'dd-MM-yyyy')}
                 </p>
               </div>

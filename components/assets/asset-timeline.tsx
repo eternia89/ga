@@ -55,13 +55,13 @@ const EVENT_ICONS: Record<AssetTimelineEventType, React.ReactNode> = {
 };
 
 const EVENT_COLORS: Record<AssetTimelineEventType, string> = {
-  created: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-  field_update: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-  status_changed: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  transfer_initiated: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
-  transfer_accepted: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300',
-  transfer_rejected: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
-  transfer_cancelled: 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
+  created: 'bg-green-100 text-green-700',
+  field_update: 'bg-gray-100 text-gray-600',
+  status_changed: 'bg-blue-100 text-blue-700',
+  transfer_initiated: 'bg-purple-100 text-purple-700',
+  transfer_accepted: 'bg-emerald-100 text-emerald-700',
+  transfer_rejected: 'bg-red-100 text-red-700',
+  transfer_cancelled: 'bg-stone-100 text-stone-600',
 };
 
 function formatTimestamp(iso: string): string {
@@ -221,7 +221,7 @@ function EventContent({ event }: { event: AssetTimelineEvent }) {
         <span>
           <span className="font-medium">{receiverName ?? by}</span> rejected the transfer
           {reason && (
-            <blockquote className="mt-1 border-l-2 border-red-300 dark:border-red-700 pl-3 text-sm text-muted-foreground italic">
+            <blockquote className="mt-1 border-l-2 border-red-300 pl-3 text-sm text-muted-foreground italic">
               {reason}
             </blockquote>
           )}

@@ -216,7 +216,7 @@ export function UserFormDialog({
             {isEditMode && (
               <div className="space-y-2">
                 <FormLabel>Email</FormLabel>
-                <Input type="email" value={user?.email} disabled className="bg-gray-100 dark:bg-gray-800" />
+                <Input type="email" value={user?.email} disabled className="bg-gray-100" />
                 <p className="text-xs text-gray-500">Email cannot be changed</p>
               </div>
             )}

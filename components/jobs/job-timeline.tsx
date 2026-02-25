@@ -66,14 +66,14 @@ const EVENT_ICONS: Record<JobTimelineEventType, React.ReactNode> = {
 };
 
 const EVENT_COLORS: Record<JobTimelineEventType, string> = {
-  created: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-  assignment: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  status_change: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-  approval_submitted: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
-  approval: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-  approval_rejection: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
-  cancellation: 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
-  field_update: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+  created: 'bg-green-100 text-green-700',
+  assignment: 'bg-blue-100 text-blue-700',
+  status_change: 'bg-blue-100 text-blue-700',
+  approval_submitted: 'bg-purple-100 text-purple-700',
+  approval: 'bg-green-100 text-green-700',
+  approval_rejection: 'bg-red-100 text-red-700',
+  cancellation: 'bg-stone-100 text-stone-600',
+  field_update: 'bg-gray-100 text-gray-600',
   comment: 'bg-muted text-muted-foreground',
 };
 
@@ -143,7 +143,7 @@ function EventContent({ event }: { event: JobTimelineEvent }) {
         <span>
           <span className="font-medium">{event.by}</span> rejected this job
           {reason && (
-            <blockquote className="mt-1 border-l-2 border-red-300 dark:border-red-700 pl-3 text-sm text-muted-foreground italic">
+            <blockquote className="mt-1 border-l-2 border-red-300 pl-3 text-sm text-muted-foreground italic">
               {reason}
             </blockquote>
           )}

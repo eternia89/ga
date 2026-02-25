@@ -27,7 +27,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
       return name ? (
         <Link
           href={`/maintenance/templates/${templateId}`}
-          className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline max-w-[200px] truncate block"
+          className="font-medium text-blue-600 hover:text-blue-800 hover:underline max-w-[200px] truncate block"
           title={name}
         >
           {name}
@@ -85,11 +85,11 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
     cell: ({ row }) => {
       const type = row.getValue('interval_type') as 'fixed' | 'floating';
       return type === 'fixed' ? (
-        <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+        <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700">
           Fixed
         </span>
       ) : (
-        <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900 dark:text-purple-300">
+        <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-700">
           Floating
         </span>
       );
@@ -135,7 +135,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
       const isOverdue = dueDate < new Date();
 
       return (
-        <span className={isOverdue ? 'text-red-600 font-medium dark:text-red-400' : ''}>
+        <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
           {format(dueDate, 'dd-MM-yyyy')}
         </span>
       );

@@ -20,8 +20,8 @@ export function InlineFeedback({ message, type, className, onDismiss }: InlineFe
     <div
       className={cn(
         "flex items-center justify-between gap-2 rounded-md px-3 py-2 text-sm font-medium",
-        type === "success" && "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400",
-        type === "error" && "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-400",
+        type === "success" && "bg-green-50 text-green-700",
+        type === "error" && "bg-red-50 text-red-700",
         className
       )}
     >

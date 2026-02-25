@@ -80,7 +80,7 @@ export function PMChecklistItem({ item, jobId, canEdit, onSaved }: PMChecklistIt
     }
     if (savedAt) {
       return (
-        <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+        <span className="flex items-center gap-1 text-xs text-green-600">
           <CheckCircle2 className="h-3 w-3" />
           Saved
         </span>
@@ -103,7 +103,7 @@ export function PMChecklistItem({ item, jobId, canEdit, onSaved }: PMChecklistIt
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-2 min-w-0">
           {isCompleted && (
-            <CheckCircle2 className="h-4 w-4 text-green-500 dark:text-green-400 mt-0.5 shrink-0" />
+            <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
           )}
           {!isCompleted && (
             <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30 mt-0.5 shrink-0" />
@@ -158,7 +158,7 @@ function CheckboxControl({
     return (
       <div className="flex items-center gap-2">
         {checked ? (
-          <span className="inline-flex items-center gap-1 text-sm text-green-700 dark:text-green-400">
+          <span className="inline-flex items-center gap-1 text-sm text-green-700">
             <Check className="h-4 w-4" />
             Done
           </span>
@@ -206,14 +206,14 @@ function PassFailControl({
   if (!canEdit) {
     if (value === 'pass') {
       return (
-        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
           Pass
         </span>
       );
     }
     if (value === 'fail') {
       return (
-        <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
+        <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">
           Fail
         </span>
       );
@@ -229,7 +229,7 @@ function PassFailControl({
         className={[
           'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
           value === 'pass'
-            ? 'bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600'
+            ? 'bg-green-600 text-white hover:bg-green-700'
             : 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
         ].join(' ')}
       >
@@ -242,7 +242,7 @@ function PassFailControl({
         className={[
           'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
           value === 'fail'
-            ? 'bg-red-600 text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600'
+            ? 'bg-red-600 text-white hover:bg-red-700'
             : 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
         ].join(' ')}
       >
