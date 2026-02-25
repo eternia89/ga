@@ -204,7 +204,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 3. Admin & System Configuration | 3/3 | ✓ Complete | 2026-02-11 |
 | 4. Requests | 2/2 | ✓ Complete | 2026-02-19 |
 | 5. Jobs & Approvals | 5/5 | Complete   | 2026-02-24 |
-| 6. Inventory | 1/3 | In Progress|  |
+| 6. Inventory | 2/3 | In Progress|  |
 | 7. Preventive Maintenance | 0/4 | Not started | - |
 | 8. Media, Notifications & Dashboards | 0/7 | Not started | - |
 | 9. Polish & Integration | 0/4 | Not started | - |
