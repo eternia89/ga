@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 8 of 9 (Media, Notifications & Dashboards) — IN PROGRESS
-Plan: 7 of 7 in phase complete
-Status: Plan 06 complete — dashboard visualization components (status bar charts, staff workload, request aging, maintenance summary, inventory counts)
-Last activity: 2026-02-25 -- Completed 08-06-PLAN.md (Dashboard Visualizations)
+Plan: 8 of 8 in phase complete
+Status: Plan 08 complete — notification triggers wired into job-actions.ts and approval-actions.ts (gap closure)
+Last activity: 2026-02-25 -- Completed 08-08-PLAN.md (Notification Triggers Gap Closure)
 
-Progress: [████████████████████] (Phase 8 complete — 7/7 plans done)
+Progress: [████████████████████] (Phase 8 complete — 8/8 plans done)
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [████████████████████] (Phase 
 | Phase 08-media-notifications-dashboards P02 | 2 | 2 tasks | 4 files |
 | Phase 08-media-notifications-dashboards P04 | 3 | 2 tasks | 5 files |
 | Phase 08 P06 | 3 | 2 tasks | 7 files |
+| Phase 08-media-notifications-dashboards P08 | 5 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -174,6 +175,9 @@ Recent decisions affecting current work:
 - [Phase 08]: STATUS_HEX_COLORS map added for recharts (parallel to STATUS_COLORS Tailwind map) -- recharts Cell requires hex/rgb, not Tailwind class strings
 - [Phase 08]: Bar onClick uses any-typed barData parameter -- recharts BarMouseEvent type does not include custom data fields from data array
 - [Phase 08]: Dashboard page fetches all 7 data sources via single Promise.all for operational roles in 08-06
+- [Phase 08-08]: All five notification types now used across codebase: status_change, assignment, approval, completion, auto_accept_warning — job and approval actions fully wired
+- [Phase 08-08]: completionRecipients includes both created_by and assigned_to — job creator and PIC both notified on completion
+- [Phase 08-08]: cancelJob notification guarded by if job.assigned_to — unassigned jobs have no PIC to notify
 
 ### Pending Todos
 
@@ -189,6 +193,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 08-04-PLAN.md (Notification Center Page + Request Triggers)
-Resume file: .planning/phases/08-media-notifications-dashboards/08-04-SUMMARY.md
+Stopped at: Completed 08-08-PLAN.md (Notification Triggers Gap Closure)
+Resume file: .planning/phases/08-media-notifications-dashboards/08-08-SUMMARY.md
 Next: Execute Phase 9 (Polish & UAT)
