@@ -308,5 +308,5 @@ All requirements below are scoped for v1 unless marked otherwise.
 | REQ-UI-003 | Phase 9 | Pending |
 | REQ-UI-004 | Phase 9 | Pending |
 | REQ-UI-005 | Phase 3 | Pending |
-| REQ-UI-006 | Phase 9 | Pending |
-| REQ-UI-007 | Phase 9 | Pending |
+| REQ-UI-006 | Phase 9 | Complete |
+| REQ-UI-007 | Phase 9 | Complete |

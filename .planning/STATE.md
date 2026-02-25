@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 9 of 9 (Polish & Integration) — IN PROGRESS
-Plan: 2 of 4 in phase complete
-Status: Plan 02 complete — Filterable audit trail viewer at /admin/audit-trail with 5-column DataTable, sidebar navigation, and permission gating for admin/ga_lead
-Last activity: 2026-02-25 -- Completed 09-02-PLAN.md (Audit Trail Viewer)
+Plan: 4 of 4 in phase complete (checkpoint reached — awaiting human verification)
+Status: Plan 04 tasks 1-2 complete — Mobile responsiveness (hamburger sidebar, camera capture, full-screen dialogs, table scroll), breadcrumbs on all pages, 404 page, consistent error pages. Awaiting human visual verification (Task 3 checkpoint).
+Last activity: 2026-02-25 -- Completed 09-04-PLAN.md tasks 1-2 (Mobile Responsiveness & UI Polish)
 
-Progress: [██████████████████████] (Phase 9 in progress — 2/4 plans done)
+Progress: [████████████████████████] (Phase 9 in progress — 4/4 plans tasks done, checkpoint pending)
 
 ## Performance Metrics
 
@@ -186,6 +186,10 @@ Recent decisions affecting current work:
 - [Phase 09-02]: audit_logs table uses user_id (UUID) and user_email columns — AuditLogRow type uses user_id matching actual DB schema (not performed_by as plan suggested)
 - [Phase 09-02]: AUDIT_VIEW permission added to ga_lead role in permissions.ts — was missing despite being defined as a PERMISSIONS constant; admin already has all permissions
 - [Phase 09-02]: Audit trail sidebar item uses PERMISSIONS.AUDIT_VIEW (not PERMISSIONS.ADMIN_PANEL) so ga_lead users also see it
+- [Phase 09-04]: MobileMenu as client island imported in server layout — avoids converting layout to 'use client'
+- [Phase 09-04]: Two file inputs (desktop no-capture + mobile capture=environment) for camera vs file picker — no hydration mismatch
+- [Phase 09-04]: Full-screen dialogs on mobile use max-md: Tailwind classes on DialogContent — no separate mobile component
+- [Phase 09-04]: Table horizontal scroll uses overflow-x-auto on wrapper + min-w-[600px] — tables stay as tables on mobile per prior user decision
 
 ### Pending Todos
 
@@ -201,6 +205,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 09-02-PLAN.md (Audit Trail Viewer)
-Resume file: .planning/phases/09-polish-integration/09-02-SUMMARY.md
-Next: Execute Phase 9 Plan 03
+Stopped at: 09-04-PLAN.md Tasks 1-2 complete — awaiting human verification at checkpoint (Task 3)
+Resume file: .planning/phases/09-polish-integration/09-04-SUMMARY.md
+Next: Human verifies mobile layout, breadcrumbs, error pages. Resume 09-04-PLAN.md Task 3 (human-verify checkpoint)
