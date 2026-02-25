@@ -11,8 +11,8 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 
 Phase: 8 of 9 (Media, Notifications & Dashboards) — IN PROGRESS
 Plan: 7 of 7 in phase complete
-Status: Plan 07 complete — ExcelJS exports for requests, jobs, inventory, maintenance with styled spreadsheets and toolbar button
-Last activity: 2026-02-25 -- Completed 08-07-PLAN.md (Excel Exports)
+Status: Plan 06 complete — dashboard visualization components (status bar charts, staff workload, request aging, maintenance summary, inventory counts)
+Last activity: 2026-02-25 -- Completed 08-06-PLAN.md (Dashboard Visualizations)
 
 Progress: [████████████████████] (Phase 8 complete — 7/7 plans done)
 
@@ -53,6 +53,7 @@ Progress: [████████████████████] (Phase 
 | Phase 08-media-notifications-dashboards P05 | 3 | 2 tasks | 6 files |
 | Phase 08-media-notifications-dashboards P02 | 2 | 2 tasks | 4 files |
 | Phase 08-media-notifications-dashboards P04 | 3 | 2 tasks | 5 files |
+| Phase 08 P06 | 3 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -170,6 +171,9 @@ Recent decisions affecting current work:
 - [Phase 08-media-notifications-dashboards]: getAllNotifications uses cursor pagination (cursor = last item's created_at) rather than offset pagination for consistent results with live data
 - [Phase 08-media-notifications-dashboards]: cancelRequest fetches GA Lead/Admin recipients server-side to prevent frontend bypass
 - [Phase 08-media-notifications-dashboards]: Notification fire-and-forget pattern documented in helpers.ts for future phases (jobs, inventory, maintenance)
+- [Phase 08]: STATUS_HEX_COLORS map added for recharts (parallel to STATUS_COLORS Tailwind map) -- recharts Cell requires hex/rgb, not Tailwind class strings
+- [Phase 08]: Bar onClick uses any-typed barData parameter -- recharts BarMouseEvent type does not include custom data fields from data array
+- [Phase 08]: Dashboard page fetches all 7 data sources via single Promise.all for operational roles in 08-06
 
 ### Pending Todos
 
