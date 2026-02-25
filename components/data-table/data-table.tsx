@@ -50,6 +50,7 @@ interface DataTableProps<TData, TValue> {
   createButton?: React.ReactNode;
   emptyMessage?: string;
   meta?: Record<string, unknown>;
+  exportUrl?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -68,6 +69,7 @@ export function DataTable<TData, TValue>({
   createButton,
   emptyMessage = "No items found",
   meta,
+  exportUrl,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(initialColumnVisibility || {});
@@ -117,6 +119,7 @@ export function DataTable<TData, TValue>({
         onDeactivatedToggleChange={onDeactivatedToggleChange}
         showDeactivated={showDeactivated}
         createButton={createButton}
+        exportUrl={exportUrl}
       />
       <div className="rounded-md border">
         <Table>

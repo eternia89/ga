@@ -210,6 +210,11 @@ export function RequestTable({
         columns={requestColumns}
         data={filteredData}
         emptyMessage="No requests found"
+        exportUrl={
+          ['ga_lead', 'admin', 'finance_approver'].includes(currentUserRole)
+            ? '/api/exports/requests'
+            : undefined
+        }
         createButton={
           <Button asChild size="sm">
             <Link href="/requests/new">
