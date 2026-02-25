@@ -79,7 +79,7 @@ const NAV_SECTIONS: NavSection[] = [
         label: 'Templates',
         href: '/maintenance/templates',
         permission: PERMISSIONS.MAINTENANCE_MANAGE,
-        built: false,
+        built: true,
         icon: '📋',
       },
     ],
