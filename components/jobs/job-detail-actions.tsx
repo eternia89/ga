@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { JobWithRelations } from '@/lib/types/database';
+import { useGeolocation } from '@/hooks/use-geolocation';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -63,6 +64,9 @@ export function JobDetailActions({
   onActionSuccess,
 }: JobDetailActionsProps) {
   const router = useRouter();
+
+  // GPS hook for status changes
+  const { capturing: capturingGps, capturePosition } = useGeolocation();
 
   // Dialog states
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -132,10 +136,27 @@ export function JobDetailActions({
   };
 
   const handleStartWork = async () => {
-    setSubmitting(true);
     setFeedback(null);
+    // Capture GPS before status change — GPS is blocking (REQ-JOB-010)
+    let gps: { latitude: number; longitude: number; accuracy: number } | undefined;
     try {
-      const result = await updateJobStatus({ id: job.id, status: 'in_progress' });
+      gps = await capturePosition();
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Failed to get location. Please allow location access.',
+      });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const result = await updateJobStatus({
+        id: job.id,
+        status: 'in_progress',
+        latitude: gps.latitude,
+        longitude: gps.longitude,
+        gpsAccuracy: gps.accuracy,
+      });
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
         return;
@@ -207,10 +228,27 @@ export function JobDetailActions({
   };
 
   const handleMarkComplete = async () => {
-    setSubmitting(true);
     setFeedback(null);
+    // Capture GPS before status change — GPS is blocking (REQ-JOB-010)
+    let gps: { latitude: number; longitude: number; accuracy: number } | undefined;
     try {
-      const result = await updateJobStatus({ id: job.id, status: 'completed' });
+      gps = await capturePosition();
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Failed to get location. Please allow location access.',
+      });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const result = await updateJobStatus({
+        id: job.id,
+        status: 'completed',
+        latitude: gps.latitude,
+        longitude: gps.longitude,
+        gpsAccuracy: gps.accuracy,
+      });
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
         return;
@@ -263,9 +301,9 @@ export function JobDetailActions({
 
           {/* Start Work */}
           {canStartWork && (
-            <Button onClick={handleStartWork} disabled={submitting}>
+            <Button onClick={handleStartWork} disabled={submitting || capturingGps}>
               <Play className="mr-2 h-4 w-4" />
-              Start Work
+              {capturingGps ? 'Getting location...' : 'Start Work'}
             </Button>
           )}
 
@@ -306,9 +344,9 @@ export function JobDetailActions({
 
           {/* Mark Complete */}
           {canMarkComplete && (
-            <Button onClick={handleMarkComplete} disabled={submitting}>
+            <Button onClick={handleMarkComplete} disabled={submitting || capturingGps}>
               <CheckCircle className="mr-2 h-4 w-4" />
-              Mark Complete
+              {capturingGps ? 'Getting location...' : 'Mark Complete'}
             </Button>
           )}
 

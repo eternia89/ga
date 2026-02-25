@@ -82,7 +82,7 @@ export default async function JobDetailPage({ params }: PageProps) {
   const job = jobData as JobWithRelations;
 
   // Fetch all data in parallel
-  const [auditLogsResult, commentsResult, usersResult] = await Promise.all([
+  const [auditLogsResult, commentsResult, usersResult, statusChangesResult] = await Promise.all([
     // Audit logs for timeline
     supabase
       .from('audit_logs')
@@ -106,10 +106,27 @@ export default async function JobDetailPage({ params }: PageProps) {
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .order('full_name'),
+
+    // GPS status change records for timeline GPS links (REQ-JOB-010)
+    supabase
+      .from('job_status_changes')
+      .select('from_status, to_status, latitude, longitude, created_at')
+      .eq('job_id', id)
+      .order('created_at', { ascending: true }),
   ]);
 
   const auditLogs = auditLogsResult.data ?? [];
   const comments = commentsResult.data ?? [];
+  // Build GPS lookup: key = "fromStatus->toStatus" (may have duplicates, use most recent per pair)
+  type GpsRecord = { latitude: number | null; longitude: number | null; created_at: string };
+  const gpsMap: Record<string, GpsRecord> = {};
+  for (const sc of statusChangesResult.data ?? []) {
+    const key = `${sc.from_status}->${sc.to_status}`;
+    // Keep latest if multiple transitions with same from->to exist
+    if (!gpsMap[key] || sc.created_at > gpsMap[key].created_at) {
+      gpsMap[key] = { latitude: sc.latitude, longitude: sc.longitude, created_at: sc.created_at };
+    }
+  }
   const users = usersResult.data ?? [];
 
   // Fetch comment photos
@@ -297,14 +314,20 @@ export default async function JobDetailPage({ params }: PageProps) {
 
     // Check for status change (non-cancel, non-approval paths)
     if (changedFields.includes('status') && newData?.status) {
+      const fromSt = oldData?.status as string | undefined;
+      const toSt = newData?.status as string;
+      const gpsKey = fromSt ? `${fromSt}->${toSt}` : undefined;
+      const gpsData = gpsKey ? gpsMap[gpsKey] : undefined;
       timelineEvents.push({
         type: 'status_change',
         at: log.performed_at,
         by: byUser,
         details: {
-          old_status: oldData?.status,
-          new_status: newData?.status,
+          old_status: fromSt,
+          new_status: toSt,
         },
+        latitude: gpsData?.latitude ?? null,
+        longitude: gpsData?.longitude ?? null,
       });
       continue;
     }

@@ -12,6 +12,7 @@ import {
   ThumbsUp,
   ThumbsDown,
   MessageCircle,
+  MapPin,
 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { JobComment } from '@/lib/types/database';
@@ -34,6 +35,9 @@ export type JobTimelineEvent = {
   at: string; // ISO timestamp
   by: string; // user name or 'System'
   details?: Record<string, unknown>;
+  // GPS coordinates captured at time of status change (REQ-JOB-010)
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 interface PhotoItem {
@@ -222,6 +226,7 @@ export function JobTimeline({ events, comments, commentPhotos }: JobTimelineProp
             {entries.map((entry, index) => {
               if (entry.kind === 'event') {
                 const { event } = entry;
+                const hasGps = event.latitude != null && event.longitude != null;
                 return (
                   <div key={`event-${index}`} className="relative flex gap-4">
                     {/* Icon */}
@@ -238,6 +243,17 @@ export function JobTimeline({ events, comments, commentPhotos }: JobTimelineProp
                       <p className="text-xs text-muted-foreground">
                         {formatTimestamp(event.at)}
                       </p>
+                      {hasGps && (
+                        <a
+                          href={`https://www.google.com/maps?q=${event.latitude},${event.longitude}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-600 hover:underline inline-flex items-center gap-1"
+                        >
+                          <MapPin className="h-3 w-3" />
+                          View location
+                        </a>
+                      )}
                     </div>
                   </div>
                 );

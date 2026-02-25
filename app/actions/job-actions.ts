@@ -291,11 +291,15 @@ export const assignJob = authActionClient
 // updateJobStatus — ga_lead/admin OR assigned PIC
 // When transitioning to 'completed': set completed_at, move linked requests to
 // 'pending_acceptance' and set their completed_at.
+// GPS coordinates are recorded for every status change (REQ-JOB-010).
 // ============================================================================
 export const updateJobStatus = authActionClient
   .schema(z.object({
     id: z.string().uuid(),
     status: z.enum(['assigned', 'in_progress', 'completed', 'pending_approval']),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+    gpsAccuracy: z.number().optional(),
   }))
   .action(async ({ parsedInput, ctx }) => {
     const { supabase, profile } = ctx;
@@ -350,6 +354,20 @@ export const updateJobStatus = authActionClient
     if (error) {
       throw new Error(error.message);
     }
+
+    // Record GPS status change (REQ-JOB-010)
+    await supabase
+      .from('job_status_changes')
+      .insert({
+        job_id: parsedInput.id,
+        company_id: job.company_id,
+        from_status: job.status,
+        to_status: parsedInput.status,
+        changed_by: profile.id,
+        latitude: parsedInput.latitude ?? null,
+        longitude: parsedInput.longitude ?? null,
+        gps_accuracy: parsedInput.gpsAccuracy ?? null,
+      });
 
     // TODO(PM-INTEGRATION): When completing a PM job, call advanceFloatingSchedule.
     // Example integration:
