@@ -173,3 +173,63 @@ export interface CompanySetting {
   created_at: string;
   updated_at: string;
 }
+
+// ============================================================================
+// Inventory types
+// ============================================================================
+
+export type AssetStatus = 'active' | 'under_repair' | 'broken' | 'sold_disposed';
+export type MovementStatus = 'pending' | 'accepted' | 'rejected' | 'cancelled';
+
+export interface InventoryItem {
+  id: string;
+  company_id: string;
+  location_id: string | null;
+  category_id: string | null;
+  display_id: string;
+  name: string;
+  description: string | null;
+  status: AssetStatus;
+  brand: string | null;
+  model: string | null;
+  serial_number: string | null;
+  acquisition_date: string | null;
+  warranty_expiry: string | null;
+  notes: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InventoryItemWithRelations extends InventoryItem {
+  category: { name: string } | null;
+  location: { name: string } | null;
+  company: { name: string } | null;
+}
+
+export interface InventoryMovement {
+  id: string;
+  company_id: string;
+  item_id: string;
+  from_location_id: string | null;
+  to_location_id: string;
+  initiated_by: string;
+  receiver_id: string | null;
+  received_by: string | null;
+  status: MovementStatus;
+  notes: string | null;
+  received_at: string | null;
+  rejection_reason: string | null;
+  rejected_at: string | null;
+  cancelled_at: string | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InventoryMovementWithRelations extends InventoryMovement {
+  from_location: { name: string } | null;
+  to_location: { name: string } | null;
+  initiator: { full_name: string } | null;
+  receiver: { full_name: string } | null;
+}
