@@ -103,3 +103,62 @@ export const markAllAsRead = authActionClient
 
     return { success: true };
   });
+
+export type NotificationFilter = 'all' | 'unread' | 'request' | 'job' | 'inventory' | 'maintenance';
+
+const getAllNotificationsSchema = z.object({
+  filter: z.enum(['all', 'unread', 'request', 'job', 'inventory', 'maintenance']).optional(),
+  cursor: z.string().optional(),
+  limit: z.number().int().min(1).max(100).optional(),
+});
+
+/**
+ * Get paginated notifications for the current user, with optional filter.
+ * Uses cursor-based pagination (cursor = created_at of last item).
+ */
+export const getAllNotifications = authActionClient
+  .schema(getAllNotificationsSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    const { supabase, profile } = ctx;
+    const { filter = 'all', cursor, limit = 20 } = parsedInput;
+
+    let query = supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', profile.id)
+      .is('deleted_at', null);
+
+    // Apply filter
+    if (filter === 'unread') {
+      query = query.eq('is_read', false);
+    } else if (filter === 'request') {
+      query = query.eq('entity_type', 'request');
+    } else if (filter === 'job') {
+      query = query.eq('entity_type', 'job');
+    } else if (filter === 'inventory') {
+      query = query.eq('entity_type', 'inventory');
+    } else if (filter === 'maintenance') {
+      query = query.eq('entity_type', 'maintenance_schedule');
+    }
+
+    // Cursor-based pagination
+    if (cursor) {
+      query = query.lt('created_at', cursor);
+    }
+
+    query = query.order('created_at', { ascending: false }).limit(limit + 1);
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const notifications = (data ?? []) as Notification[];
+    const hasMore = notifications.length > limit;
+    if (hasMore) {
+      notifications.pop();
+    }
+
+    return { notifications, hasMore };
+  });
