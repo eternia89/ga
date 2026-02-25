@@ -261,12 +261,12 @@ All requirements below are scoped for v1 unless marked otherwise.
 | REQ-INV-001 | Phase 6 | Complete |
 | REQ-INV-002 | Phase 6 | Complete |
 | REQ-INV-003 | Phase 6 | Complete |
-| REQ-INV-004 | Phase 6 | Pending |
-| REQ-INV-005 | Phase 6 | Pending |
+| REQ-INV-004 | Phase 6 | Complete |
+| REQ-INV-005 | Phase 6 | Complete |
 | REQ-INV-006 | Phase 6 | Complete |
 | REQ-INV-007 | Phase 6 | Complete |
 | REQ-INV-008 | Phase 6 | Complete |
-| REQ-INV-009 | Phase 6 | Pending |
+| REQ-INV-009 | Phase 6 | Complete |
 | REQ-INV-010 | Phase 6 | Complete |
 | REQ-PM-001 | Phase 7 | Pending |
 | REQ-PM-002 | Phase 7 | Pending |
