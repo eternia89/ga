@@ -16,6 +16,7 @@ import {
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { JobStatusBadge } from './job-status-badge';
 import { JobPriorityBadge } from './job-priority-badge';
+import { OverdueBadge } from '@/components/maintenance/overdue-badge';
 
 export type JobTableMeta = {
   onView?: (job: JobWithRelations) => void;
@@ -43,13 +44,28 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
     ),
     cell: ({ row }) => {
       const title = row.getValue('title') as string;
+      const job = row.original;
+      const isPM = job.job_type === 'preventive_maintenance';
+      const nextDueAt = job.maintenance_schedule?.next_due_at ?? null;
       return (
-        <span className="max-w-[220px] truncate block" title={title}>
-          {title}
-        </span>
+        <div className="space-y-0.5 max-w-[240px]">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {isPM && (
+              <span className="inline-flex items-center rounded-full bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 shrink-0">
+                PM
+              </span>
+            )}
+            {isPM && (
+              <OverdueBadge nextDueAt={nextDueAt} jobStatus={job.status} />
+            )}
+          </div>
+          <span className="truncate block text-sm" title={title}>
+            {title}
+          </span>
+        </div>
       );
     },
-    size: 220,
+    size: 240,
   },
   {
     accessorKey: 'status',

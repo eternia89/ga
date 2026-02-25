@@ -12,6 +12,7 @@ import {
 import { JobStatusBadge } from '@/components/jobs/job-status-badge';
 import { JobPriorityBadge } from '@/components/jobs/job-priority-badge';
 import { JobDetailClient } from '@/components/jobs/job-detail-client';
+import { OverdueBadge } from '@/components/maintenance/overdue-badge';
 import type { JobTimelineEvent } from '@/components/jobs/job-timeline';
 import type { JobWithRelations } from '@/lib/types/database';
 import { JOB_STATUS_LABELS } from '@/lib/constants/job-status';
@@ -43,7 +44,7 @@ export default async function JobDetailPage({ params }: PageProps) {
     redirect('/login');
   }
 
-  // Fetch job with all relations
+  // Fetch job with all relations (including maintenance_schedule for PM jobs)
   const { data: jobData } = await supabase
     .from('jobs')
     .select(
@@ -53,6 +54,12 @@ export default async function JobDetailPage({ params }: PageProps) {
       category:categories(name),
       pic:user_profiles!assigned_to(full_name),
       created_by_user:user_profiles!created_by(full_name),
+      maintenance_schedule:maintenance_schedules(
+        id,
+        next_due_at,
+        interval_type,
+        interval_days
+      ),
       job_requests(
         request:requests(
           id,
@@ -339,6 +346,19 @@ export default async function JobDetailPage({ params }: PageProps) {
           </h1>
           <JobStatusBadge status={job.status} />
           {job.priority && <JobPriorityBadge priority={job.priority} />}
+          {/* PM type badge */}
+          {job.job_type === 'preventive_maintenance' && (
+            <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+              PM
+            </span>
+          )}
+          {/* Overdue badge for PM jobs */}
+          {job.job_type === 'preventive_maintenance' && job.maintenance_schedule && (
+            <OverdueBadge
+              nextDueAt={job.maintenance_schedule.next_due_at ?? null}
+              jobStatus={job.status}
+            />
+          )}
         </div>
         <p className="text-sm text-muted-foreground">
           {job.title}
@@ -361,6 +381,7 @@ export default async function JobDetailPage({ params }: PageProps) {
         approvedByName={approvedByName}
         approvalRejectedByName={approvalRejectedByName}
       />
+
     </div>
   );
 }
