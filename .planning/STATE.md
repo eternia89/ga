@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 7 of 9 (Preventive Maintenance) — IN PROGRESS
-Plan: 2 of 3 in phase complete
-Status: Phase 7 template UI complete — dnd-kit builder, list/create/detail pages, sidebar activated
-Last activity: 2026-02-25 -- Completed 07-02-PLAN.md (Template Builder UI)
+Plan: 3 of 3 in phase complete
+Status: Phase 7 complete — schedule management UI, status badges, list/create/detail pages, both Maintenance nav items active
+Last activity: 2026-02-25 -- Completed 07-03-PLAN.md (Schedule Management Pages)
 
-Progress: [█████████████] (Phase 7 in progress — 2/3 plans done)
+Progress: [██████████████] (Phase 7 complete — 3/3 plans done)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 8.5 min
-- Total execution time: 2.01 hours
+- Total plans completed: 14
+- Average duration: 8.2 min
+- Total execution time: 2.1 hours
 
 **By Phase:**
 
@@ -45,6 +45,7 @@ Progress: [█████████████] (Phase 7 in progress — 2/3
 | Phase 06-inventory P03 | 9 | 2 tasks | 10 files |
 | Phase 07-preventive-maintenance P01 | 5 | 2 tasks | 9 files |
 | Phase 07-preventive-maintenance P02 | 4 | 2 tasks | 11 files |
+| Phase 07-preventive-maintenance P03 | 6 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -134,6 +135,9 @@ Recent decisions affecting current work:
 - [07-01]: changeAssetStatus in asset-actions.ts updated to use auto: prefix convention and handle all 3 branches: sold_disposed (deactivate), broken/under_repair (pause + cancel jobs), active (resume auto-paused only)
 - [Phase 07-02]: TemplateCreateForm and TemplateDetail are separate components for clarity — create navigates away, edit stays on page with inline toggle
 - [Phase 07-02]: Sidebar Templates nav item activated at plan 02 completion; Schedules remains built: false until plan 03
+- [Phase 07-03]: ScheduleForm split into ScheduleCreateForm and ScheduleEditForm sub-components to avoid TypeScript type union issues between useForm instances with different Zod schema types
+- [Phase 07-03]: Used z.output<typeof scheduleCreateSchema> as useForm type to avoid Resolver mismatch caused by interval_type .default('floating') making input type optional but output type required
+- [Phase 07-03]: Sidebar Schedules nav item activated at plan 03 completion — both Maintenance nav items (Templates, Schedules) now active
 
 ### Pending Todos
 
@@ -149,6 +153,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 07-02-PLAN.md (Template Builder UI) — Phase 7 in progress (2/3 plans)
-Resume file: .planning/phases/07-preventive-maintenance/07-02-SUMMARY.md
+Stopped at: Completed 07-03-PLAN.md (Schedule Management Pages) — Phase 7 complete (3/3 plans)
+Resume file: .planning/phases/07-preventive-maintenance/07-03-SUMMARY.md
 Next: Execute Phase 7 Plan 03 (Schedule Management Pages)
