@@ -242,3 +242,21 @@ export interface InventoryMovementWithRelations extends InventoryMovement {
   initiator: { full_name: string } | null;
   receiver: { full_name: string } | null;
 }
+
+// ============================================================================
+// Job GPS tracking types (Phase 9 - REQ-JOB-010)
+// ============================================================================
+
+export interface JobStatusChange {
+  id: string;
+  job_id: string;
+  company_id: string;
+  from_status: string;
+  to_status: string;
+  changed_by: string;
+  latitude: number | null;
+  longitude: number | null;
+  gps_accuracy: number | null;
+  created_at: string;
+  changed_by_user?: { full_name: string } | null;
+}
