@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Insert media_attachments record
-      const { error: insertError } = await adminSupabase
+      const { data: insertedRow, error: insertError } = await adminSupabase
         .from('media_attachments')
         .insert({
           company_id: profile.company_id,
@@ -190,7 +190,9 @@ export async function POST(request: NextRequest) {
           mime_type: file.type,
           sort_order: currentCount + i,
           uploaded_by: user.id,
-        });
+        })
+        .select('id')
+        .single();
 
       if (insertError) {
         console.error('Insert error:', insertError.message);
@@ -200,6 +202,53 @@ export async function POST(request: NextRequest) {
       }
 
       uploadedCount++;
+
+      // Fire-and-forget: trigger Vision API description generation (non-blocking)
+      if (insertedRow?.id) {
+        const attachmentId = insertedRow.id;
+        // Read file buffer and base64-encode for Vision API
+        file
+          .arrayBuffer()
+          .then((buffer) => {
+            const base64 = Buffer.from(buffer).toString('base64');
+            const apiKey = process.env.GOOGLE_VISION_API_KEY;
+            if (!apiKey) return; // Skip if not configured
+
+            return fetch(
+              `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  requests: [
+                    {
+                      image: { content: base64 },
+                      features: [{ type: 'LABEL_DETECTION', maxResults: 5 }],
+                    },
+                  ],
+                }),
+              }
+            )
+              .then(async (res) => {
+                if (!res.ok) return;
+                const data = await res.json();
+                const labels: Array<{ description: string }> =
+                  data.responses?.[0]?.labelAnnotations ?? [];
+                const description =
+                  labels.length > 0
+                    ? labels.map((l) => l.description).join(', ')
+                    : null;
+                if (description) {
+                  await adminSupabase
+                    .from('media_attachments')
+                    .update({ description })
+                    .eq('id', attachmentId);
+                }
+              })
+              .catch(() => {});
+          })
+          .catch(() => {}); // Truly fire-and-forget
+      }
     }
 
     return NextResponse.json({ success: true, count: uploadedCount });
