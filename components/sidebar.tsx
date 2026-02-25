@@ -132,10 +132,10 @@ export function Sidebar({ companyName, onNavigate }: SidebarProps) {
 
 
   return (
-    <aside className="w-64 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col h-screen">
+    <aside className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col h-screen">
       {/* Company name at top */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-        <h1 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+      <div className="p-6 border-b border-gray-200">
+        <h1 className="text-lg font-semibold text-gray-900 truncate">
           {companyName}
         </h1>
       </div>
@@ -153,7 +153,7 @@ export function Sidebar({ companyName, onNavigate }: SidebarProps) {
 
           return (
             <div key={section.title}>
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">
                 {section.title}
               </h2>
               <ul className="space-y-1">
@@ -164,10 +164,10 @@ export function Sidebar({ companyName, onNavigate }: SidebarProps) {
                   if (!item.built) {
                     return (
                       <li key={item.href}>
-                        <span className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 dark:text-gray-600 cursor-not-allowed">
+                        <span className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-400 cursor-not-allowed">
                           <span className="text-base">{item.icon}</span>
                           <span className="text-sm">{item.label}</span>
-                          <span className="ml-auto text-xs text-gray-400 dark:text-gray-600">
+                          <span className="ml-auto text-xs text-gray-400">
                             Coming soon
                           </span>
                         </span>
@@ -185,8 +185,8 @@ export function Sidebar({ companyName, onNavigate }: SidebarProps) {
                           flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors
                           ${
                             isActive
-                              ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-l-2 border-blue-700 dark:border-blue-500'
-                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                              ? 'bg-blue-50 text-blue-700 border-l-2 border-blue-700'
+                              : 'text-gray-700 hover:bg-gray-100'
                           }
                         `}
                       >
@@ -203,7 +203,7 @@ export function Sidebar({ companyName, onNavigate }: SidebarProps) {
       </nav>
 
       {/* User menu at bottom - sticky */}
-      <div className="border-t border-gray-200 dark:border-gray-800 p-4">
+      <div className="border-t border-gray-200 p-4">
         <UserMenu />
       </div>
     </aside>

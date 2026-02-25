@@ -97,6 +97,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     PERMISSIONS.JOB_ASSIGN,
     PERMISSIONS.MAINTENANCE_MANAGE,
     PERMISSIONS.DASHBOARD_EXPORT,
+    PERMISSIONS.AUDIT_VIEW,
   ],
 
   finance_approver: [
