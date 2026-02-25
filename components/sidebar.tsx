@@ -60,7 +60,7 @@ const NAV_SECTIONS: NavSection[] = [
         label: 'Assets',
         href: '/inventory',
         permission: PERMISSIONS.INVENTORY_VIEW_ALL,
-        built: false,
+        built: true,
         icon: '📦',
       },
     ],
