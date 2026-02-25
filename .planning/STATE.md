@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Centralize GA operations -- requests, jobs, inventory, maintenance -- with full traceability and real-time visibility for a corporate group.
-**Current focus:** Phase 6 - Inventory
+**Current focus:** Phase 7 - Maintenance
 
 ## Current Position
 
-Phase: 6 of 9 (Inventory)
-Plan: 2 of 3 in current phase
-Status: Plan 02 complete — asset list + creation UI done
-Last activity: 2026-02-25 -- Completed 06-02-PLAN.md (Asset List + Creation UI)
+Phase: 6 of 9 (Inventory) — COMPLETE
+Plan: 3 of 3 in phase complete — Phase 6 done, advancing to Phase 7
+Status: Phase 6 complete — asset list, creation, detail, status changes, transfers all built
+Last activity: 2026-02-25 -- Completed 06-03-PLAN.md (Asset Detail Page)
 
-Progress: [████████████] (Phase 6 in progress — 2/3 plans done)
+Progress: [█████████████] (Phase 6 complete — 3/3 plans done)
 
 ## Performance Metrics
 
@@ -32,15 +32,16 @@ Progress: [████████████] (Phase 6 in progress — 2/3 pl
 | 03-admin-system-configuration | 3/3 | 25min | 8min |
 | 04-requests | 2/2 | 13min | 6.5min |
 | 05-jobs-approvals | 5/5 | 32min | 6.4min |
-| 06-inventory | 2/3 | 8min | 4min |
+| 06-inventory | 3/3 | 17min | 5.7min |
 
 **Recent Trend:**
-- Last 5 plans: 05-03 (12min), 05-04 (4min), 05-05 (7min), 06-01 (4min), 06-02 (4min)
+- Last 5 plans: 05-05 (7min), 06-01 (4min), 06-02 (4min), 06-03 (9min)
 - Trend: Consistent — 4-12 min per plan (excellent velocity)
 
 *Updated after each plan completion*
 | Phase 06-inventory P01 | 4 | 2 tasks | 7 files |
 | Phase 06-inventory P02 | 4 | 2 tasks | 8 files |
+| Phase 06-inventory P03 | 9 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -122,6 +123,9 @@ Recent decisions affecting current work:
 - [06-02]: pendingTransfers map fetched server-side, passed to AssetTable, propagated via TanStack Table meta for per-row lookup in column cells
 - [06-02]: AssetPhotoUpload is a controlled component — photos state lives in parent form, onPhotosChange callback syncs upward
 - [06-02]: Invoice upload uses file list UI (not thumbnail grid) since PDFs cannot show preview thumbnails
+- [Phase 06-03]: AssetDetailInfo renders status badge as button wrapper — cursor/disabled controls clickability without forking badge component
+- [Phase 06-03]: Timeline merges audit_logs and inventory_movements client-side into single sorted chronological array
+- [Phase 06-03]: Sidebar Inventory nav item activated at plan 03 completion — list + detail both functional
 
 ### Pending Todos
 
@@ -137,6 +141,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 06-02-PLAN.md (Asset List + Creation UI) — Phase 6 Plan 2 of 3 done
-Resume file: .planning/phases/06-inventory/06-02-SUMMARY.md
-Next: Execute Phase 6 Plan 3 (Asset Detail Page)
+Stopped at: Completed 06-03-PLAN.md (Asset Detail Page) — Phase 6 complete (3/3 plans)
+Resume file: .planning/phases/06-inventory/06-03-SUMMARY.md
+Next: Execute Phase 7 (Maintenance)
