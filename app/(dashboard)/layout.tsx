@@ -3,6 +3,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { createClient } from '@/lib/supabase/server';
 import { AuthProvider } from '@/lib/auth/hooks';
 import { Sidebar } from '@/components/sidebar';
+import { NotificationBell } from '@/components/notifications/notification-bell';
 import type { ReactNode } from 'react';
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
@@ -35,9 +36,16 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       <AuthProvider initialProfile={profile}>
         <div className="flex h-screen">
           <Sidebar companyName={companyName} />
-          <main className="flex-1 overflow-auto p-6 bg-white dark:bg-gray-950">
-            {children}
-          </main>
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* Top header bar with notification bell */}
+            <header className="flex items-center justify-end px-6 py-3 border-b border-border bg-white dark:bg-gray-950 flex-shrink-0">
+              <NotificationBell />
+            </header>
+            {/* Scrollable content area */}
+            <main className="flex-1 overflow-auto p-6 bg-white dark:bg-gray-950">
+              {children}
+            </main>
+          </div>
         </div>
       </AuthProvider>
     </NuqsAdapter>

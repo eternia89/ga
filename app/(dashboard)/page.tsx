@@ -1,11 +1,43 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+} from 'date-fns';
+import {
+  FileText,
+  AlertCircle,
+  Clock,
+  Wrench,
+  CheckCircle,
+} from 'lucide-react';
+import { KpiCard } from '@/components/dashboard/kpi-card';
+import { DateRangeFilter } from '@/components/dashboard/date-range-filter';
+import { getDashboardKpis, calculateTrend } from '@/lib/dashboard/queries';
 
-export default async function DashboardPage() {
+// Operational roles that see the full dashboard
+const OPERATIONAL_ROLES = ['ga_lead', 'admin', 'finance_approver'];
+
+const KPI_ICONS: Record<string, React.ReactNode> = {
+  'open-requests': <FileText className="h-4 w-4" />,
+  untriaged: <AlertCircle className="h-4 w-4" />,
+  'overdue-jobs': <Clock className="h-4 w-4" />,
+  'open-jobs': <Wrench className="h-4 w-4" />,
+  completed: <CheckCircle className="h-4 w-4" />,
+};
+
+interface PageProps {
+  searchParams: Promise<{ from?: string; to?: string }>;
+}
+
+export default async function DashboardPage({ searchParams }: PageProps) {
   const supabase = await createClient();
 
   // Get user profile
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login');
@@ -29,72 +61,124 @@ export default async function DashboardPage() {
 
   // Time-based greeting
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const greeting =
+    hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
   // Role badge color
   const roleColors: Record<string, string> = {
     admin: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
     ga_lead: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
     ga_staff: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-    finance_approver: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
+    finance_approver:
+      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
     general_user: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
   };
 
   const roleColor = roleColors[profile.role] || roleColors.general_user;
+  const isOperational = OPERATIONAL_ROLES.includes(profile.role);
+
+  // Parse date range from searchParams (default: This Month)
+  const resolvedParams = await searchParams;
+  const dateFrom =
+    resolvedParams.from ?? format(startOfMonth(new Date()), 'yyyy-MM-dd');
+  const dateTo =
+    resolvedParams.to ?? format(endOfMonth(new Date()), 'yyyy-MM-dd');
+
+  // Fetch KPI data for operational roles
+  const kpis = isOperational
+    ? await getDashboardKpis(supabase, { from: dateFrom, to: dateTo })
+    : [];
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="space-y-6">
       {/* Welcome header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          {greeting}, {profile.full_name.split(' ')[0]}
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Welcome back to your dashboard
-        </p>
+      <div className="flex items-start justify-between gap-4 max-md:flex-col">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">
+            {greeting}, {profile.full_name.split(' ')[0]}
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {isOperational
+              ? 'Here is the current operational overview'
+              : 'Welcome back to your dashboard'}
+          </p>
+        </div>
+
+        {/* Date range filter — only for operational roles */}
+        {isOperational && (
+          <div className="shrink-0">
+            <DateRangeFilter />
+          </div>
+        )}
       </div>
 
-      {/* User info card */}
-      <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Your Profile
-        </h2>
-        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <dt className="text-sm text-gray-600 dark:text-gray-400">Email</dt>
-            <dd className="text-sm font-medium text-gray-900 dark:text-white">{profile.email}</dd>
+      {/* Operational dashboard — KPI cards */}
+      {isOperational && (
+        <>
+          <div className="grid grid-cols-5 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 gap-4">
+            {kpis.map((kpi) => {
+              const trend = calculateTrend(kpi.value, kpi.previousValue);
+              return (
+                <KpiCard
+                  key={kpi.id}
+                  title={kpi.title}
+                  value={kpi.value}
+                  trend={trend}
+                  href={kpi.href}
+                  icon={KPI_ICONS[kpi.id]}
+                  trendIsGood={kpi.trendIsGood}
+                />
+              );
+            })}
           </div>
-          <div>
-            <dt className="text-sm text-gray-600 dark:text-gray-400">Role</dt>
-            <dd>
-              <span className={`text-sm px-2 py-1 rounded ${roleColor} inline-block`}>
-                {roleDisplay}
-              </span>
-            </dd>
-          </div>
-          <div>
-            <dt className="text-sm text-gray-600 dark:text-gray-400">Company</dt>
-            <dd className="text-sm font-medium text-gray-900 dark:text-white">
-              {profile.companies?.name || 'N/A'}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-sm text-gray-600 dark:text-gray-400">Division</dt>
-            <dd className="text-sm font-medium text-gray-900 dark:text-white">
-              {profile.divisions?.name || 'Not assigned'}
-            </dd>
-          </div>
-        </dl>
-      </div>
 
-      {/* Placeholder content */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-        <p className="text-sm text-blue-800 dark:text-blue-300">
-          Dashboard features will appear here as they are built. Navigation items marked as
-          &quot;Coming soon&quot; in the sidebar are under development and will be available in
-          upcoming phases.
-        </p>
-      </div>
+          {/* Charts placeholder — will be built in plan 08-06 */}
+          <div className="rounded-lg border border-dashed border-border p-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              Charts will appear here
+            </p>
+          </div>
+        </>
+      )}
+
+      {/* Simple welcome card for general users and GA staff */}
+      {!isOperational && (
+        <div className="bg-muted/40 border border-border rounded-lg p-6">
+          <h2 className="text-base font-semibold text-foreground mb-4">
+            Your Profile
+          </h2>
+          <dl className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
+            <div>
+              <dt className="text-sm text-muted-foreground">Email</dt>
+              <dd className="text-sm font-medium text-foreground">
+                {profile.email}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">Role</dt>
+              <dd>
+                <span
+                  className={`text-sm px-2 py-1 rounded ${roleColor} inline-block`}
+                >
+                  {roleDisplay}
+                </span>
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">Company</dt>
+              <dd className="text-sm font-medium text-foreground">
+                {profile.companies?.name || 'N/A'}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">Division</dt>
+              <dd className="text-sm font-medium text-foreground">
+                {profile.divisions?.name || 'Not assigned'}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      )}
     </div>
   );
 }
