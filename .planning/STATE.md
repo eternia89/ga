@@ -51,6 +51,8 @@ Progress: [████████████████████] (Phase 
 | Phase 08-media-notifications-dashboards P07 | 3 | 2 tasks | 8 files |
 | Phase 08 P03 | 3 | 2 tasks | 7 files |
 | Phase 08-media-notifications-dashboards P05 | 3 | 2 tasks | 6 files |
+| Phase 08-media-notifications-dashboards P02 | 2 | 2 tasks | 4 files |
+| Phase 08-media-notifications-dashboards P04 | 3 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -162,6 +164,12 @@ Recent decisions affecting current work:
 - [Phase 08-05]: getDashboardKpis runs 10 parallel Supabase count queries for 5 KPIs (current + previous period each)
 - [Phase 08-05]: Previous period = same duration shifted back from dateRange.from; Overdue Jobs heuristic = in_progress jobs older than 7 days
 - [Phase 08-05]: DateRangeFilter syncs from/to to URL via nuqs; server component reads them from searchParams with This Month default
+- [Phase 08-02]: Vision API called directly in upload route (not HTTP self-call) — simpler, avoids auth cookie forwarding complexity
+- [Phase 08-02]: GOOGLE_VISION_API_KEY is server-side only (no NEXT_PUBLIC_ prefix) — key never exposed to browser
+- [Phase 08-02]: AI descriptions displayed inside lightbox only (not under thumbnails) — per REQ-MEDIA-006
+- [Phase 08-media-notifications-dashboards]: getAllNotifications uses cursor pagination (cursor = last item's created_at) rather than offset pagination for consistent results with live data
+- [Phase 08-media-notifications-dashboards]: cancelRequest fetches GA Lead/Admin recipients server-side to prevent frontend bypass
+- [Phase 08-media-notifications-dashboards]: Notification fire-and-forget pattern documented in helpers.ts for future phases (jobs, inventory, maintenance)
 
 ### Pending Todos
 
