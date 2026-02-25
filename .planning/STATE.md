@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 
 ## Current Position
 
-Phase: 6 of 9 (Inventory) — COMPLETE
-Plan: 3 of 3 in phase complete — Phase 6 done, advancing to Phase 7
-Status: Phase 6 complete — asset list, creation, detail, status changes, transfers all built
-Last activity: 2026-02-25 -- Completed 06-03-PLAN.md (Asset Detail Page)
+Phase: 7 of 9 (Preventive Maintenance) — IN PROGRESS
+Plan: 1 of 3 in phase complete
+Status: Phase 7 data foundation complete — migration, types, schemas, template/schedule server actions built
+Last activity: 2026-02-25 -- Completed 07-01-PLAN.md (PM Data Foundation)
 
-Progress: [█████████████] (Phase 6 complete — 3/3 plans done)
+Progress: [█████████████] (Phase 7 in progress — 1/3 plans done)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
-- Average duration: 8.7 min
-- Total execution time: 1.94 hours
+- Total plans completed: 13
+- Average duration: 8.5 min
+- Total execution time: 2.01 hours
 
 **By Phase:**
 
@@ -33,15 +33,17 @@ Progress: [█████████████] (Phase 6 complete — 3/3 pl
 | 04-requests | 2/2 | 13min | 6.5min |
 | 05-jobs-approvals | 5/5 | 32min | 6.4min |
 | 06-inventory | 3/3 | 17min | 5.7min |
+| 07-preventive-maintenance | 1/3 | 5min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 05-05 (7min), 06-01 (4min), 06-02 (4min), 06-03 (9min)
+- Last 5 plans: 06-01 (4min), 06-02 (4min), 06-03 (9min), 07-01 (5min)
 - Trend: Consistent — 4-12 min per plan (excellent velocity)
 
 *Updated after each plan completion*
 | Phase 06-inventory P01 | 4 | 2 tasks | 7 files |
 | Phase 06-inventory P02 | 4 | 2 tasks | 8 files |
 | Phase 06-inventory P03 | 9 | 2 tasks | 10 files |
+| Phase 07-preventive-maintenance P01 | 5 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -126,11 +128,14 @@ Recent decisions affecting current work:
 - [Phase 06-03]: AssetDetailInfo renders status badge as button wrapper — cursor/disabled controls clickability without forking badge component
 - [Phase 06-03]: Timeline merges audit_logs and inventory_movements client-side into single sorted chronological array
 - [Phase 06-03]: Sidebar Inventory nav item activated at plan 03 completion — list + detail both functional
+- [07-01]: generate_pm_jobs cron registration commented out pending pg_cron extension enable in Supabase Dashboard (consistent with Phase 5 pattern)
+- [07-01]: pauseSchedulesForAsset/resumeSchedulesForAsset/deactivateSchedulesForAsset exported as plain async functions not authActionClient — called internally by changeAssetStatus as helpers
+- [07-01]: changeAssetStatus in asset-actions.ts updated to use auto: prefix convention and handle all 3 branches: sold_disposed (deactivate), broken/under_repair (pause + cancel jobs), active (resume auto-paused only)
 
 ### Pending Todos
 
-- Push migrations 00007 through 00009 to Supabase: `supabase db push`
-- Enable pg_cron extension in Supabase Dashboard and run schedule manually (see 05-01-SUMMARY.md)
+- Push migrations 00007 through 00010 to Supabase: `supabase db push`
+- Enable pg_cron extension in Supabase Dashboard and run schedule manually (see 05-01-SUMMARY.md and 07-01-SUMMARY.md)
 
 ### Blockers/Concerns
 
@@ -141,6 +146,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 06-03-PLAN.md (Asset Detail Page) — Phase 6 complete (3/3 plans)
-Resume file: .planning/phases/06-inventory/06-03-SUMMARY.md
-Next: Execute Phase 7 (Maintenance)
+Stopped at: Completed 07-01-PLAN.md (PM Data Foundation) — Phase 7 in progress (1/3 plans)
+Resume file: .planning/phases/07-preventive-maintenance/07-01-SUMMARY.md
+Next: Execute Phase 7 Plan 02 (Template Builder UI and Schedule Management Pages)
