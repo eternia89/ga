@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Centralize GA operations -- requests, jobs, inventory, maintenance -- with full traceability and real-time visibility for a corporate group.
-**Current focus:** Phase 8 - Media, Notifications & Dashboards
+**Current focus:** Phase 9 - Polish & Integration
 
 ## Current Position
 
-Phase: 8 of 9 (Media, Notifications & Dashboards) — IN PROGRESS
-Plan: 8 of 8 in phase complete
-Status: Plan 08 complete — notification triggers wired into job-actions.ts and approval-actions.ts (gap closure)
-Last activity: 2026-02-25 -- Completed 08-08-PLAN.md (Notification Triggers Gap Closure)
+Phase: 9 of 9 (Polish & Integration) — IN PROGRESS
+Plan: 1 of 4 in phase complete
+Status: Plan 01 complete — GPS infrastructure (migration, useGeolocation hook, entity routes) and GPS-integrated job status workflow
+Last activity: 2026-02-25 -- Completed 09-01-PLAN.md (GPS Job Status Changes)
 
-Progress: [████████████████████] (Phase 8 complete — 8/8 plans done)
+Progress: [█████████████████████] (Phase 9 in progress — 1/4 plans done)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
-- Average duration: 8.0 min
-- Total execution time: 2.2 hours
+- Total plans completed: 17
+- Average duration: 7.9 min
+- Total execution time: 2.3 hours
 
 **By Phase:**
 
@@ -55,6 +55,7 @@ Progress: [████████████████████] (Phase 
 | Phase 08-media-notifications-dashboards P04 | 3 | 2 tasks | 5 files |
 | Phase 08 P06 | 3 | 2 tasks | 7 files |
 | Phase 08-media-notifications-dashboards P08 | 5 | 2 tasks | 2 files |
+| Phase 09-polish-integration P01 | 8 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -178,10 +179,14 @@ Recent decisions affecting current work:
 - [Phase 08-08]: All five notification types now used across codebase: status_change, assignment, approval, completion, auto_accept_warning — job and approval actions fully wired
 - [Phase 08-08]: completionRecipients includes both created_by and assigned_to — job creator and PIC both notified on completion
 - [Phase 08-08]: cancelJob notification guarded by if job.assigned_to — unassigned jobs have no PIC to notify
+- [Phase 09-01]: GPS capture is blocking — capturePosition() must succeed before updateJobStatus is called; GPS denial shows error and status change does not proceed
+- [Phase 09-01]: GPS columns nullable in job_status_changes — pre-existing transitions (no GPS) handled gracefully by checking latitude != null in timeline
+- [Phase 09-01]: Timeline GPS correlation uses from_status->to_status string key map; latest record kept per pair for jobs with repeated transitions
+- [Phase 09-01]: ENTITY_ROUTES maps settings entities to /admin/settings base path (no individual detail pages); entities with no detail page return '#'
 
 ### Pending Todos
 
-- Push migrations 00007 through 00010 to Supabase: `supabase db push`
+- Push migrations 00007 through 00011 to Supabase: `supabase db push`
 - Enable pg_cron extension in Supabase Dashboard and run schedule manually (see 05-01-SUMMARY.md and 07-01-SUMMARY.md)
 
 ### Blockers/Concerns
@@ -193,6 +198,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 08-08-PLAN.md (Notification Triggers Gap Closure)
-Resume file: .planning/phases/08-media-notifications-dashboards/08-08-SUMMARY.md
-Next: Execute Phase 9 (Polish & UAT)
+Stopped at: Completed 09-01-PLAN.md (GPS Job Status Changes)
+Resume file: .planning/phases/09-polish-integration/09-01-SUMMARY.md
+Next: Execute Phase 9 Plan 02 (Audit Trail Viewer)
