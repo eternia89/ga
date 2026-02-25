@@ -161,7 +161,7 @@ Plans:
   3. Users see a bell icon with unread count, a notification dropdown (recent 10-20 items), and a full notification center page with filters and mark-all-read. Clicking a notification navigates to the relevant entity
   4. Notifications fire for: status changes, assignments, approvals, completions, and auto-accept warnings. The actor is never notified about their own action
   5. The GA Lead dashboard shows KPI cards (open requests, overdue jobs, untriaged count), request/job status distribution charts, staff workload view, maintenance due/overdue summary, inventory counts, and request aging. Excel export is available for requests, jobs, inventory, and maintenance data
-**Plans**: 7 plans
+**Plans**: 8 plans
 
 Plans:
 - [ ] 08-01-PLAN.md — Image compression (WebP), generalized entity upload route, freehand annotation dialog, reusable photo upload component
@@ -171,6 +171,7 @@ Plans:
 - [x] 08-05-PLAN.md — Dashboard KPI cards with trend indicators, date range filter, dashboard page foundation
 - [ ] 08-06-PLAN.md — Status distribution charts, staff workload table, request aging, maintenance summary, inventory counts
 - [ ] 08-07-PLAN.md — Excel export for requests, jobs, inventory, maintenance with styled spreadsheets
+- [ ] 08-08-PLAN.md — Gap closure: notification triggers in job-actions.ts and approval-actions.ts
 
 ### Phase 9: Polish & Integration
 **Goal**: All remaining cross-cutting quality requirements are addressed -- GPS accountability, audit trail visibility, loading states, mobile responsiveness for field workers, and overall UI consistency -- bringing the tool to production readiness.
