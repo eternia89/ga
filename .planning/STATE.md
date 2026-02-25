@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 7 of 9 (Preventive Maintenance) — IN PROGRESS
-Plan: 3 of 3 in phase complete
-Status: Phase 7 complete — schedule management UI, status badges, list/create/detail pages, both Maintenance nav items active
-Last activity: 2026-02-25 -- Completed 07-03-PLAN.md (Schedule Management Pages)
+Plan: 4 of 4 in phase complete
+Status: Phase 7 complete — PM checklist UI, overdue/PM badges, server actions for checklist save and schedule advancement
+Last activity: 2026-02-25 -- Completed 07-04-PLAN.md (PM Job Integration)
 
-Progress: [██████████████] (Phase 7 complete — 3/3 plans done)
+Progress: [████████████████] (Phase 7 complete — 4/4 plans done)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
-- Average duration: 8.2 min
+- Total plans completed: 15
+- Average duration: 8.1 min
 - Total execution time: 2.1 hours
 
 **By Phase:**
@@ -33,7 +33,7 @@ Progress: [██████████████] (Phase 7 complete — 3/3
 | 04-requests | 2/2 | 13min | 6.5min |
 | 05-jobs-approvals | 5/5 | 32min | 6.4min |
 | 06-inventory | 3/3 | 17min | 5.7min |
-| 07-preventive-maintenance | 1/3 | 5min | 5min |
+| 07-preventive-maintenance | 4/4 | 20min | 5min |
 
 **Recent Trend:**
 - Last 5 plans: 06-01 (4min), 06-02 (4min), 06-03 (9min), 07-01 (5min)
@@ -46,6 +46,7 @@ Progress: [██████████████] (Phase 7 complete — 3/3
 | Phase 07-preventive-maintenance P01 | 5 | 2 tasks | 9 files |
 | Phase 07-preventive-maintenance P02 | 4 | 2 tasks | 11 files |
 | Phase 07-preventive-maintenance P03 | 6 | 2 tasks | 9 files |
+| Phase 07-preventive-maintenance P04 | 4 | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -138,6 +139,11 @@ Recent decisions affecting current work:
 - [Phase 07-03]: ScheduleForm split into ScheduleCreateForm and ScheduleEditForm sub-components to avoid TypeScript type union issues between useForm instances with different Zod schema types
 - [Phase 07-03]: Used z.output<typeof scheduleCreateSchema> as useForm type to avoid Resolver mismatch caused by interval_type .default('floating') making input type optional but output type required
 - [Phase 07-03]: Sidebar Schedules nav item activated at plan 03 completion — both Maintenance nav items (Templates, Schedules) now active
+- [Phase 07-04]: savePMChecklistItem uses fetch-modify-replace on checklist_responses JSONB — fetch full PMJobChecklist, find item by item_id, update value + completed_at, write back full object
+- [Phase 07-04]: advanceFloatingSchedule differentiates fixed vs floating: floating sets next_due_at = now + interval_days on completion; fixed only updates last_completed_at (cron already advanced next_due_at)
+- [Phase 07-04]: completePMChecklist does NOT change job status — only sets checklist_completed_at metadata; PIC uses normal job status change flow
+- [Phase 07-04]: OverdueBadge is a pure presentational component comparing next_due_at < now at render time, no grace period
+- [Phase 07-04]: PM type badge inline in title cell of job-columns.tsx (not a separate column) to keep table compact
 
 ### Pending Todos
 
@@ -153,6 +159,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 07-03-PLAN.md (Schedule Management Pages) — Phase 7 complete (3/3 plans)
-Resume file: .planning/phases/07-preventive-maintenance/07-03-SUMMARY.md
-Next: Execute Phase 7 Plan 03 (Schedule Management Pages)
+Stopped at: Completed 07-04-PLAN.md (PM Job Integration) — Phase 7 complete (4/4 plans)
+Resume file: .planning/phases/07-preventive-maintenance/07-04-SUMMARY.md
+Next: Execute Phase 8 (Cross-cutting: Media, Notifications, Dashboard)

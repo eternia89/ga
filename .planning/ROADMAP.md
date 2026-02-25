@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Requests** - Request submission, triage, listing, and detail views *(completed 2026-02-19)*
 - [x] **Phase 5: Jobs & Approvals** - Job creation/execution, CEO approval workflow, completion, and auto-accept (completed 2026-02-24)
 - [x] **Phase 6: Inventory** - Asset registry, movement tracking, and receiver acceptance (completed 2026-02-25)
-- [ ] **Phase 7: Preventive Maintenance** - Templates, scheduling, auto-job generation, and auto-pause
+- [x] **Phase 7: Preventive Maintenance** - Templates, scheduling, auto-job generation, and auto-pause (completed 2026-02-25)
 - [ ] **Phase 8: Media, Notifications & Dashboards** - Image handling, in-app notifications, dashboard metrics, and exports
 - [ ] **Phase 9: Polish & Integration** - GPS capture, audit trail viewer, remaining UI refinements, cross-cutting quality
 
@@ -205,7 +205,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 4. Requests | 2/2 | ✓ Complete | 2026-02-19 |
 | 5. Jobs & Approvals | 5/5 | Complete    | 2026-02-25 |
 | 6. Inventory | 3/3 | Complete   | 2026-02-25 |
-| 7. Preventive Maintenance | 3/4 | In Progress|  |
+| 7. Preventive Maintenance | 4/4 | Complete   | 2026-02-25 |
 | 8. Media, Notifications & Dashboards | 0/7 | Not started | - |
 | 9. Polish & Integration | 0/4 | Not started | - |
 
