@@ -278,11 +278,11 @@ All requirements below are scoped for v1 unless marked otherwise.
 | REQ-PM-008 | Phase 7 | Complete |
 | REQ-PM-009 | Phase 7 | Complete |
 | REQ-PM-010 | Phase 7 | Complete |
-| REQ-MEDIA-001 | Phase 8 | Pending |
-| REQ-MEDIA-002 | Phase 8 | Pending |
-| REQ-MEDIA-003 | Phase 8 | Pending |
+| REQ-MEDIA-001 | Phase 8 | Complete |
+| REQ-MEDIA-002 | Phase 8 | Complete |
+| REQ-MEDIA-003 | Phase 8 | Complete |
 | REQ-MEDIA-004 | Phase 8 | Pending |
-| REQ-MEDIA-005 | Phase 8 | Pending |
+| REQ-MEDIA-005 | Phase 8 | Complete |
 | REQ-MEDIA-006 | Phase 8 | Pending |
 | REQ-NOTIF-001 | Phase 8 | Pending |
 | REQ-NOTIF-002 | Phase 8 | Pending |

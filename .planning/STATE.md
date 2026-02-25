@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Centralize GA operations -- requests, jobs, inventory, maintenance -- with full traceability and real-time visibility for a corporate group.
-**Current focus:** Phase 7 - Maintenance
+**Current focus:** Phase 8 - Media, Notifications & Dashboards
 
 ## Current Position
 
-Phase: 7 of 9 (Preventive Maintenance) — IN PROGRESS
-Plan: 4 of 4 in phase complete
-Status: Phase 7 complete — PM checklist UI, overdue/PM badges, server actions for checklist save and schedule advancement
-Last activity: 2026-02-25 -- Completed 07-04-PLAN.md (PM Job Integration)
+Phase: 8 of 9 (Media, Notifications & Dashboards) — IN PROGRESS
+Plan: 1 of 4 in phase complete
+Status: Plan 01 complete — media infrastructure: compression, annotation, generic upload route, PhotoUpload component
+Last activity: 2026-02-25 -- Completed 08-01-PLAN.md (Media Infrastructure)
 
-Progress: [████████████████] (Phase 7 complete — 4/4 plans done)
+Progress: [████████████████░] (Phase 8 in progress — 1/4 plans done)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
-- Average duration: 8.1 min
-- Total execution time: 2.1 hours
+- Total plans completed: 16
+- Average duration: 8.0 min
+- Total execution time: 2.2 hours
 
 **By Phase:**
 
@@ -47,6 +47,7 @@ Progress: [████████████████] (Phase 7 complete �
 | Phase 07-preventive-maintenance P02 | 4 | 2 tasks | 11 files |
 | Phase 07-preventive-maintenance P03 | 6 | 2 tasks | 9 files |
 | Phase 07-preventive-maintenance P04 | 4 | 2 tasks | 11 files |
+| Phase 08-media-notifications-dashboards P01 | 8 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -144,6 +145,10 @@ Recent decisions affecting current work:
 - [Phase 07-04]: completePMChecklist does NOT change job status — only sets checklist_completed_at metadata; PIC uses normal job status change flow
 - [Phase 07-04]: OverdueBadge is a pure presentational component comparing next_due_at < now at render time, no grace period
 - [Phase 07-04]: PM type badge inline in title cell of job-columns.tsx (not a separate column) to keep table compact
+- [Phase 08-01]: ENTITY_CONFIGS map centralizes per-entity-type bucket/maxFiles/table — adding a new entity type requires one line change
+- [Phase 08-01]: Freehand-only annotation (ReactSketchCanvas) — no text overlay, shapes, or arrows per phase decision
+- [Phase 08-01]: Compression runs client-side via useWebWorker:true (non-blocking WebP conversion before preview)
+- [Phase 08-01]: job_comment shares job-photos bucket with maxFiles:3; existing RequestPhotoUpload left untouched for backward compat
 
 ### Pending Todos
 
@@ -159,6 +164,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 07-04-PLAN.md (PM Job Integration) — Phase 7 complete (4/4 plans)
-Resume file: .planning/phases/07-preventive-maintenance/07-04-SUMMARY.md
-Next: Execute Phase 8 (Cross-cutting: Media, Notifications, Dashboard)
+Stopped at: Completed 08-01-PLAN.md (Media Infrastructure) — Phase 8 in progress (1/4 plans)
+Resume file: .planning/phases/08-media-notifications-dashboards/08-01-SUMMARY.md
+Next: Execute Phase 8 Plan 02 (Notifications)
