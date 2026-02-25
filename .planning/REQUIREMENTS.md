@@ -291,7 +291,7 @@ All requirements below are scoped for v1 unless marked otherwise.
 | REQ-NOTIF-005 | Phase 8 | Complete |
 | REQ-NOTIF-006 | Phase 8 | Pending |
 | REQ-NOTIF-007 | Phase 8 | Complete |
-| REQ-DASH-001 | Phase 8 | Pending |
+| REQ-DASH-001 | Phase 8 | Complete |
 | REQ-DASH-002 | Phase 8 | Pending |
 | REQ-DASH-003 | Phase 8 | Pending |
 | REQ-DASH-004 | Phase 8 | Pending |

@@ -168,7 +168,7 @@ Plans:
 - [ ] 08-02-PLAN.md — Google Vision API proxy, enhanced lightbox with AI descriptions, thumbnail grid component
 - [ ] 08-03-PLAN.md — Notification creation helper, server actions, polling hook, bell icon + dropdown in header
 - [ ] 08-04-PLAN.md — Notification center page with filters, notification event triggers in request server actions
-- [ ] 08-05-PLAN.md — Dashboard KPI cards with trend indicators, date range filter, dashboard page foundation
+- [x] 08-05-PLAN.md — Dashboard KPI cards with trend indicators, date range filter, dashboard page foundation
 - [ ] 08-06-PLAN.md — Status distribution charts, staff workload table, request aging, maintenance summary, inventory counts
 - [ ] 08-07-PLAN.md — Excel export for requests, jobs, inventory, maintenance with styled spreadsheets
 
