@@ -72,7 +72,7 @@ const NAV_SECTIONS: NavSection[] = [
         label: 'Schedules',
         href: '/maintenance',
         permission: PERMISSIONS.MAINTENANCE_VIEW_ALL,
-        built: false,
+        built: true,
         icon: '📅',
       },
       {
