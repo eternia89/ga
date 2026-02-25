@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { createJobSchema, updateJobSchema, jobCommentSchema } from '@/lib/validations/job-schema';
 import { z } from 'zod';
+import { createNotifications } from '@/lib/notifications/helpers';
 
 const PRIORITY_ORDER = ['low', 'medium', 'high', 'urgent'] as const;
 
@@ -243,7 +244,7 @@ export const assignJob = authActionClient
 
     const { data: job } = await supabase
       .from('jobs')
-      .select('id, status')
+      .select('id, status, display_id')
       .eq('id', parsedInput.id)
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
@@ -269,6 +270,18 @@ export const assignJob = authActionClient
       throw new Error(error.message);
     }
 
+    // Non-blocking notification: notify the assigned PIC
+    createNotifications({
+      companyId: profile.company_id,
+      recipientIds: [parsedInput.assigned_to],
+      actorId: profile.id,
+      title: `Job ${job.display_id} assigned to you`,
+      body: 'You have been assigned as PIC for this job',
+      type: 'assignment',
+      entityType: 'job',
+      entityId: parsedInput.id,
+    });
+
     revalidatePath('/jobs');
     revalidatePath(`/jobs/${parsedInput.id}`);
     return { success: true };
@@ -290,7 +303,7 @@ export const updateJobStatus = authActionClient
     // Fetch job
     const { data: job } = await supabase
       .from('jobs')
-      .select('id, status, assigned_to, company_id')
+      .select('id, status, assigned_to, company_id, created_by, display_id')
       .eq('id', parsedInput.id)
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
@@ -367,7 +380,40 @@ export const updateJobStatus = authActionClient
           })
           .in('id', requestIds)
           .neq('status', 'cancelled');
+
+        // Non-blocking notification: notify requesters with auto-accept warning
+        const { data: linkedRequests } = await supabase
+          .from('requests')
+          .select('requester_id, display_id')
+          .in('id', requestIds)
+          .is('deleted_at', null);
+
+        if (linkedRequests && linkedRequests.length > 0) {
+          const requesterIds = [...new Set(linkedRequests.map((r) => r.requester_id))];
+          createNotifications({
+            companyId: job.company_id,
+            recipientIds: requesterIds,
+            actorId: profile.id,
+            title: `Job completed — please review`,
+            body: 'Your request work is done. Accept or reject within 7 days or it will be auto-accepted.',
+            type: 'auto_accept_warning',
+            entityType: 'job',
+            entityId: parsedInput.id,
+          });
+        }
       }
+
+      // Non-blocking notification: notify job creator and assigned PIC about completion
+      const completionRecipients = [job.created_by, job.assigned_to].filter(Boolean) as string[];
+      createNotifications({
+        companyId: job.company_id,
+        recipientIds: completionRecipients,
+        actorId: profile.id,
+        title: `Job ${job.display_id} completed`,
+        type: 'completion',
+        entityType: 'job',
+        entityId: parsedInput.id,
+      });
     }
 
     revalidatePath('/jobs');
@@ -391,7 +437,7 @@ export const cancelJob = authActionClient
 
     const { data: job } = await supabase
       .from('jobs')
-      .select('id, status')
+      .select('id, status, assigned_to, display_id, company_id')
       .eq('id', parsedInput.id)
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
@@ -412,6 +458,19 @@ export const cancelJob = authActionClient
 
     if (error) {
       throw new Error(error.message);
+    }
+
+    // Non-blocking notification: notify the assigned PIC (if any)
+    if (job.assigned_to) {
+      createNotifications({
+        companyId: profile.company_id,
+        recipientIds: [job.assigned_to],
+        actorId: profile.id,
+        title: `Job ${job.display_id} cancelled`,
+        type: 'status_change',
+        entityType: 'job',
+        entityId: parsedInput.id,
+      });
     }
 
     // Move linked requests back to triaged
