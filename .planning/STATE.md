@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 7 of 9 (Preventive Maintenance) — IN PROGRESS
-Plan: 1 of 3 in phase complete
-Status: Phase 7 data foundation complete — migration, types, schemas, template/schedule server actions built
-Last activity: 2026-02-25 -- Completed 07-01-PLAN.md (PM Data Foundation)
+Plan: 2 of 3 in phase complete
+Status: Phase 7 template UI complete — dnd-kit builder, list/create/detail pages, sidebar activated
+Last activity: 2026-02-25 -- Completed 07-02-PLAN.md (Template Builder UI)
 
-Progress: [█████████████] (Phase 7 in progress — 1/3 plans done)
+Progress: [█████████████] (Phase 7 in progress — 2/3 plans done)
 
 ## Performance Metrics
 
@@ -44,6 +44,7 @@ Progress: [█████████████] (Phase 7 in progress — 1/3
 | Phase 06-inventory P02 | 4 | 2 tasks | 8 files |
 | Phase 06-inventory P03 | 9 | 2 tasks | 10 files |
 | Phase 07-preventive-maintenance P01 | 5 | 2 tasks | 9 files |
+| Phase 07-preventive-maintenance P02 | 4 | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -131,6 +132,8 @@ Recent decisions affecting current work:
 - [07-01]: generate_pm_jobs cron registration commented out pending pg_cron extension enable in Supabase Dashboard (consistent with Phase 5 pattern)
 - [07-01]: pauseSchedulesForAsset/resumeSchedulesForAsset/deactivateSchedulesForAsset exported as plain async functions not authActionClient — called internally by changeAssetStatus as helpers
 - [07-01]: changeAssetStatus in asset-actions.ts updated to use auto: prefix convention and handle all 3 branches: sold_disposed (deactivate), broken/under_repair (pause + cancel jobs), active (resume auto-paused only)
+- [Phase 07-02]: TemplateCreateForm and TemplateDetail are separate components for clarity — create navigates away, edit stays on page with inline toggle
+- [Phase 07-02]: Sidebar Templates nav item activated at plan 02 completion; Schedules remains built: false until plan 03
 
 ### Pending Todos
 
@@ -146,6 +149,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Completed 07-01-PLAN.md (PM Data Foundation) — Phase 7 in progress (1/3 plans)
-Resume file: .planning/phases/07-preventive-maintenance/07-01-SUMMARY.md
-Next: Execute Phase 7 Plan 02 (Template Builder UI and Schedule Management Pages)
+Stopped at: Completed 07-02-PLAN.md (Template Builder UI) — Phase 7 in progress (2/3 plans)
+Resume file: .planning/phases/07-preventive-maintenance/07-02-SUMMARY.md
+Next: Execute Phase 7 Plan 03 (Schedule Management Pages)
