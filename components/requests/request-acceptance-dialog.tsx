@@ -89,8 +89,10 @@ export function RequestAcceptanceDialog({
         return;
       }
       onOpenChange(false);
-      onSuccess();
+      // Call onAccepted FIRST to set feedbackOpen state before refresh
       onAccepted?.();
+      // Then refresh — React preserves client state across server refresh
+      onSuccess();
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Failed to accept request');
     } finally {

@@ -67,8 +67,10 @@ export function RequestDetailActions({
   };
 
   const handleAccepted = () => {
-    // After accepting, prompt for feedback
-    setFeedbackOpen(true);
+    // Use setTimeout to ensure state update happens after dialog close animation
+    setTimeout(() => {
+      setFeedbackOpen(true);
+    }, 100);
   };
 
   return (
