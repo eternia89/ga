@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { JobWithRelations } from '@/lib/types/database';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,7 +31,6 @@ import {
   assignJob,
   updateJobStatus,
   cancelJob,
-  updateJobBudget,
 } from '@/app/actions/job-actions';
 import {
   approveJob,
@@ -48,7 +46,6 @@ import {
   ThumbsDown,
   RefreshCw,
   Unlock,
-  Send,
 } from 'lucide-react';
 
 interface JobDetailActionsProps {
@@ -79,7 +76,6 @@ export function JobDetailActions({
   // Form states
   const [selectedPIC, setSelectedPIC] = useState(job.assigned_to ?? '');
   const [rejectReason, setRejectReason] = useState('');
-  const [budgetAmount, setBudgetAmount] = useState('');
 
   // Feedback states
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -105,12 +101,6 @@ export function JobDetailActions({
     !isFinanceApproverOnly &&
     !['completed', 'cancelled'].includes(job.status);
 
-  // Budget: PIC or lead can set budget when in_progress and not yet approved
-  const canEditBudget =
-    (isPIC || isGaLeadOrAdmin) &&
-    job.status === 'in_progress' &&
-    !job.approved_at;
-
   // Un-approve: finance_approver/admin can unlock budget on approved in_progress jobs
   const canUnapprove =
     isFinanceApproverOrAdmin &&
@@ -124,7 +114,6 @@ export function JobDetailActions({
     canApproveReject ||
     canMarkComplete ||
     canCancel ||
-    canEditBudget ||
     canUnapprove;
 
   if (!hasAnyAction) return null;
@@ -179,30 +168,6 @@ export function JobDetailActions({
       onActionSuccess();
     } catch (err) {
       setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to start' });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleSubmitBudget = async () => {
-    const amount = parseFloat(budgetAmount.replace(/[^0-9.]/g, ''));
-    if (isNaN(amount) || amount <= 0) {
-      setFeedback({ type: 'error', message: 'Please enter a valid budget amount.' });
-      return;
-    }
-    setSubmitting(true);
-    setFeedback(null);
-    try {
-      const result = await updateJobBudget({ id: job.id, estimated_cost: amount });
-      if (result?.serverError) {
-        setFeedback({ type: 'error', message: result.serverError });
-        return;
-      }
-      setBudgetAmount('');
-      setFeedback({ type: 'success', message: 'Budget submitted for approval.' });
-      onActionSuccess();
-    } catch (err) {
-      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to submit budget' });
     } finally {
       setSubmitting(false);
     }
@@ -321,47 +286,6 @@ export function JobDetailActions({
   return (
     <>
       <div className="space-y-3">
-        {/* Budget Input Section */}
-        {canEditBudget && (
-          <div className="rounded-md border px-4 py-3 space-y-2">
-            <Label htmlFor="budget-input" className="text-sm font-medium">
-              Estimated Budget
-            </Label>
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1 max-w-xs">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                  Rp
-                </span>
-                <Input
-                  id="budget-input"
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="0"
-                  value={budgetAmount}
-                  onChange={(e) => {
-                    // Allow only digits
-                    const raw = e.target.value.replace(/[^0-9]/g, '');
-                    setBudgetAmount(raw);
-                  }}
-                  className="pl-8"
-                  maxLength={15}
-                />
-              </div>
-              <Button
-                onClick={handleSubmitBudget}
-                disabled={submitting || !budgetAmount}
-                size="sm"
-              >
-                <Send className="mr-2 h-4 w-4" />
-                Submit Budget
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Submitting a budget will send this job for approval.
-            </p>
-          </div>
-        )}
-
         <div className="flex flex-wrap gap-2">
           {/* Assign / Reassign */}
           {(canAssign || canReassign) && (

@@ -84,7 +84,7 @@ export default async function JobDetailPage({ params }: PageProps) {
   const job = jobData as JobWithRelations;
 
   // Fetch all data in parallel
-  const [auditLogsResult, commentsResult, usersResult, statusChangesResult] = await Promise.all([
+  const [auditLogsResult, commentsResult, usersResult, statusChangesResult, categoriesResult, locationsResult] = await Promise.all([
     // Audit logs for timeline
     supabase
       .from('audit_logs')
@@ -115,10 +115,27 @@ export default async function JobDetailPage({ params }: PageProps) {
       .select('from_status, to_status, latitude, longitude, created_at')
       .eq('job_id', id)
       .order('created_at', { ascending: true }),
+
+    // Categories for inline editing
+    supabase
+      .from('categories')
+      .select('id, name')
+      .is('deleted_at', null)
+      .order('name'),
+
+    // Locations for inline editing
+    supabase
+      .from('locations')
+      .select('id, name')
+      .eq('company_id', profile.company_id)
+      .is('deleted_at', null)
+      .order('name'),
   ]);
 
   const auditLogs = auditLogsResult.data ?? [];
   const comments = commentsResult.data ?? [];
+  const categories = categoriesResult.data ?? [];
+  const locations = locationsResult.data ?? [];
   // Build GPS lookup: key = "fromStatus->toStatus" (may have duplicates, use most recent per pair)
   type GpsRecord = { latitude: number | null; longitude: number | null; created_at: string };
   const gpsMap: Record<string, GpsRecord> = {};
@@ -372,6 +389,8 @@ export default async function JobDetailPage({ params }: PageProps) {
         currentUserId={profile.id}
         currentUserRole={profile.role}
         users={users}
+        categories={categories}
+        locations={locations}
         approvedByName={approvedByName}
         approvalRejectedByName={approvalRejectedByName}
       />

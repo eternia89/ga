@@ -23,6 +23,8 @@ interface JobDetailClientProps {
   currentUserId: string;
   currentUserRole: string;
   users: { id: string; name: string }[];
+  categories: { id: string; name: string }[];
+  locations: { id: string; name: string }[];
   approvedByName?: string | null;
   approvalRejectedByName?: string | null;
 }
@@ -35,6 +37,8 @@ export function JobDetailClient({
   currentUserId,
   currentUserRole,
   users,
+  categories,
+  locations,
   approvedByName,
   approvalRejectedByName,
 }: JobDetailClientProps) {
@@ -54,8 +58,13 @@ export function JobDetailClient({
       <div className="space-y-4">
         <JobDetailInfo
           job={job}
+          currentUserId={currentUserId}
+          currentUserRole={currentUserRole}
           approvedByName={approvedByName}
           approvalRejectedByName={approvalRejectedByName}
+          onActionSuccess={handleActionSuccess}
+          categories={categories}
+          locations={locations}
         />
 
         <JobDetailActions
