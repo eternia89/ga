@@ -104,14 +104,19 @@ Plans:
   3. Users can post comments (text + optional photo) on a job, and the job detail page shows a timeline with all status changes and comments
   4. When a request involves money, it routes to the CEO approval queue; the Finance Approver can approve or reject (with required reason) from a dedicated approval page showing estimated cost
   5. After a job is completed, the requester has 7 days to accept or reject; if no response, a cron job auto-accepts and the request closes
-**Plans**: 5 plans
+**Plans**: 10 plans
 
 Plans:
 - [x] 05-01-PLAN.md — DB migration (schema changes, job_requests join table, company_settings, display ID, auto-accept cron), types, constants, Zod schemas, server actions, photo upload API
 - [x] 05-02-PLAN.md — Job creation form with multi-request linking and job list page with filters/data table
 - [x] 05-03-PLAN.md — Job detail page with info panel, unified timeline (audit events + comments), comment form
 - [x] 05-04-PLAN.md — Approval queue page (pending/history tabs), Company Settings page (budget threshold), sidebar activation
-- [ ] 05-05-PLAN.md — Requester acceptance cycle (accept/reject completed work), feedback star rating, linked jobs on request detail
+- [x] 05-05-PLAN.md — Requester acceptance cycle (accept/reject completed work), feedback star rating, linked jobs on request detail
+- [ ] 05-06-PLAN.md — Gap closure: comment blocker fix, header dedup, reassign scope, approval labels, comment visibility, approval page scope
+- [ ] 05-07-PLAN.md — Gap closure: inline budget editing and merged view/edit on job detail page
+- [ ] 05-08-PLAN.md — Gap closure: star rating auto-prompt after acceptance, job preview modal on request detail
+- [ ] 05-09-PLAN.md — Gap closure: approval queue refactored from tabs to data table with checkbox filter
+- [ ] 05-10-PLAN.md — Gap closure: completion approval flow (dual approval: budget + completion)
 
 ### Phase 6: Inventory
 **Goal**: GA Staff can manage a complete asset registry with tracked movements between locations, including receiver confirmation, so the organization has accurate visibility into what assets exist and where they are.
