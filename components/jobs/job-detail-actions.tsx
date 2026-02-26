@@ -25,10 +25,8 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
 import {
-  assignJob,
   updateJobStatus,
   cancelJob,
 } from '@/app/actions/job-actions';
@@ -40,7 +38,6 @@ import {
   rejectCompletion,
 } from '@/app/actions/approval-actions';
 import {
-  UserCheck,
   Play,
   CheckCircle,
   Ban,
@@ -54,7 +51,6 @@ interface JobDetailActionsProps {
   job: JobWithRelations;
   currentUserId: string;
   currentUserRole: string;
-  users: { id: string; name: string }[];
   onActionSuccess: () => void;
 }
 
@@ -62,7 +58,6 @@ export function JobDetailActions({
   job,
   currentUserId,
   currentUserRole,
-  users,
   onActionSuccess,
 }: JobDetailActionsProps) {
   const router = useRouter();
@@ -72,12 +67,10 @@ export function JobDetailActions({
 
   // Dialog states
   const [cancelOpen, setCancelOpen] = useState(false);
-  const [assignOpen, setAssignOpen] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
   const [rejectCompletionOpen, setRejectCompletionOpen] = useState(false);
 
   // Form states
-  const [selectedPIC, setSelectedPIC] = useState(job.assigned_to ?? '');
   const [rejectReason, setRejectReason] = useState('');
   const [rejectCompletionReason, setRejectCompletionReason] = useState('');
 
@@ -90,11 +83,7 @@ export function JobDetailActions({
   const isFinanceApproverOnly = currentUserRole === 'finance_approver';
   const isPIC = job.assigned_to === currentUserId;
 
-  const userOptions = users.map((u) => ({ label: u.name, value: u.id }));
-
   // Determine available actions per role + status
-  const canAssign = isGaLeadOrAdmin && job.status === 'created';
-  const canReassign = isGaLeadOrAdmin && ['assigned', 'in_progress', 'pending_approval', 'pending_completion_approval'].includes(job.status);
   const canStartWork = (isGaLeadOrAdmin || isPIC) && job.status === 'assigned';
   const canApproveReject =
     isFinanceApproverOrAdmin && job.status === 'pending_approval';
@@ -114,8 +103,6 @@ export function JobDetailActions({
     !!job.approved_at;
 
   const hasAnyAction =
-    canAssign ||
-    canReassign ||
     canStartWork ||
     canApproveReject ||
     canApproveCompletion ||
@@ -124,26 +111,6 @@ export function JobDetailActions({
     canUnapprove;
 
   if (!hasAnyAction) return null;
-
-  const handleAssign = async () => {
-    if (!selectedPIC) return;
-    setSubmitting(true);
-    setFeedback(null);
-    try {
-      const result = await assignJob({ id: job.id, assigned_to: selectedPIC });
-      if (result?.serverError) {
-        setFeedback({ type: 'error', message: result.serverError });
-        return;
-      }
-      setAssignOpen(false);
-      setFeedback({ type: 'success', message: 'Job assigned successfully.' });
-      onActionSuccess();
-    } catch (err) {
-      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to assign' });
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const handleStartWork = async () => {
     setFeedback(null);
@@ -332,107 +299,90 @@ export function JobDetailActions({
   return (
     <>
       <div className="space-y-3">
-        <div className="flex flex-wrap gap-2">
-          {/* Assign / Reassign */}
-          {(canAssign || canReassign) && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSelectedPIC(job.assigned_to ?? '');
-                setAssignOpen(true);
-              }}
-              disabled={submitting}
-            >
-              <UserCheck className="mr-2 h-4 w-4" />
-              {canReassign ? 'Reassign PIC' : 'Assign PIC'}
-            </Button>
-          )}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          {/* Left: Primary CTA */}
+          <div className="flex flex-wrap gap-2">
+            {canStartWork && (
+              <Button onClick={handleStartWork} disabled={submitting || capturingGps}>
+                <Play className="mr-2 h-4 w-4" />
+                {capturingGps ? 'Getting location...' : 'Start Work'}
+              </Button>
+            )}
 
-          {/* Start Work */}
-          {canStartWork && (
-            <Button onClick={handleStartWork} disabled={submitting || capturingGps}>
-              <Play className="mr-2 h-4 w-4" />
-              {capturingGps ? 'Getting location...' : 'Start Work'}
-            </Button>
-          )}
+            {canApproveReject && (
+              <Button onClick={handleApprove} disabled={submitting}>
+                <ThumbsUp className="mr-2 h-4 w-4" />
+                Approve Budget
+              </Button>
+            )}
 
-          {/* Approve Budget */}
-          {canApproveReject && (
-            <Button onClick={handleApprove} disabled={submitting}>
-              <ThumbsUp className="mr-2 h-4 w-4" />
-              Approve Budget
-            </Button>
-          )}
+            {canApproveCompletion && (
+              <Button onClick={handleApproveCompletion} disabled={submitting}>
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Approve Completion
+              </Button>
+            )}
 
-          {/* Reject Budget */}
-          {canApproveReject && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                setRejectReason('');
-                setRejectOpen(true);
-              }}
-              disabled={submitting}
-            >
-              <ThumbsDown className="mr-2 h-4 w-4 text-destructive" />
-              <span className="text-destructive">Reject Budget</span>
-            </Button>
-          )}
+            {canMarkComplete && (
+              <Button onClick={handleMarkComplete} disabled={submitting || capturingGps}>
+                <CheckCircle className="mr-2 h-4 w-4" />
+                {capturingGps ? 'Getting location...' : 'Mark Complete'}
+              </Button>
+            )}
+          </div>
 
-          {/* Approve Completion */}
-          {canApproveCompletion && (
-            <Button onClick={handleApproveCompletion} disabled={submitting}>
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Approve Completion
-            </Button>
-          )}
+          {/* Right: Secondary actions */}
+          <div className="flex flex-wrap gap-2">
+            {canApproveReject && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setRejectReason('');
+                  setRejectOpen(true);
+                }}
+                disabled={submitting}
+              >
+                <ThumbsDown className="mr-2 h-4 w-4 text-destructive" />
+                <span className="text-destructive">Reject Budget</span>
+              </Button>
+            )}
 
-          {/* Reject Completion */}
-          {canApproveCompletion && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                setRejectCompletionReason('');
-                setRejectCompletionOpen(true);
-              }}
-              disabled={submitting}
-            >
-              <ThumbsDown className="mr-2 h-4 w-4 text-destructive" />
-              <span className="text-destructive">Reject Completion</span>
-            </Button>
-          )}
+            {canApproveCompletion && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setRejectCompletionReason('');
+                  setRejectCompletionOpen(true);
+                }}
+                disabled={submitting}
+              >
+                <ThumbsDown className="mr-2 h-4 w-4 text-destructive" />
+                <span className="text-destructive">Reject Completion</span>
+              </Button>
+            )}
 
-          {/* Un-approve (unlock budget) */}
-          {canUnapprove && (
-            <Button
-              variant="outline"
-              onClick={handleUnapprove}
-              disabled={submitting}
-            >
-              <Unlock className="mr-2 h-4 w-4" />
-              Unlock Budget
-            </Button>
-          )}
+            {canUnapprove && (
+              <Button
+                variant="outline"
+                onClick={handleUnapprove}
+                disabled={submitting}
+              >
+                <Unlock className="mr-2 h-4 w-4" />
+                Unlock Budget
+              </Button>
+            )}
 
-          {/* Mark Complete */}
-          {canMarkComplete && (
-            <Button onClick={handleMarkComplete} disabled={submitting || capturingGps}>
-              <CheckCircle className="mr-2 h-4 w-4" />
-              {capturingGps ? 'Getting location...' : 'Mark Complete'}
-            </Button>
-          )}
-
-          {/* Cancel */}
-          {canCancel && (
-            <Button
-              variant="destructive"
-              onClick={() => setCancelOpen(true)}
-              disabled={submitting}
-            >
-              <Ban className="mr-2 h-4 w-4" />
-              Cancel Job
-            </Button>
-          )}
+            {canCancel && (
+              <Button
+                variant="outline"
+                onClick={() => setCancelOpen(true)}
+                disabled={submitting}
+              >
+                <Ban className="mr-2 h-4 w-4 text-destructive" />
+                <span className="text-destructive">Cancel Job</span>
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Pending Approval read-only indicator (for non-approvers) */}
@@ -459,39 +409,6 @@ export function JobDetailActions({
           />
         )}
       </div>
-
-      {/* Assign Dialog */}
-      <Dialog open={assignOpen} onOpenChange={setAssignOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {canReassign ? 'Reassign PIC' : 'Assign PIC'}
-            </DialogTitle>
-            <DialogDescription>
-              Select a person in charge for this job.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 py-2">
-            <Label>Person in Charge</Label>
-            <Combobox
-              options={userOptions}
-              value={selectedPIC}
-              onValueChange={setSelectedPIC}
-              placeholder="Select PIC..."
-              searchPlaceholder="Search users..."
-              emptyText="No users found."
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAssignOpen(false)} disabled={submitting}>
-              Cancel
-            </Button>
-            <Button onClick={handleAssign} disabled={submitting || !selectedPIC}>
-              {submitting ? 'Saving...' : (canReassign ? 'Reassign' : 'Assign')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Reject Dialog */}
       <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>

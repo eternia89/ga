@@ -65,13 +65,13 @@ export function JobDetailClient({
           onActionSuccess={handleActionSuccess}
           categories={categories}
           locations={locations}
+          users={users}
         />
 
         <JobDetailActions
           job={job}
           currentUserId={currentUserId}
           currentUserRole={currentUserRole}
-          users={users}
           onActionSuccess={handleActionSuccess}
         />
 

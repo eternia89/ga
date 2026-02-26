@@ -6,7 +6,7 @@ import { JobWithRelations } from '@/lib/types/database';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { RequestPreviewDialog } from './request-preview-dialog';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
-import { Lock, LockOpen, Pencil, X, Check, Send } from 'lucide-react';
+import { Pencil, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { updateJob, updateJobBudget } from '@/app/actions/job-actions';
-import { formatIDR } from '@/lib/utils';
+import { formatIDR, formatNumber } from '@/lib/utils';
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return '—';
@@ -39,6 +39,7 @@ interface JobDetailInfoProps {
   onActionSuccess: () => void;
   categories: { id: string; name: string }[];
   locations: { id: string; name: string }[];
+  users: { id: string; name: string }[];
 }
 
 export function JobDetailInfo({
@@ -50,6 +51,7 @@ export function JobDetailInfo({
   onActionSuccess,
   categories,
   locations,
+  users,
 }: JobDetailInfoProps) {
   const linkedRequests = job.job_requests ?? [];
   const [previewRequest, setPreviewRequest] = useState<typeof linkedRequests[number]['request'] | null>(null);
@@ -61,10 +63,10 @@ export function JobDetailInfo({
   const [editLocationId, setEditLocationId] = useState(job.location_id ?? '');
   const [editCategoryId, setEditCategoryId] = useState(job.category_id ?? '');
   const [editPriority, setEditPriority] = useState(job.priority ?? 'low');
-
-  // Budget inline edit state
-  const [isBudgetEditing, setIsBudgetEditing] = useState(false);
-  const [budgetAmount, setBudgetAmount] = useState('');
+  const [editAssignedTo, setEditAssignedTo] = useState(job.assigned_to ?? '');
+  const [editEstimatedCost, setEditEstimatedCost] = useState(
+    job.estimated_cost !== null && job.estimated_cost !== undefined ? String(job.estimated_cost) : ''
+  );
 
   // Feedback state
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -76,14 +78,9 @@ export function JobDetailInfo({
   // canEdit: GA Lead/Admin can edit any non-terminal job
   const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job.status);
 
-  // canEditBudget: PIC or GA Lead/Admin can set budget when in_progress and not yet budget-approved
-  const canEditBudget =
-    (isPIC || isGaLeadOrAdmin) &&
-    job.status === 'in_progress' &&
-    !job.approved_at;
-
   const categoryOptions = categories.map((c) => ({ label: c.name, value: c.id }));
   const locationOptions = locations.map((l) => ({ label: l.name, value: l.id }));
+  const userOptions = users.map((u) => ({ label: u.name, value: u.id }));
 
   const handleEditStart = () => {
     setEditTitle(job.title);
@@ -91,6 +88,8 @@ export function JobDetailInfo({
     setEditLocationId(job.location_id ?? '');
     setEditCategoryId(job.category_id ?? '');
     setEditPriority(job.priority ?? 'low');
+    setEditAssignedTo(job.assigned_to ?? '');
+    setEditEstimatedCost(job.estimated_cost ? String(job.estimated_cost) : '');
     setFeedback(null);
     setIsEditing(true);
   };
@@ -111,41 +110,29 @@ export function JobDetailInfo({
         location_id: editLocationId || undefined,
         category_id: editCategoryId || undefined,
         priority: editPriority as typeof PRIORITY_ORDER[number],
+        assigned_to: editAssignedTo || undefined,
       });
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
         return;
       }
+
+      // If estimated cost changed, use updateJobBudget to trigger approval flow
+      const newCost = editEstimatedCost ? parseInt(editEstimatedCost.replace(/[^0-9]/g, ''), 10) : 0;
+      const oldCost = job.estimated_cost ?? 0;
+      if (newCost !== oldCost && newCost > 0) {
+        const budgetResult = await updateJobBudget({ id: job.id, estimated_cost: newCost });
+        if (budgetResult?.serverError) {
+          setFeedback({ type: 'error', message: budgetResult.serverError });
+          return;
+        }
+      }
+
       setIsEditing(false);
       setFeedback({ type: 'success', message: 'Job updated successfully.' });
       onActionSuccess();
     } catch (err) {
       setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to update job' });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleBudgetSubmit = async () => {
-    const amount = parseFloat(budgetAmount.replace(/[^0-9.]/g, ''));
-    if (isNaN(amount) || amount <= 0) {
-      setFeedback({ type: 'error', message: 'Please enter a valid budget amount.' });
-      return;
-    }
-    setSubmitting(true);
-    setFeedback(null);
-    try {
-      const result = await updateJobBudget({ id: job.id, estimated_cost: amount });
-      if (result?.serverError) {
-        setFeedback({ type: 'error', message: result.serverError });
-        return;
-      }
-      setIsBudgetEditing(false);
-      setBudgetAmount('');
-      setFeedback({ type: 'success', message: 'Budget submitted for approval.' });
-      onActionSuccess();
-    } catch (err) {
-      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to submit budget' });
     } finally {
       setSubmitting(false);
     }
@@ -213,101 +200,6 @@ export function JobDetailInfo({
         )}
       </div>
 
-      {/* Estimated Cost — prominent, with inline editing */}
-      <div className="rounded-md bg-muted/50 border px-4 py-3">
-        <div className="flex items-center justify-between mb-1">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Estimated Cost
-          </p>
-          <div className="flex items-center gap-2">
-            {job.approved_at ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                <Lock className="h-3 w-3" />
-                Approved
-              </span>
-            ) : job.status === 'pending_approval' ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">
-                Pending Approval
-              </span>
-            ) : canEditBudget && !isBudgetEditing ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setBudgetAmount(job.estimated_cost ? String(job.estimated_cost) : '');
-                  setIsBudgetEditing(true);
-                  setFeedback(null);
-                }}
-                className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground hover:bg-muted/70 transition-colors cursor-pointer"
-              >
-                <LockOpen className="h-3 w-3" />
-                Edit
-                <Pencil className="h-3 w-3" />
-              </button>
-            ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                <LockOpen className="h-3 w-3" />
-                Editable
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Budget display or inline edit */}
-        {isBudgetEditing ? (
-          <div className="space-y-2 mt-2">
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1 max-w-xs">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                  Rp
-                </span>
-                <Input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="0"
-                  value={budgetAmount}
-                  onChange={(e) => {
-                    const raw = e.target.value.replace(/[^0-9]/g, '');
-                    setBudgetAmount(raw);
-                  }}
-                  className="pl-8"
-                  maxLength={15}
-                  autoFocus
-                />
-              </div>
-              <Button
-                size="sm"
-                onClick={handleBudgetSubmit}
-                disabled={submitting || !budgetAmount}
-              >
-                <Send className="mr-1.5 h-3.5 w-3.5" />
-                {submitting ? 'Submitting...' : 'Submit'}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setIsBudgetEditing(false);
-                  setBudgetAmount('');
-                }}
-                disabled={submitting}
-              >
-                Cancel
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Submitting a budget will send this job for approval.
-            </p>
-          </div>
-        ) : (
-          <p className="text-2xl font-bold tabular-nums">
-            {job.estimated_cost !== null && job.estimated_cost !== undefined
-              ? formatIDR(job.estimated_cost)
-              : <span className="text-muted-foreground text-base font-normal">Not set</span>
-            }
-          </p>
-        )}
-      </div>
-
       {/* Core fields — editable in edit mode */}
       <dl className="grid grid-cols-2 max-sm:grid-cols-1 gap-4">
         <div>
@@ -315,8 +207,59 @@ export function JobDetailInfo({
             PIC
           </dt>
           <dd className="text-sm">
-            {job.pic?.full_name ?? (
-              <span className="text-muted-foreground">Unassigned</span>
+            {isEditing ? (
+              <div className="max-w-xs">
+                <Combobox
+                  options={userOptions}
+                  value={editAssignedTo}
+                  onValueChange={setEditAssignedTo}
+                  placeholder="Select PIC..."
+                  searchPlaceholder="Search users..."
+                  emptyText="No users found."
+                />
+              </div>
+            ) : (
+              job.pic?.full_name ?? (
+                <span className="text-muted-foreground">Unassigned</span>
+              )
+            )}
+          </dd>
+        </div>
+
+        <div>
+          <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+            Estimated Cost
+          </dt>
+          <dd className="text-sm">
+            {isEditing ? (
+              <div className="relative max-w-xs">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">Rp</span>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={editEstimatedCost ? formatNumber(parseInt(editEstimatedCost.replace(/[^0-9]/g, ''), 10) || 0) : ''}
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/[^0-9]/g, '');
+                    setEditEstimatedCost(digits);
+                  }}
+                  className="pl-8"
+                  maxLength={20}
+                />
+              </div>
+            ) : (
+              <span>
+                {job.estimated_cost !== null && job.estimated_cost !== undefined
+                  ? formatIDR(job.estimated_cost)
+                  : <span className="text-muted-foreground">Not set</span>
+                }
+                {job.approved_at && (
+                  <span className="ml-2 text-xs text-green-600">Budget Approved</span>
+                )}
+                {job.status === 'pending_approval' && (
+                  <span className="ml-2 text-xs text-yellow-600">Pending Approval</span>
+                )}
+              </span>
             )}
           </dd>
         </div>
