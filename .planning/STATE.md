@@ -59,6 +59,7 @@ Progress: [███████████████████████
 | Phase 09-polish-integration P03 | 14 | 2 tasks | 65 files |
 | Phase 05-jobs-approvals P06 | 2 | 2 tasks | 6 files |
 | Phase 05-jobs-approvals P07 | 3 | 1 tasks | 4 files |
+| Phase 05-jobs-approvals P08 | 8 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -197,6 +198,8 @@ Recent decisions affecting current work:
 - [Phase 09-03]: Used Next.js loading.tsx pattern with custom skeleton components per route; skeletons mirror exact page layouts for smooth loading UX
 - [Phase 05-jobs-approvals]: isFinanceApproverOnly derived from strict role equality so admin still sees cancel; terminal-status guard in JobCommentForm returns null before hooks
 - [Phase 05-jobs-approvals]: Inline budget editing moved into cost panel (not actions); canEdit restricted to GA Lead/Admin for field editing while PIC retains budget editing only
+- [Phase 05-jobs-approvals]: onAccepted called before onSuccess in acceptance dialog — state must be set before router.refresh() triggers re-render
+- [Phase 05-jobs-approvals]: JobPreviewDialog uses client-side Supabase fetch on open — same pattern as RequestPreviewDialog on job detail; linked job display_id rendered as button to open modal instead of navigating away
 
 ### Pending Todos
 
@@ -212,6 +215,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 05-07-PLAN.md (Inline Budget Editing + View/Edit Merge on Job Detail)
-Resume file: .planning/phases/05-jobs-approvals/05-07-SUMMARY.md
+Stopped at: Completed 05-08-PLAN.md (UAT gap closure — feedback auto-prompt and job preview modal)
+Resume file: .planning/phases/05-jobs-approvals/05-08-SUMMARY.md
 Next: Continue remaining UAT gap closure plans for phase 05 (08+)
