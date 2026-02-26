@@ -15,6 +15,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
+import { formatIDR } from '@/lib/utils';
 
 // ============================================================================
 // Types
@@ -47,14 +48,6 @@ interface JobPreviewData {
 // ============================================================================
 // Helpers
 // ============================================================================
-
-function formatIDR(amount: number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-  }).format(amount);
-}
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return '—';

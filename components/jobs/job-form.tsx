@@ -28,6 +28,7 @@ import {
 import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
+import { formatNumber } from '@/lib/utils';
 
 const PRIORITY_ORDER = ['low', 'medium', 'high', 'urgent'] as const;
 type Priority = typeof PRIORITY_ORDER[number];
@@ -372,7 +373,7 @@ export function JobForm({
           control={form.control}
           name="estimated_cost"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="max-w-xs">
               <FormLabel>Estimated Cost</FormLabel>
               <FormControl>
                 <div className="relative">
@@ -380,16 +381,15 @@ export function JobForm({
                     Rp
                   </span>
                   <Input
-                    type="number"
-                    min={0}
-                    step={1000}
+                    type="text"
+                    inputMode="numeric"
                     placeholder="0"
                     className="pl-10"
                     disabled={isSubmitting}
-                    value={field.value ?? ''}
+                    value={field.value ? formatNumber(field.value) : ''}
                     onChange={(e) => {
-                      const val = e.target.value;
-                      field.onChange(val === '' ? undefined : Number(val));
+                      const digits = e.target.value.replace(/[^0-9]/g, '');
+                      field.onChange(digits === '' ? undefined : parseInt(digits, 10));
                     }}
                   />
                 </div>

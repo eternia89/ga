@@ -15,3 +15,26 @@ export function emptyToNull<T extends Record<string, unknown>>(obj: T): T {
   }
   return result;
 }
+
+/** Format a number as IDR currency with dot thousand separators: Rp 1.500.000 */
+export function formatIDR(amount: number): string {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+  }).format(amount);
+}
+
+/** Format a number with dot thousand separators (no Rp prefix): 1.500.000 */
+export function formatNumber(amount: number): string {
+  return new Intl.NumberFormat('id-ID', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+/** Parse a formatted IDR string back to a number: "1.500.000" -> 1500000 */
+export function parseIDR(formatted: string): number {
+  const digits = formatted.replace(/[^0-9]/g, '');
+  return digits ? parseInt(digits, 10) : 0;
+}

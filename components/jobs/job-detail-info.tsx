@@ -21,14 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { updateJob, updateJobBudget } from '@/app/actions/job-actions';
-
-function formatIDR(amount: number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-  }).format(amount);
-}
+import { formatIDR } from '@/lib/utils';
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return '—';

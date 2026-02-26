@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { formatIDR } from '@/lib/utils';
 
 // ============================================================================
 // Types
@@ -55,16 +56,6 @@ interface ApprovalQueueProps {
 // ============================================================================
 // Helpers
 // ============================================================================
-
-function formatIDR(amount: number | null): string {
-  if (amount === null || amount === undefined) return '—';
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
 
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—';
@@ -203,7 +194,7 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
                     </TableCell>
                     <TableCell>
                       <span className="font-semibold text-base">
-                        {formatIDR(job.estimated_cost)}
+                        {job.estimated_cost != null ? formatIDR(job.estimated_cost) : '\u2014'}
                       </span>
                     </TableCell>
                     <TableCell className="text-sm">

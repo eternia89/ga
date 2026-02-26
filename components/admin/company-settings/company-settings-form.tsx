@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { InlineFeedback } from '@/components/inline-feedback';
+import { formatNumber } from '@/lib/utils';
 
 interface CompanySettingsFormProps {
   budgetThreshold: number;
@@ -71,11 +72,14 @@ export function CompanySettingsForm({ budgetThreshold }: CompanySettingsFormProp
               </span>
               <Input
                 id="budget_threshold"
-                type="number"
-                min={0}
-                step={1}
+                type="text"
+                inputMode="numeric"
                 className="pl-10"
-                {...form.register('budget_threshold', { valueAsNumber: true })}
+                value={form.watch('budget_threshold') ? formatNumber(form.watch('budget_threshold')) : ''}
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/[^0-9]/g, '');
+                  form.setValue('budget_threshold', digits === '' ? 0 : parseInt(digits, 10));
+                }}
               />
             </div>
             {form.formState.errors.budget_threshold && (
