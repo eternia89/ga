@@ -38,7 +38,10 @@ export default async function ApprovalsPage() {
 
   // Fetch ALL jobs that are pending budget approval OR have a budget decision (approved/rejected)
   // OR pending completion approval OR have a completion decision
-  const { data: rawJobs } = await supabase
+  // NOTE: FK join hints for approved_by / approval_rejected_by / completion_approved_by /
+  // completion_rejected_by are NOT used because PostgREST cannot resolve them when the jobs
+  // table has 6 FK constraints to user_profiles. Instead, we fetch actor names in a batch query.
+  const { data: rawJobs, error: rawJobsError } = await supabase
     .from('jobs')
     .select(
       `id,
@@ -48,18 +51,18 @@ export default async function ApprovalsPage() {
        status,
        approval_submitted_at,
        approved_at,
+       approved_by,
        approval_rejected_at,
+       approval_rejected_by,
        approval_rejection_reason,
        completion_submitted_at,
        completion_approved_at,
-       completion_rejected_at,
-       completion_rejection_reason,
        completion_approved_by,
+       completion_rejected_at,
        completion_rejected_by,
+       completion_rejection_reason,
        created_at,
        pic:user_profiles!assigned_to(full_name),
-       approved_by_user:user_profiles!approved_by(full_name),
-       rejected_by_user:user_profiles!approval_rejected_by(full_name),
        job_requests(
          request:requests(display_id)
        )`
@@ -71,24 +74,30 @@ export default async function ApprovalsPage() {
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
-  // Fetch completion approver/rejecter names
-  const completionApproverIds = [
+  if (rawJobsError) {
+    console.error('Failed to fetch approval queue jobs:', rawJobsError);
+  }
+
+  // Batch-fetch all actor names (budget approvers/rejecters + completion approvers/rejecters)
+  const allActorIds = [
+    ...(rawJobs ?? []).map((j) => j.approved_by).filter(Boolean),
+    ...(rawJobs ?? []).map((j) => j.approval_rejected_by).filter(Boolean),
     ...(rawJobs ?? []).map((j) => j.completion_approved_by).filter(Boolean),
     ...(rawJobs ?? []).map((j) => j.completion_rejected_by).filter(Boolean),
   ] as string[];
 
-  const uniqueCompletionActorIds = [...new Set(completionApproverIds)];
-  let completionActorMap: Record<string, string> = {};
+  const uniqueActorIds = [...new Set(allActorIds)];
+  let actorNameMap: Record<string, string> = {};
 
-  if (uniqueCompletionActorIds.length > 0) {
-    const { data: completionActors } = await supabase
+  if (uniqueActorIds.length > 0) {
+    const { data: actors } = await supabase
       .from('user_profiles')
       .select('id, full_name')
-      .in('id', uniqueCompletionActorIds);
+      .in('id', uniqueActorIds);
 
-    if (completionActors) {
-      completionActorMap = Object.fromEntries(
-        completionActors.map((u) => [u.id, u.full_name ?? ''])
+    if (actors) {
+      actorNameMap = Object.fromEntries(
+        actors.map((u) => [u.id, u.full_name ?? ''])
       );
     }
   }
@@ -98,12 +107,6 @@ export default async function ApprovalsPage() {
 
   for (const job of rawJobs ?? []) {
     const picNorm = Array.isArray(job.pic) ? job.pic[0] ?? null : job.pic ?? null;
-    const approvedByUserNorm = Array.isArray(job.approved_by_user)
-      ? job.approved_by_user[0] ?? null
-      : job.approved_by_user ?? null;
-    const rejectedByUserNorm = Array.isArray(job.rejected_by_user)
-      ? job.rejected_by_user[0] ?? null
-      : job.rejected_by_user ?? null;
     const jobRequestsNorm = Array.isArray(job.job_requests)
       ? job.job_requests.map((jr: { request: { display_id: string } | { display_id: string }[] }) => ({
           request: Array.isArray(jr.request)
@@ -128,13 +131,17 @@ export default async function ApprovalsPage() {
       completion_rejection_reason: job.completion_rejection_reason,
       created_at: job.created_at,
       pic: picNorm,
-      approved_by_user: approvedByUserNorm,
-      rejected_by_user: rejectedByUserNorm,
+      approved_by_user: job.approved_by
+        ? { full_name: actorNameMap[job.approved_by] ?? '' }
+        : null,
+      rejected_by_user: job.approval_rejected_by
+        ? { full_name: actorNameMap[job.approval_rejected_by] ?? '' }
+        : null,
       completion_approved_by_user: job.completion_approved_by
-        ? { full_name: completionActorMap[job.completion_approved_by] ?? '' }
+        ? { full_name: actorNameMap[job.completion_approved_by] ?? '' }
         : null,
       completion_rejected_by_user: job.completion_rejected_by
-        ? { full_name: completionActorMap[job.completion_rejected_by] ?? '' }
+        ? { full_name: actorNameMap[job.completion_rejected_by] ?? '' }
         : null,
       job_requests: jobRequestsNorm,
     };
