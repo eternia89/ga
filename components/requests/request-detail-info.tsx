@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
 import { triageSchema, TriageFormData } from '@/lib/validations/request-schema';
 import { RequestWithRelations } from '@/lib/types/database';
 import { triageRequest } from '@/app/actions/request-actions';
@@ -11,6 +10,7 @@ import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { PhotoLightbox } from './request-photo-lightbox';
 import { RequestEditForm } from './request-edit-form';
+import { JobPreviewDialog } from '@/components/jobs/job-preview-dialog';
 import { FeedbackStarRating } from './feedback-star-rating';
 import { RequestStatusBadge } from './request-status-badge';
 import {
@@ -65,6 +65,7 @@ export function RequestDetailInfo({
   linkedJobs,
 }: RequestDetailInfoProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [previewJobId, setPreviewJobId] = useState<string | null>(null);
   const [triageSubmitting, setTriageSubmitting] = useState(false);
   const [triageFeedback, setTriageFeedback] = useState<{
     type: 'success' | 'error';
@@ -202,12 +203,13 @@ export function RequestDetailInfo({
             <ul className="space-y-1.5">
               {linkedJobs.map((job) => (
                 <li key={job.id} className="flex items-center gap-2 flex-wrap">
-                  <Link
-                    href={`/jobs/${job.id}`}
-                    className="text-sm font-mono font-medium text-primary hover:underline"
+                  <button
+                    type="button"
+                    onClick={() => setPreviewJobId(job.id)}
+                    className="text-sm font-mono font-medium text-primary hover:underline cursor-pointer"
                   >
                     {job.display_id}
-                  </Link>
+                  </button>
                   <span className="text-sm text-muted-foreground">—</span>
                   <span
                     className="text-sm truncate max-w-[200px]"
@@ -397,6 +399,12 @@ export function RequestDetailInfo({
           onClose={() => setLightboxIndex(null)}
         />
       )}
+
+      <JobPreviewDialog
+        open={!!previewJobId}
+        onOpenChange={(open) => { if (!open) setPreviewJobId(null); }}
+        jobId={previewJobId ?? ''}
+      />
     </>
   );
 }
