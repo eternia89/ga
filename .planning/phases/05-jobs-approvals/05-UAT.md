@@ -1,76 +1,74 @@
 ---
-status: complete
+status: diagnosed
 phase: 05-jobs-approvals
-source: 05-01-SUMMARY.md, 05-02-SUMMARY.md, 05-03-SUMMARY.md, 05-04-SUMMARY.md, 05-05-SUMMARY.md
+source: [05-01-SUMMARY.md, 05-02-SUMMARY.md, 05-03-SUMMARY.md, 05-04-SUMMARY.md, 05-05-SUMMARY.md, 05-06-SUMMARY.md, 05-07-SUMMARY.md, 05-08-SUMMARY.md, 05-09-SUMMARY.md, 05-10-SUMMARY.md]
 started: 2026-02-26T00:00:00Z
-updated: 2026-02-26T01:00:00Z
+updated: 2026-02-26T15:00:00Z
 ---
+
+## Current Test
+
+[testing complete]
 
 ## Tests
 
 ### 1. Create a Job with Multi-Request Linking
-expected: Navigate to /jobs/new. Fill in title, description, location, category, PIC. Search and select multiple requests as chips. Priority auto-computes. Submit successfully.
-result: issue
-reported: "the dropdown boxes should not full width, check previous implementation which I ever comment. when I submit, it failed to generate job ID"
-severity: major
+expected: Navigate to /jobs/new. Fill in title, description, location, category, PIC. Search and select multiple requests as chips. Priority auto-computes. Submit successfully. Dropdown/combobox fields should NOT be full width (constrained width). Job ID auto-generates on submit.
+result: pass
 
 ### 2. Job List Page with Filters
-expected: Navigate to /jobs. See a data table with columns: ID, Title, Status, PIC, Priority, Linked Request, Created, Actions. Filter by status, priority, PIC, search text. "New Job" button visible for GA Lead/Admin.
+expected: Navigate to /jobs. See a data table with columns: ID, Title, Status, PIC, Priority, Linked Request, Created, Actions. Filter by status, priority, PIC, search text. "New Job" button visible for GA Lead/Admin. Category column works without errors.
 result: issue
-reported: "Could not find the 'category_id' column of 'jobs' in the schema cache"
-severity: blocker
+reported: "general user, only can view jobs that's been assigned to them, but now it sees all same like admin"
+severity: major
 
 ### 3. Job Detail Page Layout
-expected: Click a job from the list. See two-column layout: left panel with job info (display ID, status badge, priority badge, IDR-formatted cost, fields grid, linked requests) and right panel with timeline + comment form.
+expected: Click a job from the list. See two-column layout: left panel with job info (display ID, status badge, priority badge, IDR-formatted cost, fields grid, linked requests as clickable chips that open a modal preview of the request detail). Right panel with timeline + comment form. No duplicated header. Budget/estimated cost is editable inline in the info panel (not a separate section). Fields are inline-editable for users with edit permission. Header should contain breadcrumb navigation.
 result: issue
-reported: "linked request should be clickable to open a modal that shows the request detail page, without the timeline. so the information is concluded within 1 page"
+reported: "header should contain the breadcrumb, now it contains nothing beside notification icons in the right side. remove the squared wrapper in job detail page, treat the UI similar to request detail page. all detail pages should have a maximum of 1000px width that consist of activity timeline column and the detail column itself, so the UI doesn't get stretched on ultra-wide monitors"
 severity: major
 
 ### 4. Job Timeline with Event Types
 expected: On job detail, the timeline shows chronological events with icons: created, assignment, status changes, approval submissions, approvals, rejections (with reason highlighted), cancellations. Comments interleave with their own style.
-result: issue
-reported: "the header in job detail is duplicated"
-severity: minor
+result: pass
 
 ### 5. Add Comment with Photo
-expected: On job detail, type a comment and optionally attach a photo (JPEG/PNG/WebP, max 5MB). Preview thumbnail appears before submit. After submit, comment shows in timeline with photo viewable in lightbox.
-result: issue
-reported: "when submitting comment, this error occurs: null value in column company_id of relation job_comments violates not-null constraint"
-severity: blocker
+expected: On job detail, type a comment and optionally attach a photo (JPEG/PNG/WebP, max 5MB). Preview thumbnail appears before submit. After submit, comment shows in timeline with photo viewable in lightbox. No company_id errors.
+result: pass
 
 ### 6. Assign / Reassign Job
-expected: On a job in "created" status, click Assign. A dialog with a Combobox opens to search GA Staff. Select a user and confirm — job moves to "assigned" status. Reassign works similarly on an already-assigned job.
+expected: On a job in "created" status, click Assign. A dialog with a Combobox opens to search GA Staff. Select a user and confirm — job moves to "assigned" status. Reassign is available on jobs in assigned, in_progress, and other active statuses (not just "assigned").
 result: issue
-reported: "user should be able to reassign jobs after it's delegated to a person"
+reported: "to assign PIC, user should only pick the dropdown of PIC that's editable later (view details and edit page the same) — no separate assign dialog"
 severity: major
 
 ### 7. Start Work on Job
-expected: As the assigned PIC, click "Start Work" on an assigned job. Job status changes to "in_progress".
+expected: As the assigned PIC, click "Start Work" on an assigned job. Job status changes to "in_progress". Approval-related buttons clearly say "Approve Budget" / "Reject Budget" (not generic "Approve"/"Reject").
 result: issue
-reported: "approve button should have better information. it's specifically to approve budget, not approve the job"
-severity: minor
-
-### 8. Submit Job for Approval (Budget Threshold)
-expected: On an in_progress job, submit budget triggers approval. Two approval types exist: budget approval and job completion approval.
-result: issue
-reported: "there are 2 approvals: approval for budget, and approval for the job to be considered finish. so it doesn't get superseded"
+reported: "estimated cost shouldn't behave like it's special. treat it like all the other fields"
 severity: major
 
-### 9. Approval Queue Page
-expected: Navigate to /approvals (finance_approver/admin only). See Tabs: Pending and History. Pending tab shows jobs awaiting approval with IDR cost prominent. History tab shows approved/rejected decisions with badges and rejection reasons.
+### 8. Submit Job for Budget Approval
+expected: On an in_progress job, submit budget triggers approval when above threshold. This is specifically a BUDGET approval. The approval flow is: submit budget → pending_approval → finance approver approves/rejects budget.
 result: issue
-reported: "finance/CEO approval page doesn't allow them to cancel the job. finance should keep on financial matters, not operational"
+reported: "all RP number should have thousand separator to reduce mistake, reading a lot of 0000000"
 severity: minor
 
-### 10. Approve / Reject Job
+### 9. Approval Queue Page
+expected: Navigate to /approvals (finance_approver/admin only). See a data table (not tabs) showing pending approvals by default. A checkbox/filter allows toggling to show previously approved/rejected history. The page is strictly financial — approve/reject budget actions only, no operational controls like cancel.
+result: issue
+reported: "approval page is always empty"
+severity: blocker
+
+### 10. Approve / Reject Budget
 expected: On the approval queue or job detail, approve a pending_approval job — it moves to "in_progress". Reject with a reason — it returns with the rejection reason visible in timeline.
 result: pass
 
-### 11. Mark Job Complete
-expected: On an in_progress job, click "Mark Complete". Job moves to "completed". Linked requests transition to "pending_acceptance".
+### 11. Mark Job Complete & Completion Approval
+expected: On an in_progress job, click "Mark Complete". Job moves to "pending_completion_approval" (NOT directly to completed). CEO/admin must approve the completion. After approval, job moves to "completed". Comments are disabled on completed/cancelled jobs.
 result: issue
-reported: "completed job should disable comment, it's already final, no need to enable any response"
-severity: minor
+reported: "when I click mark complete, this error occurs: Could not find the 'completion_submitted_at' column of 'jobs' in the schema cache"
+severity: blocker
 
 ### 12. Cancel Job
 expected: Click cancel on a job. Confirmation dialog warns about cascade effects. After confirming, job moves to "cancelled".
@@ -81,10 +79,9 @@ expected: Navigate to /admin/company-settings (admin only). See budget threshold
 result: pass
 
 ### 14. Accept Completed Work on Request
-expected: On a request in "pending_acceptance", click "Accept Work". The acceptance dialog appears. After accepting, a feedback dialog immediately opens prompting for a star rating.
-result: issue
-reported: "there's no star rating after accepting a work, only a success notification that Work accepted successfully"
-severity: major
+expected: On a request in "pending_acceptance", click "Accept Work". After accepting, a star rating/feedback dialog AUTOMATICALLY opens (not just a success notification). User rates 1-5 stars + optional comment.
+result: skipped
+reason: blocked by Test 11 — completion flow broken
 
 ### 15. Reject Completed Work on Request
 expected: On a request in "pending_acceptance", click "Reject Work". Provide a reason. Linked jobs revert to "in_progress". Rejection reason shows in request timeline.
@@ -93,135 +90,145 @@ result: pass
 ### 16. Submit Feedback with Star Rating
 expected: After accepting work, the feedback dialog shows a 1-5 star rating with hover preview. Submit a rating + optional comment. Request closes. Rating displays read-only on the request detail.
 result: pass
-note: "Rating works via manual button on detail page. Auto-prompt gap captured in test 14."
 
 ### 17. Linked Jobs on Request Detail
-expected: On a request detail page, see a "Linked Jobs" section showing each linked job's ID, title, and live status badge. Each is a clickable link to the job detail page.
-result: issue
-reported: "linked job should open the job detail in a modal, just like request detail that we did earlier"
-severity: major
+expected: On a request detail page, see a "Linked Jobs" section showing each linked job's ID, title, and live status badge. Each is clickable and opens a modal preview of the job detail (similar to how linked requests open a modal preview on job detail).
+result: pass
 
 ### 18. Sidebar Navigation — Jobs, Approvals, Company Settings
-expected: Sidebar shows Jobs and Approvals nav items as active links. Admin section shows Company Settings. All navigate to their respective pages.
-result: issue
-reported: "approval queue should have same pattern as jobs, where it shows all pending approval, with checkbox to show previously approved budget"
-severity: major
+expected: Sidebar shows Jobs and Approvals nav items as active links. Admin section shows Company Settings. All navigate to their respective pages. Approval queue uses the data table pattern (not tabs).
+result: pass
 
 ## Summary
 
 total: 18
-passed: 5
-issues: 13
+passed: 10
+issues: 7
 pending: 0
-skipped: 0
+skipped: 1
 
 ## Gaps
 
-- truth: "Dropdown/combobox fields in job form should not be full width"
-  status: resolved
-  severity: minor
-  test: 1
-  root_cause: "job-form.tsx FormItems for Combobox/Select fields missing max-w-xs class"
+- truth: "General users should only see jobs assigned to them, not all jobs"
+  status: failed
+  reason: "User reported: general user, only can view jobs that's been assigned to them, but now it sees all same like admin"
+  severity: major
+  test: 2
+  root_cause: "Jobs page query filters only by company_id, no role-based filtering. RLS policy also lacks role check. Requests page has this pattern but jobs page never got it."
+  artifacts:
+    - path: "app/(dashboard)/jobs/page.tsx"
+      issue: "Missing role-based query filter (lines 36-52)"
+    - path: "app/(dashboard)/jobs/[id]/page.tsx"
+      issue: "Missing role-based access check on detail page"
+    - path: "supabase/migrations/00003_rls_policies.sql"
+      issue: "jobs_select RLS policy lacks role-based condition"
+  missing:
+    - "Add .eq('assigned_to', profile.id) for general_user/ga_staff roles in jobs list query"
+    - "Add role-based access check on job detail page"
+    - "New migration for RLS defense-in-depth"
+  debug_session: ".planning/debug/jobs-visible-to-all-users.md"
 
-- truth: "Job creation form submits successfully and generates a job display ID"
-  status: open
-  severity: blocker
-  test: 1
-  root_cause: "generate_job_display_id RPC function not applied to Supabase database — migration 00008 needs to be run"
-  fix: "Run migration 00008_jobs_phase5.sql in Supabase SQL Editor"
-
-- truth: "Linked requests on job detail open modal preview"
-  status: resolved
+- truth: "Job detail page should match request detail page UI — no squared wrapper, breadcrumb in header, max-w-[1000px]"
+  status: failed
+  reason: "User reported: header should contain breadcrumb, remove squared wrapper, treat UI similar to request detail page, max 1000px width for detail pages"
   severity: major
   test: 3
-  root_cause: "Linked requests were navigation links, now use RequestPreviewDialog"
+  root_cause: "3 sub-issues: (1) Missing page-level header between breadcrumb and grid — request detail has h1+badges+creator info, job detail goes straight to JobDetailClient. (2) JobDetailInfo uses 'rounded-lg border p-6' wrapper — RequestDetailInfo uses bare fragment. (3) No max-width on outer wrapper div."
+  artifacts:
+    - path: "app/(dashboard)/jobs/[id]/page.tsx"
+      issue: "Missing header section between breadcrumb and grid; no max-width on wrapper"
+    - path: "components/jobs/job-detail-info.tsx"
+      issue: "Line 165: rounded-lg border p-6 card wrapper not present on request equivalent"
+  missing:
+    - "Add page-level header (display_id h1, status badge, priority badge, creator info) mirroring request detail"
+    - "Remove rounded-lg border p-6 from JobDetailInfo root div"
+    - "Add max-w-[1000px] to outer wrapper (and request detail for consistency)"
+  debug_session: ".planning/debug/job-detail-ui-issues.md"
 
-- truth: "Jobs list page loads with category column"
-  status: resolved
-  severity: blocker
-  test: 2
-  root_cause: "jobs table missing category_id column — created migration 00012"
-
-- truth: "Job detail header should not be duplicated"
-  status: open
-  severity: minor
-  test: 4
-  root_cause: "Header with display_id/status/priority/title rendered both in page server component and in JobDetailInfo"
-  fix: "Remove header from either page.tsx or job-detail-info.tsx"
-
-- truth: "Estimated cost should be editable inline in info panel, not a separate section"
-  status: open
-  severity: major
-  test: 4
-  root_cause: "Budget input is a separate section in job-detail-actions.tsx instead of inline-editable in job-detail-info.tsx"
-  fix: "Move budget editing to inline in job-detail-info.tsx where cost already displays"
-
-- truth: "Job detail and edit should be a single page with inline editing"
-  status: open
-  severity: major
-  test: 4
-  root_cause: "View and edit are separate concerns — detail page is read-only, edit is a separate form"
-  fix: "Merge view/edit into one page — fields become editable for users with edit access"
-
-- truth: "addJobComment must pass company_id"
-  status: open
-  severity: blocker
-  test: 5
-  root_cause: "addJobComment in job-actions.ts does not include company_id when inserting into job_comments"
-  fix: "Add company_id: job.company_id to the insert payload in addJobComment"
-
-- truth: "Reassign should be available in statuses beyond just 'assigned'"
-  status: open
+- truth: "PIC assignment should be inline-editable field on detail page, not a separate assign dialog"
+  status: failed
+  reason: "User reported: to assign PIC, user should only pick the dropdown of PIC that's editable later — no separate assign dialog"
   severity: major
   test: 6
-  root_cause: "canReassign only checks job.status === 'assigned' — should also allow in_progress, pending_approval, etc."
-  fix: "Expand canReassign condition to include more active statuses"
+  root_cause: "PIC field in job-detail-info.tsx is display-only. Assignment lives in job-detail-actions.tsx as a separate Dialog. updateJobSchema already supports assigned_to — just needs Combobox in edit mode grid."
+  artifacts:
+    - path: "components/jobs/job-detail-info.tsx"
+      issue: "PIC field display-only, no edit Combobox"
+    - path: "components/jobs/job-detail-actions.tsx"
+      issue: "Lines 338-490: separate Assign Dialog that should be removed"
+    - path: "components/jobs/job-detail-client.tsx"
+      issue: "Needs to pass users prop to JobDetailInfo"
+  missing:
+    - "Add PIC Combobox in edit mode grid in job-detail-info.tsx"
+    - "Remove Assign Dialog from job-detail-actions.tsx"
+    - "Pass users prop through job-detail-client.tsx to JobDetailInfo"
+  debug_session: ".planning/debug/job-pic-inline-edit.md"
 
-- truth: "Approve/reject buttons should say 'Approve Budget' / 'Reject Budget'"
-  status: open
-  severity: minor
+- truth: "Estimated cost should be a regular inline-editable field like all others"
+  status: failed
+  reason: "User reported: estimated cost shouldn't behave like it's special, treat it like all the other fields"
+  severity: major
   test: 7
-  root_cause: "Button labels say 'Approve' / 'Reject' without specifying budget context"
-  fix: "Update button text to 'Approve Budget' / 'Reject Budget'"
+  root_cause: "Estimated cost has own card wrapper (bg-muted/50 border), text-2xl bold display, separate isBudgetEditing state, lock/unlock badge system. All other fields use standard text-sm in dl grid."
+  artifacts:
+    - path: "components/jobs/job-detail-info.tsx"
+      issue: "Lines 247-339: special budget section instead of regular dl field"
+  missing:
+    - "Move estimated cost into the dl grid as regular inline-editable field"
+    - "Remove separate isBudgetEditing state, use main isEditing toggle"
+    - "Keep updateJobBudget server action for approval trigger but normalize UI"
+  debug_session: ".planning/debug/job-pic-inline-edit.md"
 
-- truth: "Two approval types needed: budget approval and job completion approval"
-  status: open
-  severity: major
+- truth: "All Rp currency values must display with dot thousand separators"
+  status: failed
+  reason: "User reported: all RP number should have thousand separator to reduce mistake, reading a lot of 0000000"
+  severity: minor
   test: 8
-  root_cause: "Only budget approval exists. Job completion approval (before marking finished) is missing."
-  fix: "Add completion approval flow: Mark Complete → pending_completion_approval → CEO approves → completed"
+  root_cause: "Input fields use type='number' which never shows separators. No shared formatIDR utility — 3 duplicate local copies exist. Display-only locations work but inputs don't."
+  artifacts:
+    - path: "components/jobs/job-form.tsx"
+      issue: "Line 382: type='number' input shows raw digits"
+    - path: "components/admin/company-settings/company-settings-form.tsx"
+      issue: "Line 72: type='number' input shows raw digits"
+    - path: "components/jobs/job-detail-info.tsx"
+      issue: "Line 293: text input but no live formatting"
+    - path: "components/jobs/job-preview-dialog.tsx"
+      issue: "Duplicate local formatIDR"
+    - path: "components/approvals/approval-queue.tsx"
+      issue: "Duplicate local formatIDR"
+  missing:
+    - "Create shared formatIDR in lib/utils.ts"
+    - "Replace all local copies with shared import"
+    - "Convert currency inputs to type='text' with live dot-formatting"
+  debug_session: ".planning/debug/idr-currency-no-separators.md"
 
-- truth: "Approval page should be strictly financial — no cancel/operational actions"
-  status: open
-  severity: minor
+- truth: "Approval queue page should display pending approvals"
+  status: failed
+  reason: "User reported: approval page is always empty"
+  severity: blocker
   test: 9
-  root_cause: "Approval queue page scope not restricted to financial matters"
-  fix: "Ensure approval page only shows approve/reject budget actions, no operational controls"
+  root_cause: "Supabase query in approvals/page.tsx uses FK join hints (user_profiles!approved_by, !approval_rejected_by) that PostgREST cannot resolve with 6 FKs to user_profiles. Error is silently swallowed — only data destructured, not error. data=null becomes [] via fallback."
+  artifacts:
+    - path: "app/(dashboard)/approvals/page.tsx"
+      issue: "Lines 41-72: broken FK join hints and missing error handling"
+  missing:
+    - "Remove problematic FK joins, batch-fetch user names separately"
+    - "Add error destructuring to surface PostgREST errors"
+  debug_session: ".planning/debug/approval-queue-empty.md"
 
-- truth: "Comments should be disabled on completed/cancelled jobs"
-  status: open
-  severity: minor
+- truth: "Mark Complete should transition job to pending_completion_approval with completion_submitted_at column"
+  status: failed
+  reason: "User reported: when I click mark complete, this error occurs: Could not find the 'completion_submitted_at' column of 'jobs' in the schema cache"
+  severity: blocker
   test: 11
-  root_cause: "Comment form shows regardless of job status"
-  fix: "Hide comment form when job.status is completed or cancelled"
-
-- truth: "Star rating dialog should auto-open after accepting work"
-  status: open
-  severity: major
-  test: 14
-  root_cause: "Accept work action shows success message but doesn't trigger feedback dialog"
-  fix: "Chain feedback dialog to open immediately after successful work acceptance"
-
-- truth: "Linked jobs on request detail should open modal preview"
-  status: open
-  severity: major
-  test: 17
-  root_cause: "Linked jobs render as navigation links to /jobs/[id] instead of modal triggers"
-  fix: "Create JobPreviewDialog (like RequestPreviewDialog) and use it on request detail page"
-
-- truth: "Approval queue should use data table pattern with filter, not tabs"
-  status: open
-  severity: major
-  test: 18
-  root_cause: "Approval page uses Tabs (Pending/History) instead of data table with filter/checkbox"
-  fix: "Refactor to data table showing pending approvals by default, with checkbox to include approved history"
+  root_cause: "Migration 00013_completion_approval.sql exists in codebase but was never applied to the live Supabase database. Adds 6 columns and updates status CHECK constraint."
+  artifacts:
+    - path: "supabase/migrations/00013_completion_approval.sql"
+      issue: "Migration not applied to live database"
+    - path: "app/actions/job-actions.ts"
+      issue: "updateJobStatus fails at line 370 setting completion_submitted_at"
+    - path: "app/actions/approval-actions.ts"
+      issue: "approveCompletion and rejectCompletion also depend on missing columns"
+  missing:
+    - "Run migration 00013_completion_approval.sql in Supabase SQL Editor"
+  debug_session: ".planning/debug/mark-complete-missing-column.md"
