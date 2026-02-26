@@ -95,6 +95,7 @@ export function JobDetailClient({
         {canComment && (
           <JobCommentForm
             jobId={job.id}
+            jobStatus={job.status}
             onSuccess={handleActionSuccess}
           />
         )}

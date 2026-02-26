@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { JobWithRelations } from '@/lib/types/database';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,21 +32,23 @@ import {
   assignJob,
   updateJobStatus,
   cancelJob,
+  updateJobBudget,
 } from '@/app/actions/job-actions';
 import {
-  submitForApproval,
   approveJob,
   rejectJob,
+  unapproveJob,
 } from '@/app/actions/approval-actions';
 import {
   UserCheck,
   Play,
   CheckCircle,
   Ban,
-  Send,
   ThumbsUp,
   ThumbsDown,
   RefreshCw,
+  Unlock,
+  Send,
 } from 'lucide-react';
 
 interface JobDetailActionsProps {
@@ -76,6 +79,7 @@ export function JobDetailActions({
   // Form states
   const [selectedPIC, setSelectedPIC] = useState(job.assigned_to ?? '');
   const [rejectReason, setRejectReason] = useState('');
+  const [budgetAmount, setBudgetAmount] = useState('');
 
   // Feedback states
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -83,35 +87,45 @@ export function JobDetailActions({
 
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
   const isFinanceApproverOrAdmin = ['finance_approver', 'admin'].includes(currentUserRole);
+  const isFinanceApproverOnly = currentUserRole === 'finance_approver';
   const isPIC = job.assigned_to === currentUserId;
 
   const userOptions = users.map((u) => ({ label: u.name, value: u.id }));
 
   // Determine available actions per role + status
   const canAssign = isGaLeadOrAdmin && job.status === 'created';
-  const canReassign = isGaLeadOrAdmin && job.status === 'assigned';
+  const canReassign = isGaLeadOrAdmin && ['assigned', 'in_progress', 'pending_approval', 'pending_completion_approval'].includes(job.status);
   const canStartWork = (isGaLeadOrAdmin || isPIC) && job.status === 'assigned';
-  const canSubmitApproval =
-    isGaLeadOrAdmin &&
-    ['assigned', 'in_progress'].includes(job.status) &&
-    job.estimated_cost !== null &&
-    job.estimated_cost !== undefined;
   const canApproveReject =
     isFinanceApproverOrAdmin && job.status === 'pending_approval';
   const canMarkComplete =
     (isGaLeadOrAdmin || isPIC) && job.status === 'in_progress';
   const canCancel =
     isGaLeadOrAdmin &&
+    !isFinanceApproverOnly &&
     !['completed', 'cancelled'].includes(job.status);
+
+  // Budget: PIC or lead can set budget when in_progress and not yet approved
+  const canEditBudget =
+    (isPIC || isGaLeadOrAdmin) &&
+    job.status === 'in_progress' &&
+    !job.approved_at;
+
+  // Un-approve: finance_approver/admin can unlock budget on approved in_progress jobs
+  const canUnapprove =
+    isFinanceApproverOrAdmin &&
+    job.status === 'in_progress' &&
+    !!job.approved_at;
 
   const hasAnyAction =
     canAssign ||
     canReassign ||
     canStartWork ||
-    canSubmitApproval ||
     canApproveReject ||
     canMarkComplete ||
-    canCancel;
+    canCancel ||
+    canEditBudget ||
+    canUnapprove;
 
   if (!hasAnyAction) return null;
 
@@ -170,19 +184,25 @@ export function JobDetailActions({
     }
   };
 
-  const handleSubmitApproval = async () => {
+  const handleSubmitBudget = async () => {
+    const amount = parseFloat(budgetAmount.replace(/[^0-9.]/g, ''));
+    if (isNaN(amount) || amount <= 0) {
+      setFeedback({ type: 'error', message: 'Please enter a valid budget amount.' });
+      return;
+    }
     setSubmitting(true);
     setFeedback(null);
     try {
-      const result = await submitForApproval({ job_id: job.id });
+      const result = await updateJobBudget({ id: job.id, estimated_cost: amount });
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
         return;
       }
-      setFeedback({ type: 'success', message: 'Submitted for approval.' });
+      setBudgetAmount('');
+      setFeedback({ type: 'success', message: 'Budget submitted for approval.' });
       onActionSuccess();
     } catch (err) {
-      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to submit' });
+      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to submit budget' });
     } finally {
       setSubmitting(false);
     }
@@ -218,10 +238,28 @@ export function JobDetailActions({
       }
       setRejectOpen(false);
       setRejectReason('');
-      setFeedback({ type: 'success', message: 'Job rejected. Returned to Assigned status.' });
+      setFeedback({ type: 'success', message: 'Job rejected. Returned to In Progress — budget can be re-edited.' });
       onActionSuccess();
     } catch (err) {
       setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to reject' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleUnapprove = async () => {
+    setSubmitting(true);
+    setFeedback(null);
+    try {
+      const result = await unapproveJob({ job_id: job.id });
+      if (result?.serverError) {
+        setFeedback({ type: 'error', message: result.serverError });
+        return;
+      }
+      setFeedback({ type: 'success', message: 'Budget unlocked. PIC can now re-edit the estimated cost.' });
+      onActionSuccess();
+    } catch (err) {
+      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to un-approve' });
     } finally {
       setSubmitting(false);
     }
@@ -283,6 +321,47 @@ export function JobDetailActions({
   return (
     <>
       <div className="space-y-3">
+        {/* Budget Input Section */}
+        {canEditBudget && (
+          <div className="rounded-md border px-4 py-3 space-y-2">
+            <Label htmlFor="budget-input" className="text-sm font-medium">
+              Estimated Budget
+            </Label>
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1 max-w-xs">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  Rp
+                </span>
+                <Input
+                  id="budget-input"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={budgetAmount}
+                  onChange={(e) => {
+                    // Allow only digits
+                    const raw = e.target.value.replace(/[^0-9]/g, '');
+                    setBudgetAmount(raw);
+                  }}
+                  className="pl-8"
+                  maxLength={15}
+                />
+              </div>
+              <Button
+                onClick={handleSubmitBudget}
+                disabled={submitting || !budgetAmount}
+                size="sm"
+              >
+                <Send className="mr-2 h-4 w-4" />
+                Submit Budget
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Submitting a budget will send this job for approval.
+            </p>
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-2">
           {/* Assign / Reassign */}
           {(canAssign || canReassign) && (
@@ -307,27 +386,15 @@ export function JobDetailActions({
             </Button>
           )}
 
-          {/* Submit for Approval */}
-          {canSubmitApproval && (
-            <Button
-              variant="outline"
-              onClick={handleSubmitApproval}
-              disabled={submitting}
-            >
-              <Send className="mr-2 h-4 w-4" />
-              Submit for Approval
-            </Button>
-          )}
-
-          {/* Approve */}
+          {/* Approve Budget */}
           {canApproveReject && (
             <Button onClick={handleApprove} disabled={submitting}>
               <ThumbsUp className="mr-2 h-4 w-4" />
-              Approve
+              Approve Budget
             </Button>
           )}
 
-          {/* Reject */}
+          {/* Reject Budget */}
           {canApproveReject && (
             <Button
               variant="outline"
@@ -338,7 +405,19 @@ export function JobDetailActions({
               disabled={submitting}
             >
               <ThumbsDown className="mr-2 h-4 w-4 text-destructive" />
-              <span className="text-destructive">Reject</span>
+              <span className="text-destructive">Reject Budget</span>
+            </Button>
+          )}
+
+          {/* Un-approve (unlock budget) */}
+          {canUnapprove && (
+            <Button
+              variant="outline"
+              onClick={handleUnapprove}
+              disabled={submitting}
+            >
+              <Unlock className="mr-2 h-4 w-4" />
+              Unlock Budget
             </Button>
           )}
 
@@ -367,7 +446,7 @@ export function JobDetailActions({
         {job.status === 'pending_approval' && !isFinanceApproverOrAdmin && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground rounded-md border px-3 py-2">
             <RefreshCw className="h-4 w-4 animate-spin" />
-            Awaiting Finance Approval
+            Awaiting Budget Approval
           </div>
         )}
 
@@ -417,9 +496,9 @@ export function JobDetailActions({
       <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Reject Job</DialogTitle>
+            <DialogTitle>Reject Budget</DialogTitle>
             <DialogDescription>
-              Provide a reason for rejecting this job. The job will return to Assigned status.
+              Provide a reason for rejecting this budget. The job will return to In Progress so the PIC can revise.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2">
@@ -428,7 +507,7 @@ export function JobDetailActions({
             </Label>
             <Textarea
               id="reject-reason"
-              placeholder="Explain why this job is being rejected..."
+              placeholder="Explain why this budget is being rejected..."
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               maxLength={1000}
@@ -447,7 +526,7 @@ export function JobDetailActions({
               onClick={handleReject}
               disabled={submitting || !rejectReason.trim()}
             >
-              {submitting ? 'Rejecting...' : 'Reject Job'}
+              {submitting ? 'Rejecting...' : 'Reject Budget'}
             </Button>
           </DialogFooter>
         </DialogContent>

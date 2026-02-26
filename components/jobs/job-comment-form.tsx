@@ -32,10 +32,14 @@ type CommentFormData = z.infer<typeof commentFormSchema>;
 
 interface JobCommentFormProps {
   jobId: string;
+  jobStatus?: string;
   onSuccess?: () => void;
 }
 
-export function JobCommentForm({ jobId, onSuccess }: JobCommentFormProps) {
+export function JobCommentForm({ jobId, jobStatus, onSuccess }: JobCommentFormProps) {
+  if (jobStatus && ['completed', 'cancelled'].includes(jobStatus)) {
+    return null;
+  }
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
