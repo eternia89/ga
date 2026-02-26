@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 9 of 9 (Polish & Integration) — IN PROGRESS
 Plan: 4 of 4 in phase complete (checkpoint reached — awaiting human verification)
 Status: Plan 04 tasks 1-2 complete — Mobile responsiveness (hamburger sidebar, camera capture, full-screen dialogs, table scroll), breadcrumbs on all pages, 404 page, consistent error pages. Awaiting human visual verification (Task 3 checkpoint).
-Last activity: 2026-02-26 -- Completed 05-07-PLAN.md (Inline Budget Editing + View/Edit Merge on Job Detail)
+Last activity: 2026-02-26 -- Completed 05-09-PLAN.md (Approval Queue refactor from Tabs to data table with checkbox filter)
 
 Progress: [████████████████████████] (Phase 9 in progress — 4/4 plans tasks done, checkpoint pending)
 
@@ -60,6 +60,7 @@ Progress: [███████████████████████
 | Phase 05-jobs-approvals P06 | 2 | 2 tasks | 6 files |
 | Phase 05-jobs-approvals P07 | 3 | 1 tasks | 4 files |
 | Phase 05-jobs-approvals P08 | 8 | 2 tasks | 4 files |
+| Phase 05-jobs-approvals P09 | 2 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -200,6 +201,8 @@ Recent decisions affecting current work:
 - [Phase 05-jobs-approvals]: Inline budget editing moved into cost panel (not actions); canEdit restricted to GA Lead/Admin for field editing while PIC retains budget editing only
 - [Phase 05-jobs-approvals]: onAccepted called before onSuccess in acceptance dialog — state must be set before router.refresh() triggers re-render
 - [Phase 05-jobs-approvals]: JobPreviewDialog uses client-side Supabase fetch on open — same pattern as RequestPreviewDialog on job detail; linked job display_id rendered as button to open modal instead of navigating away
+- [Phase 05-09]: Unified server-side data fetch for approval queue: single OR query (pending_approval + approved_at + rejection), computed decision field, avoids two separate queries
+- [Phase 05-09]: ApprovalJob type exported from approval-queue.tsx; Supabase FK join arrays unwrapped via Array.isArray guards in page.tsx
 
 ### Pending Todos
 
