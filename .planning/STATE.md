@@ -61,6 +61,7 @@ Progress: [███████████████████████
 | Phase 05-jobs-approvals P07 | 3 | 1 tasks | 4 files |
 | Phase 05-jobs-approvals P08 | 8 | 2 tasks | 4 files |
 | Phase 05-jobs-approvals P09 | 2 | 1 tasks | 2 files |
+| Phase 05-jobs-approvals P10 | 9 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -203,6 +204,8 @@ Recent decisions affecting current work:
 - [Phase 05-jobs-approvals]: JobPreviewDialog uses client-side Supabase fetch on open — same pattern as RequestPreviewDialog on job detail; linked job display_id rendered as button to open modal instead of navigating away
 - [Phase 05-09]: Unified server-side data fetch for approval queue: single OR query (pending_approval + approved_at + rejection), computed decision field, avoids two separate queries
 - [Phase 05-09]: ApprovalJob type exported from approval-queue.tsx; Supabase FK join arrays unwrapped via Array.isArray guards in page.tsx
+- [Phase 05-10]: completion approval mirrors budget approval: same budget_threshold, pending_completion_approval routes through when cost >= threshold
+- [Phase 05-10]: Approval queue emits separate row per approval type — same job can appear twice (once Budget, once Completion)
 
 ### Pending Todos
 
@@ -218,6 +221,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 05-08-PLAN.md (UAT gap closure — feedback auto-prompt and job preview modal)
-Resume file: .planning/phases/05-jobs-approvals/05-08-SUMMARY.md
-Next: Continue remaining UAT gap closure plans for phase 05 (08+)
+Stopped at: Completed 05-10-PLAN.md (dual approval flow — completion approval with DB migration, server actions, and UI)
+Resume file: .planning/phases/05-jobs-approvals/05-10-SUMMARY.md
+Next: Phase 05 complete — all 10 plans done. Check remaining phases or UAT verification.
