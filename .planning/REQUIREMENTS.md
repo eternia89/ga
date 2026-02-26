@@ -220,7 +220,7 @@ All requirements below are scoped for v1 unless marked otherwise.
 | REQ-AUTH-007 | Phase 2 | Pending |
 | REQ-AUTH-008 | Phase 2 | Pending |
 | REQ-RBAC-001 | Phase 2 | Pending |
-| REQ-RBAC-002 | Phase 2 | Pending |
+| REQ-RBAC-002 | Phase 2 | Complete |
 | REQ-RBAC-003 | Phase 2 | Pending |
 | REQ-RBAC-004 | Phase 1 | Pending |
 | REQ-RBAC-005 | Phase 1 | Pending |
@@ -301,7 +301,7 @@ All requirements below are scoped for v1 unless marked otherwise.
 | REQ-DATA-001 | Phase 1 | Pending |
 | REQ-DATA-002 | Phase 8 | Complete |
 | REQ-DATA-003 | Phase 1 | Pending |
-| REQ-DATA-004 | Phase 4 | Pending |
+| REQ-DATA-004 | Phase 4 | Complete |
 | REQ-DATA-005 | Phase 9 | Complete |
 | REQ-UI-001 | Phase 3 | Pending |
 | REQ-UI-002 | Phase 3 | Pending |

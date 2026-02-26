@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 9 of 9 (Polish & Integration) — IN PROGRESS
 Plan: 4 of 4 in phase complete (checkpoint reached — awaiting human verification)
 Status: Plan 04 tasks 1-2 complete — Mobile responsiveness (hamburger sidebar, camera capture, full-screen dialogs, table scroll), breadcrumbs on all pages, 404 page, consistent error pages. Awaiting human visual verification (Task 3 checkpoint).
-Last activity: 2026-02-26 -- Completed 05-09-PLAN.md (Approval Queue refactor from Tabs to data table with checkbox filter)
+Last activity: 2026-02-26 -- Completed 05-13-PLAN.md (inline PIC Combobox, normalized estimated cost, shared IDR formatter)
 
 Progress: [████████████████████████] (Phase 9 in progress — 4/4 plans tasks done, checkpoint pending)
 
@@ -62,6 +62,8 @@ Progress: [███████████████████████
 | Phase 05-jobs-approvals P08 | 8 | 2 tasks | 4 files |
 | Phase 05-jobs-approvals P09 | 2 | 1 tasks | 2 files |
 | Phase 05-jobs-approvals P10 | 9 | 2 tasks | 9 files |
+| Phase 05-jobs-approvals P12 | 3 | 2 tasks | 4 files |
+| Phase 05-jobs-approvals P13 | 6 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -206,6 +208,13 @@ Recent decisions affecting current work:
 - [Phase 05-09]: ApprovalJob type exported from approval-queue.tsx; Supabase FK join arrays unwrapped via Array.isArray guards in page.tsx
 - [Phase 05-10]: completion approval mirrors budget approval: same budget_threshold, pending_completion_approval routes through when cost >= threshold
 - [Phase 05-10]: Approval queue emits separate row per approval type — same job can appear twice (once Budget, once Completion)
+- [Phase 05-12]: Role-based job filtering: general_user and ga_staff see only jobs assigned to them; GA Lead/Admin/Finance see all
+- [Phase 05-12]: Page-level header pattern on job detail: display_id, status badge, priority badge, PM badge — matches request detail
+- [Phase 05-12]: max-w-[1000px] on both job and request detail pages for consistent content width
+- [Phase 05-13]: Shared formatIDR/formatNumber/parseIDR in lib/utils.ts replaces all local copies
+- [Phase 05-13]: PIC assignment via inline Combobox in edit mode; separate assign dialog removed from job-detail-actions
+- [Phase 05-13]: Estimated cost normalized to regular dl grid field; special bg-muted/50 section with lock badges removed
+- [Phase 05-13]: Currency inputs use type=text + inputMode=numeric with live dot-separator formatting
 
 ### Pending Todos
 
@@ -221,6 +230,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 05-10-PLAN.md (dual approval flow — completion approval with DB migration, server actions, and UI)
-Resume file: .planning/phases/05-jobs-approvals/05-10-SUMMARY.md
-Next: Phase 05 complete — all 10 plans done. Check remaining phases or UAT verification.
+Stopped at: Completed 05-13-PLAN.md (inline PIC Combobox, normalized cost, shared IDR formatter)
+Resume file: .planning/phases/05-jobs-approvals/05-13-SUMMARY.md
+Next: Phase 05 plans 11-13 complete. Check remaining UAT gaps or proceed to other phases.
