@@ -209,7 +209,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 2. Auth & RBAC | 2/2 | ✓ Complete | 2026-02-11 |
 | 3. Admin & System Configuration | 3/3 | ✓ Complete | 2026-02-11 |
 | 4. Requests | 2/2 | ✓ Complete | 2026-02-19 |
-| 5. Jobs & Approvals | 6/10 | In Progress|  |
+| 5. Jobs & Approvals | 7/10 | In Progress|  |
 | 6. Inventory | 3/3 | Complete   | 2026-02-25 |
 | 7. Preventive Maintenance | 4/4 | Complete    | 2026-02-25 |
 | 8. Media, Notifications & Dashboards | 8/8 | Complete    | 2026-02-25 |

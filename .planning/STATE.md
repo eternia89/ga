@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 9 of 9 (Polish & Integration) — IN PROGRESS
 Plan: 4 of 4 in phase complete (checkpoint reached — awaiting human verification)
 Status: Plan 04 tasks 1-2 complete — Mobile responsiveness (hamburger sidebar, camera capture, full-screen dialogs, table scroll), breadcrumbs on all pages, 404 page, consistent error pages. Awaiting human visual verification (Task 3 checkpoint).
-Last activity: 2026-02-25 -- Completed 09-04-PLAN.md tasks 1-2 (Mobile Responsiveness & UI Polish)
+Last activity: 2026-02-26 -- Completed 05-07-PLAN.md (Inline Budget Editing + View/Edit Merge on Job Detail)
 
 Progress: [████████████████████████] (Phase 9 in progress — 4/4 plans tasks done, checkpoint pending)
 
@@ -58,6 +58,7 @@ Progress: [███████████████████████
 | Phase 09-polish-integration P01 | 8 | 2 tasks | 9 files |
 | Phase 09-polish-integration P03 | 14 | 2 tasks | 65 files |
 | Phase 05-jobs-approvals P06 | 2 | 2 tasks | 6 files |
+| Phase 05-jobs-approvals P07 | 3 | 1 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -195,6 +196,7 @@ Recent decisions affecting current work:
 - [Phase 09-03]: Extended dark mode cleanup to all 50+ files (not just 25 in plan) to achieve true zero dark: count; batch-processed with Python regex
 - [Phase 09-03]: Used Next.js loading.tsx pattern with custom skeleton components per route; skeletons mirror exact page layouts for smooth loading UX
 - [Phase 05-jobs-approvals]: isFinanceApproverOnly derived from strict role equality so admin still sees cancel; terminal-status guard in JobCommentForm returns null before hooks
+- [Phase 05-jobs-approvals]: Inline budget editing moved into cost panel (not actions); canEdit restricted to GA Lead/Admin for field editing while PIC retains budget editing only
 
 ### Pending Todos
 
@@ -210,6 +212,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-26
-Stopped at: Completed 05-06-PLAN.md (UAT Gap Closure — 6 fixes)
-Resume file: .planning/phases/05-jobs-approvals/05-06-SUMMARY.md
-Next: Continue remaining UAT gap closure plans for phase 05 (07+)
+Stopped at: Completed 05-07-PLAN.md (Inline Budget Editing + View/Edit Merge on Job Detail)
+Resume file: .planning/phases/05-jobs-approvals/05-07-SUMMARY.md
+Next: Continue remaining UAT gap closure plans for phase 05 (08+)
