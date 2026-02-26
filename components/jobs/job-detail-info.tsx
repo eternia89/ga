@@ -7,7 +7,9 @@ import { JobStatusBadge } from './job-status-badge';
 import { JobPriorityBadge } from './job-priority-badge';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { RequestPreviewDialog } from './request-preview-dialog';
+import { OverdueBadge } from '@/components/maintenance/overdue-badge';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
+import { Lock, LockOpen } from 'lucide-react';
 
 function formatIDR(amount: number): string {
   return new Intl.NumberFormat('id-ID', {
@@ -38,7 +40,7 @@ export function JobDetailInfo({
 
   return (
     <div className="rounded-lg border p-6 space-y-6">
-      {/* Header: display_id, title, status, priority */}
+      {/* Header: display_id, title, status, priority, PM badges */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-mono text-sm font-semibold text-muted-foreground">
@@ -46,16 +48,50 @@ export function JobDetailInfo({
           </span>
           <JobStatusBadge status={job.status} />
           {job.priority && <JobPriorityBadge priority={job.priority} />}
+          {job.job_type === 'preventive_maintenance' && (
+            <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+              PM
+            </span>
+          )}
+          {job.job_type === 'preventive_maintenance' && job.maintenance_schedule && (
+            <OverdueBadge
+              nextDueAt={(job.maintenance_schedule as { next_due_at?: string | null }).next_due_at ?? null}
+              jobStatus={job.status}
+            />
+          )}
         </div>
         <h2 className="text-xl font-semibold leading-tight">{job.title}</h2>
+        {job.created_by_user?.full_name && (
+          <p className="text-sm text-muted-foreground">
+            Created by {job.created_by_user.full_name}
+            <span> · {format(new Date(job.created_at), 'dd-MM-yyyy')}</span>
+          </p>
+        )}
       </div>
 
       {/* Estimated Cost — prominent */}
       {job.estimated_cost !== null && job.estimated_cost !== undefined && (
         <div className="rounded-md bg-muted/50 border px-4 py-3">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-            Estimated Cost
-          </p>
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Estimated Cost
+            </p>
+            {job.approved_at ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                <Lock className="h-3 w-3" />
+                Approved
+              </span>
+            ) : job.status === 'pending_approval' ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">
+                Pending Approval
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                <LockOpen className="h-3 w-3" />
+                Editable
+              </span>
+            )}
+          </div>
           <p className="text-2xl font-bold tabular-nums">
             {formatIDR(job.estimated_cost)}
           </p>

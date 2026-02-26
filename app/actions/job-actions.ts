@@ -441,6 +441,105 @@ export const updateJobStatus = authActionClient
   });
 
 // ============================================================================
+// updateJobBudget — PIC, ga_lead, or admin
+// Sets estimated_cost and auto-routes to pending_approval for CEO review.
+// Only allowed when job is in_progress and NOT already approved.
+// ============================================================================
+export const updateJobBudget = authActionClient
+  .schema(z.object({
+    id: z.string().uuid(),
+    estimated_cost: z.number().positive('Budget must be a positive number'),
+  }))
+  .action(async ({ parsedInput, ctx }) => {
+    const { supabase, profile } = ctx;
+
+    // Fetch job
+    const { data: job } = await supabase
+      .from('jobs')
+      .select('id, status, assigned_to, company_id, display_id, approved_at')
+      .eq('id', parsedInput.id)
+      .eq('company_id', profile.company_id)
+      .is('deleted_at', null)
+      .single();
+
+    if (!job) {
+      throw new Error('Job not found');
+    }
+
+    const isLead = ['ga_lead', 'admin'].includes(profile.role);
+    const isPIC = job.assigned_to === profile.id;
+
+    if (!isLead && !isPIC) {
+      throw new Error('Only GA Lead, Admin, or assigned PIC can update the budget');
+    }
+
+    if (job.status !== 'in_progress') {
+      throw new Error('Budget can only be set when job is In Progress');
+    }
+
+    if (job.approved_at) {
+      throw new Error('Budget is locked after approval. Ask the approver to un-approve first.');
+    }
+
+    const now = new Date().toISOString();
+
+    const { error } = await supabase
+      .from('jobs')
+      .update({
+        estimated_cost: parsedInput.estimated_cost,
+        status: 'pending_approval',
+        approval_submitted_at: now,
+        // Clear any previous rejection data
+        approval_rejected_at: null,
+        approval_rejected_by: null,
+        approval_rejection_reason: null,
+      })
+      .eq('id', parsedInput.id);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    // Record GPS status change
+    await supabase
+      .from('job_status_changes')
+      .insert({
+        job_id: parsedInput.id,
+        company_id: job.company_id,
+        from_status: job.status,
+        to_status: 'pending_approval',
+        changed_by: profile.id,
+      });
+
+    // Non-blocking notification: notify finance approvers and admins
+    const { data: financeApprovers } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('company_id', job.company_id)
+      .in('role', ['finance_approver', 'admin'])
+      .is('deleted_at', null);
+
+    if (financeApprovers && financeApprovers.length > 0) {
+      const formattedCost = parsedInput.estimated_cost.toLocaleString('id-ID');
+      createNotifications({
+        companyId: job.company_id,
+        recipientIds: financeApprovers.map((u) => u.id),
+        actorId: profile.id,
+        title: `Job ${job.display_id} requires budget approval`,
+        body: `Estimated cost: Rp ${formattedCost}`,
+        type: 'approval',
+        entityType: 'job',
+        entityId: parsedInput.id,
+      });
+    }
+
+    revalidatePath('/jobs');
+    revalidatePath(`/jobs/${parsedInput.id}`);
+    revalidatePath('/approvals');
+    return { success: true };
+  });
+
+// ============================================================================
 // cancelJob — ga_lead or admin only; moves linked requests back to 'triaged'
 // ============================================================================
 export const cancelJob = authActionClient
@@ -545,6 +644,7 @@ export const addJobComment = authActionClient
       .insert({
         job_id: parsedInput.job_id,
         user_id: profile.id,
+        company_id: job.company_id,
         content: parsedInput.content,
       })
       .select('id')
