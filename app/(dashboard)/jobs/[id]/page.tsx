@@ -83,6 +83,11 @@ export default async function JobDetailPage({ params }: PageProps) {
 
   const job = jobData as JobWithRelations;
 
+  // Role-based access: general_user and ga_staff can only view jobs assigned to them
+  if (['general_user', 'ga_staff'].includes(profile.role) && job.assigned_to !== profile.id) {
+    notFound();
+  }
+
   // Fetch all data in parallel
   const [auditLogsResult, commentsResult, usersResult, statusChangesResult, categoriesResult, locationsResult] = await Promise.all([
     // Audit logs for timeline

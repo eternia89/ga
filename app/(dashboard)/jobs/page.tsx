@@ -32,24 +32,31 @@ export default async function JobsPage() {
     redirect('/login');
   }
 
-  // Fetch all company jobs with relations (including maintenance_schedule for overdue badge)
+  // Build jobs query with role-based filtering
+  let jobsQuery = supabase
+    .from('jobs')
+    .select(
+      `id, display_id, title, status, priority, assigned_to, created_by,
+       estimated_cost, created_at, updated_at, company_id,
+       job_type, maintenance_schedule_id,
+       location:locations(name),
+       category:categories(name),
+       pic:user_profiles!assigned_to(full_name),
+       created_by_user:user_profiles!created_by(full_name),
+       maintenance_schedule:maintenance_schedules(id, next_due_at, interval_type, interval_days),
+       job_requests(request:requests(id, display_id, title, status))`
+    )
+    .eq('company_id', profile.company_id)
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false });
+
+  // General users and GA Staff only see jobs assigned to them
+  if (['general_user', 'ga_staff'].includes(profile.role)) {
+    jobsQuery = jobsQuery.eq('assigned_to', profile.id);
+  }
+
   const [jobsResult, usersResult] = await Promise.all([
-    supabase
-      .from('jobs')
-      .select(
-        `id, display_id, title, status, priority, assigned_to, created_by,
-         estimated_cost, created_at, updated_at, company_id,
-         job_type, maintenance_schedule_id,
-         location:locations(name),
-         category:categories(name),
-         pic:user_profiles!assigned_to(full_name),
-         created_by_user:user_profiles!created_by(full_name),
-         maintenance_schedule:maintenance_schedules(id, next_due_at, interval_type, interval_days),
-         job_requests(request:requests(id, display_id, title, status))`
-      )
-      .eq('company_id', profile.company_id)
-      .is('deleted_at', null)
-      .order('created_at', { ascending: false }),
+    jobsQuery,
 
     // GA Staff/Lead users for PIC filter
     supabase
