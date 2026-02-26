@@ -7,6 +7,7 @@ import {
   BreadcrumbPage,
 } from '@/components/ui/breadcrumb';
 import { ApprovalQueue } from '@/components/approvals/approval-queue';
+import type { ApprovalJob } from '@/components/approvals/approval-queue';
 
 export default async function ApprovalsPage() {
   const supabase = await createClient();
@@ -35,42 +36,67 @@ export default async function ApprovalsPage() {
     redirect('/');
   }
 
-  // Fetch pending jobs (pending tab)
-  const { data: pendingJobs } = await supabase
+  // Fetch ALL jobs that are pending approval OR have a decision (approved/rejected)
+  const { data: rawJobs } = await supabase
     .from('jobs')
     .select(
-      `*,
-       location:locations(name),
-       category:categories(name),
+      `id,
+       display_id,
+       title,
+       estimated_cost,
+       status,
+       approval_submitted_at,
+       approved_at,
+       approval_rejected_at,
+       approval_rejection_reason,
+       created_at,
        pic:user_profiles!assigned_to(full_name),
-       created_by_user:user_profiles!created_by(full_name),
+       approved_by_user:user_profiles!approved_by(full_name),
+       rejected_by_user:user_profiles!approval_rejected_by(full_name),
        job_requests(
-         request:requests(
-           display_id,
-           title,
-           requester:user_profiles!requester_id(full_name)
-         )
+         request:requests(display_id)
        )`
     )
-    .eq('status', 'pending_approval')
+    .or(
+      'status.eq.pending_approval,approved_at.not.is.null,approval_rejected_at.not.is.null'
+    )
     .eq('company_id', profile.company_id)
     .is('deleted_at', null)
     .order('approval_submitted_at', { ascending: true });
 
-  // Fetch history jobs (approved or rejected)
-  const { data: historyJobs } = await supabase
-    .from('jobs')
-    .select(
-      `*,
-       pic:user_profiles!assigned_to(full_name),
-       approved_by_user:user_profiles!approved_by(full_name),
-       rejected_by_user:user_profiles!approval_rejected_by(full_name)`
-    )
-    .or('approved_at.not.is.null,approval_rejected_at.not.is.null')
-    .eq('company_id', profile.company_id)
-    .is('deleted_at', null)
-    .order('updated_at', { ascending: false })
-    .limit(50);
+  // Compute decision field and cast to ApprovalJob[]
+  const jobs: ApprovalJob[] = (rawJobs ?? []).map((job) => ({
+    id: job.id,
+    display_id: job.display_id,
+    title: job.title,
+    estimated_cost: job.estimated_cost,
+    status: job.status,
+    approval_submitted_at: job.approval_submitted_at,
+    approved_at: job.approved_at,
+    approval_rejected_at: job.approval_rejected_at,
+    approval_rejection_reason: job.approval_rejection_reason,
+    created_at: job.created_at,
+    pic: Array.isArray(job.pic) ? job.pic[0] ?? null : job.pic ?? null,
+    approved_by_user: Array.isArray(job.approved_by_user)
+      ? job.approved_by_user[0] ?? null
+      : job.approved_by_user ?? null,
+    rejected_by_user: Array.isArray(job.rejected_by_user)
+      ? job.rejected_by_user[0] ?? null
+      : job.rejected_by_user ?? null,
+    job_requests: Array.isArray(job.job_requests)
+      ? job.job_requests.map((jr: { request: { display_id: string } | { display_id: string }[] }) => ({
+          request: Array.isArray(jr.request)
+            ? (jr.request[0] as { display_id: string })
+            : (jr.request as { display_id: string }),
+        }))
+      : [],
+    decision:
+      job.approved_at !== null
+        ? 'approved'
+        : job.approval_rejected_at !== null
+          ? 'rejected'
+          : 'pending',
+  }));
 
   return (
     <div className="space-y-6 py-6">
@@ -91,10 +117,7 @@ export default async function ApprovalsPage() {
         </p>
       </div>
 
-      <ApprovalQueue
-        pendingJobs={pendingJobs ?? []}
-        historyJobs={historyJobs ?? []}
-      />
+      <ApprovalQueue jobs={jobs} />
     </div>
   );
 }
