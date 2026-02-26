@@ -65,8 +65,14 @@ export default async function JobDetailPage({ params }: PageProps) {
           id,
           display_id,
           title,
+          description,
           status,
-          requester:user_profiles!requester_id(full_name)
+          priority,
+          created_at,
+          location:locations(name),
+          category:categories(name),
+          requester:user_profiles!requester_id(full_name),
+          assigned_user:user_profiles!assigned_to(full_name)
         )
       )
     `

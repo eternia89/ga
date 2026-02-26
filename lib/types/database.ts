@@ -150,8 +150,14 @@ export interface JobWithRelations extends Job {
       id: string;
       display_id: string;
       title: string;
+      description: string | null;
       status: string;
+      priority: string | null;
+      created_at: string;
+      location: { name: string } | null;
+      category: { name: string } | null;
       requester?: { full_name: string } | null;
+      assigned_user?: { full_name: string } | null;
     };
   }>;
   maintenance_schedule?: {

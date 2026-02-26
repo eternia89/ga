@@ -1,11 +1,12 @@
 'use client';
 
-import Link from 'next/link';
+import { useState } from 'react';
 import { format } from 'date-fns';
 import { JobWithRelations } from '@/lib/types/database';
 import { JobStatusBadge } from './job-status-badge';
 import { JobPriorityBadge } from './job-priority-badge';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
+import { RequestPreviewDialog } from './request-preview-dialog';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
 
 function formatIDR(amount: number): string {
@@ -33,6 +34,7 @@ export function JobDetailInfo({
   approvalRejectedByName,
 }: JobDetailInfoProps) {
   const linkedRequests = job.job_requests ?? [];
+  const [previewRequest, setPreviewRequest] = useState<typeof linkedRequests[number]['request'] | null>(null);
 
   return (
     <div className="rounded-lg border p-6 space-y-6">
@@ -210,17 +212,16 @@ export function JobDetailInfo({
           </h3>
           <div className="space-y-2">
             {linkedRequests.map(({ request }) => (
-              <div
+              <button
                 key={request.id}
-                className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm hover:bg-muted/40 transition-colors"
+                type="button"
+                onClick={() => setPreviewRequest(request)}
+                className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm hover:bg-muted/40 transition-colors w-full text-left cursor-pointer"
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <Link
-                    href={`/requests/${request.id}`}
-                    className="font-mono text-xs font-semibold text-muted-foreground hover:text-foreground shrink-0 transition-colors"
-                  >
+                  <span className="font-mono text-xs font-semibold text-muted-foreground shrink-0">
                     {request.display_id}
-                  </Link>
+                  </span>
                   <span className="truncate text-sm">{request.title}</span>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
@@ -231,11 +232,18 @@ export function JobDetailInfo({
                   )}
                   <RequestStatusBadge status={request.status} />
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
       )}
+
+      {/* Request Preview Dialog */}
+      <RequestPreviewDialog
+        request={previewRequest}
+        open={!!previewRequest}
+        onOpenChange={(open) => { if (!open) setPreviewRequest(null); }}
+      />
     </div>
   );
 }

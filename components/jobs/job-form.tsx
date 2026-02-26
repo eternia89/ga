@@ -259,7 +259,7 @@ export function JobForm({
           control={form.control}
           name="location_id"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="max-w-xs">
               <FormLabel>
                 Location <span className="text-destructive">*</span>
               </FormLabel>
@@ -284,7 +284,7 @@ export function JobForm({
           control={form.control}
           name="category_id"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="max-w-xs">
               <FormLabel>
                 Category <span className="text-destructive">*</span>
               </FormLabel>
@@ -309,7 +309,7 @@ export function JobForm({
           control={form.control}
           name="priority"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="max-w-xs">
               <FormLabel>
                 Priority <span className="text-destructive">*</span>
               </FormLabel>
@@ -346,7 +346,7 @@ export function JobForm({
           control={form.control}
           name="assigned_to"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="max-w-xs">
               <FormLabel>PIC (Person in Charge)</FormLabel>
               <FormControl>
                 <Combobox
