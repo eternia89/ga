@@ -25,18 +25,27 @@ export type ApprovalJob = {
   title: string;
   estimated_cost: number | null;
   status: string;
+  // Budget approval fields
   approval_submitted_at: string | null;
   approved_at: string | null;
   approval_rejected_at: string | null;
   approval_rejection_reason: string | null;
+  // Completion approval fields
+  completion_submitted_at: string | null;
+  completion_approved_at: string | null;
+  completion_rejected_at: string | null;
+  completion_rejection_reason: string | null;
   created_at: string;
   pic?: { full_name: string } | null;
   approved_by_user?: { full_name: string } | null;
   rejected_by_user?: { full_name: string } | null;
+  completion_approved_by_user?: { full_name: string } | null;
+  completion_rejected_by_user?: { full_name: string } | null;
   job_requests?: Array<{
     request: { display_id: string };
   }>;
   decision: 'pending' | 'approved' | 'rejected';
+  approval_type: 'budget' | 'completion';
 };
 
 interface ApprovalQueueProps {
@@ -63,15 +72,32 @@ function formatDate(dateStr: string | null): string {
 }
 
 function getDecisionDate(job: ApprovalJob): string | null {
+  if (job.approval_type === 'completion') {
+    if (job.decision === 'approved') return job.completion_approved_at;
+    if (job.decision === 'rejected') return job.completion_rejected_at;
+    return job.completion_submitted_at ?? job.created_at;
+  }
+  // budget type
   if (job.decision === 'approved') return job.approved_at;
   if (job.decision === 'rejected') return job.approval_rejected_at;
   return job.approval_submitted_at ?? job.created_at;
 }
 
 function getDecidedBy(job: ApprovalJob): string | null {
+  if (job.approval_type === 'completion') {
+    if (job.decision === 'approved') return job.completion_approved_by_user?.full_name ?? null;
+    if (job.decision === 'rejected') return job.completion_rejected_by_user?.full_name ?? null;
+    return job.pic?.full_name ?? null;
+  }
+  // budget type
   if (job.decision === 'approved') return job.approved_by_user?.full_name ?? null;
   if (job.decision === 'rejected') return job.rejected_by_user?.full_name ?? null;
   return job.pic?.full_name ?? null;
+}
+
+function getRejectionReason(job: ApprovalJob): string | null {
+  if (job.approval_type === 'completion') return job.completion_rejection_reason;
+  return job.approval_rejection_reason;
 }
 
 // ============================================================================
@@ -120,17 +146,18 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
           </p>
           <p className="text-sm text-muted-foreground mt-1">
             {showHistory
-              ? 'No jobs have been submitted for budget approval yet.'
-              : 'Jobs submitted for budget approval will appear here.'}
+              ? 'No jobs have been submitted for approval yet.'
+              : 'Jobs submitted for budget or completion approval will appear here.'}
           </p>
         </div>
       ) : (
         <div className="rounded-md border overflow-x-auto">
-          <Table className="min-w-[700px]">
+          <Table className="min-w-[800px]">
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[120px]">Job ID</TableHead>
                 <TableHead>Title</TableHead>
+                <TableHead className="w-[130px]">Type</TableHead>
                 <TableHead className="w-[180px]">Estimated Cost</TableHead>
                 <TableHead className="w-[160px]">PIC</TableHead>
                 <TableHead className="w-[130px]">Status</TableHead>
@@ -141,13 +168,14 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
               {visibleJobs.map((job) => {
                 const dateLabel =
                   job.decision === 'pending'
-                    ? formatDate(job.approval_submitted_at ?? job.created_at)
+                    ? formatDate(getDecisionDate(job))
                     : formatDate(getDecisionDate(job));
                 const decidedBy = getDecidedBy(job);
+                const rejectionReason = getRejectionReason(job);
 
                 return (
                   <TableRow
-                    key={job.id}
+                    key={`${job.id}-${job.approval_type}`}
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() => router.push(`/jobs/${job.id}`)}
                   >
@@ -156,10 +184,21 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
                     </TableCell>
                     <TableCell>
                       <div className="font-medium">{job.title}</div>
-                      {job.decision === 'rejected' && job.approval_rejection_reason && (
+                      {job.decision === 'rejected' && rejectionReason && (
                         <div className="text-xs text-red-600 mt-0.5 max-w-xs truncate">
-                          Reason: {job.approval_rejection_reason}
+                          Reason: {rejectionReason}
                         </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {job.approval_type === 'budget' ? (
+                        <Badge className="bg-purple-100 text-purple-700 border-0 whitespace-nowrap">
+                          Budget
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-orange-100 text-orange-700 border-0 whitespace-nowrap">
+                          Completion
+                        </Badge>
                       )}
                     </TableCell>
                     <TableCell>

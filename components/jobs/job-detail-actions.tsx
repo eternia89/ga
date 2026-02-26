@@ -36,6 +36,8 @@ import {
   approveJob,
   rejectJob,
   unapproveJob,
+  approveCompletion,
+  rejectCompletion,
 } from '@/app/actions/approval-actions';
 import {
   UserCheck,
@@ -72,10 +74,12 @@ export function JobDetailActions({
   const [cancelOpen, setCancelOpen] = useState(false);
   const [assignOpen, setAssignOpen] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
+  const [rejectCompletionOpen, setRejectCompletionOpen] = useState(false);
 
   // Form states
   const [selectedPIC, setSelectedPIC] = useState(job.assigned_to ?? '');
   const [rejectReason, setRejectReason] = useState('');
+  const [rejectCompletionReason, setRejectCompletionReason] = useState('');
 
   // Feedback states
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -94,6 +98,8 @@ export function JobDetailActions({
   const canStartWork = (isGaLeadOrAdmin || isPIC) && job.status === 'assigned';
   const canApproveReject =
     isFinanceApproverOrAdmin && job.status === 'pending_approval';
+  const canApproveCompletion =
+    isFinanceApproverOrAdmin && job.status === 'pending_completion_approval';
   const canMarkComplete =
     (isGaLeadOrAdmin || isPIC) && job.status === 'in_progress';
   const canCancel =
@@ -112,6 +118,7 @@ export function JobDetailActions({
     canReassign ||
     canStartWork ||
     canApproveReject ||
+    canApproveCompletion ||
     canMarkComplete ||
     canCancel ||
     canUnapprove;
@@ -230,6 +237,45 @@ export function JobDetailActions({
     }
   };
 
+  const handleApproveCompletion = async () => {
+    setSubmitting(true);
+    setFeedback(null);
+    try {
+      const result = await approveCompletion({ job_id: job.id });
+      if (result?.serverError) {
+        setFeedback({ type: 'error', message: result.serverError });
+        return;
+      }
+      setFeedback({ type: 'success', message: 'Completion approved. Linked requests moved to pending acceptance.' });
+      onActionSuccess();
+    } catch (err) {
+      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to approve completion' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRejectCompletion = async () => {
+    if (!rejectCompletionReason.trim()) return;
+    setSubmitting(true);
+    setFeedback(null);
+    try {
+      const result = await rejectCompletion({ job_id: job.id, reason: rejectCompletionReason.trim() });
+      if (result?.serverError) {
+        setFeedback({ type: 'error', message: result.serverError });
+        return;
+      }
+      setRejectCompletionOpen(false);
+      setRejectCompletionReason('');
+      setFeedback({ type: 'success', message: 'Completion rejected. Job returned to In Progress for rework.' });
+      onActionSuccess();
+    } catch (err) {
+      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to reject completion' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleMarkComplete = async () => {
     setFeedback(null);
     // Capture GPS before status change — GPS is blocking (REQ-JOB-010)
@@ -333,6 +379,29 @@ export function JobDetailActions({
             </Button>
           )}
 
+          {/* Approve Completion */}
+          {canApproveCompletion && (
+            <Button onClick={handleApproveCompletion} disabled={submitting}>
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Approve Completion
+            </Button>
+          )}
+
+          {/* Reject Completion */}
+          {canApproveCompletion && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRejectCompletionReason('');
+                setRejectCompletionOpen(true);
+              }}
+              disabled={submitting}
+            >
+              <ThumbsDown className="mr-2 h-4 w-4 text-destructive" />
+              <span className="text-destructive">Reject Completion</span>
+            </Button>
+          )}
+
           {/* Un-approve (unlock budget) */}
           {canUnapprove && (
             <Button
@@ -371,6 +440,14 @@ export function JobDetailActions({
           <div className="flex items-center gap-2 text-sm text-muted-foreground rounded-md border px-3 py-2">
             <RefreshCw className="h-4 w-4 animate-spin" />
             Awaiting Budget Approval
+          </div>
+        )}
+
+        {/* Pending Completion Approval read-only indicator (for non-approvers) */}
+        {job.status === 'pending_completion_approval' && !isFinanceApproverOrAdmin && (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground rounded-md border px-3 py-2">
+            <RefreshCw className="h-4 w-4 animate-spin" />
+            Awaiting Completion Approval
           </div>
         )}
 
@@ -451,6 +528,46 @@ export function JobDetailActions({
               disabled={submitting || !rejectReason.trim()}
             >
               {submitting ? 'Rejecting...' : 'Reject Budget'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Completion Dialog */}
+      <Dialog open={rejectCompletionOpen} onOpenChange={setRejectCompletionOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Completion</DialogTitle>
+            <DialogDescription>
+              Provide a reason for rejecting this completion. The job will return to In Progress so the PIC can rework and resubmit.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <Label htmlFor="reject-completion-reason">
+              Rejection Reason <span className="text-destructive">*</span>
+            </Label>
+            <Textarea
+              id="reject-completion-reason"
+              placeholder="Explain why the completion is being rejected..."
+              value={rejectCompletionReason}
+              onChange={(e) => setRejectCompletionReason(e.target.value)}
+              maxLength={1000}
+              className="min-h-24 resize-y"
+            />
+            <p className="text-xs text-muted-foreground text-right">
+              {rejectCompletionReason.length}/1000
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectCompletionOpen(false)} disabled={submitting}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleRejectCompletion}
+              disabled={submitting || !rejectCompletionReason.trim()}
+            >
+              {submitting ? 'Rejecting...' : 'Reject Completion'}
             </Button>
           </DialogFooter>
         </DialogContent>

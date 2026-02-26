@@ -244,7 +244,7 @@ export default async function JobDetailPage({ params }: PageProps) {
 
     if (log.operation !== 'UPDATE' || !changedFields) continue;
 
-    // Check for approval rejection (has approval_rejection_reason in new_data)
+    // Check for budget approval rejection (has approval_rejection_reason in new_data)
     if (
       changedFields.includes('approval_rejection_reason') &&
       newData?.approval_rejection_reason
@@ -254,6 +254,20 @@ export default async function JobDetailPage({ params }: PageProps) {
         at: log.performed_at,
         by: byUser,
         details: { reason: newData.approval_rejection_reason as string },
+      });
+      continue;
+    }
+
+    // Check for completion approval rejection (has completion_rejection_reason in new_data)
+    if (
+      changedFields.includes('completion_rejection_reason') &&
+      newData?.completion_rejection_reason
+    ) {
+      timelineEvents.push({
+        type: 'approval_rejection',
+        at: log.performed_at,
+        by: byUser,
+        details: { reason: `Completion rejected: ${newData.completion_rejection_reason as string}` },
       });
       continue;
     }
@@ -268,7 +282,7 @@ export default async function JobDetailPage({ params }: PageProps) {
       continue;
     }
 
-    // Check for approval (approved_at set)
+    // Check for budget approval (approved_at set)
     if (changedFields.includes('approved_at') && newData?.approved_at) {
       timelineEvents.push({
         type: 'approval',
@@ -278,10 +292,33 @@ export default async function JobDetailPage({ params }: PageProps) {
       continue;
     }
 
-    // Check for approval submission (status changed to pending_approval)
+    // Check for completion approval (completion_approved_at set)
+    if (changedFields.includes('completion_approved_at') && newData?.completion_approved_at) {
+      timelineEvents.push({
+        type: 'approval',
+        at: log.performed_at,
+        by: byUser,
+      });
+      continue;
+    }
+
+    // Check for budget approval submission (status changed to pending_approval)
     if (
       changedFields.includes('status') &&
       newData?.status === 'pending_approval'
+    ) {
+      timelineEvents.push({
+        type: 'approval_submitted',
+        at: log.performed_at,
+        by: byUser,
+      });
+      continue;
+    }
+
+    // Check for completion approval submission (status changed to pending_completion_approval)
+    if (
+      changedFields.includes('status') &&
+      newData?.status === 'pending_completion_approval'
     ) {
       timelineEvents.push({
         type: 'approval_submitted',
