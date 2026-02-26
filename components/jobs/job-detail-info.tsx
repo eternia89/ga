@@ -3,11 +3,8 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { JobWithRelations } from '@/lib/types/database';
-import { JobStatusBadge } from './job-status-badge';
-import { JobPriorityBadge } from './job-priority-badge';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { RequestPreviewDialog } from './request-preview-dialog';
-import { OverdueBadge } from '@/components/maintenance/overdue-badge';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
 import { Lock, LockOpen, Pencil, X, Check, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -162,28 +159,23 @@ export function JobDetailInfo({
   };
 
   return (
-    <div className="rounded-lg border p-6 space-y-6">
-      {/* Header: display_id, title, status, priority, PM badges + Edit button */}
+    <div className="space-y-6">
+      {/* Title row with edit controls */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-sm font-semibold text-muted-foreground">
-              {job.display_id}
-            </span>
-            <JobStatusBadge status={job.status} />
-            {job.priority && <JobPriorityBadge priority={job.priority} />}
-            {job.job_type === 'preventive_maintenance' && (
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
-                PM
-              </span>
-            )}
-            {job.job_type === 'preventive_maintenance' && job.maintenance_schedule && (
-              <OverdueBadge
-                nextDueAt={(job.maintenance_schedule as { next_due_at?: string | null }).next_due_at ?? null}
-                jobStatus={job.status}
+          {isEditing ? (
+            <div className="flex-1 space-y-1">
+              <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Title</Label>
+              <Input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                maxLength={150}
+                className="text-xl font-semibold"
               />
-            )}
-          </div>
+            </div>
+          ) : (
+            <h2 className="text-xl font-semibold leading-tight">{job.title}</h2>
+          )}
 
           {/* Edit / Save / Cancel buttons */}
           {canEdit && !isEditing && (
@@ -220,25 +212,10 @@ export function JobDetailInfo({
           )}
         </div>
 
-        {/* Title */}
-        {isEditing ? (
-          <div className="space-y-1">
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Title</Label>
-            <Input
-              value={editTitle}
-              onChange={(e) => setEditTitle(e.target.value)}
-              maxLength={150}
-              className="text-xl font-semibold"
-            />
-          </div>
-        ) : (
-          <h2 className="text-xl font-semibold leading-tight">{job.title}</h2>
-        )}
-
         {job.created_by_user?.full_name && (
           <p className="text-sm text-muted-foreground">
             Created by {job.created_by_user.full_name}
-            <span> · {format(new Date(job.created_at), 'dd-MM-yyyy')}</span>
+            <span> {'\u00b7'} {format(new Date(job.created_at), 'dd-MM-yyyy')}</span>
           </p>
         )}
       </div>

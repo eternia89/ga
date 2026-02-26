@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
+import { format } from 'date-fns';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,6 +10,8 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { JobDetailClient } from '@/components/jobs/job-detail-client';
+import { JobStatusBadge } from '@/components/jobs/job-status-badge';
+import { JobPriorityBadge } from '@/components/jobs/job-priority-badge';
 import type { JobTimelineEvent } from '@/components/jobs/job-timeline';
 import type { JobWithRelations } from '@/lib/types/database';
 import { JOB_STATUS_LABELS } from '@/lib/constants/job-status';
@@ -408,7 +411,7 @@ export default async function JobDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-6 py-6 max-w-[1000px]">
       {/* Breadcrumb */}
       <Breadcrumb>
         <BreadcrumbList>
@@ -421,6 +424,26 @@ export default async function JobDetailPage({ params }: PageProps) {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      {/* Header */}
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-bold tracking-tight font-mono">
+            {job.display_id}
+          </h1>
+          <JobStatusBadge status={job.status} />
+          {job.priority && <JobPriorityBadge priority={job.priority} />}
+          {job.job_type === 'preventive_maintenance' && (
+            <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+              PM
+            </span>
+          )}
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {job.created_by_user?.full_name ?? 'Unknown'}
+          {' \u00b7 '}Created {format(new Date(job.created_at), 'dd-MM-yyyy')}
+        </p>
+      </div>
 
       {/* Two-column layout */}
       <JobDetailClient

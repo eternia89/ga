@@ -342,7 +342,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
     .filter((job): job is LinkedJobItem => job !== null);
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-6 py-6 max-w-[1000px]">
       {/* Breadcrumb */}
       <Breadcrumb>
         <BreadcrumbList>
