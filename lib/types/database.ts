@@ -133,6 +133,12 @@ export interface Job {
   approval_rejected_at: string | null;
   approval_rejected_by: string | null;
   approval_rejection_reason: string | null;
+  completion_submitted_at: string | null;
+  completion_approved_at: string | null;
+  completion_approved_by: string | null;
+  completion_rejected_at: string | null;
+  completion_rejected_by: string | null;
+  completion_rejection_reason: string | null;
   started_at: string | null;
   completed_at: string | null;
   deleted_at: string | null;

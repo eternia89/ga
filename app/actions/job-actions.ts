@@ -289,8 +289,9 @@ export const assignJob = authActionClient
 
 // ============================================================================
 // updateJobStatus — ga_lead/admin OR assigned PIC
-// When transitioning to 'completed': set completed_at, move linked requests to
-// 'pending_acceptance' and set their completed_at.
+// When transitioning to 'completed': check budget_threshold to determine if
+// completion approval is required. If cost >= threshold, transition to
+// 'pending_completion_approval' instead of 'completed' directly.
 // GPS coordinates are recorded for every status change (REQ-JOB-010).
 // ============================================================================
 export const updateJobStatus = authActionClient
@@ -307,7 +308,7 @@ export const updateJobStatus = authActionClient
     // Fetch job
     const { data: job } = await supabase
       .from('jobs')
-      .select('id, status, assigned_to, company_id, created_by, display_id')
+      .select('id, status, assigned_to, company_id, created_by, display_id, estimated_cost')
       .eq('id', parsedInput.id)
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
@@ -330,6 +331,7 @@ export const updateJobStatus = authActionClient
       assigned: ['in_progress', 'pending_approval'],
       in_progress: ['completed', 'pending_approval'],
       pending_approval: ['in_progress'], // after approval (approval action handles the approve path)
+      pending_completion_approval: [], // handled by approveCompletion/rejectCompletion
       completed: [],
       cancelled: [],
     };
@@ -340,9 +342,33 @@ export const updateJobStatus = authActionClient
     }
 
     const now = new Date().toISOString();
-    const jobUpdate: Record<string, unknown> = { status: parsedInput.status };
+
+    // When marking complete, check if completion approval is required
+    let actualStatus: string = parsedInput.status;
+    let requiresCompletionApproval = false;
 
     if (parsedInput.status === 'completed') {
+      const { data: setting } = await supabase
+        .from('company_settings')
+        .select('value')
+        .eq('company_id', job.company_id)
+        .eq('key', 'budget_threshold')
+        .single();
+
+      const budgetThreshold = setting ? parseInt(setting.value, 10) : null;
+      const estimatedCost = job.estimated_cost ?? 0;
+
+      if (budgetThreshold !== null && estimatedCost >= budgetThreshold) {
+        actualStatus = 'pending_completion_approval';
+        requiresCompletionApproval = true;
+      }
+    }
+
+    const jobUpdate: Record<string, unknown> = { status: actualStatus };
+
+    if (requiresCompletionApproval) {
+      jobUpdate.completion_submitted_at = now;
+    } else if (actualStatus === 'completed') {
       jobUpdate.completed_at = now;
     }
 
@@ -362,7 +388,7 @@ export const updateJobStatus = authActionClient
         job_id: parsedInput.id,
         company_id: job.company_id,
         from_status: job.status,
-        to_status: parsedInput.status,
+        to_status: actualStatus,
         changed_by: profile.id,
         latitude: parsedInput.latitude ?? null,
         longitude: parsedInput.longitude ?? null,
@@ -371,7 +397,7 @@ export const updateJobStatus = authActionClient
 
     // TODO(PM-INTEGRATION): When completing a PM job, call advanceFloatingSchedule.
     // Example integration:
-    //   if (parsedInput.status === 'completed') {
+    //   if (actualStatus === 'completed') {
     //     const { data: fullJob } = await supabase.from('jobs').select('job_type').eq('id', parsedInput.id).single();
     //     if (fullJob?.job_type === 'preventive_maintenance') {
     //       await advanceFloatingSchedule({ jobId: parsedInput.id }); // from pm-job-actions.ts
@@ -380,8 +406,31 @@ export const updateJobStatus = authActionClient
     // This advances floating schedule next_due_at from completion date (not generation date).
     // Fixed schedule next_due_at is already advanced by the cron at job generation time.
 
-    // When completing, move all linked requests to pending_acceptance
-    if (parsedInput.status === 'completed') {
+    if (requiresCompletionApproval) {
+      // Notify finance approvers and admins that completion approval is needed
+      const { data: financeApprovers } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('company_id', job.company_id)
+        .in('role', ['finance_approver', 'admin'])
+        .is('deleted_at', null);
+
+      if (financeApprovers && financeApprovers.length > 0) {
+        createNotifications({
+          companyId: job.company_id,
+          recipientIds: financeApprovers.map((u) => u.id),
+          actorId: profile.id,
+          title: `Job ${job.display_id} requires completion approval`,
+          body: `Estimated cost: Rp ${(job.estimated_cost ?? 0).toLocaleString('id-ID')}`,
+          type: 'approval',
+          entityType: 'job',
+          entityId: parsedInput.id,
+        });
+      }
+    }
+
+    // When directly completing (no completion approval required), move linked requests
+    if (actualStatus === 'completed') {
       const { data: linkedJobRequests } = await supabase
         .from('job_requests')
         .select('request_id')
@@ -437,6 +486,7 @@ export const updateJobStatus = authActionClient
     revalidatePath('/jobs');
     revalidatePath(`/jobs/${parsedInput.id}`);
     revalidatePath('/requests');
+    revalidatePath('/approvals');
     return { success: true };
   });
 

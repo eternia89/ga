@@ -4,6 +4,7 @@ export const JOB_STATUS_LABELS: Record<string, string> = {
   assigned: 'Assigned',
   in_progress: 'In Progress',
   pending_approval: 'Pending Approval',
+  pending_completion_approval: 'Pending Completion Approval',
   completed: 'Completed',
   cancelled: 'Cancelled',
 };
@@ -14,6 +15,7 @@ export const JOB_STATUS_COLORS: Record<string, string> = {
   assigned: 'bg-blue-100 text-blue-700',
   in_progress: 'bg-amber-100 text-amber-700',
   pending_approval: 'bg-purple-100 text-purple-700',
+  pending_completion_approval: 'bg-orange-100 text-orange-700',
   completed: 'bg-green-100 text-green-700',
   cancelled: 'bg-stone-100 text-stone-600',
 };
@@ -24,6 +26,7 @@ export const JOB_STATUSES = [
   'assigned',
   'in_progress',
   'pending_approval',
+  'pending_completion_approval',
   'completed',
   'cancelled',
 ] as const;
