@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 9 of 9 (Polish & Integration) — IN PROGRESS
 Plan: 4 of 4 in phase complete (checkpoint reached — awaiting human verification)
 Status: Plan 04 tasks 1-2 complete — Mobile responsiveness (hamburger sidebar, camera capture, full-screen dialogs, table scroll), breadcrumbs on all pages, 404 page, consistent error pages. Awaiting human visual verification (Task 3 checkpoint).
-Last activity: 2026-02-27 -- Completed 05-14-PLAN.md (detail page centering, scrollable timelines, internal fields filter)
+Last activity: 2026-02-27 -- Completed 05-15-PLAN.md (approval queue default view + feedback dialog auto-open)
 
 Progress: [████████████████████████] (Phase 9 in progress — 4/4 plans tasks done, checkpoint pending)
 
@@ -66,6 +66,7 @@ Progress: [███████████████████████
 | Phase 05-jobs-approvals P13 | 6 | 2 tasks | 8 files |
 | Phase 05-jobs-approvals P11 | 10 | 2 tasks | 1 files |
 | Phase 05-jobs-approvals P14 | 2 | 2 tasks | 4 files |
+| Phase 05-jobs-approvals P15 | 3 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -221,6 +222,8 @@ Recent decisions affecting current work:
 - [Phase 05-14]: INTERNAL_FIELDS blocklist includes approval/completion/feedback timestamps specific to each page context
 - [Phase 05-14]: calc(100vh - 200px) for timeline max-height instead of fixed pixel value to adapt to viewport
 - [Phase 05-14]: Job comment form stays outside scroll container for constant visibility
+- [Phase 05-15]: pendingOnly state (default false) replaces showHistory -- approval queue shows all statuses by default with flat date-descending sort
+- [Phase 05-15]: feedbackOpen state lifted from RequestDetailActions to RequestDetailClient to survive router.refresh() remount; 300ms delay before opening
 
 ### Pending Todos
 
@@ -236,6 +239,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 05-14-PLAN.md (detail page centering, scrollable timelines, internal fields filter)
-Resume file: .planning/phases/05-jobs-approvals/05-14-SUMMARY.md
-Next: Phase 05 plan 15 (remaining UAT gap closure) then phase complete.
+Stopped at: Completed 05-15-PLAN.md (approval queue default view, feedback dialog auto-open)
+Resume file: .planning/phases/05-jobs-approvals/05-15-SUMMARY.md
+Next: Phase 05 complete (all 15 plans done). Resume Phase 09 checkpoint verification.
