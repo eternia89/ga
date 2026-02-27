@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 
 ## Current Position
 
-Phase: 09.1 (UI Improvements) — IN PROGRESS
-Plan: 4 of 5 in phase complete
-Status: Completed 09.1-05-PLAN.md — Text-labeled ghost buttons for all table row actions
-Last activity: 2026-02-27 -- Completed 09.1-05-PLAN.md (text-labeled table row action buttons)
+Phase: 09.1 (UI Improvements) — COMPLETE
+Plan: 5 of 5 in phase complete
+Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
+Last activity: 2026-02-27 -- Completed 09.1-04-PLAN.md (CTA/export button placement)
 
-Progress: [███████████████████░░░░░] (Phase 09.1 — 4/5 plans done)
+Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ Progress: [███████████████████░░░░
 | Phase 09.1-ui-improvements P01 | 3 | 2 tasks | 6 files |
 | Phase 09.1-ui-improvements P02 | 5 | 2 tasks | 8 files |
 | Phase 09.1-ui-improvements P05 | 2 | 1 tasks | 3 files |
+| Phase 09.1-ui-improvements P04 | 6 | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -233,6 +234,7 @@ Recent decisions affecting current work:
 - [Phase 09.1-01]: Ghost icon buttons with title attributes for row actions instead of dropdown menus; CTA buttons in server page headers; job edit navigates to detail page (inline editing)
 - [Phase 09.1-02]: react-day-picker v9 Calendar with Popover for date range picking; applied to both job and request filters; ISO params in URL, dd-MM-yyyy display
 - [Phase 09.1-05]: Text labels replace icons entirely (no icon+text combo) for table row action buttons -- cleaner, more compact, no guessing
+- [Phase 09.1-04]: ExportButton as standalone reusable client component; admin tab headers use h2+Create button pattern above DataTable; toolbar simplified to search/filters/bulk-actions only
 
 ### Roadmap Evolution
 
@@ -252,6 +254,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 09.1-05-PLAN.md (text-labeled table row action buttons)
-Resume file: .planning/phases/09.1-ui-improvements/09.1-05-SUMMARY.md
-Next: Execute 09.1-04-PLAN.md (remaining UI improvement plan)
+Stopped at: Completed 09.1-04-PLAN.md (CTA/export button placement) -- Phase 09.1 COMPLETE
+Resume file: .planning/phases/09.1-ui-improvements/09.1-04-SUMMARY.md
+Next: Phase 09.1 complete -- all 5 plans done
