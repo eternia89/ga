@@ -104,7 +104,7 @@ Plans:
   3. Users can post comments (text + optional photo) on a job, and the job detail page shows a timeline with all status changes and comments
   4. When a request involves money, it routes to the CEO approval queue; the Finance Approver can approve or reject (with required reason) from a dedicated approval page showing estimated cost
   5. After a job is completed, the requester has 7 days to accept or reject; if no response, a cron job auto-accepts and the request closes
-**Plans**: 13 plans
+**Plans**: 15 plans
 
 Plans:
 - [x] 05-01-PLAN.md — DB migration (schema changes, job_requests join table, company_settings, display ID, auto-accept cron), types, constants, Zod schemas, server actions, photo upload API
@@ -117,9 +117,11 @@ Plans:
 - [x] 05-08-PLAN.md — Gap closure: star rating auto-prompt after acceptance, job preview modal on request detail
 - [x] 05-09-PLAN.md — Gap closure: approval queue refactored from tabs to data table with checkbox filter
 - [x] 05-10-PLAN.md — Gap closure: completion approval flow (dual approval: budget + completion)
-- [ ] 05-11-PLAN.md — Gap closure: fix approval queue FK join failure, apply completion migration
-- [ ] 05-12-PLAN.md — Gap closure: role-based job list filtering, job detail page UI overhaul (header, card removal, max-width)
-- [ ] 05-13-PLAN.md — Gap closure: inline PIC Combobox, normalized estimated cost field, shared IDR currency formatting
+- [x] 05-11-PLAN.md — Gap closure: fix approval queue FK join failure, apply completion migration
+- [x] 05-12-PLAN.md — Gap closure: role-based job list filtering, job detail page UI overhaul (header, card removal, max-width)
+- [x] 05-13-PLAN.md — Gap closure: inline PIC Combobox, normalized estimated cost field, shared IDR currency formatting
+- [ ] 05-14-PLAN.md — Gap closure: center detail page layouts, scrollable timeline with auto-scroll, filter internal fields from timeline
+- [ ] 05-15-PLAN.md — Gap closure: approval queue all-statuses default, feedback dialog auto-open after acceptance
 
 ### Phase 6: Inventory
 **Goal**: GA Staff can manage a complete asset registry with tracked movements between locations, including receiver confirmation, so the organization has accurate visibility into what assets exist and where they are.
@@ -212,7 +214,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 2. Auth & RBAC | 2/2 | ✓ Complete | 2026-02-11 |
 | 3. Admin & System Configuration | 3/3 | ✓ Complete | 2026-02-11 |
 | 4. Requests | 2/2 | ✓ Complete | 2026-02-19 |
-| 5. Jobs & Approvals | 13/13 | Complete   | 2026-02-27 |
+| 5. Jobs & Approvals | 13/15 | Gap closure | 2026-02-27 |
 | 6. Inventory | 3/3 | Complete   | 2026-02-25 |
 | 7. Preventive Maintenance | 4/4 | Complete    | 2026-02-25 |
 | 8. Media, Notifications & Dashboards | 8/8 | Complete    | 2026-02-25 |
