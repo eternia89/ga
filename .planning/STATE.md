@@ -64,6 +64,7 @@ Progress: [███████████████████████
 | Phase 05-jobs-approvals P10 | 9 | 2 tasks | 9 files |
 | Phase 05-jobs-approvals P12 | 3 | 2 tasks | 4 files |
 | Phase 05-jobs-approvals P13 | 6 | 2 tasks | 8 files |
+| Phase 05-jobs-approvals P11 | 10 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -215,6 +216,7 @@ Recent decisions affecting current work:
 - [Phase 05-13]: PIC assignment via inline Combobox in edit mode; separate assign dialog removed from job-detail-actions
 - [Phase 05-13]: Estimated cost normalized to regular dl grid field; special bg-muted/50 section with lock badges removed
 - [Phase 05-13]: Currency inputs use type=text + inputMode=numeric with live dot-separator formatting
+- [Phase 05-jobs-approvals]: FK join hints fail silently when jobs table has 6 FK constraints to user_profiles; fix is plain UUID columns + batch actor name lookup via actorNameMap
 
 ### Pending Todos
 
