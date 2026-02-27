@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 9 of 9 (Polish & Integration) — IN PROGRESS
 Plan: 4 of 4 in phase complete (checkpoint reached — awaiting human verification)
 Status: Plan 04 tasks 1-2 complete — Mobile responsiveness (hamburger sidebar, camera capture, full-screen dialogs, table scroll), breadcrumbs on all pages, 404 page, consistent error pages. Awaiting human visual verification (Task 3 checkpoint).
-Last activity: 2026-02-26 -- Completed 05-13-PLAN.md (inline PIC Combobox, normalized estimated cost, shared IDR formatter)
+Last activity: 2026-02-27 -- Completed 05-14-PLAN.md (detail page centering, scrollable timelines, internal fields filter)
 
 Progress: [████████████████████████] (Phase 9 in progress — 4/4 plans tasks done, checkpoint pending)
 
@@ -65,6 +65,7 @@ Progress: [███████████████████████
 | Phase 05-jobs-approvals P12 | 3 | 2 tasks | 4 files |
 | Phase 05-jobs-approvals P13 | 6 | 2 tasks | 8 files |
 | Phase 05-jobs-approvals P11 | 10 | 2 tasks | 1 files |
+| Phase 05-jobs-approvals P14 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -217,6 +218,9 @@ Recent decisions affecting current work:
 - [Phase 05-13]: Estimated cost normalized to regular dl grid field; special bg-muted/50 section with lock badges removed
 - [Phase 05-13]: Currency inputs use type=text + inputMode=numeric with live dot-separator formatting
 - [Phase 05-jobs-approvals]: FK join hints fail silently when jobs table has 6 FK constraints to user_profiles; fix is plain UUID columns + batch actor name lookup via actorNameMap
+- [Phase 05-14]: INTERNAL_FIELDS blocklist includes approval/completion/feedback timestamps specific to each page context
+- [Phase 05-14]: calc(100vh - 200px) for timeline max-height instead of fixed pixel value to adapt to viewport
+- [Phase 05-14]: Job comment form stays outside scroll container for constant visibility
 
 ### Pending Todos
 
@@ -231,7 +235,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-26
-Stopped at: Completed 05-13-PLAN.md (inline PIC Combobox, normalized cost, shared IDR formatter)
-Resume file: .planning/phases/05-jobs-approvals/05-13-SUMMARY.md
-Next: Phase 05 plans 11-13 complete. Check remaining UAT gaps or proceed to other phases.
+Last session: 2026-02-27
+Stopped at: Completed 05-14-PLAN.md (detail page centering, scrollable timelines, internal fields filter)
+Resume file: .planning/phases/05-jobs-approvals/05-14-SUMMARY.md
+Next: Phase 05 plan 15 (remaining UAT gap closure) then phase complete.
