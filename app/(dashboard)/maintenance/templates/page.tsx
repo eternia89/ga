@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,6 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
 import { TemplateList } from '@/components/maintenance/template-list';
 import type { MaintenanceTemplate } from '@/lib/types/maintenance';
 
@@ -75,11 +78,21 @@ export default async function MaintenanceTemplatesPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Maintenance Templates</h1>
-        <p className="text-muted-foreground mt-1">
-          Define reusable maintenance checklists for assets
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Maintenance Templates</h1>
+          <p className="text-muted-foreground mt-1">
+            Define reusable maintenance checklists for assets
+          </p>
+        </div>
+        {['ga_lead', 'admin'].includes(profile.role) && (
+          <Button asChild size="sm">
+            <Link href="/maintenance/templates/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Template
+            </Link>
+          </Button>
+        )}
       </div>
 
       <TemplateList templates={templateList} userRole={profile.role} />

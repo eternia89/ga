@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,6 +10,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
+import { ExportButton } from '@/components/export-button';
 import { ScheduleList } from '@/components/maintenance/schedule-list';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 import { getScheduleDisplayStatus } from '@/lib/constants/schedule-status';
@@ -96,11 +100,26 @@ export default async function MaintenanceSchedulesPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Maintenance Schedules</h1>
-        <p className="text-muted-foreground mt-1">
-          View and manage maintenance schedules for company assets
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Maintenance Schedules</h1>
+          <p className="text-muted-foreground mt-1">
+            View and manage maintenance schedules for company assets
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {['ga_lead', 'admin'].includes(profile.role) && (
+            <ExportButton exportUrl="/api/exports/maintenance" />
+          )}
+          {['ga_lead', 'admin'].includes(profile.role) && (
+            <Button asChild size="sm">
+              <Link href="/maintenance/schedules/new">
+                <Plus className="mr-2 h-4 w-4" />
+                New Schedule
+              </Link>
+            </Button>
+          )}
+        </div>
       </div>
 
       <ScheduleList schedules={scheduleList} userRole={profile.role} />

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { JobTable } from '@/components/jobs/job-table';
 import { Button } from '@/components/ui/button';
+import { ExportButton } from '@/components/export-button';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -96,14 +97,19 @@ export default async function JobsPage() {
             View and manage all company jobs
           </p>
         </div>
-        {['ga_lead', 'admin'].includes(profile.role) && (
-          <Button asChild size="sm">
-            <Link href="/jobs/new">
-              <Plus className="mr-2 h-4 w-4" />
-              New Job
-            </Link>
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {['ga_lead', 'admin', 'finance_approver'].includes(profile.role) && (
+            <ExportButton exportUrl="/api/exports/jobs" />
+          )}
+          {['ga_lead', 'admin'].includes(profile.role) && (
+            <Button asChild size="sm">
+              <Link href="/jobs/new">
+                <Plus className="mr-2 h-4 w-4" />
+                New Job
+              </Link>
+            </Button>
+          )}
+        </div>
       </div>
 
       <JobTable

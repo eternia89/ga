@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { RequestTable } from '@/components/requests/request-table';
 import { Button } from '@/components/ui/button';
+import { ExportButton } from '@/components/export-button';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -138,12 +139,17 @@ export default async function RequestsPage() {
               : 'View and manage all company requests'}
           </p>
         </div>
-        <Button asChild size="sm">
-          <Link href="/requests/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Request
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          {['ga_lead', 'admin', 'finance_approver'].includes(profile.role) && (
+            <ExportButton exportUrl="/api/exports/requests" />
+          )}
+          <Button asChild size="sm">
+            <Link href="/requests/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Request
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <RequestTable

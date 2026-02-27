@@ -2,10 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
 import { DataTable } from '@/components/data-table/data-table';
-import { Button } from '@/components/ui/button';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { templateColumns } from './template-columns';
 import { deactivateTemplate, reactivateTemplate } from '@/app/actions/template-actions';
@@ -22,7 +19,6 @@ export function TemplateList({ templates, userRole }: TemplateListProps) {
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const canCreate = ['ga_lead', 'admin'].includes(userRole);
   const canManage = ['ga_lead', 'admin'].includes(userRole);
 
   function handleDeactivate(id: string) {
@@ -75,16 +71,6 @@ export function TemplateList({ templates, userRole }: TemplateListProps) {
         columns={templateColumns}
         data={templates}
         emptyMessage="No maintenance templates found."
-        createButton={
-          canCreate ? (
-            <Button asChild size="sm" disabled={isPending}>
-              <Link href="/maintenance/templates/new">
-                <Plus className="mr-2 h-4 w-4" />
-                New Template
-              </Link>
-            </Button>
-          ) : undefined
-        }
         meta={meta}
       />
     </div>

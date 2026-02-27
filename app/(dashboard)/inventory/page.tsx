@@ -1,7 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import { AssetTable } from '@/components/assets/asset-table';
 import { PendingTransfer } from '@/components/assets/asset-columns';
+import { Button } from '@/components/ui/button';
+import { ExportButton } from '@/components/export-button';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -100,11 +104,26 @@ export default async function InventoryPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Inventory</h1>
-        <p className="text-muted-foreground mt-1">
-          View and manage all company assets
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Inventory</h1>
+          <p className="text-muted-foreground mt-1">
+            View and manage all company assets
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {['ga_staff', 'ga_lead', 'admin'].includes(profile.role) && (
+            <ExportButton exportUrl="/api/exports/inventory" />
+          )}
+          {['ga_staff', 'ga_lead', 'admin'].includes(profile.role) && (
+            <Button asChild size="sm">
+              <Link href="/inventory/new">
+                <Plus className="mr-2 h-4 w-4" />
+                New Asset
+              </Link>
+            </Button>
+          )}
+        </div>
       </div>
 
       <AssetTable

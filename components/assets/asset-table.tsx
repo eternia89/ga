@@ -3,11 +3,8 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryStates } from 'nuqs';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
 import { InventoryItemWithRelations } from '@/lib/types/database';
 import { DataTable } from '@/components/data-table/data-table';
-import { Button } from '@/components/ui/button';
 import { assetColumns, PendingTransfer } from './asset-columns';
 import { AssetFilters, filterParsers } from './asset-filters';
 
@@ -76,8 +73,6 @@ export function AssetTable({
     router.push(`/inventory/${asset.id}?edit=true`);
   };
 
-  const canCreate = ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole);
-
   return (
     <div className="space-y-4">
       {/* Filter bar */}
@@ -87,16 +82,6 @@ export function AssetTable({
         columns={assetColumns}
         data={filteredData}
         emptyMessage="No assets found"
-        createButton={
-          canCreate ? (
-            <Button asChild size="sm">
-              <Link href="/inventory/new">
-                <Plus className="mr-2 h-4 w-4" />
-                New Asset
-              </Link>
-            </Button>
-          ) : undefined
-        }
         meta={{
           onView: handleView,
           onEdit: handleEdit,

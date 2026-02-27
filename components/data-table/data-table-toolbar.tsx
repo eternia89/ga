@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Table } from "@tanstack/react-table";
-import { Download, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -42,7 +42,6 @@ interface DataTableToolbarProps<TData> {
   onDeactivatedToggleChange?: (show: boolean) => void;
   showDeactivated?: boolean;
   createButton?: React.ReactNode;
-  exportUrl?: string;
 }
 
 export function DataTableToolbar<TData>({
@@ -56,41 +55,12 @@ export function DataTableToolbar<TData>({
   onDeactivatedToggleChange,
   showDeactivated,
   createButton,
-  exportUrl,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
   const [bulkDeleteOpen, setBulkDeleteOpen] = React.useState(false);
   const [bulkDeleteConfirmText, setBulkDeleteConfirmText] = React.useState("");
   const [isBulkDeleting, setIsBulkDeleting] = React.useState(false);
   const [bulkDeleteItems, setBulkDeleteItems] = React.useState<{ ids: string[]; names: string[] }>({ ids: [], names: [] });
-  const [isExporting, setIsExporting] = React.useState(false);
-
-  const handleExport = async () => {
-    if (!exportUrl) return;
-    setIsExporting(true);
-    try {
-      const response = await fetch(exportUrl);
-      if (!response.ok) {
-        console.error('Export failed:', response.statusText);
-        return;
-      }
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download =
-        response.headers
-          .get('content-disposition')
-          ?.split('filename=')[1]
-          ?.replace(/"/g, '') ?? 'export.xlsx';
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Export error:', error);
-    } finally {
-      setIsExporting(false);
-    }
-  };
 
   const handleBulkDeleteClick = () => {
     const selectedRows = table.getFilteredSelectedRowModel().rows;
@@ -221,29 +191,6 @@ export function DataTableToolbar<TData>({
           </>
         ) : (
           <>
-            {exportUrl && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={isExporting}
-              >
-                {isExporting ? (
-                  <span className="flex items-center gap-1.5">
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                    </svg>
-                    Exporting...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1.5">
-                    <Download className="h-4 w-4" />
-                    Export
-                  </span>
-                )}
-              </Button>
-            )}
             {createButton}
           </>
         )}

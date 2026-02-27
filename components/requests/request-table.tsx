@@ -207,11 +207,6 @@ export function RequestTable({
         columns={requestColumns}
         data={filteredData}
         emptyMessage="No requests found"
-        exportUrl={
-          ['ga_lead', 'admin', 'finance_approver'].includes(currentUserRole)
-            ? '/api/exports/requests'
-            : undefined
-        }
         meta={{
           onTriage: handleTriage,
           onReject: handleReject,
