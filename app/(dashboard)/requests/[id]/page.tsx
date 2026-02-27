@@ -148,6 +148,14 @@ export default async function RequestDetailPage({ params }: PageProps) {
 
   const timelineEvents: TimelineEvent[] = [];
 
+  // Internal DB fields that should not appear as generic field updates in the timeline.
+  // Feedback/acceptance timestamps are transitions handled by specific checks above.
+  const INTERNAL_FIELDS = new Set([
+    'updated_at', 'created_at', 'deleted_at',
+    'feedback_submitted_at', 'feedback_rating',
+    'accepted_at', 'auto_accepted',
+  ]);
+
   for (const log of auditLogs) {
     const byUser = userMap[log.user_id] ?? log.user_email ?? 'System';
     const newData = log.new_data as Record<string, unknown> | null;
@@ -309,8 +317,10 @@ export default async function RequestDetailPage({ params }: PageProps) {
       continue;
     }
 
-    // Generic field update
-    const updatedField = changedFields[0];
+    // Generic field update — skip internal DB fields
+    const meaningfulFields = changedFields.filter((f) => !INTERNAL_FIELDS.has(f));
+    if (meaningfulFields.length === 0) continue;
+    const updatedField = meaningfulFields[0];
     timelineEvents.push({
       type: 'field_update',
       at: log.performed_at,
@@ -342,7 +352,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
     .filter((job): job is LinkedJobItem => job !== null);
 
   return (
-    <div className="space-y-6 py-6 max-w-[1000px]">
+    <div className="space-y-6 py-6 max-w-[1000px] mx-auto">
       {/* Breadcrumb */}
       <Breadcrumb>
         <BreadcrumbList>
