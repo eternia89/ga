@@ -159,6 +159,14 @@ export function CategoryTable({ data }: CategoryTableProps) {
         <InlineFeedback type={feedback.type} message={feedback.message} onDismiss={() => setFeedback(null)} />
       )}
 
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Categories</h2>
+        <Button onClick={handleCreateClick} size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          Create Category
+        </Button>
+      </div>
+
       <DataTable
         columns={categoryColumns}
         data={filteredData}
@@ -178,12 +186,6 @@ export function CategoryTable({ data }: CategoryTableProps) {
         showDeactivated={showDeactivated}
         onBulkDelete={handleBulkDelete}
         onBulkExport={handleBulkExport}
-        createButton={
-          <Button onClick={handleCreateClick} size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            Create Category
-          </Button>
-        }
         meta={{
           onEdit: handleEdit,
           onDelete: handleDelete,

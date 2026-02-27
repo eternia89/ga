@@ -41,7 +41,6 @@ interface DataTableToolbarProps<TData> {
   showDeactivatedToggle?: boolean;
   onDeactivatedToggleChange?: (show: boolean) => void;
   showDeactivated?: boolean;
-  createButton?: React.ReactNode;
 }
 
 export function DataTableToolbar<TData>({
@@ -54,7 +53,6 @@ export function DataTableToolbar<TData>({
   showDeactivatedToggle,
   onDeactivatedToggleChange,
   showDeactivated,
-  createButton,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
   const [bulkDeleteOpen, setBulkDeleteOpen] = React.useState(false);
@@ -159,42 +157,36 @@ export function DataTableToolbar<TData>({
         )}
       </div>
 
-      {/* Right side: Bulk actions or create button + export */}
-      <div className="flex items-center gap-2">
-        {selectedRowCount > 0 ? (
-          <>
-            <span className="text-sm text-muted-foreground">
-              {selectedRowCount} selected
-            </span>
-            {onBulkExport && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const selectedRows = table.getFilteredSelectedRowModel().rows;
-                  const ids = selectedRows.map((row) => (row.original as any).id);
-                  onBulkExport(ids);
-                }}
-              >
-                Export
-              </Button>
-            )}
-            {onBulkDelete && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleBulkDeleteClick}
-              >
-                Delete
-              </Button>
-            )}
-          </>
-        ) : (
-          <>
-            {createButton}
-          </>
-        )}
-      </div>
+      {/* Right side: Bulk actions */}
+      {selectedRowCount > 0 && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            {selectedRowCount} selected
+          </span>
+          {onBulkExport && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const selectedRows = table.getFilteredSelectedRowModel().rows;
+                const ids = selectedRows.map((row) => (row.original as any).id);
+                onBulkExport(ids);
+              }}
+            >
+              Export
+            </Button>
+          )}
+          {onBulkDelete && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleBulkDeleteClick}
+            >
+              Delete
+            </Button>
+          )}
+        </div>
+      )}
 
       <AlertDialog open={bulkDeleteOpen} onOpenChange={(open) => {
         setBulkDeleteOpen(open);

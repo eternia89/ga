@@ -201,6 +201,14 @@ export function UserTable({ users, companies, divisions, defaultCompanyId, initi
     <div className="space-y-4">
       {feedback && <InlineFeedback type={feedback.type} message={feedback.message} onDismiss={() => setFeedback(null)} />}
 
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Users</h2>
+        <Button onClick={handleCreate} size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          Create User
+        </Button>
+      </div>
+
       <DataTable
         columns={columns}
         data={filteredUsers}
@@ -215,12 +223,6 @@ export function UserTable({ users, companies, divisions, defaultCompanyId, initi
         onDeactivatedToggleChange={setShowDeactivated}
         onBulkDelete={handleBulkDeactivate}
         onBulkExport={handleBulkExport}
-        createButton={
-          <Button onClick={handleCreate} size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            Create User
-          </Button>
-        }
         emptyMessage="No users found"
       />
 

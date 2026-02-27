@@ -161,6 +161,14 @@ export function CompanyTable({ data }: CompanyTableProps) {
         />
       )}
 
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Companies</h2>
+        <Button onClick={() => setCreateDialogOpen(true)} size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          Create Company
+        </Button>
+      </div>
+
       <DataTable
         columns={companyColumns}
         data={filteredData}
@@ -170,12 +178,6 @@ export function CompanyTable({ data }: CompanyTableProps) {
         showDeactivated={showDeactivated}
         onBulkDelete={handleBulkDelete}
         onBulkExport={handleBulkExport}
-        createButton={
-          <Button onClick={() => setCreateDialogOpen(true)} size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            Create Company
-          </Button>
-        }
         meta={{
           onEdit: handleEdit,
           onDelete: handleDelete,

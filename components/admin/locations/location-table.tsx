@@ -160,6 +160,14 @@ export function LocationTable({ data, companies }: LocationTableProps) {
         <InlineFeedback type={feedback.type} message={feedback.message} onDismiss={() => setFeedback(null)} />
       )}
 
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Locations</h2>
+        <Button onClick={() => setCreateDialogOpen(true)} size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          Create Location
+        </Button>
+      </div>
+
       <DataTable
         columns={locationColumns}
         data={filteredData}
@@ -169,12 +177,6 @@ export function LocationTable({ data, companies }: LocationTableProps) {
         showDeactivated={showDeactivated}
         onBulkDelete={handleBulkDelete}
         onBulkExport={handleBulkExport}
-        createButton={
-          <Button onClick={() => setCreateDialogOpen(true)} size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            Create Location
-          </Button>
-        }
         meta={{
           onEdit: handleEdit,
           onDelete: handleDelete,

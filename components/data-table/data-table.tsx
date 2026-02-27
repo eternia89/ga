@@ -47,7 +47,6 @@ interface DataTableProps<TData, TValue> {
   onDeactivatedToggleChange?: (show: boolean) => void;
   showDeactivated?: boolean;
   pageSize?: number;
-  createButton?: React.ReactNode;
   emptyMessage?: string;
   meta?: Record<string, unknown>;
 }
@@ -65,7 +64,6 @@ export function DataTable<TData, TValue>({
   onDeactivatedToggleChange,
   showDeactivated,
   pageSize = 50,
-  createButton,
   emptyMessage = "No items found",
   meta,
 }: DataTableProps<TData, TValue>) {
@@ -116,7 +114,6 @@ export function DataTable<TData, TValue>({
         showDeactivatedToggle={showDeactivatedToggle}
         onDeactivatedToggleChange={onDeactivatedToggleChange}
         showDeactivated={showDeactivated}
-        createButton={createButton}
       />
       <div className="rounded-md border overflow-x-auto">
         <Table className="min-w-[600px]">

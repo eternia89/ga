@@ -171,6 +171,14 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
         />
       )}
 
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Divisions</h2>
+        <Button onClick={() => setCreateDialogOpen(true)} size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          Create Division
+        </Button>
+      </div>
+
       <DataTable
         columns={divisionColumns}
         data={filteredData}
@@ -180,12 +188,6 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
         showDeactivated={showDeactivated}
         onBulkDelete={handleBulkDelete}
         onBulkExport={handleBulkExport}
-        createButton={
-          <Button onClick={() => setCreateDialogOpen(true)} size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            Create Division
-          </Button>
-        }
         meta={{
           onEdit: handleEdit,
           onDelete: handleDelete,
