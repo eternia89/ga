@@ -2,7 +2,6 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { Eye, Pencil, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { JobWithRelations } from '@/lib/types/database';
 import { Button } from '@/components/ui/button';
@@ -136,49 +135,46 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            title="View Details"
+            size="sm"
+            className="h-7 px-2 text-xs"
             onClick={(e) => {
               e.stopPropagation();
               meta?.onView?.(job);
             }}
           >
-            <Eye className="h-3.5 w-3.5" />
+            View
           </Button>
 
           {isGaLeadOrAdmin && (
             <Button
               variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              title="Edit"
+              size="sm"
+              className="h-7 px-2 text-xs"
               onClick={(e) => {
                 e.stopPropagation();
                 meta?.onEdit?.(job);
               }}
             >
-              <Pencil className="h-3.5 w-3.5" />
+              Edit
             </Button>
           )}
 
           {canCancel && (
             <Button
               variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-destructive hover:text-destructive"
-              title="Cancel"
+              size="sm"
+              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
               onClick={(e) => {
                 e.stopPropagation();
                 meta?.onCancel?.(job);
               }}
             >
-              <XCircle className="h-3.5 w-3.5" />
+              Cancel
             </Button>
           )}
         </div>
       );
     },
-    size: 80,
+    size: 150,
   },
 ];

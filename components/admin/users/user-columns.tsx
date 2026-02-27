@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Button } from '@/components/ui/button';
-import { Pencil, Ban, CheckCircle } from 'lucide-react';
 
 export type UserRow = {
   id: string;
@@ -36,32 +35,29 @@ function UserActions({ user, onEdit, onDeactivate, onReactivate }: UserActionsPr
     <div className="flex items-center gap-1">
       <Button
         variant="ghost"
-        size="icon"
-        className="h-7 w-7"
+        size="sm"
+        className="h-7 px-2 text-xs"
         onClick={() => onEdit(user)}
-        title="Edit user"
       >
-        <Pencil className="h-3.5 w-3.5" />
+        Edit
       </Button>
       {isDeactivated ? (
         <Button
           variant="ghost"
-          size="icon"
-          className="h-7 w-7 text-green-600 hover:text-green-700"
+          size="sm"
+          className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
           onClick={() => onReactivate(user)}
-          title="Reactivate user"
         >
-          <CheckCircle className="h-3.5 w-3.5" />
+          Reactivate
         </Button>
       ) : (
         <Button
           variant="ghost"
-          size="icon"
-          className="h-7 w-7 text-destructive hover:text-destructive"
+          size="sm"
+          className="h-7 px-2 text-xs text-destructive hover:text-destructive"
           onClick={() => onDeactivate(user)}
-          title="Deactivate user"
         >
-          <Ban className="h-3.5 w-3.5" />
+          Deactivate
         </Button>
       )}
     </div>

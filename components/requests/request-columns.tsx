@@ -2,7 +2,7 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { Eye, ClipboardList, XCircle, Ban, ImageIcon, CheckCircle } from 'lucide-react';
+import { ImageIcon } from 'lucide-react';
 import { RequestWithRelations } from '@/lib/types/database';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
@@ -176,29 +176,27 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            title="View Details"
+            size="sm"
+            className="h-7 px-2 text-xs"
             onClick={(e) => {
               e.stopPropagation();
               meta?.onView?.(request);
             }}
           >
-            <Eye className="h-3.5 w-3.5" />
+            View
           </Button>
 
           {canTriage && (
             <Button
               variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              title="Triage"
+              size="sm"
+              className="h-7 px-2 text-xs"
               onClick={(e) => {
                 e.stopPropagation();
                 meta?.onTriage?.(request);
               }}
             >
-              <ClipboardList className="h-3.5 w-3.5" />
+              Triage
             </Button>
           )}
 
@@ -206,27 +204,25 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
             <>
               <Button
                 variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-green-600 hover:text-green-700"
-                title="Accept Work"
+                size="sm"
+                className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
                 onClick={(e) => {
                   e.stopPropagation();
                   meta?.onAccept?.(request);
                 }}
               >
-                <CheckCircle className="h-3.5 w-3.5" />
+                Accept
               </Button>
               <Button
                 variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-destructive hover:text-destructive"
-                title="Reject Work"
+                size="sm"
+                className="h-7 px-2 text-xs text-destructive hover:text-destructive"
                 onClick={(e) => {
                   e.stopPropagation();
                   meta?.onRejectWork?.(request);
                 }}
               >
-                <XCircle className="h-3.5 w-3.5" />
+                Reject
               </Button>
             </>
           )}
@@ -234,35 +230,33 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
           {canReject && (
             <Button
               variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-destructive hover:text-destructive"
-              title="Reject"
+              size="sm"
+              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
               onClick={(e) => {
                 e.stopPropagation();
                 meta?.onReject?.(request);
               }}
             >
-              <XCircle className="h-3.5 w-3.5" />
+              Reject
             </Button>
           )}
 
           {canCancel && (
             <Button
               variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-destructive hover:text-destructive"
-              title="Cancel"
+              size="sm"
+              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
               onClick={(e) => {
                 e.stopPropagation();
                 meta?.onCancel?.(request);
               }}
             >
-              <Ban className="h-3.5 w-3.5" />
+              Cancel
             </Button>
           )}
         </div>
       );
     },
-    size: 120,
+    size: 180,
   },
 ];
