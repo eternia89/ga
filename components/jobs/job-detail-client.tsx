@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { JobWithRelations, JobComment } from '@/lib/types/database';
 import { JobDetailInfo } from './job-detail-info';
@@ -52,6 +53,14 @@ export function JobDetailClient({
     ['ga_lead', 'admin'].includes(currentUserRole) ||
     job.assigned_to === currentUserId;
 
+  const timelineRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (timelineRef.current) {
+      timelineRef.current.scrollTop = timelineRef.current.scrollHeight;
+    }
+  }, [timelineEvents, comments]);
+
   return (
     <div className="grid grid-cols-[1fr_380px] max-lg:grid-cols-1 gap-6">
       {/* Left column: info + actions + PM checklist */}
@@ -91,22 +100,26 @@ export function JobDetailClient({
       </div>
 
       {/* Right column: timeline + comment form */}
-      <div className="space-y-4">
-        <div className="rounded-lg border p-4">
-          <h2 className="text-sm font-semibold mb-4">Activity Timeline</h2>
-          <JobTimeline
-            events={timelineEvents}
-            comments={comments}
-            commentPhotos={commentPhotos}
-          />
+      <div className="flex flex-col" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+        <div className="rounded-lg border p-4 flex flex-col flex-1 min-h-0">
+          <h2 className="text-sm font-semibold mb-4 shrink-0">Activity Timeline</h2>
+          <div ref={timelineRef} className="overflow-y-auto flex-1 min-h-0">
+            <JobTimeline
+              events={timelineEvents}
+              comments={comments}
+              commentPhotos={commentPhotos}
+            />
+          </div>
         </div>
 
         {canComment && (
-          <JobCommentForm
-            jobId={job.id}
-            jobStatus={job.status}
-            onSuccess={handleActionSuccess}
-          />
+          <div className="shrink-0 mt-4">
+            <JobCommentForm
+              jobId={job.id}
+              jobStatus={job.status}
+              onSuccess={handleActionSuccess}
+            />
+          </div>
         )}
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { RequestWithRelations } from '@/lib/types/database';
 import { RequestDetailInfo } from './request-detail-info';
@@ -44,11 +44,18 @@ export function RequestDetailClient({
   linkedJobs,
 }: RequestDetailClientProps) {
   const router = useRouter();
-  const [isEditing, setIsEditing] = useState(false);
 
   const handleActionSuccess = () => {
     router.refresh();
   };
+
+  const timelineRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (timelineRef.current) {
+      timelineRef.current.scrollTop = timelineRef.current.scrollHeight;
+    }
+  }, [timelineEvents]);
 
   return (
     <div className="grid grid-cols-[1fr_380px] max-lg:grid-cols-1 gap-6">
@@ -62,34 +69,26 @@ export function RequestDetailClient({
           locations={locations}
           currentUserId={currentUserId}
           currentUserRole={currentUserRole}
-          isEditing={isEditing}
-          onEditToggle={() => {
-            setIsEditing(!isEditing);
-            if (isEditing) {
-              // After successful edit, refresh server data
-              router.refresh();
-            }
-          }}
+          onEditSuccess={handleActionSuccess}
           onTriageSuccess={handleActionSuccess}
           linkedJobs={linkedJobs}
         />
 
-        {!isEditing && (
-          <RequestDetailActions
-            request={request}
-            currentUserId={currentUserId}
-            currentUserRole={currentUserRole}
-            onEdit={() => setIsEditing(true)}
-            onActionSuccess={handleActionSuccess}
-          />
-        )}
+        <RequestDetailActions
+          request={request}
+          currentUserId={currentUserId}
+          currentUserRole={currentUserRole}
+          onActionSuccess={handleActionSuccess}
+        />
       </div>
 
       {/* Right column: timeline */}
-      <div>
-        <div className="rounded-lg border p-4">
-          <h2 className="text-sm font-semibold mb-4">Activity Timeline</h2>
-          <RequestTimeline events={timelineEvents} />
+      <div className="flex flex-col" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+        <div className="rounded-lg border p-4 flex flex-col flex-1 min-h-0">
+          <h2 className="text-sm font-semibold mb-4 shrink-0">Activity Timeline</h2>
+          <div ref={timelineRef} className="overflow-y-auto flex-1 min-h-0">
+            <RequestTimeline events={timelineEvents} />
+          </div>
         </div>
       </div>
     </div>
