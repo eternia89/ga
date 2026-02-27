@@ -1,11 +1,12 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { RequestWithRelations } from '@/lib/types/database';
 import { RequestDetailInfo } from './request-detail-info';
 import { RequestDetailActions } from './request-detail-actions';
 import { RequestTimeline, TimelineEvent } from './request-timeline';
+import { RequestFeedbackDialog } from './request-feedback-dialog';
 
 interface PhotoItem {
   id: string;
@@ -44,9 +45,17 @@ export function RequestDetailClient({
   linkedJobs,
 }: RequestDetailClientProps) {
   const router = useRouter();
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const handleActionSuccess = () => {
     router.refresh();
+  };
+
+  const handleAccepted = () => {
+    // Small delay to let the acceptance dialog close animation finish
+    setTimeout(() => {
+      setFeedbackOpen(true);
+    }, 300);
   };
 
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -58,6 +67,7 @@ export function RequestDetailClient({
   }, [timelineEvents]);
 
   return (
+  <>
     <div className="grid grid-cols-[1fr_380px] max-lg:grid-cols-1 gap-6">
       {/* Left column: info + actions */}
       <div className="space-y-6">
@@ -79,6 +89,7 @@ export function RequestDetailClient({
           currentUserId={currentUserId}
           currentUserRole={currentUserRole}
           onActionSuccess={handleActionSuccess}
+          onAccepted={handleAccepted}
         />
       </div>
 
@@ -92,5 +103,14 @@ export function RequestDetailClient({
         </div>
       </div>
     </div>
+
+    <RequestFeedbackDialog
+      open={feedbackOpen}
+      onOpenChange={setFeedbackOpen}
+      requestId={request.id}
+      requestDisplayId={request.display_id}
+      onSuccess={handleActionSuccess}
+    />
+  </>
   );
 }
