@@ -97,21 +97,18 @@ function getRejectionReason(job: ApprovalJob): string | null {
 
 export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
   const router = useRouter();
-  const [showHistory, setShowHistory] = useState(false);
+  const [pendingOnly, setPendingOnly] = useState(false);
 
-  // Sort: pending first, then by date descending
+  // Sort by date descending (newest first)
   const sortedJobs = [...jobs].sort((a, b) => {
-    if (a.decision === 'pending' && b.decision !== 'pending') return -1;
-    if (a.decision !== 'pending' && b.decision === 'pending') return 1;
-    // Within same group, sort by relevant date descending
     const dateA = getDecisionDate(a) ?? '';
     const dateB = getDecisionDate(b) ?? '';
     return dateB.localeCompare(dateA);
   });
 
-  const visibleJobs = showHistory
-    ? sortedJobs
-    : sortedJobs.filter((j) => j.decision === 'pending');
+  const visibleJobs = pendingOnly
+    ? sortedJobs.filter((j) => j.decision === 'pending')
+    : sortedJobs;
 
   const pendingCount = jobs.filter((j) => j.decision === 'pending').length;
 
@@ -120,12 +117,12 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
       {/* Filter checkbox */}
       <div className="flex items-center gap-2">
         <Checkbox
-          id="show-history"
-          checked={showHistory}
-          onCheckedChange={(checked) => setShowHistory(checked === true)}
+          id="pending-only"
+          checked={pendingOnly}
+          onCheckedChange={(checked) => setPendingOnly(checked === true)}
         />
-        <Label htmlFor="show-history" className="cursor-pointer text-sm font-normal">
-          Show approved history
+        <Label htmlFor="pending-only" className="cursor-pointer text-sm font-normal">
+          Show pending only
         </Label>
       </div>
 
@@ -133,12 +130,12 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
       {visibleJobs.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-md border py-16 text-center">
           <p className="text-lg font-medium text-muted-foreground">
-            {showHistory ? 'No approval records found' : 'No jobs awaiting approval'}
+            {pendingOnly ? 'No jobs awaiting approval' : 'No approval records found'}
           </p>
           <p className="text-sm text-muted-foreground mt-1">
-            {showHistory
-              ? 'No jobs have been submitted for approval yet.'
-              : 'Jobs submitted for budget or completion approval will appear here.'}
+            {pendingOnly
+              ? 'Jobs submitted for budget or completion approval will appear here.'
+              : 'No jobs have been submitted for approval yet.'}
           </p>
         </div>
       ) : (
@@ -235,17 +232,10 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
       )}
 
       {/* Summary line */}
-      {pendingCount > 0 && !showHistory && (
+      {pendingCount > 0 && (
         <p className="text-xs text-muted-foreground">
-          Showing {pendingCount} pending{' '}
-          {pendingCount === 1 ? 'approval' : 'approvals'}.{' '}
-          <button
-            type="button"
-            className="underline hover:no-underline"
-            onClick={() => setShowHistory(true)}
-          >
-            Show history
-          </button>
+          {pendingCount} pending {pendingCount === 1 ? 'approval' : 'approvals'}
+          {!pendingOnly && ` out of ${jobs.length} total`}.
         </p>
       )}
     </div>
