@@ -2,7 +2,9 @@
 
 import { useQueryStates, parseAsString } from 'nuqs';
 import { useCallback, useEffect, useState } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, CalendarIcon } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { type DateRange } from 'react-day-picker';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -14,6 +16,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { STATUS_LABELS, PRIORITY_LABELS } from '@/lib/constants/request-status';
 
 interface RequestFiltersProps {
@@ -29,6 +33,7 @@ const filterParsers = {
   from: parseAsString,
   to: parseAsString,
   mine: parseAsString,
+  my_requests: parseAsString,
   q: parseAsString,
 };
 
@@ -54,6 +59,7 @@ export function RequestFilters({
     !!filters.from ||
     !!filters.to ||
     !!filters.mine ||
+    !!filters.my_requests ||
     !!filters.q;
 
   const clearFilters = useCallback(() => {
@@ -65,12 +71,32 @@ export function RequestFilters({
       from: null,
       to: null,
       mine: null,
+      my_requests: null,
       q: null,
     });
   }, [setFilters]);
 
   // Only GA Staff/Lead/Admin can use "My Assigned" toggle
   const canFilterByAssigned = ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole);
+
+  // Derive DateRange from URL filters
+  const dateRange: DateRange | undefined =
+    filters.from || filters.to
+      ? {
+          from: filters.from ? parseISO(filters.from) : undefined,
+          to: filters.to ? parseISO(filters.to) : undefined,
+        }
+      : undefined;
+
+  const handleDateRangeChange = useCallback(
+    (range: DateRange | undefined) => {
+      void setFilters({
+        from: range?.from ? format(range.from, 'yyyy-MM-dd') : null,
+        to: range?.to ? format(range.to, 'yyyy-MM-dd') : null,
+      });
+    },
+    [setFilters]
+  );
 
   return (
     <div className="flex flex-wrap gap-2 items-center">
@@ -145,24 +171,50 @@ export function RequestFilters({
         </SelectContent>
       </Select>
 
-      {/* Date range */}
-      <div className="flex items-center gap-1">
-        <Input
-          type="date"
-          value={filters.from ?? ''}
-          onChange={(e) => void setFilters({ from: e.target.value || null })}
-          className="w-[140px] text-sm"
-          aria-label="From date"
-        />
-        <span className="text-muted-foreground text-sm">–</span>
-        <Input
-          type="date"
-          value={filters.to ?? ''}
-          onChange={(e) => void setFilters({ to: e.target.value || null })}
-          className="w-[140px] text-sm"
-          aria-label="To date"
-        />
-      </div>
+      {/* Date range picker */}
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="w-[240px] justify-start text-left font-normal text-sm">
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {dateRange?.from ? (
+              dateRange.to ? (
+                <>
+                  {format(dateRange.from, 'dd-MM-yyyy')} – {format(dateRange.to, 'dd-MM-yyyy')}
+                </>
+              ) : (
+                format(dateRange.from, 'dd-MM-yyyy')
+              )
+            ) : (
+              <span className="text-muted-foreground">Pick date range</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="range"
+            selected={dateRange}
+            onSelect={handleDateRangeChange}
+            numberOfMonths={2}
+            autoFocus
+          />
+        </PopoverContent>
+      </Popover>
+
+      {/* My Requests toggle (GA Staff/Lead/Admin only — general_user already sees only their own) */}
+      {canFilterByAssigned && (
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="my-requests-filter"
+            checked={filters.my_requests === 'true'}
+            onCheckedChange={(checked) =>
+              void setFilters({ my_requests: checked ? 'true' : null })
+            }
+          />
+          <Label htmlFor="my-requests-filter" className="text-sm font-normal cursor-pointer">
+            My Requests
+          </Label>
+        </div>
+      )}
 
       {/* My Assigned toggle (GA Staff/Lead/Admin only) */}
       {canFilterByAssigned && (
