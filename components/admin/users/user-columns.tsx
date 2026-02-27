@@ -6,13 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Pencil, Ban, CheckCircle } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Pencil, Ban, CheckCircle } from 'lucide-react';
 
 export type UserRow = {
   id: string;
@@ -39,31 +33,38 @@ function UserActions({ user, onEdit, onDeactivate, onReactivate }: UserActionsPr
   const isDeactivated = !!user.deleted_at;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
+    <div className="flex items-center gap-1">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7"
+        onClick={() => onEdit(user)}
+        title="Edit user"
+      >
+        <Pencil className="h-3.5 w-3.5" />
+      </Button>
+      {isDeactivated ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-green-600 hover:text-green-700"
+          onClick={() => onReactivate(user)}
+          title="Reactivate user"
+        >
+          <CheckCircle className="h-3.5 w-3.5" />
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => onEdit(user)}>
-          <Pencil className="mr-2 h-4 w-4" />
-          Edit
-        </DropdownMenuItem>
-        {isDeactivated ? (
-          <DropdownMenuItem onClick={() => onReactivate(user)}>
-            <CheckCircle className="mr-2 h-4 w-4" />
-            Reactivate
-          </DropdownMenuItem>
-        ) : (
-          <DropdownMenuItem onClick={() => onDeactivate(user)} className="text-red-600">
-            <Ban className="mr-2 h-4 w-4" />
-            Deactivate
-          </DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      ) : (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 text-destructive hover:text-destructive"
+          onClick={() => onDeactivate(user)}
+          title="Deactivate user"
+        >
+          <Ban className="h-3.5 w-3.5" />
+        </Button>
+      )}
+    </div>
   );
 }
 
@@ -114,26 +115,14 @@ export function getUserColumns(
       header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
       cell: ({ row }) => {
         const name = row.getValue('full_name') as string;
-        const initials = name
-          .split(' ')
-          .map((n) => n[0])
-          .join('')
-          .toUpperCase()
-          .slice(0, 2);
-
+        const email = row.original.email;
         return (
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-xs">
-              {initials}
-            </div>
+          <div>
             <span className="font-medium">{name}</span>
+            <span className="block text-xs text-muted-foreground">{email}</span>
           </div>
         );
       },
-    },
-    {
-      accessorKey: 'email',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
     },
     {
       accessorKey: 'role',
@@ -189,7 +178,7 @@ export function getUserColumns(
       cell: ({ row }) => {
         const lastLogin = row.getValue('last_sign_in_at') as string | null;
         if (!lastLogin) return <span className="text-gray-500">Never</span>;
-        return <span>{format(new Date(lastLogin), 'dd-MM-yyyy, HH:mm:ss')}</span>;
+        return <span>{format(new Date(lastLogin), 'dd-MM-yyyy')}</span>;
       },
     },
     {
