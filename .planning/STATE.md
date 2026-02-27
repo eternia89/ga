@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 09.1 (UI Improvements) — IN PROGRESS
-Plan: 2 of 3 in phase complete
-Status: Completed 09.1-02-PLAN.md — Pagination defaults 50/100/200, human-readable Excel exports, date range picker for job+request filters
-Last activity: 2026-02-27 -- Completed 09.1-02-PLAN.md (pagination, exports, date range picker)
+Plan: 4 of 5 in phase complete
+Status: Completed 09.1-05-PLAN.md — Text-labeled ghost buttons for all table row actions
+Last activity: 2026-02-27 -- Completed 09.1-05-PLAN.md (text-labeled table row action buttons)
 
-Progress: [████████████████░░░░░░░░] (Phase 09.1 — 2/3 plans done)
+Progress: [███████████████████░░░░░] (Phase 09.1 — 4/5 plans done)
 
 ## Performance Metrics
 
@@ -70,6 +70,7 @@ Progress: [████████████████░░░░░░░
 | Phase 09.1-ui-improvements P03 | 2 | 2 tasks | 4 files |
 | Phase 09.1-ui-improvements P01 | 3 | 2 tasks | 6 files |
 | Phase 09.1-ui-improvements P02 | 5 | 2 tasks | 8 files |
+| Phase 09.1-ui-improvements P05 | 2 | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -231,6 +232,7 @@ Recent decisions affecting current work:
 - [Phase 09.1-03]: User detail permalink uses window.history.replaceState for shareable links without triggering full page navigation
 - [Phase 09.1-01]: Ghost icon buttons with title attributes for row actions instead of dropdown menus; CTA buttons in server page headers; job edit navigates to detail page (inline editing)
 - [Phase 09.1-02]: react-day-picker v9 Calendar with Popover for date range picking; applied to both job and request filters; ISO params in URL, dd-MM-yyyy display
+- [Phase 09.1-05]: Text labels replace icons entirely (no icon+text combo) for table row action buttons -- cleaner, more compact, no guessing
 
 ### Roadmap Evolution
 
@@ -250,6 +252,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 09.1-02-PLAN.md (pagination, exports, date range picker)
-Resume file: .planning/phases/09.1-ui-improvements/09.1-02-SUMMARY.md
-Next: Execute 09.1-03-PLAN.md (final UI improvement plan)
+Stopped at: Completed 09.1-05-PLAN.md (text-labeled table row action buttons)
+Resume file: .planning/phases/09.1-ui-improvements/09.1-05-SUMMARY.md
+Next: Execute 09.1-04-PLAN.md (remaining UI improvement plan)

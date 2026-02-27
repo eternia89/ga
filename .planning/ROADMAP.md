@@ -349,7 +349,7 @@ These are tracked but not mapped to any phase in this milestone:
 
 **Goal:** Apply 10 UI polish items from UAT backlog: CTA repositioning, compact columns, pagination defaults, human-readable Excel exports, ghost action buttons, status column placement, linked requests stacking, users list cleanup, user permalink, and date range picker.
 **Depends on:** Phase 9
-**Plans:** 5 plans
+**Plans:** 4/5 plans executed
 
 Plans:
 - [x] 09.1-01-PLAN.md — List page column overhaul (CTA position, compact columns, ghost buttons, status beside ID, vertical linked requests)
