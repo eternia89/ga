@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DataTable } from '@/components/data-table/data-table';
 import { getUserColumns, type UserRow } from './user-columns';
 import { UserFormDialog } from './user-form-dialog';
@@ -26,9 +26,10 @@ type UserTableProps = {
   companies: Company[];
   divisions: Division[];
   defaultCompanyId: string;
+  initialUserId?: string;
 };
 
-export function UserTable({ users, companies, divisions, defaultCompanyId }: UserTableProps) {
+export function UserTable({ users, companies, divisions, defaultCompanyId, initialUserId }: UserTableProps) {
   const [showDeactivated, setShowDeactivated] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRow | undefined>(undefined);
@@ -51,9 +52,25 @@ export function UserTable({ users, companies, divisions, defaultCompanyId }: Use
     setFormOpen(true);
   };
 
+  // Auto-open edit dialog when initialUserId is set (permalink support)
+  useEffect(() => {
+    if (initialUserId) {
+      const targetUser = users.find((u) => u.id === initialUserId);
+      if (targetUser) {
+        setEditingUser(targetUser);
+        setFormOpen(true);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialUserId]);
+
   const handleEdit = (user: UserRow) => {
     setEditingUser(user);
     setFormOpen(true);
+    // Update URL with userid for shareable permalink
+    const url = new URL(window.location.href);
+    url.searchParams.set('userid', user.id);
+    window.history.replaceState({}, '', url.toString());
   };
 
   const handleDeactivate = (user: UserRow) => {
@@ -209,7 +226,15 @@ export function UserTable({ users, companies, divisions, defaultCompanyId }: Use
 
       <UserFormDialog
         open={formOpen}
-        onOpenChange={setFormOpen}
+        onOpenChange={(open) => {
+          setFormOpen(open);
+          if (!open) {
+            // Remove userid from URL when dialog closes
+            const url = new URL(window.location.href);
+            url.searchParams.delete('userid');
+            window.history.replaceState({}, '', url.toString());
+          }
+        }}
         user={editingUser as any}
         companies={companies}
         divisions={divisions}

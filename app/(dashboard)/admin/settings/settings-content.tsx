@@ -7,23 +7,31 @@ import { CompanyTable } from "@/components/admin/companies/company-table";
 import { DivisionTable } from "@/components/admin/divisions/division-table";
 import { LocationTable } from "@/components/admin/locations/location-table";
 import { CategoryTable } from "@/components/admin/categories/category-table";
+import { UserTable } from "@/components/admin/users/user-table";
+import type { UserRow } from "@/components/admin/users/user-columns";
 
 interface SettingsContentProps {
   companies: Company[];
   divisions: Division[];
   locations: Location[];
   categories: Category[];
+  users: UserRow[];
+  defaultCompanyId: string;
   initialTab?: string;
+  initialUserId?: string;
 }
 
-const VALID_TABS = ["companies", "divisions", "locations", "categories"];
+const VALID_TABS = ["companies", "divisions", "locations", "categories", "users"];
 
 export function SettingsContent({
   companies,
   divisions,
   locations,
   categories,
+  users,
+  defaultCompanyId,
   initialTab,
+  initialUserId,
 }: SettingsContentProps) {
   const defaultTab = initialTab && VALID_TABS.includes(initialTab) ? initialTab : "companies";
   const [tab, setTab] = useQueryState("tab", { defaultValue: defaultTab });
@@ -46,6 +54,7 @@ export function SettingsContent({
             <TabsTrigger value="divisions">Divisions</TabsTrigger>
             <TabsTrigger value="locations">Locations</TabsTrigger>
             <TabsTrigger value="categories">Categories</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
           </TabsList>
         </div>
 
@@ -63,6 +72,16 @@ export function SettingsContent({
 
         <TabsContent value="categories" className="space-y-4">
           <CategoryTable data={categories} />
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-4">
+          <UserTable
+            users={users}
+            companies={companies}
+            divisions={divisions}
+            defaultCompanyId={defaultCompanyId}
+            initialUserId={initialUserId}
+          />
         </TabsContent>
       </Tabs>
     </div>
