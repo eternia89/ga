@@ -38,10 +38,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Fetch ALL maintenance schedules (no filter — export everything)
+    // Fetch ALL maintenance schedules with joined FK names (no filter — export everything)
     const { data: schedules, error: fetchError } = await supabase
       .from('maintenance_schedules')
-      .select('*')
+      .select('*, asset:inventory_items(display_id, name), template:maintenance_templates(name)')
       .is('deleted_at', null)
       .order('created_at', { ascending: false });
 
@@ -50,10 +50,15 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch maintenance schedules' }, { status: 500 });
     }
 
+    // Capitalize interval type for display
+    const capitalizeInterval = (type: string | null) => {
+      if (!type) return '';
+      return type.charAt(0).toUpperCase() + type.slice(1);
+    };
+
     const { workbook, sheet } = createStyledWorkbook('Maintenance', [
-      { header: 'ID', key: 'id', width: 36 },
       { header: 'Template Name', key: 'template_name', width: 40 },
-      { header: 'Asset ID', key: 'asset_id', width: 36 },
+      { header: 'Asset', key: 'asset_name', width: 35 },
       { header: 'Interval Days', key: 'interval_days', width: 14 },
       { header: 'Interval Type', key: 'interval_type', width: 14 },
       { header: 'Is Active', key: 'is_active', width: 10 },
@@ -63,12 +68,14 @@ export async function GET() {
     ]);
 
     for (const schedule of schedules ?? []) {
+      const asset = schedule.asset as { display_id: string; name: string } | null;
+      const template = schedule.template as { name: string } | null;
+
       sheet.addRow({
-        id: schedule.id,
-        template_name: schedule.template_name ?? '',
-        asset_id: schedule.asset_id ?? '',
+        template_name: template?.name ?? schedule.template_name ?? '',
+        asset_name: asset ? `${asset.name} (${asset.display_id})` : '',
         interval_days: schedule.interval_days ?? '',
-        interval_type: schedule.interval_type ?? '',
+        interval_type: capitalizeInterval(schedule.interval_type),
         is_active: schedule.is_active ? 'Yes' : 'No',
         next_due_at: schedule.next_due_at
           ? format(new Date(schedule.next_due_at), 'dd-MM-yyyy')

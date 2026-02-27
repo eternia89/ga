@@ -38,10 +38,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Fetch ALL inventory items (no filter — export everything)
+    // Fetch ALL inventory items with joined FK names (no filter — export everything)
     const { data: items, error: fetchError } = await supabase
       .from('inventory_items')
-      .select('*')
+      .select('*, category:categories(name), location:locations(name)')
       .is('deleted_at', null)
       .order('created_at', { ascending: false });
 
@@ -50,11 +50,19 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch inventory' }, { status: 500 });
     }
 
+    // Human-readable status labels
+    const STATUS_DISPLAY: Record<string, string> = {
+      active: 'Active',
+      under_repair: 'Under Repair',
+      broken: 'Broken',
+      sold_disposed: 'Sold/Disposed',
+    };
+
     const { workbook, sheet } = createStyledWorkbook('Inventory', [
       { header: 'ID', key: 'display_id', width: 12 },
       { header: 'Name', key: 'name', width: 40 },
-      { header: 'Category ID', key: 'category_id', width: 36 },
-      { header: 'Location ID', key: 'location_id', width: 36 },
+      { header: 'Category', key: 'category_name', width: 25 },
+      { header: 'Location', key: 'location_name', width: 25 },
       { header: 'Status', key: 'status', width: 18 },
       { header: 'Warranty Expiry', key: 'warranty_expiry', width: 16 },
       { header: 'Purchase Date', key: 'purchase_date', width: 14 },
@@ -64,12 +72,15 @@ export async function GET() {
     ]);
 
     for (const item of items ?? []) {
+      const category = item.category as { name: string } | null;
+      const location = item.location as { name: string } | null;
+
       sheet.addRow({
         display_id: item.display_id,
         name: item.name ?? '',
-        category_id: item.category_id ?? '',
-        location_id: item.location_id ?? '',
-        status: item.status ?? '',
+        category_name: category?.name ?? '',
+        location_name: location?.name ?? '',
+        status: STATUS_DISPLAY[item.status] ?? item.status ?? '',
         warranty_expiry: item.warranty_expiry
           ? format(new Date(item.warranty_expiry), 'dd-MM-yyyy')
           : '',

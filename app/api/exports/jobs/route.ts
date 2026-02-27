@@ -6,6 +6,7 @@ import {
   applyStandardStyles,
   generateExcelResponse,
 } from '@/lib/exports/excel-helpers';
+import { JOB_STATUS_LABELS, PRIORITY_LABELS } from '@/lib/constants/job-status';
 
 const EXPORT_ROLES = ['ga_lead', 'admin', 'finance_approver'];
 
@@ -38,10 +39,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Fetch ALL jobs (no filter — export everything)
+    // Fetch ALL jobs with joined FK names (no filter — export everything)
     const { data: jobs, error: fetchError } = await supabase
       .from('jobs')
-      .select('*')
+      .select('*, pic:user_profiles!assigned_to(full_name), created_by_user:user_profiles!created_by(full_name), category:categories(name), location:locations(name)')
       .is('deleted_at', null)
       .order('created_at', { ascending: false });
 
@@ -56,21 +57,30 @@ export async function GET() {
       { header: 'Description', key: 'description', width: 50 },
       { header: 'Status', key: 'status', width: 18 },
       { header: 'Priority', key: 'priority', width: 12 },
-      { header: 'Assigned To', key: 'assigned_to', width: 36 },
-      { header: 'Created By', key: 'created_by', width: 36 },
+      { header: 'Category', key: 'category_name', width: 25 },
+      { header: 'Location', key: 'location_name', width: 25 },
+      { header: 'PIC', key: 'pic_name', width: 25 },
+      { header: 'Created By', key: 'created_by_name', width: 25 },
       { header: 'Created At', key: 'created_at', width: 14 },
       { header: 'Updated At', key: 'updated_at', width: 14 },
     ]);
 
     for (const job of jobs ?? []) {
+      const pic = job.pic as { full_name: string } | null;
+      const createdByUser = job.created_by_user as { full_name: string } | null;
+      const category = job.category as { name: string } | null;
+      const location = job.location as { name: string } | null;
+
       sheet.addRow({
         display_id: job.display_id,
         title: job.title ?? '',
         description: job.description ?? '',
-        status: job.status ?? '',
-        priority: job.priority ?? '',
-        assigned_to: job.assigned_to ?? '',
-        created_by: job.created_by ?? '',
+        status: JOB_STATUS_LABELS[job.status] ?? job.status ?? '',
+        priority: PRIORITY_LABELS[job.priority] ?? job.priority ?? '',
+        category_name: category?.name ?? '',
+        location_name: location?.name ?? '',
+        pic_name: pic?.full_name ?? '',
+        created_by_name: createdByUser?.full_name ?? '',
         created_at: job.created_at
           ? format(new Date(job.created_at), 'dd-MM-yyyy')
           : '',

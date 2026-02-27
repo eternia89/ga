@@ -4,11 +4,8 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryStates } from 'nuqs';
 import { isAfter, isBefore, parseISO, startOfDay, endOfDay } from 'date-fns';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
 import { JobWithRelations } from '@/lib/types/database';
 import { DataTable } from '@/components/data-table/data-table';
-import { Button } from '@/components/ui/button';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { jobColumns } from './job-columns';
 import { JobFilters, jobFilterParsers } from './job-filters';
@@ -35,8 +32,6 @@ export function JobTable({
   const [cancellingDisplayId, setCancellingDisplayId] = useState('');
 
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
-  const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
 
   // Client-side filtering based on URL params
   const filteredData = useMemo(() => {
@@ -80,7 +75,7 @@ export function JobTable({
   };
 
   const handleEdit = (job: JobWithRelations) => {
-    router.push(`/jobs/${job.id}/edit`);
+    router.push(`/jobs/${job.id}`);
   };
 
   const handleCancel = (job: JobWithRelations) => {
@@ -110,16 +105,6 @@ export function JobTable({
         columns={jobColumns}
         data={filteredData}
         emptyMessage="No jobs found"
-        createButton={
-          isGaLeadOrAdmin ? (
-            <Button asChild size="sm">
-              <Link href="/jobs/new">
-                <Plus className="mr-2 h-4 w-4" />
-                New Job
-              </Link>
-            </Button>
-          ) : undefined
-        }
         meta={{
           onView: handleView,
           onEdit: handleEdit,
@@ -127,7 +112,6 @@ export function JobTable({
           currentUserId,
           currentUserRole,
         }}
-        pageSize={20}
       />
 
       <JobCancelDialog

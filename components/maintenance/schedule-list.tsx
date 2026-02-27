@@ -102,7 +102,6 @@ export function ScheduleList({ schedules, userRole }: ScheduleListProps) {
           ) : undefined
         }
         meta={meta}
-        pageSize={20}
       />
     </div>
   );

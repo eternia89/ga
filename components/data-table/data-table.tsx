@@ -65,7 +65,7 @@ export function DataTable<TData, TValue>({
   showDeactivatedToggle,
   onDeactivatedToggleChange,
   showDeactivated,
-  pageSize = 10,
+  pageSize = 50,
   createButton,
   emptyMessage = "No items found",
   meta,

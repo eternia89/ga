@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
 import { RequestTable } from '@/components/requests/request-table';
+import { Button } from '@/components/ui/button';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -126,13 +129,21 @@ export default async function RequestsPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Requests</h1>
-        <p className="text-muted-foreground mt-1">
-          {profile.role === 'general_user'
-            ? 'View and manage your submitted requests'
-            : 'View and manage all company requests'}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Requests</h1>
+          <p className="text-muted-foreground mt-1">
+            {profile.role === 'general_user'
+              ? 'View and manage your submitted requests'
+              : 'View and manage all company requests'}
+          </p>
+        </div>
+        <Button asChild size="sm">
+          <Link href="/requests/new">
+            <Plus className="mr-2 h-4 w-4" />
+            New Request
+          </Link>
+        </Button>
       </div>
 
       <RequestTable

@@ -4,11 +4,8 @@ import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryStates } from 'nuqs';
 import { isAfter, isBefore, parseISO, startOfDay, endOfDay } from 'date-fns';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
 import { RequestWithRelations } from '@/lib/types/database';
 import { DataTable } from '@/components/data-table/data-table';
-import { Button } from '@/components/ui/button';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { getRequestPhotos } from '@/app/actions/request-actions';
 import { requestColumns } from './request-columns';
@@ -215,14 +212,6 @@ export function RequestTable({
             ? '/api/exports/requests'
             : undefined
         }
-        createButton={
-          <Button asChild size="sm">
-            <Link href="/requests/new">
-              <Plus className="mr-2 h-4 w-4" />
-              New Request
-            </Link>
-          </Button>
-        }
         meta={{
           onTriage: handleTriage,
           onReject: handleReject,
@@ -235,7 +224,6 @@ export function RequestTable({
           currentUserId,
           currentUserRole,
         }}
-        pageSize={20}
       />
 
       {/* Dialogs */}

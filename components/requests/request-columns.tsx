@@ -2,16 +2,9 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { MoreHorizontal, Eye, ClipboardList, XCircle, Ban, ImageIcon, CheckCircle } from 'lucide-react';
+import { Eye, ClipboardList, XCircle, Ban, ImageIcon, CheckCircle } from 'lucide-react';
 import { RequestWithRelations } from '@/lib/types/database';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { RequestStatusBadge } from './request-status-badge';
 import { RequestPriorityBadge } from './request-priority-badge';
@@ -42,9 +35,12 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
       <DataTableColumnHeader column={column} title="ID" />
     ),
     cell: ({ row }) => (
-      <span className="font-mono text-xs">{row.getValue('display_id')}</span>
+      <div className="flex items-center gap-2">
+        <span className="font-mono text-xs">{row.getValue('display_id')}</span>
+        <RequestStatusBadge status={row.original.status} />
+      </div>
     ),
-    size: 130,
+    size: 200,
   },
   {
     id: 'photo',
@@ -84,7 +80,7 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
         </button>
       );
     },
-    size: 56,
+    size: 50,
     enableSorting: false,
   },
   {
@@ -112,20 +108,14 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
     cell: ({ row }) => {
       const name = row.original.location?.name;
       return name ? (
-        <span className="truncate block max-w-[140px]" title={name}>
+        <span className="truncate block max-w-[130px]" title={name}>
           {name}
         </span>
       ) : (
         <span className="text-muted-foreground">—</span>
       );
     },
-    size: 140,
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => <RequestStatusBadge status={row.getValue('status')} />,
-    size: 110,
+    size: 130,
   },
   {
     accessorKey: 'priority',
@@ -133,23 +123,7 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
     cell: ({ row }) => (
       <RequestPriorityBadge priority={row.getValue('priority')} />
     ),
-    size: 100,
-  },
-  {
-    id: 'category_name',
-    accessorFn: (row) => row.category?.name ?? null,
-    header: 'Category',
-    cell: ({ row }) => {
-      const name = row.original.category?.name;
-      return name ? (
-        <span className="truncate block max-w-[120px]" title={name}>
-          {name}
-        </span>
-      ) : (
-        <span className="text-muted-foreground">—</span>
-      );
-    },
-    size: 120,
+    size: 90,
   },
   {
     id: 'assigned_user_name',
@@ -176,7 +150,7 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
       const date = row.getValue('created_at') as string;
       return format(new Date(date), 'dd-MM-yyyy');
     },
-    size: 110,
+    size: 100,
   },
   {
     id: 'actions',
@@ -199,69 +173,96 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
         (isRequester || isAdmin) && request.status === 'pending_acceptance';
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Open menu</span>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            title="View Details"
+            onClick={(e) => {
+              e.stopPropagation();
+              meta?.onView?.(request);
+            }}
+          >
+            <Eye className="h-3.5 w-3.5" />
+          </Button>
+
+          {canTriage && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              title="Triage"
+              onClick={(e) => {
+                e.stopPropagation();
+                meta?.onTriage?.(request);
+              }}
+            >
+              <ClipboardList className="h-3.5 w-3.5" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => meta?.onView?.(request)}>
-              <Eye className="mr-2 h-4 w-4" />
-              View Details
-            </DropdownMenuItem>
+          )}
 
-            {(canTriage || canReject || canCancel || canAcceptOrRejectWork) && (
-              <DropdownMenuSeparator />
-            )}
-
-            {canTriage && (
-              <DropdownMenuItem onClick={() => meta?.onTriage?.(request)}>
-                <ClipboardList className="mr-2 h-4 w-4" />
-                Triage
-              </DropdownMenuItem>
-            )}
-
-            {canAcceptOrRejectWork && (
-              <>
-                <DropdownMenuItem onClick={() => meta?.onAccept?.(request)}>
-                  <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
-                  Accept Work
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => meta?.onRejectWork?.(request)}
-                  className="text-destructive"
-                >
-                  <XCircle className="mr-2 h-4 w-4" />
-                  Reject Work
-                </DropdownMenuItem>
-              </>
-            )}
-
-            {canReject && (
-              <DropdownMenuItem
-                onClick={() => meta?.onReject?.(request)}
-                className="text-destructive"
+          {canAcceptOrRejectWork && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-green-600 hover:text-green-700"
+                title="Accept Work"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  meta?.onAccept?.(request);
+                }}
               >
-                <XCircle className="mr-2 h-4 w-4" />
-                Reject
-              </DropdownMenuItem>
-            )}
-
-            {canCancel && (
-              <DropdownMenuItem
-                onClick={() => meta?.onCancel?.(request)}
-                className="text-destructive"
+                <CheckCircle className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-destructive hover:text-destructive"
+                title="Reject Work"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  meta?.onRejectWork?.(request);
+                }}
               >
-                <Ban className="mr-2 h-4 w-4" />
-                Cancel
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                <XCircle className="h-3.5 w-3.5" />
+              </Button>
+            </>
+          )}
+
+          {canReject && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-destructive hover:text-destructive"
+              title="Reject"
+              onClick={(e) => {
+                e.stopPropagation();
+                meta?.onReject?.(request);
+              }}
+            >
+              <XCircle className="h-3.5 w-3.5" />
+            </Button>
+          )}
+
+          {canCancel && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-destructive hover:text-destructive"
+              title="Cancel"
+              onClick={(e) => {
+                e.stopPropagation();
+                meta?.onCancel?.(request);
+              }}
+            >
+              <Ban className="h-3.5 w-3.5" />
+            </Button>
+          )}
+        </div>
       );
     },
-    size: 60,
+    size: 120,
   },
 ];

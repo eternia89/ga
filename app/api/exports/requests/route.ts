@@ -39,10 +39,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Fetch ALL requests (no filter — export everything)
+    // Fetch ALL requests with joined FK names (no filter — export everything)
     const { data: requests, error: fetchError } = await supabase
       .from('requests')
-      .select('*')
+      .select('*, location:locations(name), category:categories(name), requester:user_profiles!requester_id(full_name), assigned_user:user_profiles!assigned_to(full_name)')
       .is('deleted_at', null)
       .order('created_at', { ascending: false });
 
@@ -53,27 +53,34 @@ export async function GET() {
 
     const { workbook, sheet } = createStyledWorkbook('Requests', [
       { header: 'ID', key: 'display_id', width: 12 },
+      { header: 'Title', key: 'title', width: 30 },
       { header: 'Description', key: 'description', width: 40 },
       { header: 'Status', key: 'status', width: 18 },
       { header: 'Priority', key: 'priority', width: 12 },
-      { header: 'Location ID', key: 'location_id', width: 36 },
-      { header: 'Category ID', key: 'category_id', width: 36 },
-      { header: 'Requester ID', key: 'requester_id', width: 36 },
-      { header: 'Assigned To', key: 'assigned_to', width: 36 },
+      { header: 'Location', key: 'location_name', width: 25 },
+      { header: 'Category', key: 'category_name', width: 25 },
+      { header: 'Requester', key: 'requester_name', width: 25 },
+      { header: 'PIC', key: 'pic_name', width: 25 },
       { header: 'Created At', key: 'created_at', width: 14 },
       { header: 'Updated At', key: 'updated_at', width: 14 },
     ]);
 
     for (const req of requests ?? []) {
+      const location = req.location as { name: string } | null;
+      const category = req.category as { name: string } | null;
+      const requester = req.requester as { full_name: string } | null;
+      const assignedUser = req.assigned_user as { full_name: string } | null;
+
       sheet.addRow({
         display_id: req.display_id,
+        title: req.title ?? '',
         description: req.description ?? '',
         status: STATUS_LABELS[req.status] ?? req.status,
         priority: PRIORITY_LABELS[req.priority] ?? req.priority ?? '',
-        location_id: req.location_id ?? '',
-        category_id: req.category_id ?? '',
-        requester_id: req.requester_id ?? '',
-        assigned_to: req.assigned_to ?? '',
+        location_name: location?.name ?? '',
+        category_name: category?.name ?? '',
+        requester_name: requester?.full_name ?? '',
+        pic_name: assignedUser?.full_name ?? '',
         created_at: req.created_at
           ? format(new Date(req.created_at), 'dd-MM-yyyy')
           : '',

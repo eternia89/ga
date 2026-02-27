@@ -70,7 +70,6 @@ export function AuditTrailTable({ data, users }: AuditTrailTableProps) {
         columns={auditTrailColumns}
         data={filteredData}
         emptyMessage="No audit log entries found"
-        pageSize={25}
         defaultColumnFilters={[]}
       />
     </div>

@@ -86,7 +86,6 @@ export function TemplateList({ templates, userRole }: TemplateListProps) {
           ) : undefined
         }
         meta={meta}
-        pageSize={20}
       />
     </div>
   );
