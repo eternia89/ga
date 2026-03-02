@@ -256,6 +256,7 @@ Recent decisions affecting current work:
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 1 | Extract context menu to ghost buttons on all table rows | 2026-03-02 | 57ef422 | [1-extract-context-menu-to-be-shown-directl](./quick/1-extract-context-menu-to-be-shown-directl/) |
+| 2 | Audit redundant UI components (research only) | 2026-03-02 | — | [2-check-for-any-redundant-implementation-o](./quick/2-check-for-any-redundant-implementation-o/) |
 
 ## Session Continuity
 
