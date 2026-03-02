@@ -5,18 +5,7 @@ import { authActionClient } from '@/lib/safe-action';
 import { createJobSchema, updateJobSchema, jobCommentSchema } from '@/lib/validations/job-schema';
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
-
-const PRIORITY_ORDER = ['low', 'medium', 'high', 'urgent'] as const;
-
-function highestPriority(priorities: (string | null)[]): string {
-  let maxIndex = -1;
-  for (const p of priorities) {
-    if (!p) continue;
-    const idx = PRIORITY_ORDER.indexOf(p as typeof PRIORITY_ORDER[number]);
-    if (idx > maxIndex) maxIndex = idx;
-  }
-  return maxIndex >= 0 ? PRIORITY_ORDER[maxIndex] : 'low';
-}
+import { highestPriority } from '@/lib/jobs/priority';
 
 // ============================================================================
 // createJob — ga_lead or admin only
