@@ -3,6 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import type { MaintenanceTemplate } from '@/lib/types/maintenance';
 
@@ -101,23 +102,25 @@ export const templateColumns: ColumnDef<MaintenanceTemplate>[] = [
       if (!canManage) return null;
 
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {template.is_active ? (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
               onClick={() => meta?.onDeactivate?.(template.id)}
-              className="text-xs text-muted-foreground hover:text-destructive transition-colors"
             >
               Deactivate
-            </button>
+            </Button>
           ) : (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
               onClick={() => meta?.onReactivate?.(template.id)}
-              className="text-xs text-muted-foreground hover:text-green-600 transition-colors"
             >
               Reactivate
-            </button>
+            </Button>
           )}
         </div>
       );

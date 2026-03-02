@@ -3,6 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { ScheduleStatusBadge } from './schedule-status-badge';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
@@ -167,31 +168,34 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
       if (!canManage) return null;
 
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {schedule.is_active ? (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
               onClick={() => meta?.onDeactivate?.(schedule.id)}
-              className="text-xs text-muted-foreground hover:text-destructive transition-colors"
             >
               Deactivate
-            </button>
+            </Button>
           ) : (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
               onClick={() => meta?.onActivate?.(schedule.id)}
-              className="text-xs text-muted-foreground hover:text-green-600 transition-colors"
             >
               Activate
-            </button>
+            </Button>
           )}
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs text-destructive hover:text-destructive"
             onClick={() => meta?.onDelete?.(schedule.id)}
-            className="text-xs text-muted-foreground hover:text-destructive transition-colors"
           >
             Delete
-          </button>
+          </Button>
         </div>
       );
     },

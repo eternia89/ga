@@ -2,15 +2,8 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { MoreHorizontal, Eye, Edit } from 'lucide-react';
 import { InventoryItemWithRelations } from '@/lib/types/database';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { AssetStatusBadge } from './asset-status-badge';
 
@@ -129,6 +122,7 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
   },
   {
     id: 'actions',
+    header: 'Actions',
     cell: ({ row, table }) => {
       const asset = row.original;
       const meta = table.options.meta as AssetTableMeta | undefined;
@@ -136,29 +130,29 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
       const canEdit = ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole ?? '');
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Open menu</span>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => meta?.onView?.(asset)}
+          >
+            View
+          </Button>
+          {canEdit && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => meta?.onEdit?.(asset)}
+            >
+              Edit
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => meta?.onView?.(asset)}>
-              <Eye className="mr-2 h-4 w-4" />
-              View Detail
-            </DropdownMenuItem>
-            {canEdit && (
-              <DropdownMenuItem onClick={() => meta?.onEdit?.(asset)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          )}
+        </div>
       );
     },
-    size: 60,
+    size: 120,
     enableSorting: false,
   },
 ];
