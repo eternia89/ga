@@ -7,7 +7,7 @@ import { JobWithRelations } from '@/lib/types/database';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { JobStatusBadge } from './job-status-badge';
-import { JobPriorityBadge } from './job-priority-badge';
+import { PriorityBadge } from '@/components/priority-badge';
 import { OverdueBadge } from '@/components/maintenance/overdue-badge';
 
 export type JobTableMeta = {
@@ -81,7 +81,7 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
   {
     accessorKey: 'priority',
     header: 'Priority',
-    cell: ({ row }) => <JobPriorityBadge priority={row.getValue('priority')} />,
+    cell: ({ row }) => <PriorityBadge priority={row.getValue('priority')} />,
     size: 90,
   },
   {

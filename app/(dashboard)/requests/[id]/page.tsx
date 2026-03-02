@@ -3,7 +3,7 @@ import { redirect, notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
-import { RequestPriorityBadge } from '@/components/requests/request-priority-badge';
+import { PriorityBadge } from '@/components/priority-badge';
 import { RequestDetailClient } from '@/components/requests/request-detail-client';
 import type { TimelineEvent } from '@/components/requests/request-timeline';
 import { RequestWithRelations } from '@/lib/types/database';
@@ -355,7 +355,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
             {req.display_id}
           </h1>
           <RequestStatusBadge status={req.status} />
-          {req.priority && <RequestPriorityBadge priority={req.priority} />}
+          {req.priority && <PriorityBadge priority={req.priority} />}
         </div>
 
         {/* Requester info */}

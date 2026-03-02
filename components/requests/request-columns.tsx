@@ -7,7 +7,7 @@ import { RequestWithRelations } from '@/lib/types/database';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { RequestStatusBadge } from './request-status-badge';
-import { RequestPriorityBadge } from './request-priority-badge';
+import { PriorityBadge } from '@/components/priority-badge';
 
 interface PhotoItem {
   id: string;
@@ -121,7 +121,7 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
     accessorKey: 'priority',
     header: 'Priority',
     cell: ({ row }) => (
-      <RequestPriorityBadge priority={row.getValue('priority')} />
+      <PriorityBadge priority={row.getValue('priority')} />
     ),
     size: 90,
   },

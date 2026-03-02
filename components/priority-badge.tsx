@@ -1,12 +1,12 @@
 'use client';
 
-import { PRIORITY_LABELS, PRIORITY_COLORS } from '@/lib/constants/job-status';
+import { PRIORITY_LABELS, PRIORITY_COLORS } from '@/lib/constants/request-status';
 
-interface JobPriorityBadgeProps {
+interface PriorityBadgeProps {
   priority: string | null | undefined;
 }
 
-export function JobPriorityBadge({ priority }: JobPriorityBadgeProps) {
+export function PriorityBadge({ priority }: PriorityBadgeProps) {
   if (!priority) {
     return <span className="text-muted-foreground text-sm">—</span>;
   }

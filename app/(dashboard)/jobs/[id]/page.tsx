@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { JobDetailClient } from '@/components/jobs/job-detail-client';
 import { JobStatusBadge } from '@/components/jobs/job-status-badge';
-import { JobPriorityBadge } from '@/components/jobs/job-priority-badge';
+import { PriorityBadge } from '@/components/priority-badge';
 import type { JobTimelineEvent } from '@/components/jobs/job-timeline';
 import type { JobWithRelations } from '@/lib/types/database';
 import { JOB_STATUS_LABELS } from '@/lib/constants/job-status';
@@ -425,7 +425,7 @@ export default async function JobDetailPage({ params }: PageProps) {
             {job.display_id}
           </h1>
           <JobStatusBadge status={job.status} />
-          {job.priority && <JobPriorityBadge priority={job.priority} />}
+          {job.priority && <PriorityBadge priority={job.priority} />}
           {job.job_type === 'preventive_maintenance' && (
             <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
               PM

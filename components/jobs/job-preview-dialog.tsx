@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { JobStatusBadge } from './job-status-badge';
-import { JobPriorityBadge } from './job-priority-badge';
+import { PriorityBadge } from '@/components/priority-badge';
 import {
   Dialog,
   DialogContent,
@@ -168,7 +168,7 @@ export function JobPreviewDialog({ open, onOpenChange, jobId }: JobPreviewDialog
                   {job.display_id}
                 </span>
                 <JobStatusBadge status={job.status} />
-                {job.priority && <JobPriorityBadge priority={job.priority} />}
+                {job.priority && <PriorityBadge priority={job.priority} />}
               </div>
               <DialogTitle className="text-lg">{job.title}</DialogTitle>
             </DialogHeader>
