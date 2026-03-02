@@ -293,7 +293,7 @@ export function UserFormDialog({
               name="division_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Division (Optional)</FormLabel>
+                  <FormLabel>Division{isEditMode ? ' (Optional)' : ''}</FormLabel>
                   <Select
                     onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
                     value={field.value || "none"}
@@ -304,7 +304,7 @@ export function UserFormDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
+                      {isEditMode && <SelectItem value="none">None</SelectItem>}
                       {filteredDivisions.map(division => (
                         <SelectItem key={division.id} value={division.id}>
                           {division.name}

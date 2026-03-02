@@ -88,13 +88,6 @@ const NAV_SECTIONS: NavSection[] = [
     title: 'Admin',
     items: [
       {
-        label: 'Users',
-        href: '/admin/users',
-        permission: PERMISSIONS.ADMIN_PANEL,
-        built: true,
-        icon: '👥',
-      },
-      {
         label: 'Settings',
         href: '/admin/settings',
         permission: PERMISSIONS.ADMIN_PANEL,

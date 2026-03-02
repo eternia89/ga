@@ -24,20 +24,30 @@ This is a **Next.js 16** app using the **App Router** (`app/` directory), **Reac
 - **ESLint v9** flat config format (`eslint.config.mjs`), not legacy `.eslintrc`
 - **Package manager:** npm
 
+## Responsive Design
+
+- **Desktop-first (MANDATORY).** Default styles target desktop. Use `max-*` breakpoints to override for smaller screens.
+  - Correct: `grid-cols-[1fr_380px] max-lg:grid-cols-1`
+  - Wrong: `grid-cols-1 lg:grid-cols-[1fr_380px]`
+- **Never use mobile-first breakpoints** (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`). Always use `max-sm:`, `max-md:`, `max-lg:`, `max-xl:`, `max-2xl:`.
+- **Tailwind arbitrary values use underscores for spaces** (e.g., `grid-cols-[1fr_380px]` not `grid-cols-[1fr,380px]`).
+
 ## UI Conventions
 
 - **Dropdowns with many options:** Use shadcn **Combobox** (basic) instead of plain Select for any dropdown where the list may grow large (e.g., Company, Division, Location, Category, User selectors). The combobox turns the trigger into a search box on click, allowing type-to-filter. Only use plain Select for short, fixed lists (e.g., Role with 5 options, Type with 2 options).
 - **Duplicate name checks on all write paths:** Create, Update, AND Restore actions must all check for duplicate names among active (non-deleted) entities before proceeding. Restore is easy to miss — a deleted entity's name may conflict with a newly created one.
 - **Feedback messages must be persistent.** Never auto-dismiss success/error messages with a timer. Users may be in another tab or not paying attention. Use the `InlineFeedback` component with an `onDismiss` callback (X button) so users dismiss manually.
+- **Detail pages ARE edit pages (MANDATORY).** Never have separate "view" and "edit" pages/modes. The detail page should allow inline editing for users with edit permission. No separate edit button that navigates to an edit form — fields are directly editable on the detail page.
+- **Detail page max width:** All detail pages (request, job, etc.) must have a `max-w-[1000px]` constraint on the two-column layout (detail + activity timeline). Prevents content from stretching on ultra-wide monitors.
 
 ## Validation Conventions
 
 - **All text fields MUST have max length in Zod schemas.** Every `z.string()` field must include `.max(N)` — no unbounded strings. Also add `maxLength={N}` on the corresponding `<Input>` component.
 - Use **realistic** limits based on what the field actually holds — don't over-allocate. Think about the longest real-world value a user would actually type:
-  - **Name fields (company, division, location, category):** 100 chars
-  - **Person name:** 100 chars
+  - **Name fields (company, division, location, category):** 60 chars
+  - **Person name:** 60 chars
   - **Code/short identifier:** 10 chars
-  - **Email:** 255 chars
+  - **Email:** 60 chars
   - **Phone:** 20 chars
   - **Address:** 200 chars
   - **Description/notes:** 200 chars

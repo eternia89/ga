@@ -32,7 +32,6 @@ interface RequestEditFormProps {
   request: RequestWithRelations;
   locations: { id: string; name: string }[];
   existingPhotos: ExistingPhoto[];
-  onCancel: () => void;
   onSuccess: () => void;
 }
 
@@ -40,7 +39,6 @@ export function RequestEditForm({
   request,
   locations,
   existingPhotos: initialPhotos,
-  onCancel,
   onSuccess,
 }: RequestEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -162,7 +160,7 @@ export function RequestEditForm({
             control={form.control}
             name="location_id"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="max-w-xs">
                 <FormLabel>
                   Location <span className="text-destructive">*</span>
                 </FormLabel>
@@ -185,49 +183,47 @@ export function RequestEditForm({
           <div className="space-y-2">
             <p className="text-sm font-medium">Photos</p>
 
-            {/* Existing photos with remove option */}
-            {existingPhotos.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {existingPhotos.map((photo) => (
-                  <div key={photo.id} className="relative w-20 h-20 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => setLightboxSrc(photo.url)}
-                      className="w-full h-full"
-                      aria-label={`View ${photo.fileName}`}
-                    >
-                      <img
-                        src={photo.url}
-                        alt={photo.fileName}
-                        className="w-full h-full object-cover rounded border border-border hover:opacity-80 transition-opacity"
-                      />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveExistingPhoto(photo)}
-                      className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground rounded-full p-0.5 shadow-sm hover:opacity-90"
-                      aria-label={`Remove ${photo.fileName}`}
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="flex flex-wrap gap-2">
+              {/* Existing photos with remove option */}
+              {existingPhotos.map((photo) => (
+                <div key={photo.id} className="relative w-20 h-20 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setLightboxSrc(photo.url)}
+                    className="w-full h-full"
+                    aria-label={`View ${photo.fileName}`}
+                  >
+                    <img
+                      src={photo.url}
+                      alt={photo.fileName}
+                      className="w-full h-full object-cover rounded border border-border hover:opacity-80 transition-opacity"
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveExistingPhoto(photo)}
+                    className="absolute -top-1.5 -right-1.5 bg-destructive text-white rounded-full p-0.5 shadow-sm hover:opacity-90"
+                    aria-label={`Remove ${photo.fileName}`}
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
 
-            {/* New photo upload (only if slots remain) */}
-            {totalPhotos < maxPhotos && (
-              <RequestPhotoUpload
-                onChange={setNewFiles}
-                maxPhotos={maxPhotos - existingPhotos.length}
-              />
-            )}
+              {/* New photo upload placeholder */}
+              {totalPhotos < maxPhotos && (
+                <RequestPhotoUpload
+                  onChange={setNewFiles}
+                  maxPhotos={maxPhotos - existingPhotos.length}
+                />
+              )}
+            </div>
 
-            {totalPhotos >= maxPhotos && (
-              <p className="text-xs text-muted-foreground">
-                Maximum {maxPhotos} photos reached.
-              </p>
-            )}
+            <p className="text-xs text-muted-foreground">
+              {totalPhotos >= maxPhotos
+                ? `Maximum ${maxPhotos} photos reached.`
+                : `${totalPhotos}/${maxPhotos} photos. JPEG, PNG, or WebP. Max 5MB each.`}
+            </p>
           </div>
 
           {feedback && (
@@ -238,19 +234,9 @@ export function RequestEditForm({
             />
           )}
 
-          <div className="flex gap-3">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-          </div>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
+          </Button>
         </form>
       </Form>
 

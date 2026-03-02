@@ -6,6 +6,6 @@
   "researchAgents": true,
   "planChecker": true,
   "verifier": true,
-  "modelProfile": "quality",
+  "model_profile": "quality",
   "createdAt": "2026-02-10"
 }

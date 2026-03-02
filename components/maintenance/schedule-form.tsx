@@ -194,7 +194,7 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl">
 
         {/* Section 1: Template & Asset */}
         <div className="rounded-lg border border-border p-6 space-y-4">
@@ -207,7 +207,7 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
             control={form.control}
             name="template_id"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="max-w-xs">
                 <FormLabel>
                   Template <span className="text-destructive">*</span>
                 </FormLabel>
@@ -239,7 +239,7 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
             control={form.control}
             name="item_id"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="max-w-xs">
                 <FormLabel>
                   Asset <span className="text-destructive">*</span>
                 </FormLabel>
@@ -283,7 +283,7 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
             control={form.control}
             name="interval_days"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="max-w-xs">
                 <FormLabel>
                   Interval (days) <span className="text-destructive">*</span>
                 </FormLabel>
@@ -328,7 +328,7 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
             control={form.control}
             name="start_date"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="max-w-xs">
                 <FormLabel>
                   Start Date <span className="text-muted-foreground text-xs">(optional)</span>
                 </FormLabel>
@@ -418,7 +418,7 @@ function ScheduleEditForm({ schedule }: EditFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl">
 
         <div className="rounded-lg border border-border p-6 space-y-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
@@ -430,7 +430,7 @@ function ScheduleEditForm({ schedule }: EditFormProps) {
             control={form.control}
             name="interval_days"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="max-w-xs">
                 <FormLabel>
                   Interval (days) <span className="text-destructive">*</span>
                 </FormLabel>

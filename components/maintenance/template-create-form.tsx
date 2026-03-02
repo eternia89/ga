@@ -83,7 +83,7 @@ export function TemplateCreateForm({ categories }: TemplateCreateFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl">
 
         {/* Section 1: Basic Info */}
         <div className="rounded-lg border border-border p-6 space-y-4">
@@ -117,7 +117,7 @@ export function TemplateCreateForm({ categories }: TemplateCreateFormProps) {
             control={form.control}
             name="category_id"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="max-w-xs">
                 <FormLabel>
                   Category <span className="text-destructive">*</span>
                 </FormLabel>

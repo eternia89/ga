@@ -45,8 +45,7 @@ interface RequestDetailInfoProps {
   locations: { id: string; name: string }[];
   currentUserId: string;
   currentUserRole: string;
-  isEditing: boolean;
-  onEditToggle: () => void;
+  onEditSuccess: () => void;
   onTriageSuccess: () => void;
   linkedJobs: LinkedJob[];
 }
@@ -59,8 +58,7 @@ export function RequestDetailInfo({
   locations,
   currentUserId,
   currentUserRole,
-  isEditing,
-  onEditToggle,
+  onEditSuccess,
   onTriageSuccess,
   linkedJobs,
 }: RequestDetailInfoProps) {
@@ -121,16 +119,15 @@ export function RequestDetailInfo({
   }));
   const userOptions = users.map((u) => ({ label: u.name, value: u.id }));
 
-  // Show edit form when requester is editing a submitted request
-  if (isEditing && isEditable) {
+  // Show edit form directly when requester can edit (submitted status)
+  if (isEditable) {
     return (
       <>
         <RequestEditForm
           request={request}
           locations={locations}
           existingPhotos={photoUrls}
-          onCancel={onEditToggle}
-          onSuccess={onEditToggle}
+          onSuccess={onEditSuccess}
         />
         {lightboxIndex !== null && (
           <PhotoLightbox

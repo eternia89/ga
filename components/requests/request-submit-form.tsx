@@ -99,7 +99,7 @@ export function RequestSubmitForm({ locations }: RequestSubmitFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl">
         {/* Description */}
         <FormField
           control={form.control}
@@ -130,7 +130,7 @@ export function RequestSubmitForm({ locations }: RequestSubmitFormProps) {
           control={form.control}
           name="location_id"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="max-w-xs">
               <FormLabel>
                 Location <span className="text-destructive">*</span>
               </FormLabel>
@@ -153,11 +153,16 @@ export function RequestSubmitForm({ locations }: RequestSubmitFormProps) {
         {/* Photos */}
         <div className="space-y-2">
           <p className="text-sm font-medium">Photos (optional)</p>
-          <RequestPhotoUpload
-            onChange={setPhotoFiles}
-            disabled={isSubmitting}
-            maxPhotos={3}
-          />
+          <div className="flex flex-wrap gap-2">
+            <RequestPhotoUpload
+              onChange={setPhotoFiles}
+              disabled={isSubmitting}
+              maxPhotos={3}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Up to 3 photos. JPEG, PNG, or WebP. Max 5MB each.
+          </p>
         </div>
 
         {/* Error feedback */}
@@ -170,7 +175,7 @@ export function RequestSubmitForm({ locations }: RequestSubmitFormProps) {
         )}
 
         {/* Submit button */}
-        <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
+        <Button type="submit" disabled={isSubmitting} className="w-auto max-sm:w-full">
           {isSubmitting ? 'Submitting...' : 'Submit Request'}
         </Button>
       </form>
