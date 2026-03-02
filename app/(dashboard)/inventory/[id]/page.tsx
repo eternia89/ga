@@ -1,13 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { AssetDetailClient } from '@/components/assets/asset-detail-client';
 import type { InventoryItemWithRelations, InventoryMovementWithRelations } from '@/lib/types/database';
 
@@ -225,18 +218,7 @@ export default async function AssetDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6 py-6">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/inventory">Inventory</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{assetWithRelations.display_id}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <SetBreadcrumbs items={[{ label: 'Inventory', href: '/inventory' }, { label: assetWithRelations.display_id }]} />
 
       {/* Two-column layout via client wrapper */}
       <AssetDetailClient

@@ -1,14 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
 import { format } from 'date-fns';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { JobDetailClient } from '@/components/jobs/job-detail-client';
 import { JobStatusBadge } from '@/components/jobs/job-status-badge';
 import { JobPriorityBadge } from '@/components/jobs/job-priority-badge';
@@ -422,19 +415,8 @@ export default async function JobDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="space-y-6 py-6 max-w-[1000px] mx-auto">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/jobs">Jobs</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{job.display_id}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <div className="space-y-6 py-6">
+      <SetBreadcrumbs items={[{ label: 'Jobs', href: '/jobs' }, { label: job.display_id }]} />
 
       {/* Header */}
       <div className="space-y-2">

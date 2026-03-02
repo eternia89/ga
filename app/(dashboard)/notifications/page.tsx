@@ -2,14 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { NotificationCenter } from '@/components/notifications/notification-center';
 import type { Notification } from '@/lib/notifications/actions';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 
 export default async function NotificationsPage() {
   const supabase = await createClient();
@@ -49,18 +42,7 @@ export default async function NotificationsPage() {
 
   return (
     <div className="space-y-6 py-6">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Notifications</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <SetBreadcrumbs items={[{ label: 'Dashboard', href: '/' }, { label: 'Notifications' }]} />
 
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Notifications</h1>

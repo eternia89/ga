@@ -1,14 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { RequestSubmitForm } from '@/components/requests/request-submit-form';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 
 export default async function NewRequestPage() {
   const supabase = await createClient();
@@ -39,23 +32,8 @@ export default async function NewRequestPage() {
     .order('name');
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 py-6">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/requests">Requests</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>New Request</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <div className="space-y-6 py-6">
+      <SetBreadcrumbs items={[{ label: 'Dashboard', href: '/' }, { label: 'Requests', href: '/requests' }, { label: 'New Request' }]} />
 
       <div>
         <h1 className="text-2xl font-bold tracking-tight">New Request</h1>

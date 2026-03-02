@@ -1,14 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { ScheduleDetail } from '@/components/maintenance/schedule-detail';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 import type { PMJobRef } from '@/components/maintenance/schedule-detail';
@@ -108,23 +101,8 @@ export default async function ScheduleDetailPage({ params }: PageProps) {
     : templateName;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 py-6">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/maintenance">Maintenance</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/maintenance">Schedules</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage className="max-w-[300px] truncate">{breadcrumbTitle}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <div className="space-y-6 py-6">
+      <SetBreadcrumbs items={[{ label: 'Maintenance', href: '/maintenance' }, { label: 'Schedules', href: '/maintenance' }, { label: breadcrumbTitle }]} />
 
       <div>
         <h1 className="text-2xl font-bold tracking-tight">{templateName}</h1>

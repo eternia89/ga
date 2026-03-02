@@ -3,13 +3,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 export function UsersSkeleton() {
   return (
     <div className="space-y-4">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-4 w-4" />
-        <Skeleton className="h-4 w-16" />
-      </div>
-
       {/* Page header */}
       <div className="flex items-center justify-between gap-4">
         <Skeleton className="h-8 w-32" />

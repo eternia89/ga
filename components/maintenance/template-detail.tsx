@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { Edit, X } from 'lucide-react';
 import { templateEditSchema, type TemplateEditFormData } from '@/lib/validations/template-schema';
 import { updateTemplate, deactivateTemplate, reactivateTemplate } from '@/app/actions/template-actions';
 import {
@@ -48,7 +47,6 @@ interface TemplateDetailProps {
 
 export function TemplateDetail({ template, categories, userRole }: TemplateDetailProps) {
   const router = useRouter();
-  const [isEditing, setIsEditing] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -71,17 +69,6 @@ export function TemplateDetail({ template, categories, userRole }: TemplateDetai
 
   const checklist = form.watch('checklist') as ChecklistItem[];
 
-  function handleCancelEdit() {
-    form.reset({
-      name: template.name,
-      description: template.description ?? '',
-      category_id: template.category_id ?? '',
-      checklist: template.checklist,
-    });
-    setIsEditing(false);
-    setFeedback(null);
-  }
-
   function onSubmit(data: TemplateEditFormData) {
     setFeedback(null);
     startTransition(async () => {
@@ -98,7 +85,6 @@ export function TemplateDetail({ template, categories, userRole }: TemplateDetai
       }
 
       setFeedback({ type: 'success', message: 'Template updated successfully.' });
-      setIsEditing(false);
       router.refresh();
     });
   }
@@ -156,19 +142,8 @@ export function TemplateDetail({ template, categories, userRole }: TemplateDetai
         </div>
 
         {/* Action buttons */}
-        {canManage && !isEditing && (
+        {canManage && (
           <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-              disabled={isPending}
-            >
-              <Edit className="h-4 w-4 mr-1.5" />
-              Edit
-            </Button>
-
             {template.is_active ? (
               <Button
                 type="button"
@@ -193,19 +168,6 @@ export function TemplateDetail({ template, categories, userRole }: TemplateDetai
             )}
           </div>
         )}
-
-        {isEditing && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleCancelEdit}
-            disabled={isPending}
-          >
-            <X className="h-4 w-4 mr-1.5" />
-            Cancel
-          </Button>
-        )}
       </div>
 
       {/* Feedback */}
@@ -217,8 +179,8 @@ export function TemplateDetail({ template, categories, userRole }: TemplateDetai
         />
       )}
 
-      {isEditing ? (
-        /* Edit mode */
+      {canManage ? (
+        /* Directly editable form for users with permission */
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
@@ -326,19 +288,9 @@ export function TemplateDetail({ template, categories, userRole }: TemplateDetai
               />
             </div>
 
-            <div className="flex items-center gap-3">
-              <Button type="submit" disabled={isPending}>
-                {isPending ? 'Saving...' : 'Save Changes'}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                disabled={isPending}
-                onClick={handleCancelEdit}
-              >
-                Cancel
-              </Button>
-            </div>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? 'Saving...' : 'Save Changes'}
+            </Button>
           </form>
         </Form>
       ) : (

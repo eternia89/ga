@@ -2,14 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { SettingsContent } from "./settings-content";
 import { Company, Division, Location, Category } from "@/lib/types/database";
 import type { UserRow } from "@/components/admin/users/user-columns";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { SetBreadcrumbs } from "@/lib/breadcrumb-context";
 
 export default async function SettingsPage({
   searchParams,
@@ -61,18 +54,7 @@ export default async function SettingsPage({
 
   return (
     <div className="space-y-4">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Settings</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <SetBreadcrumbs items={[{ label: 'Dashboard', href: '/' }, { label: 'Settings' }]} />
 
       <SettingsContent
         companies={companies}

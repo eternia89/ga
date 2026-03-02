@@ -18,6 +18,7 @@ interface AssetPhotoUploadProps {
   maxPhotos?: number;
   required?: boolean;
   existingPhotos?: ExistingPhoto[];
+  onExistingPhotoRemove?: (photoId: string) => void;
   disabled?: boolean;
 }
 
@@ -27,6 +28,7 @@ export function AssetPhotoUpload({
   maxPhotos = 5,
   required = false,
   existingPhotos = [],
+  onExistingPhotoRemove,
   disabled = false,
 }: AssetPhotoUploadProps) {
   const [previews, setPreviews] = useState<{ url: string; file: File }[]>(() =>
@@ -74,7 +76,7 @@ export function AssetPhotoUpload({
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2">
-        {/* Existing photos (read-only) */}
+        {/* Existing photos */}
         {existingPhotos.map((photo) => (
           <div key={photo.id} className="relative w-20 h-20 shrink-0">
             <img
@@ -82,6 +84,16 @@ export function AssetPhotoUpload({
               alt={photo.file_name}
               className="w-full h-full object-cover rounded border border-border"
             />
+            {!disabled && onExistingPhotoRemove && (
+              <button
+                type="button"
+                onClick={() => onExistingPhotoRemove(photo.id)}
+                className="absolute -top-1.5 -right-1.5 bg-destructive text-white rounded-full p-0.5 shadow-sm hover:opacity-90"
+                aria-label={`Remove ${photo.file_name}`}
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
           </div>
         ))}
 

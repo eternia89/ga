@@ -60,7 +60,6 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const canManage = ['ga_lead', 'admin'].includes(userRole);
@@ -142,18 +141,8 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
           </span>
         </div>
 
-        {canManage && !isEditing && !showDeleteConfirm && (
+        {canManage && !showDeleteConfirm && (
           <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(true)}
-              disabled={isPending}
-            >
-              Edit Interval
-            </Button>
-
             {schedule.is_active ? (
               <Button
                 type="button"
@@ -190,17 +179,6 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
           </div>
         )}
 
-        {isEditing && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsEditing(false)}
-            disabled={isPending}
-          >
-            Cancel Edit
-          </Button>
-        )}
       </div>
 
       {/* Delete confirmation */}
@@ -252,8 +230,8 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
         />
       )}
 
-      {/* Edit form */}
-      {isEditing ? (
+      {/* Form directly editable for users with permission */}
+      {canManage ? (
         <ScheduleForm
           templates={[]}
           assets={[]}

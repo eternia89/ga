@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Pencil, Truck, CheckCircle, XCircle, Ban } from 'lucide-react';
+import { Truck, CheckCircle, XCircle, Ban } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -25,7 +25,6 @@ interface AssetDetailActionsProps {
   pendingTransfer: InventoryMovementWithRelations | null;
   currentUserId: string;
   currentUserRole: string;
-  onEdit: () => void;
   onTransfer: () => void;
   onTransferRespond: (mode: 'accept' | 'reject') => void;
   showTransferDialog: boolean;
@@ -43,7 +42,6 @@ export function AssetDetailActions({
   pendingTransfer,
   currentUserId,
   currentUserRole,
-  onEdit,
   onTransfer,
   onTransferRespond,
   showTransferDialog,
@@ -64,9 +62,6 @@ export function AssetDetailActions({
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
   const isTerminal = asset.status === 'sold_disposed';
 
-  // Edit: GA Staff or higher on non-terminal assets
-  const canEdit = isGaStaffOrHigher && !isTerminal;
-
   // Transfer: GA Staff or higher on non-terminal assets with no pending transfer
   const canTransfer = isGaStaffOrHigher && !isTerminal && !pendingTransfer;
 
@@ -82,7 +77,7 @@ export function AssetDetailActions({
     pendingTransfer &&
     (isInitiator || isGaLeadOrAdmin);
 
-  const hasAnyAction = canEdit || canTransfer || canRespond || canCancel;
+  const hasAnyAction = canTransfer || canRespond || canCancel;
 
   const handleCancelTransfer = async () => {
     if (!pendingTransfer) return;
@@ -107,23 +102,17 @@ export function AssetDetailActions({
 
   return (
     <>
-      <div className="flex flex-wrap gap-2">
-        {canEdit && (
-          <Button variant="outline" onClick={onEdit}>
-            <Pencil className="mr-2 h-4 w-4" />
-            Edit
-          </Button>
-        )}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {/* Left: Primary CTA */}
+        <div className="flex flex-wrap gap-2">
+          {canTransfer && (
+            <Button onClick={onTransfer}>
+              <Truck className="mr-2 h-4 w-4" />
+              Transfer
+            </Button>
+          )}
 
-        {canTransfer && (
-          <Button variant="outline" onClick={onTransfer}>
-            <Truck className="mr-2 h-4 w-4" />
-            Transfer
-          </Button>
-        )}
-
-        {canRespond && (
-          <>
+          {canRespond && (
             <Button
               onClick={() => onTransferRespond('accept')}
               className="bg-green-600 hover:bg-green-700 text-white"
@@ -131,19 +120,25 @@ export function AssetDetailActions({
               <CheckCircle className="mr-2 h-4 w-4" />
               Accept Transfer
             </Button>
+          )}
+        </div>
+
+        {/* Right: Secondary actions */}
+        <div className="flex flex-wrap gap-2">
+          {canRespond && (
             <Button variant="outline" onClick={() => onTransferRespond('reject')}>
               <XCircle className="mr-2 h-4 w-4 text-destructive" />
               <span className="text-destructive">Reject Transfer</span>
             </Button>
-          </>
-        )}
+          )}
 
-        {canCancel && (
-          <Button variant="destructive" onClick={() => setCancelOpen(true)}>
-            <Ban className="mr-2 h-4 w-4" />
-            Cancel Transfer
-          </Button>
-        )}
+          {canCancel && (
+            <Button variant="outline" onClick={() => setCancelOpen(true)}>
+              <Ban className="mr-2 h-4 w-4 text-destructive" />
+              <span className="text-destructive">Cancel Transfer</span>
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Cancel Transfer confirmation */}

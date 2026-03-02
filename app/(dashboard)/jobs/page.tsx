@@ -5,14 +5,7 @@ import { Plus } from 'lucide-react';
 import { JobTable } from '@/components/jobs/job-table';
 import { Button } from '@/components/ui/button';
 import { ExportButton } from '@/components/export-button';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 
 export default async function JobsPage() {
   const supabase = await createClient();
@@ -77,18 +70,7 @@ export default async function JobsPage() {
 
   return (
     <div className="space-y-6 py-6">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Jobs</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <SetBreadcrumbs items={[{ label: 'Dashboard', href: '/' }, { label: 'Jobs' }]} />
 
       <div className="flex items-center justify-between">
         <div>

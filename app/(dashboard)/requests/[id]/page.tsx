@@ -1,14 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
 import { format } from 'date-fns';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { RequestPriorityBadge } from '@/components/requests/request-priority-badge';
 import { RequestDetailClient } from '@/components/requests/request-detail-client';
@@ -352,19 +345,8 @@ export default async function RequestDetailPage({ params }: PageProps) {
     .filter((job): job is LinkedJobItem => job !== null);
 
   return (
-    <div className="space-y-6 py-6 max-w-[1000px] mx-auto">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/requests">Requests</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{req.display_id}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <div className="space-y-6 py-6">
+      <SetBreadcrumbs items={[{ label: 'Requests', href: '/requests' }, { label: req.display_id }]} />
 
       {/* Header */}
       <div className="space-y-2">

@@ -1,13 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { ScheduleForm } from '@/components/maintenance/schedule-form';
 import type { TemplateListItem, AssetListItem } from '@/components/maintenance/schedule-form';
 
@@ -75,23 +68,8 @@ export default async function NewSchedulePage({ searchParams }: PageProps) {
   }));
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 py-6">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/maintenance">Maintenance</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/maintenance">Schedules</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>New</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <div className="space-y-6 py-6">
+      <SetBreadcrumbs items={[{ label: 'Maintenance', href: '/maintenance' }, { label: 'Schedules', href: '/maintenance' }, { label: 'New' }]} />
 
       <div>
         <h1 className="text-2xl font-bold tracking-tight">New Maintenance Schedule</h1>

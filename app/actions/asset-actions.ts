@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
+import { createAdminClient } from '@/lib/supabase/admin';
 import {
   assetCreateSchema,
   assetEditSchema,
@@ -524,4 +525,52 @@ export const getAssetInvoices = authActionClient
     }));
 
     return { success: true, invoices };
+  });
+
+// ============================================================================
+// deleteAssetPhotos — soft-delete media_attachments + remove from storage
+// ga_staff, ga_lead, admin only
+// ============================================================================
+export const deleteAssetPhotos = authActionClient
+  .schema(z.object({
+    photo_ids: z.array(z.string().uuid()).min(1).max(10),
+    bucket: z.enum(['asset-photos', 'asset-invoices']),
+  }))
+  .action(async ({ parsedInput, ctx }) => {
+    const { profile } = ctx;
+
+    if (!['ga_staff', 'ga_lead', 'admin'].includes(profile.role)) {
+      throw new Error('Insufficient permissions');
+    }
+
+    // Use admin client to bypass RLS for both read and soft-delete
+    const adminSupabase = createAdminClient();
+
+    // Fetch the attachments to get file_path for storage removal
+    const { data: attachments, error: fetchError } = await adminSupabase
+      .from('media_attachments')
+      .select('id, file_path, entity_id, company_id')
+      .in('id', parsedInput.photo_ids)
+      .eq('company_id', profile.company_id)
+      .is('deleted_at', null);
+
+    if (fetchError || !attachments || attachments.length === 0) {
+      throw new Error('No matching attachments found');
+    }
+
+    // Soft-delete the media_attachments records
+    const { error: deleteError } = await adminSupabase
+      .from('media_attachments')
+      .update({ deleted_at: new Date().toISOString() })
+      .in('id', attachments.map((a) => a.id));
+
+    if (deleteError) {
+      throw new Error('Failed to delete attachments');
+    }
+
+    // Remove files from storage
+    const filePaths = attachments.map((a) => a.file_path);
+    await adminSupabase.storage.from(parsedInput.bucket).remove(filePaths);
+
+    return { success: true, deleted: attachments.length };
   });

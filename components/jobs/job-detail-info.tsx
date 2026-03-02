@@ -6,7 +6,7 @@ import { JobWithRelations } from '@/lib/types/database';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { RequestPreviewDialog } from './request-preview-dialog';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
-import { Pencil, X, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -56,8 +56,7 @@ export function JobDetailInfo({
   const linkedRequests = job.job_requests ?? [];
   const [previewRequest, setPreviewRequest] = useState<typeof linkedRequests[number]['request'] | null>(null);
 
-  // Inline edit state
-  const [isEditing, setIsEditing] = useState(false);
+  // Inline edit state — fields are directly editable when user has permission
   const [editTitle, setEditTitle] = useState(job.title);
   const [editDescription, setEditDescription] = useState(job.description ?? '');
   const [editLocationId, setEditLocationId] = useState(job.location_id ?? '');
@@ -81,23 +80,6 @@ export function JobDetailInfo({
   const categoryOptions = categories.map((c) => ({ label: c.name, value: c.id }));
   const locationOptions = locations.map((l) => ({ label: l.name, value: l.id }));
   const userOptions = users.map((u) => ({ label: u.name, value: u.id }));
-
-  const handleEditStart = () => {
-    setEditTitle(job.title);
-    setEditDescription(job.description ?? '');
-    setEditLocationId(job.location_id ?? '');
-    setEditCategoryId(job.category_id ?? '');
-    setEditPriority(job.priority ?? 'low');
-    setEditAssignedTo(job.assigned_to ?? '');
-    setEditEstimatedCost(job.estimated_cost ? String(job.estimated_cost) : '');
-    setFeedback(null);
-    setIsEditing(true);
-  };
-
-  const handleEditCancel = () => {
-    setIsEditing(false);
-    setFeedback(null);
-  };
 
   const handleEditSave = async () => {
     setSubmitting(true);
@@ -128,7 +110,6 @@ export function JobDetailInfo({
         }
       }
 
-      setIsEditing(false);
       setFeedback({ type: 'success', message: 'Job updated successfully.' });
       onActionSuccess();
     } catch (err) {
@@ -143,7 +124,7 @@ export function JobDetailInfo({
       {/* Title row with edit controls */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          {isEditing ? (
+          {canEdit ? (
             <div className="flex-1 space-y-1">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Title</Label>
               <Input
@@ -157,38 +138,16 @@ export function JobDetailInfo({
             <h2 className="text-xl font-semibold leading-tight">{job.title}</h2>
           )}
 
-          {/* Edit / Save / Cancel buttons */}
-          {canEdit && !isEditing && (
+          {/* Save button — fields are directly editable */}
+          {canEdit && (
             <Button
-              variant="outline"
               size="sm"
-              onClick={handleEditStart}
+              onClick={handleEditSave}
               disabled={submitting}
             >
-              <Pencil className="mr-1.5 h-3.5 w-3.5" />
-              Edit
+              <Check className="mr-1.5 h-3.5 w-3.5" />
+              {submitting ? 'Saving...' : 'Save'}
             </Button>
-          )}
-          {isEditing && (
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                onClick={handleEditSave}
-                disabled={submitting}
-              >
-                <Check className="mr-1.5 h-3.5 w-3.5" />
-                {submitting ? 'Saving...' : 'Save'}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleEditCancel}
-                disabled={submitting}
-              >
-                <X className="mr-1.5 h-3.5 w-3.5" />
-                Cancel
-              </Button>
-            </div>
           )}
         </div>
 
@@ -207,7 +166,7 @@ export function JobDetailInfo({
             PIC
           </dt>
           <dd className="text-sm">
-            {isEditing ? (
+            {canEdit ? (
               <div className="max-w-xs">
                 <Combobox
                   options={userOptions}
@@ -231,7 +190,7 @@ export function JobDetailInfo({
             Estimated Cost
           </dt>
           <dd className="text-sm">
-            {isEditing ? (
+            {canEdit ? (
               <div className="relative max-w-xs">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">Rp</span>
                 <Input
@@ -269,7 +228,7 @@ export function JobDetailInfo({
             Priority
           </dt>
           <dd className="text-sm">
-            {isEditing ? (
+            {canEdit ? (
               <Select
                 value={editPriority}
                 onValueChange={setEditPriority}
@@ -298,7 +257,7 @@ export function JobDetailInfo({
             Category
           </dt>
           <dd className="text-sm">
-            {isEditing ? (
+            {canEdit ? (
               <div className="max-w-xs">
                 <Combobox
                   options={categoryOptions}
@@ -322,7 +281,7 @@ export function JobDetailInfo({
             Location
           </dt>
           <dd className="text-sm">
-            {isEditing ? (
+            {canEdit ? (
               <div className="max-w-xs">
                 <Combobox
                   options={locationOptions}
@@ -412,7 +371,7 @@ export function JobDetailInfo({
         <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
           Description
         </h3>
-        {isEditing ? (
+        {canEdit ? (
           <Textarea
             value={editDescription}
             onChange={(e) => setEditDescription(e.target.value)}

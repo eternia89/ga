@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
+import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { JobForm } from '@/components/jobs/job-form';
 
 interface NewJobPageProps {
@@ -128,14 +128,7 @@ export default async function NewJobPage({ searchParams }: NewJobPageProps) {
 
   return (
     <div className="space-y-6 py-6">
-      {/* Breadcrumb */}
-      <nav className="text-sm text-muted-foreground">
-        <Link href="/jobs" className="hover:text-foreground transition-colors">
-          Jobs
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-foreground">New Job</span>
-      </nav>
+      <SetBreadcrumbs items={[{ label: 'Jobs', href: '/jobs' }, { label: 'New Job' }]} />
 
       <div>
         <h1 className="text-2xl font-bold tracking-tight">New Job</h1>

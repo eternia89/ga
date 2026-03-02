@@ -62,7 +62,6 @@ export function AssetDetailClient({
   currentUserRole,
 }: AssetDetailClientProps) {
   const router = useRouter();
-  const [isEditing, setIsEditing] = useState(false);
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showTransferRespondDialog, setShowTransferRespondDialog] = useState(false);
@@ -90,38 +89,29 @@ export function AssetDetailClient({
           locations={locations}
           currentUserId={currentUserId}
           currentUserRole={currentUserRole}
-          isEditing={isEditing}
-          onEditToggle={() => {
-            setIsEditing(!isEditing);
-            if (isEditing) {
-              router.refresh();
-            }
-          }}
+          onEditSuccess={handleActionSuccess}
           onStatusBadgeClick={() => setShowStatusDialog(true)}
           showStatusDialog={showStatusDialog}
           onStatusDialogChange={setShowStatusDialog}
           onStatusSuccess={handleActionSuccess}
         />
 
-        {!isEditing && (
-          <AssetDetailActions
-            asset={asset}
-            pendingTransfer={pendingTransfer}
-            currentUserId={currentUserId}
-            currentUserRole={currentUserRole}
-            onEdit={() => setIsEditing(true)}
-            onTransfer={() => setShowTransferDialog(true)}
-            onTransferRespond={openTransferRespond}
-            showTransferDialog={showTransferDialog}
-            onTransferDialogChange={setShowTransferDialog}
-            showTransferRespondDialog={showTransferRespondDialog}
-            onTransferRespondDialogChange={setShowTransferRespondDialog}
-            transferRespondMode={transferRespondMode}
-            locations={locations}
-            gaUsers={gaUsers}
-            onActionSuccess={handleActionSuccess}
-          />
-        )}
+        <AssetDetailActions
+          asset={asset}
+          pendingTransfer={pendingTransfer}
+          currentUserId={currentUserId}
+          currentUserRole={currentUserRole}
+          onTransfer={() => setShowTransferDialog(true)}
+          onTransferRespond={openTransferRespond}
+          showTransferDialog={showTransferDialog}
+          onTransferDialogChange={setShowTransferDialog}
+          showTransferRespondDialog={showTransferRespondDialog}
+          onTransferRespondDialogChange={setShowTransferRespondDialog}
+          transferRespondMode={transferRespondMode}
+          locations={locations}
+          gaUsers={gaUsers}
+          onActionSuccess={handleActionSuccess}
+        />
       </div>
 
       {/* Right column: timeline */}

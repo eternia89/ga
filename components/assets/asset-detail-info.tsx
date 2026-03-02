@@ -21,8 +21,7 @@ interface AssetDetailInfoProps {
   locations: { id: string; name: string }[];
   currentUserId: string;
   currentUserRole: string;
-  isEditing: boolean;
-  onEditToggle: () => void;
+  onEditSuccess: () => void;
   onStatusBadgeClick: () => void;
   showStatusDialog: boolean;
   onStatusDialogChange: (open: boolean) => void;
@@ -38,8 +37,7 @@ export function AssetDetailInfo({
   locations,
   currentUserId,
   currentUserRole,
-  isEditing,
-  onEditToggle,
+  onEditSuccess,
   onStatusBadgeClick,
   showStatusDialog,
   onStatusDialogChange,
@@ -52,6 +50,10 @@ export function AssetDetailInfo({
     ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) &&
     asset.status !== 'sold_disposed';
 
+  const canEdit =
+    ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) &&
+    asset.status !== 'sold_disposed';
+
   const isTerminalStatus = asset.status === 'sold_disposed';
   const allowedTransitions = isTerminalStatus
     ? []
@@ -59,23 +61,89 @@ export function AssetDetailInfo({
 
   const isStatusClickable = canChangeStatus && allowedTransitions.length > 0;
 
-  // Show edit form when editing
-  if (isEditing) {
-    return (
-      <AssetEditForm
-        asset={asset}
-        categories={categories}
-        locations={locations}
-        onCancel={onEditToggle}
-        onSuccess={onEditToggle}
-      />
-    );
-  }
-
   const openLightbox = (photos: Array<{ id: string; url: string; fileName: string }>, index: number) => {
     setLightboxPhotos(photos);
     setLightboxIndex(index);
   };
+
+  // Detail page IS edit page — show edit form directly when user has permission
+  if (canEdit) {
+    // Map condition photos for the edit form
+    const editExistingPhotos = conditionPhotos
+      .filter((p) => ['asset_creation', 'asset_status_change'].includes(p.entity_type))
+      .map((p) => ({ id: p.id, url: p.url, fileName: p.fileName }));
+
+    // Map invoices for the edit form
+    const editExistingInvoices = invoices.map((inv) => ({
+      id: inv.id,
+      url: inv.url,
+      fileName: inv.fileName,
+    }));
+
+    return (
+      <>
+        <div className="rounded-lg border p-6 space-y-6">
+          {/* Header: display ID + status badge */}
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold tracking-tight font-mono">
+              {asset.display_id}
+            </h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={isStatusClickable ? onStatusBadgeClick : undefined}
+                disabled={!isStatusClickable}
+                className={isStatusClickable ? 'cursor-pointer' : 'cursor-default'}
+                aria-label={isStatusClickable ? 'Click to change status' : undefined}
+              >
+                <AssetStatusBadge
+                  status={asset.status}
+                  clickable={isStatusClickable}
+                  showInTransit={!!pendingTransfer}
+                />
+              </button>
+            </div>
+
+            {/* In Transit details */}
+            {pendingTransfer && (
+              <div className="rounded-md border border-blue-200 bg-blue-50 p-3 flex items-start gap-2">
+                <Truck className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
+                <div className="text-sm">
+                  <p className="font-medium text-blue-700">Transfer in Progress</p>
+                  <p className="text-blue-600 mt-0.5">
+                    {pendingTransfer.from_location?.name ?? '—'} &rarr; {pendingTransfer.to_location?.name ?? '—'}
+                  </p>
+                  <p className="text-blue-600">
+                    Receiver: {pendingTransfer.receiver?.full_name ?? '—'}
+                  </p>
+                  <p className="text-blue-500 text-xs mt-0.5">
+                    Initiated: {format(new Date(pendingTransfer.created_at), 'dd-MM-yyyy')}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <AssetEditForm
+          asset={asset}
+          categories={categories}
+          locations={locations}
+          existingPhotos={editExistingPhotos}
+          existingInvoices={editExistingInvoices}
+          onSuccess={onEditSuccess}
+        />
+
+        {/* Status change dialog */}
+        <AssetStatusChangeDialog
+          open={showStatusDialog}
+          onOpenChange={onStatusDialogChange}
+          asset={asset}
+          onSuccess={onStatusSuccess}
+        />
+      </>
+    );
+  }
 
   // All asset-level condition photos (creation + status changes)
   const assetConditionPhotos = conditionPhotos

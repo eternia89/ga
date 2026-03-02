@@ -1,8 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
 import { AssetSubmitForm } from '@/components/assets/asset-submit-form';
+import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 
 export default async function NewAssetPage() {
   const supabase = await createClient();
@@ -48,15 +47,8 @@ export default async function NewAssetPage() {
     .order('name');
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 py-6">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-1 text-sm text-muted-foreground">
-        <Link href="/inventory" className="hover:text-foreground transition-colors">
-          Inventory
-        </Link>
-        <ChevronRight className="h-4 w-4" />
-        <span className="text-foreground font-medium">New Asset</span>
-      </nav>
+    <div className="space-y-6 py-6">
+      <SetBreadcrumbs items={[{ label: 'Inventory', href: '/inventory' }, { label: 'New Asset' }]} />
 
       <div>
         <h1 className="text-2xl font-bold tracking-tight">New Asset</h1>

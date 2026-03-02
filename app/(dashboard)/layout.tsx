@@ -5,6 +5,7 @@ import { AuthProvider } from '@/lib/auth/hooks';
 import { Sidebar } from '@/components/sidebar';
 import { MobileMenu } from '@/components/mobile-menu';
 import { NotificationBell } from '@/components/notifications/notification-bell';
+import { BreadcrumbProvider, HeaderBreadcrumb } from '@/lib/breadcrumb-context';
 import type { ReactNode } from 'react';
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
@@ -35,31 +36,37 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   return (
     <NuqsAdapter>
       <AuthProvider initialProfile={profile}>
-        <div className="flex h-screen">
-          {/* Desktop sidebar — hidden on mobile */}
-          <div className="max-md:hidden">
-            <Sidebar companyName={companyName} />
-          </div>
+        <BreadcrumbProvider>
+          <div className="flex h-screen">
+            {/* Desktop sidebar — hidden on mobile */}
+            <div className="max-md:hidden">
+              <Sidebar companyName={companyName} />
+            </div>
 
-          <div className="flex-1 flex flex-col min-h-0">
-            {/* Top header bar */}
-            <header className="flex items-center justify-between px-6 py-3 border-b border-border bg-white flex-shrink-0 max-md:px-4">
-              {/* Mobile hamburger + company name — hidden on desktop */}
-              <div className="hidden max-md:flex items-center gap-3">
-                <MobileMenu companyName={companyName} />
-                <span className="text-sm font-semibold truncate">{companyName}</span>
-              </div>
-              {/* Spacer on desktop (pushes bell to right) */}
-              <div className="max-md:hidden" />
-              <NotificationBell />
-            </header>
+            <div className="flex-1 flex flex-col min-h-0">
+              {/* Top header bar */}
+              <header className="flex items-center justify-between px-6 py-3 border-b border-border bg-white flex-shrink-0 max-md:px-4">
+                {/* Mobile hamburger + company name — hidden on desktop */}
+                <div className="hidden max-md:flex items-center gap-3">
+                  <MobileMenu companyName={companyName} />
+                  <span className="text-sm font-semibold truncate">{companyName}</span>
+                </div>
+                {/* Desktop: breadcrumb on the left */}
+                <div className="max-md:hidden">
+                  <HeaderBreadcrumb />
+                </div>
+                <NotificationBell />
+              </header>
 
-            {/* Scrollable content area */}
-            <main className="flex-1 overflow-auto p-6 max-md:p-4 bg-white">
-              {children}
-            </main>
+              {/* Scrollable content area */}
+              <main className="flex-1 overflow-auto p-6 max-md:p-4 bg-white">
+                <div className="max-w-[1000px] mx-auto">
+                  {children}
+                </div>
+              </main>
+            </div>
           </div>
-        </div>
+        </BreadcrumbProvider>
       </AuthProvider>
     </NuqsAdapter>
   );

@@ -362,7 +362,9 @@ export function AssetSubmitForm({ categories, locations }: AssetSubmitFormProps)
               name="acquisition_date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Acquisition Date</FormLabel>
+                  <FormLabel>
+                    Acquisition Date <span className="text-destructive">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="date"

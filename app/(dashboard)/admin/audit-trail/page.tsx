@@ -3,14 +3,7 @@ import { redirect } from 'next/navigation';
 import { subDays } from 'date-fns';
 import { AuditTrailTable } from '@/components/audit-trail/audit-trail-table';
 import type { AuditLogRow } from '@/components/audit-trail/audit-trail-columns';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 
 export default async function AuditTrailPage() {
   const supabase = await createClient();
@@ -124,22 +117,7 @@ export default async function AuditTrailPage() {
 
   return (
     <div className="space-y-6 py-6">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/settings">Settings</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Audit Trail</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <SetBreadcrumbs items={[{ label: 'Dashboard', href: '/' }, { label: 'Settings', href: '/admin/settings' }, { label: 'Audit Trail' }]} />
 
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Audit Trail</h1>
