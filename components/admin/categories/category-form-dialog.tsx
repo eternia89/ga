@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useMemo } from "react";
 import {
   categorySchema,
   CategoryFormData,
@@ -13,13 +11,6 @@ import {
   updateCategory,
 } from "@/app/actions/category-actions";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -34,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { EntityFormDialog } from "@/components/admin/entity-form-dialog";
 
 interface CategoryFormDialogProps {
   open: boolean;
@@ -51,181 +42,117 @@ export function CategoryFormDialog({
   defaultType,
   onSuccess,
 }: CategoryFormDialogProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const defaultValues = useMemo(
+    () =>
+      category
+        ? {
+            name: category.name,
+            type: category.type,
+            description: category.description || "",
+          }
+        : {
+            name: "",
+            type: (defaultType || "request") as "request" | "asset",
+            description: "",
+          },
+    [category, defaultType]
+  );
 
-  const form = useForm<CategoryFormData>({
-    resolver: zodResolver(categorySchema),
-    defaultValues: category
-      ? {
-          name: category.name,
-          type: category.type,
-          description: category.description || "",
-        }
-      : {
-          name: "",
-          type: defaultType || "request",
-          description: "",
-        },
-  });
-
-  useEffect(() => {
-    if (open) {
-      form.reset(
-        category
-          ? {
-              name: category.name,
-              type: category.type,
-              description: category.description || "",
-            }
-          : {
-              name: "",
-              type: defaultType || "request",
-              description: "",
-            }
-      );
-      setError(null);
+  const handleSubmit = async (data: CategoryFormData) => {
+    if (category) {
+      // Update existing category (without type)
+      const { type, ...updateData } = data;
+      const result = await updateCategory({ id: category.id, data: updateData });
+      if (result?.serverError) return { error: result.serverError };
+    } else {
+      const result = await createCategory(data);
+      if (result?.serverError) return { error: result.serverError };
     }
-  }, [open, category, defaultType, form]);
-
-  const onSubmit = async (data: CategoryFormData) => {
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      if (category) {
-        // Update existing category (without type)
-        const { type, ...updateData } = data;
-        const result = await updateCategory({ id: category.id, data: updateData });
-        if (result?.serverError) {
-          setError(result.serverError);
-          return;
-        }
-      } else {
-        // Create new category
-        const result = await createCategory(data);
-        if (result?.serverError) {
-          setError(result.serverError);
-          return;
-        }
-      }
-
-      form.reset();
-      onOpenChange(false);
-      onSuccess?.();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setIsSubmitting(false);
-    }
+    return {};
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[500px] max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0">
-        <DialogHeader>
-          <DialogTitle>
-            {category ? "Edit Category" : "Create Category"}
-          </DialogTitle>
-        </DialogHeader>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Name <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder="Maintenance" maxLength={100} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Type <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    disabled={!!category} // Type is immutable after creation
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="request">Request</SelectItem>
-                      <SelectItem value="asset">Asset</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                  {category && (
-                    <p className="text-xs text-muted-foreground">
-                      Type cannot be changed after creation
-                    </p>
-                  )}
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Equipment maintenance and repairs"
-                      maxLength={200}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                {error}
-              </div>
+    <EntityFormDialog<CategoryFormData>
+      open={open}
+      onOpenChange={onOpenChange}
+      schema={categorySchema}
+      defaultValues={defaultValues}
+      onSubmit={handleSubmit}
+      onSuccess={onSuccess}
+      title={category ? "Edit Category" : "Create Category"}
+      submitLabel={category ? "Save Changes" : "Create Category"}
+      submittingLabel={category ? "Saving..." : "Creating..."}
+    >
+      {(form) => (
+        <>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Name <span className="text-destructive">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder="Maintenance" maxLength={100} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
+          />
 
-            <div className="flex justify-end gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting
-                  ? category
-                    ? "Saving..."
-                    : "Creating..."
-                  : category
-                    ? "Save Changes"
-                    : "Create Category"}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Type <span className="text-destructive">*</span>
+                </FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={!!category} // Type is immutable after creation
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="request">Request</SelectItem>
+                    <SelectItem value="asset">Asset</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+                {category && (
+                  <p className="text-xs text-muted-foreground">
+                    Type cannot be changed after creation
+                  </p>
+                )}
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Equipment maintenance and repairs"
+                    maxLength={200}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </>
+      )}
+    </EntityFormDialog>
   );
 }
