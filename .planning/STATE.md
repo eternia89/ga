@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-02-27 -- Completed 09.1-04-PLAN.md (CTA/export button placement)
+Last activity: 2026-03-02 -- Completed quick task 1: extract context menu to ghost buttons
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -251,9 +251,15 @@ Recent decisions affecting current work:
 - Verify Supabase Auth hooks / JWT claims custom fields availability by plan tier
 - ~~Confirm shadcn/ui CLI compatibility with Tailwind v4~~ RESOLVED: shadcn/ui v3.8.4 works with Tailwind v4, detected v4 automatically during init
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Extract context menu to ghost buttons on all table rows | 2026-03-02 | 57ef422 | [1-extract-context-menu-to-be-shown-directl](./quick/1-extract-context-menu-to-be-shown-directl/) |
+
 ## Session Continuity
 
-Last session: 2026-02-27
-Stopped at: Completed 09.1-04-PLAN.md (CTA/export button placement) -- Phase 09.1 COMPLETE
-Resume file: .planning/phases/09.1-ui-improvements/09.1-04-SUMMARY.md
-Next: Phase 09.1 complete -- all 5 plans done
+Last session: 2026-03-02
+Stopped at: Completed quick task 1: extract context menu to ghost buttons
+Resume file: .planning/quick/1-extract-context-menu-to-be-shown-directl/1-SUMMARY.md
+Next: Ready for next task
