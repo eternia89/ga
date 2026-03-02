@@ -17,7 +17,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/combobox';
-import { RequestPhotoUpload } from '@/components/requests/request-photo-upload';
+import { PhotoUpload } from '@/components/media/photo-upload';
 import { InlineFeedback } from '@/components/inline-feedback';
 
 interface Location {
@@ -154,10 +154,13 @@ export function RequestSubmitForm({ locations }: RequestSubmitFormProps) {
         <div className="space-y-2">
           <p className="text-sm font-medium">Photos (optional)</p>
           <div className="flex flex-wrap gap-2">
-            <RequestPhotoUpload
+            <PhotoUpload
               onChange={setPhotoFiles}
               disabled={isSubmitting}
               maxPhotos={3}
+              enableMobileCapture
+              enableCompression={false}
+              enableAnnotation={false}
             />
           </div>
           <p className="text-xs text-muted-foreground">

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { acceptTransfer, rejectTransfer } from '@/app/actions/asset-actions';
 import type { InventoryMovementWithRelations } from '@/lib/types/database';
-import { AssetPhotoUpload } from './asset-photo-upload';
+import { PhotoUpload } from '@/components/media/photo-upload';
 import { InlineFeedback } from '@/components/inline-feedback';
 import {
   Dialog,
@@ -180,12 +180,14 @@ export function AssetTransferRespondDialog({
                 ? 'Document the received asset condition. At least 1 photo required.'
                 : 'Document evidence for rejection. At least 1 photo required.'}
             </p>
-            <AssetPhotoUpload
-              photos={photos}
-              onPhotosChange={setPhotos}
+            <PhotoUpload
+              onChange={setPhotos}
               maxPhotos={5}
-              required={true}
+              required
+              showCount
               disabled={isSubmitting}
+              enableCompression={false}
+              enableAnnotation={false}
             />
           </div>
 

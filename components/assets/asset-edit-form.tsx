@@ -9,7 +9,7 @@ import type { InventoryItemWithRelations } from '@/lib/types/database';
 import { updateAsset, deleteAssetPhotos } from '@/app/actions/asset-actions';
 import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
-import { AssetPhotoUpload } from '@/components/assets/asset-photo-upload';
+import { PhotoUpload } from '@/components/media/photo-upload';
 import {
   Form,
   FormControl,
@@ -93,12 +93,6 @@ export function AssetEditForm({
       warranty_expiry: asset.warranty_expiry ?? '',
     },
   });
-
-  const existingPhotosMapped = visibleExistingPhotos.map((p) => ({
-    id: p.id,
-    url: p.url,
-    file_name: p.fileName,
-  }));
 
   const handleExistingPhotoRemove = (photoId: string) => {
     setDeletedPhotoIds((prev) => [...prev, photoId]);
@@ -443,13 +437,15 @@ export function AssetEditForm({
           </div>
           <Separator />
 
-          <AssetPhotoUpload
-            photos={newPhotos}
-            onPhotosChange={setNewPhotos}
+          <PhotoUpload
+            onChange={setNewPhotos}
             maxPhotos={5}
-            existingPhotos={existingPhotosMapped}
-            onExistingPhotoRemove={handleExistingPhotoRemove}
+            existingPhotos={visibleExistingPhotos}
+            onRemoveExisting={handleExistingPhotoRemove}
             disabled={isSubmitting}
+            showCount
+            enableCompression={false}
+            enableAnnotation={false}
           />
         </div>
 

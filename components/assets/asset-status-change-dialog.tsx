@@ -10,7 +10,7 @@ import {
 } from '@/lib/constants/asset-status';
 import type { AssetStatus } from '@/lib/constants/asset-status';
 import { changeAssetStatus } from '@/app/actions/asset-actions';
-import { AssetPhotoUpload } from './asset-photo-upload';
+import { PhotoUpload } from '@/components/media/photo-upload';
 import { InlineFeedback } from '@/components/inline-feedback';
 import {
   Dialog,
@@ -181,12 +181,14 @@ export function AssetStatusChangeDialog({
             <p className="text-xs text-muted-foreground">
               At least 1 photo is required to document the asset condition.
             </p>
-            <AssetPhotoUpload
-              photos={photos}
-              onPhotosChange={setPhotos}
+            <PhotoUpload
+              onChange={setPhotos}
               maxPhotos={5}
-              required={true}
+              required
+              showCount
               disabled={isSubmitting}
+              enableCompression={false}
+              enableAnnotation={false}
             />
           </div>
 

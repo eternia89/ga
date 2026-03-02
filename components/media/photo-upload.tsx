@@ -17,77 +17,106 @@ interface PhotoPreview {
 }
 
 interface PhotoUploadProps {
-  entityType: string;
-  entityId: string;
   onChange: (files: File[]) => void;
   existingPhotos?: ExistingPhoto[];
+  onRemoveExisting?: (id: string) => void;
   disabled?: boolean;
   maxPhotos?: number;
+  enableCompression?: boolean;
   enableAnnotation?: boolean;
+  enableMobileCapture?: boolean;
+  showCount?: boolean;
+  required?: boolean;
+  accept?: string;
+  maxSizeMB?: number;
 }
-
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB pre-compression guard
 
 export function PhotoUpload({
   onChange,
   existingPhotos = [],
+  onRemoveExisting,
   disabled = false,
   maxPhotos = 10,
+  enableCompression = true,
   enableAnnotation = true,
+  enableMobileCapture = false,
+  showCount = false,
+  required = false,
+  accept = 'image/jpeg,image/png,image/webp',
+  maxSizeMB = 5,
 }: PhotoUploadProps) {
   const [previews, setPreviews] = useState<PhotoPreview[]>([]);
   const [annotatingIndex, setAnnotatingIndex] = useState<number | null>(null);
   const [compressing, setCompressing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Mobile input (with camera capture) — only used when enableMobileCapture is true
+  const mobileInputRef = useRef<HTMLInputElement>(null);
+
+  const maxSizeBytes = maxSizeMB * 1024 * 1024;
+  const allowedMimeTypes = accept.split(',').map((t) => t.trim());
 
   const totalPhotos = existingPhotos.length + previews.length;
   const remainingSlots = maxPhotos - totalPhotos;
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = Array.from(e.target.files || []);
-
-    // Basic client-side validation before compression
+  const processFiles = async (selected: File[]) => {
+    // Basic client-side validation before processing
     const valid = selected.filter((file) => {
-      if (file.size > MAX_SIZE_BYTES) return false;
-      if (!ALLOWED_MIME_TYPES.includes(file.type)) return false;
+      if (file.size > maxSizeBytes) return false;
+      if (!allowedMimeTypes.includes(file.type)) return false;
       return true;
     });
 
     const available = maxPhotos - existingPhotos.length - previews.length;
     const toProcess = valid.slice(0, available);
 
-    if (toProcess.length === 0) {
-      if (inputRef.current) inputRef.current.value = '';
-      return;
-    }
+    if (toProcess.length === 0) return;
 
-    setCompressing(true);
-    try {
-      const compressed = await Promise.all(
-        toProcess.map(async (file) => {
-          const compressedFile = await compressImage(file);
-          return {
-            url: URL.createObjectURL(compressedFile),
-            file: compressedFile,
-          };
-        })
-      );
+    if (enableCompression) {
+      setCompressing(true);
+      try {
+        const compressed = await Promise.all(
+          toProcess.map(async (file) => {
+            const compressedFile = await compressImage(file);
+            return {
+              url: URL.createObjectURL(compressedFile),
+              file: compressedFile,
+            };
+          })
+        );
 
-      const combined = [...previews, ...compressed].slice(
+        const combined = [...previews, ...compressed].slice(
+          0,
+          maxPhotos - existingPhotos.length
+        );
+        setPreviews(combined);
+        onChange(combined.map((p) => p.file));
+      } catch (error) {
+        console.error('Compression error:', error);
+      } finally {
+        setCompressing(false);
+      }
+    } else {
+      const newPreviews = toProcess.map((file) => ({
+        url: URL.createObjectURL(file),
+        file,
+      }));
+
+      const combined = [...previews, ...newPreviews].slice(
         0,
         maxPhotos - existingPhotos.length
       );
       setPreviews(combined);
       onChange(combined.map((p) => p.file));
-    } catch (error) {
-      console.error('Compression error:', error);
-    } finally {
-      setCompressing(false);
     }
+  };
 
-    // Reset file input so same file can be re-selected after removal
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files || []);
+    await processFiles(selected);
+
+    // Reset file inputs so same file can be re-selected after removal
     if (inputRef.current) inputRef.current.value = '';
+    if (mobileInputRef.current) mobileInputRef.current.value = '';
   };
 
   const removePreview = (index: number) => {
@@ -100,11 +129,15 @@ export function PhotoUpload({
   const handleAnnotationSave = async (annotatedFile: File) => {
     if (annotatingIndex === null) return;
 
-    // Compress the annotated image
+    // Compress the annotated image if compression is enabled
     let finalFile: File;
-    try {
-      finalFile = await compressImage(annotatedFile);
-    } catch {
+    if (enableCompression) {
+      try {
+        finalFile = await compressImage(annotatedFile);
+      } catch {
+        finalFile = annotatedFile;
+      }
+    } else {
       finalFile = annotatedFile;
     }
 
@@ -123,9 +156,9 @@ export function PhotoUpload({
   const annotatingPreview =
     annotatingIndex !== null ? previews[annotatingIndex] : null;
 
-  return (
+  const renderContent = () => (
     <>
-      {/* Existing photos (read-only, no remove button) */}
+      {/* Existing photos (with optional remove button) */}
       {existingPhotos.map((photo) => (
         <div key={photo.id} className="relative w-20 h-20 shrink-0">
           <img
@@ -133,10 +166,20 @@ export function PhotoUpload({
             alt={photo.fileName}
             className="w-full h-full object-cover rounded border border-border"
           />
+          {!disabled && onRemoveExisting && (
+            <button
+              type="button"
+              onClick={() => onRemoveExisting(photo.id)}
+              className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground rounded-full p-0.5 shadow-sm hover:opacity-90"
+              aria-label={`Remove ${photo.fileName}`}
+            >
+              <X className="w-3 h-3" />
+            </button>
+          )}
         </div>
       ))}
 
-      {/* New preview thumbnails (removable, annotatable) */}
+      {/* New preview thumbnails (removable, optionally annotatable) */}
       {previews.map((preview, index) => (
         <div key={index} className="relative w-20 h-20 shrink-0 group">
           <img
@@ -181,30 +224,88 @@ export function PhotoUpload({
         </div>
       )}
 
-      {/* Add photo button — shown when slots remain */}
+      {/* Add photo button(s) — shown when slots remain */}
       {remainingSlots > 0 && !disabled && !compressing && (
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="w-20 h-20 border-2 border-dashed border-border rounded flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors shrink-0 cursor-pointer"
-          aria-label="Add photo"
-        >
-          <Plus className="w-5 h-5" />
-        </button>
+        enableMobileCapture ? (
+          <>
+            {/* Desktop button (no camera capture) */}
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              className="w-20 h-20 border-2 border-dashed border-border rounded flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors shrink-0 cursor-pointer max-md:hidden"
+              aria-label="Add photo"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+
+            {/* Mobile button (triggers camera capture) */}
+            <button
+              type="button"
+              onClick={() => mobileInputRef.current?.click()}
+              className="w-20 h-20 border-2 border-dashed border-border rounded items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors shrink-0 cursor-pointer hidden max-md:flex"
+              aria-label="Add photo"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="w-20 h-20 border-2 border-dashed border-border rounded flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors shrink-0 cursor-pointer"
+            aria-label="Add photo"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+        )
+      )}
+    </>
+  );
+
+  return (
+    <>
+      {showCount ? (
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            {renderContent()}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {totalPhotos} / {maxPhotos} photos
+            {required && totalPhotos === 0 && (
+              <span className="text-destructive ml-1">(at least 1 required)</span>
+            )}
+          </p>
+        </div>
+      ) : (
+        renderContent()
       )}
 
+      {/* Desktop file input — no capture attribute */}
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept={accept}
         className="sr-only"
         onChange={handleFileChange}
         multiple
         disabled={disabled || compressing}
       />
 
+      {/* Mobile file input — with camera capture (only rendered when enabled) */}
+      {enableMobileCapture && (
+        <input
+          ref={mobileInputRef}
+          type="file"
+          accept={accept}
+          capture="environment"
+          className="sr-only"
+          onChange={handleFileChange}
+          disabled={disabled || compressing}
+        />
+      )}
+
       {/* Annotation dialog */}
-      {annotatingPreview && (
+      {enableAnnotation && annotatingPreview && (
         <PhotoAnnotation
           imageUrl={annotatingPreview.url}
           open={annotatingIndex !== null}

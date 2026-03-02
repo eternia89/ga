@@ -8,7 +8,7 @@ import { RequestWithRelations } from '@/lib/types/database';
 import { updateRequest, deleteMediaAttachment } from '@/app/actions/request-actions';
 import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
-import { RequestPhotoUpload } from '@/components/requests/request-photo-upload';
+import { PhotoUpload } from '@/components/media/photo-upload';
 import { PhotoLightbox } from '@/components/requests/request-photo-lightbox';
 import {
   Form,
@@ -212,9 +212,12 @@ export function RequestEditForm({
 
               {/* New photo upload placeholder */}
               {totalPhotos < maxPhotos && (
-                <RequestPhotoUpload
+                <PhotoUpload
                   onChange={setNewFiles}
                   maxPhotos={maxPhotos - existingPhotos.length}
+                  enableMobileCapture
+                  enableCompression={false}
+                  enableAnnotation={false}
                 />
               )}
             </div>

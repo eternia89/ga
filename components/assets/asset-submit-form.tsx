@@ -20,7 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Combobox } from '@/components/combobox';
-import { AssetPhotoUpload } from '@/components/assets/asset-photo-upload';
+import { PhotoUpload } from '@/components/media/photo-upload';
 import { InlineFeedback } from '@/components/inline-feedback';
 
 interface Category {
@@ -440,12 +440,14 @@ export function AssetSubmitForm({ categories, locations }: AssetSubmitFormProps)
           </div>
           <Separator />
 
-          <AssetPhotoUpload
-            photos={photoFiles}
-            onPhotosChange={setPhotoFiles}
+          <PhotoUpload
+            onChange={setPhotoFiles}
             maxPhotos={5}
-            required={true}
+            required
+            showCount
             disabled={isSubmitting}
+            enableCompression={false}
+            enableAnnotation={false}
           />
 
           {photoError && (

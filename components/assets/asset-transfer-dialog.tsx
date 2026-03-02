@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createTransfer } from '@/app/actions/asset-actions';
 import type { InventoryItemWithRelations } from '@/lib/types/database';
 import { Combobox } from '@/components/combobox';
-import { AssetPhotoUpload } from './asset-photo-upload';
+import { PhotoUpload } from '@/components/media/photo-upload';
 import { InlineFeedback } from '@/components/inline-feedback';
 import {
   Dialog,
@@ -190,12 +190,14 @@ export function AssetTransferDialog({
             <p className="text-xs text-muted-foreground">
               Document the asset condition before transfer. At least 1 photo required.
             </p>
-            <AssetPhotoUpload
-              photos={photos}
-              onPhotosChange={setPhotos}
+            <PhotoUpload
+              onChange={setPhotos}
               maxPhotos={5}
-              required={true}
+              required
+              showCount
               disabled={isSubmitting}
+              enableCompression={false}
+              enableAnnotation={false}
             />
           </div>
 
