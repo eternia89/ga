@@ -2,17 +2,10 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
-import { MoreHorizontal } from "lucide-react";
 import { Location } from "@/lib/types/database";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
 export const locationColumns: ColumnDef<Location>[] = [
@@ -94,6 +87,7 @@ export const locationColumns: ColumnDef<Location>[] = [
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row, table }) => {
       const location = row.original;
       const isDeactivated = !!location.deleted_at;
@@ -105,35 +99,39 @@ export const locationColumns: ColumnDef<Location>[] = [
       } | undefined;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Open menu</span>
+        <div className="flex items-center gap-1">
+          {!isDeactivated ? (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={() => meta?.onEdit?.(location)}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+                onClick={() => meta?.onDelete?.(location)}
+              >
+                Delete
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
+              onClick={() => meta?.onRestore?.(location)}
+            >
+              Restore
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {!isDeactivated && (
-              <>
-                <DropdownMenuItem onClick={() => meta?.onEdit?.(location)}>
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => meta?.onDelete?.(location)}
-                  className="text-destructive"
-                >
-                  Delete
-                </DropdownMenuItem>
-              </>
-            )}
-            {isDeactivated && (
-              <DropdownMenuItem onClick={() => meta?.onRestore?.(location)}>
-                Restore
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          )}
+        </div>
       );
     },
+    size: 120,
   },
 ];
