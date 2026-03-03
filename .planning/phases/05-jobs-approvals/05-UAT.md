@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: complete
 phase: 05-jobs-approvals
-source: [05-01-SUMMARY.md, 05-02-SUMMARY.md, 05-03-SUMMARY.md, 05-04-SUMMARY.md, 05-05-SUMMARY.md, 05-06-SUMMARY.md, 05-07-SUMMARY.md, 05-08-SUMMARY.md, 05-09-SUMMARY.md, 05-10-SUMMARY.md]
+source: [05-01-SUMMARY.md, 05-02-SUMMARY.md, 05-03-SUMMARY.md, 05-04-SUMMARY.md, 05-05-SUMMARY.md, 05-06-SUMMARY.md, 05-07-SUMMARY.md, 05-08-SUMMARY.md, 05-09-SUMMARY.md, 05-10-SUMMARY.md, 05-11-SUMMARY.md, 05-12-SUMMARY.md, 05-13-SUMMARY.md, 05-14-SUMMARY.md, 05-15-SUMMARY.md]
 started: 2026-02-26T00:00:00Z
-updated: 2026-02-26T15:00:00Z
+updated: 2026-03-03T01:30:00Z
 ---
 
 ## Current Test
@@ -17,16 +17,12 @@ expected: Navigate to /jobs/new. Fill in title, description, location, category,
 result: pass
 
 ### 2. Job List Page with Filters
-expected: Navigate to /jobs. See a data table with columns: ID, Title, Status, PIC, Priority, Linked Request, Created, Actions. Filter by status, priority, PIC, search text. "New Job" button visible for GA Lead/Admin. Category column works without errors.
-result: issue
-reported: "general user, only can view jobs that's been assigned to them, but now it sees all same like admin"
-severity: major
+expected: Navigate to /jobs. See a data table with columns: ID, Title, Status, PIC, Priority, Linked Request, Created, Actions. Filter by status, priority, PIC, search text. "New Job" button visible for GA Lead/Admin. Category column works without errors. General users should only see jobs assigned to them.
+result: pass
 
 ### 3. Job Detail Page Layout
-expected: Click a job from the list. See two-column layout: left panel with job info (display ID, status badge, priority badge, IDR-formatted cost, fields grid, linked requests as clickable chips that open a modal preview of the request detail). Right panel with timeline + comment form. No duplicated header. Budget/estimated cost is editable inline in the info panel (not a separate section). Fields are inline-editable for users with edit permission. Header should contain breadcrumb navigation.
-result: issue
-reported: "header should contain the breadcrumb, now it contains nothing beside notification icons in the right side. remove the squared wrapper in job detail page, treat the UI similar to request detail page. all detail pages should have a maximum of 1000px width that consist of activity timeline column and the detail column itself, so the UI doesn't get stretched on ultra-wide monitors"
-severity: major
+expected: Click a job from the list. See two-column layout (max 1000px wide): left panel with job info (display ID, status badge, priority badge, IDR-formatted cost, fields grid, linked requests as clickable chips). Right panel with timeline + comment form. Header has breadcrumb. No squared card wrapper. Budget/estimated cost is a regular inline-editable field. Fields are inline-editable for users with edit permission.
+result: pass
 
 ### 4. Job Timeline with Event Types
 expected: On job detail, the timeline shows chronological events with icons: created, assignment, status changes, approval submissions, approvals, rejections (with reason highlighted), cancellations. Comments interleave with their own style.
@@ -37,28 +33,20 @@ expected: On job detail, type a comment and optionally attach a photo (JPEG/PNG/
 result: pass
 
 ### 6. Assign / Reassign Job
-expected: On a job in "created" status, click Assign. A dialog with a Combobox opens to search GA Staff. Select a user and confirm — job moves to "assigned" status. Reassign is available on jobs in assigned, in_progress, and other active statuses (not just "assigned").
-result: issue
-reported: "to assign PIC, user should only pick the dropdown of PIC that's editable later (view details and edit page the same) — no separate assign dialog"
-severity: major
+expected: On a job detail page, PIC is an inline-editable Combobox field (no separate assign dialog). Select a user from the dropdown — job moves to "assigned" status. PIC can be changed on any active job status.
+result: pass
 
 ### 7. Start Work on Job
-expected: As the assigned PIC, click "Start Work" on an assigned job. Job status changes to "in_progress". Approval-related buttons clearly say "Approve Budget" / "Reject Budget" (not generic "Approve"/"Reject").
-result: issue
-reported: "estimated cost shouldn't behave like it's special. treat it like all the other fields"
-severity: major
+expected: As the assigned PIC, click "Start Work" on an assigned job. Job status changes to "in_progress". Estimated cost is a regular inline-editable field in the same grid as all other fields (not a special section). Approval-related buttons clearly say "Approve Budget" / "Reject Budget". If estimated cost is already set, Start Work routes to pending_approval.
+result: pass
 
 ### 8. Submit Job for Budget Approval
-expected: On an in_progress job, submit budget triggers approval when above threshold. This is specifically a BUDGET approval. The approval flow is: submit budget → pending_approval → finance approver approves/rejects budget.
-result: issue
-reported: "all RP number should have thousand separator to reduce mistake, reading a lot of 0000000"
-severity: minor
+expected: On an in_progress job, submit budget triggers approval when above threshold. All Rp currency values display with dot thousand separators (e.g., Rp 5.000.000 not Rp 5000000). Currency input fields use live formatting with separators.
+result: pass
 
 ### 9. Approval Queue Page
-expected: Navigate to /approvals (finance_approver/admin only). See a data table (not tabs) showing pending approvals by default. A checkbox/filter allows toggling to show previously approved/rejected history. The page is strictly financial — approve/reject budget actions only, no operational controls like cancel.
-result: issue
-reported: "approval page is always empty"
-severity: blocker
+expected: Navigate to /approvals (finance_approver/admin only). See a data table showing approvals. Data loads correctly (not empty). Filter/toggle to show pending vs. all statuses. The page is strictly financial — approve/reject budget actions only, no operational controls like cancel.
+result: pass
 
 ### 10. Approve / Reject Budget
 expected: On the approval queue or job detail, approve a pending_approval job — it moves to "in_progress". Reject with a reason — it returns with the rejection reason visible in timeline.
@@ -66,9 +54,7 @@ result: pass
 
 ### 11. Mark Job Complete & Completion Approval
 expected: On an in_progress job, click "Mark Complete". Job moves to "pending_completion_approval" (NOT directly to completed). CEO/admin must approve the completion. After approval, job moves to "completed". Comments are disabled on completed/cancelled jobs.
-result: issue
-reported: "when I click mark complete, this error occurs: Could not find the 'completion_submitted_at' column of 'jobs' in the schema cache"
-severity: blocker
+result: pass
 
 ### 12. Cancel Job
 expected: Click cancel on a job. Confirmation dialog warns about cascade effects. After confirming, job moves to "cancelled".
@@ -80,8 +66,7 @@ result: pass
 
 ### 14. Accept Completed Work on Request
 expected: On a request in "pending_acceptance", click "Accept Work". After accepting, a star rating/feedback dialog AUTOMATICALLY opens (not just a success notification). User rates 1-5 stars + optional comment.
-result: skipped
-reason: blocked by Test 11 — completion flow broken
+result: pass
 
 ### 15. Reject Completed Work on Request
 expected: On a request in "pending_acceptance", click "Reject Work". Provide a reason. Linked jobs revert to "in_progress". Rejection reason shows in request timeline.
@@ -102,10 +87,10 @@ result: pass
 ## Summary
 
 total: 18
-passed: 10
-issues: 7
+passed: 18
+issues: 0
 pending: 0
-skipped: 1
+skipped: 0
 
 ## Gaps
 
