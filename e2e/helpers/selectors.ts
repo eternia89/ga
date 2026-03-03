@@ -53,7 +53,7 @@ export const SELECTORS = {
   deleteDialog: {
     container: '[role="alertdialog"]',
     confirmInput: '#confirm-text',
-    deleteButton: 'button:has-text("Delete")',
+    deleteButton: 'button:has-text("Deactivate")',
     cancelButton: 'button:has-text("Cancel")',
     dependencyBlock: '.bg-destructive\\/10',
   },

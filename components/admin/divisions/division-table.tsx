@@ -5,7 +5,7 @@ import { Division, Company } from "@/lib/types/database";
 import { DataTable } from "@/components/data-table/data-table";
 import { divisionColumns } from "./division-columns";
 import { DivisionFormDialog } from "./division-form-dialog";
-import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
+import { DeactivateConfirmDialog } from "@/components/delete-confirm-dialog";
 import { InlineFeedback } from "@/components/inline-feedback";
 import {
   deleteDivision,
@@ -58,13 +58,13 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
       } else {
         setFeedback({
           type: "success",
-          message: `${division.name} restored successfully`,
+          message: `${division.name} reactivated successfully`,
         });
       }
     } catch (error) {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to restore",
+        message: error instanceof Error ? error.message : "Failed to reactivate",
       });
     }
   };
@@ -79,14 +79,14 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
       } else {
         setFeedback({
           type: "success",
-          message: `${deletingDivision.name} deleted successfully`,
+          message: `${deletingDivision.name} deactivated successfully`,
         });
         setDeletingDivision(null);
       }
     } catch (error) {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to delete",
+        message: error instanceof Error ? error.message : "Failed to deactivate",
       });
     }
   };
@@ -101,19 +101,19 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
         if (blocked > 0) {
           setFeedback({
             type: "error",
-            message: `Deleted ${deleted} divisions. ${blocked} blocked due to dependencies.`,
+            message: `Deactivated ${deleted} divisions. ${blocked} blocked due to dependencies.`,
           });
         } else {
           setFeedback({
             type: "success",
-            message: `${deleted} divisions deleted successfully`,
+            message: `${deleted} divisions deactivated successfully`,
           });
         }
       }
     } catch (error) {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to bulk delete",
+        message: error instanceof Error ? error.message : "Failed to bulk deactivate",
       });
     }
   };
@@ -210,7 +210,7 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
         onSuccess={handleSuccess}
       />
 
-      <DeleteConfirmDialog
+      <DeactivateConfirmDialog
         open={!!deletingDivision}
         onOpenChange={(open) => !open && setDeletingDivision(null)}
         entityName={deletingDivision?.name || ""}

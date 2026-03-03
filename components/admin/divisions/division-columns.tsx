@@ -121,7 +121,7 @@ export const divisionColumns: ColumnDef<Division>[] = [
                 className="h-7 px-2 text-xs text-destructive hover:text-destructive"
                 onClick={() => meta?.onDelete?.(division)}
               >
-                Delete
+                Deactivate
               </Button>
             </>
           ) : (
@@ -131,7 +131,7 @@ export const divisionColumns: ColumnDef<Division>[] = [
               className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
               onClick={() => meta?.onRestore?.(division)}
             >
-              Restore
+              Reactivate
             </Button>
           )}
         </div>

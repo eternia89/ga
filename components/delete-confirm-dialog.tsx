@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-interface DeleteConfirmDialogProps {
+interface DeactivateConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   entityName: string;
@@ -24,7 +24,7 @@ interface DeleteConfirmDialogProps {
   dependencyLabel?: string;
 }
 
-export function DeleteConfirmDialog({
+export function DeactivateConfirmDialog({
   open,
   onOpenChange,
   entityName,
@@ -32,7 +32,7 @@ export function DeleteConfirmDialog({
   onConfirm,
   dependencyCount,
   dependencyLabel,
-}: DeleteConfirmDialogProps) {
+}: DeactivateConfirmDialogProps) {
   const [confirmText, setConfirmText] = React.useState("");
   const [isDeleting, setIsDeleting] = React.useState(false);
 
@@ -66,22 +66,22 @@ export function DeleteConfirmDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete {entityType}?</AlertDialogTitle>
+          <AlertDialogTitle>Deactivate {entityType}?</AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-4">
               {hasDependencies ? (
                 <div className="p-4 bg-destructive/10 border border-destructive rounded-md">
                   <p className="text-sm font-medium text-destructive">
-                    Cannot delete — {dependencyCount} {dependencyLabel} assigned
+                    Cannot deactivate — {dependencyCount} {dependencyLabel} assigned
                   </p>
                   <p className="text-xs text-muted-foreground mt-2">
-                    You must reassign or remove all {dependencyLabel} before deleting this {entityType}.
+                    You must reassign or remove all {dependencyLabel} before deactivating this {entityType}.
                   </p>
                 </div>
               ) : (
                 <>
                   <p>
-                    This action cannot be undone. This will permanently delete the {entityType}{" "}
+                    This will deactivate the {entityType}{" "}
                     <span className="font-semibold">{entityName}</span>.
                   </p>
                   <div className="space-y-2">
@@ -108,7 +108,7 @@ export function DeleteConfirmDialog({
             disabled={hasDependencies || !isConfirmValid || isDeleting}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isDeleting ? "Deleting..." : "Delete"}
+            {isDeleting ? "Deactivating..." : "Deactivate"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

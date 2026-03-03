@@ -5,7 +5,7 @@ import { Category } from "@/lib/types/database";
 import { DataTable } from "@/components/data-table/data-table";
 import { categoryColumns } from "./category-columns";
 import { CategoryFormDialog } from "./category-form-dialog";
-import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
+import { DeactivateConfirmDialog } from "@/components/delete-confirm-dialog";
 import { InlineFeedback } from "@/components/inline-feedback";
 import {
   deleteCategory,
@@ -52,13 +52,13 @@ export function CategoryTable({ data }: CategoryTableProps) {
       } else {
         setFeedback({
           type: "success",
-          message: `${category.name} restored successfully`,
+          message: `${category.name} reactivated successfully`,
         });
       }
     } catch (error) {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to restore",
+        message: error instanceof Error ? error.message : "Failed to reactivate",
       });
     }
   };
@@ -73,14 +73,14 @@ export function CategoryTable({ data }: CategoryTableProps) {
       } else {
         setFeedback({
           type: "success",
-          message: `${deletingCategory.name} deleted successfully`,
+          message: `${deletingCategory.name} deactivated successfully`,
         });
         setDeletingCategory(null);
       }
     } catch (error) {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to delete",
+        message: error instanceof Error ? error.message : "Failed to deactivate",
       });
     }
   };
@@ -95,19 +95,19 @@ export function CategoryTable({ data }: CategoryTableProps) {
         if (blocked > 0) {
           setFeedback({
             type: "error",
-            message: `Deleted ${deleted} categories. ${blocked} blocked due to dependencies.`,
+            message: `Deactivated ${deleted} categories. ${blocked} blocked due to dependencies.`,
           });
         } else {
           setFeedback({
             type: "success",
-            message: `${deleted} categories deleted successfully`,
+            message: `${deleted} categories deactivated successfully`,
           });
         }
       }
     } catch (error) {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to bulk delete",
+        message: error instanceof Error ? error.message : "Failed to bulk deactivate",
       });
     }
   };
@@ -206,7 +206,7 @@ export function CategoryTable({ data }: CategoryTableProps) {
         onSuccess={handleSuccess}
       />
 
-      <DeleteConfirmDialog
+      <DeactivateConfirmDialog
         open={!!deletingCategory}
         onOpenChange={(open) => !open && setDeletingCategory(null)}
         entityName={deletingCategory?.name || ""}

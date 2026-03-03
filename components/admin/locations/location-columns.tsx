@@ -116,7 +116,7 @@ export const locationColumns: ColumnDef<Location>[] = [
                 className="h-7 px-2 text-xs text-destructive hover:text-destructive"
                 onClick={() => meta?.onDelete?.(location)}
               >
-                Delete
+                Deactivate
               </Button>
             </>
           ) : (
@@ -126,7 +126,7 @@ export const locationColumns: ColumnDef<Location>[] = [
               className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
               onClick={() => meta?.onRestore?.(location)}
             >
-              Restore
+              Reactivate
             </Button>
           )}
         </div>

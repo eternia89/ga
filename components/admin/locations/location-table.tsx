@@ -5,7 +5,7 @@ import { Location, Company } from "@/lib/types/database";
 import { DataTable } from "@/components/data-table/data-table";
 import { locationColumns } from "./location-columns";
 import { LocationFormDialog } from "./location-form-dialog";
-import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
+import { DeactivateConfirmDialog } from "@/components/delete-confirm-dialog";
 import { InlineFeedback } from "@/components/inline-feedback";
 import {
   deleteLocation,
@@ -56,13 +56,13 @@ export function LocationTable({ data, companies }: LocationTableProps) {
       } else {
         setFeedback({
           type: "success",
-          message: `${location.name} restored successfully`,
+          message: `${location.name} reactivated successfully`,
         });
       }
     } catch (error) {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to restore",
+        message: error instanceof Error ? error.message : "Failed to reactivate",
       });
     }
   };
@@ -77,14 +77,14 @@ export function LocationTable({ data, companies }: LocationTableProps) {
       } else {
         setFeedback({
           type: "success",
-          message: `${deletingLocation.name} deleted successfully`,
+          message: `${deletingLocation.name} deactivated successfully`,
         });
         setDeletingLocation(null);
       }
     } catch (error) {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to delete",
+        message: error instanceof Error ? error.message : "Failed to deactivate",
       });
     }
   };
@@ -99,19 +99,19 @@ export function LocationTable({ data, companies }: LocationTableProps) {
         if (blocked > 0) {
           setFeedback({
             type: "error",
-            message: `Deleted ${deleted} locations. ${blocked} blocked due to dependencies.`,
+            message: `Deactivated ${deleted} locations. ${blocked} blocked due to dependencies.`,
           });
         } else {
           setFeedback({
             type: "success",
-            message: `${deleted} locations deleted successfully`,
+            message: `${deleted} locations deactivated successfully`,
           });
         }
       }
     } catch (error) {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to bulk delete",
+        message: error instanceof Error ? error.message : "Failed to bulk deactivate",
       });
     }
   };
@@ -199,7 +199,7 @@ export function LocationTable({ data, companies }: LocationTableProps) {
         onSuccess={handleSuccess}
       />
 
-      <DeleteConfirmDialog
+      <DeactivateConfirmDialog
         open={!!deletingLocation}
         onOpenChange={(open) => !open && setDeletingLocation(null)}
         entityName={deletingLocation?.name || ""}

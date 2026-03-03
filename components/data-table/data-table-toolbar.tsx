@@ -69,7 +69,7 @@ export function DataTableToolbar<TData>({
   };
 
   const handleBulkDeleteConfirm = async () => {
-    if (bulkDeleteConfirmText !== "DELETE" || !onBulkDelete) return;
+    if (bulkDeleteConfirmText !== "DEACTIVATE" || !onBulkDelete) return;
     setIsBulkDeleting(true);
     try {
       await onBulkDelete(bulkDeleteItems.ids);
@@ -182,7 +182,7 @@ export function DataTableToolbar<TData>({
               size="sm"
               onClick={handleBulkDeleteClick}
             >
-              Delete
+              Deactivate
             </Button>
           )}
         </div>
@@ -197,10 +197,10 @@ export function DataTableToolbar<TData>({
       }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {bulkDeleteItems.names.length} items?</AlertDialogTitle>
+            <AlertDialogTitle>Deactivate {bulkDeleteItems.names.length} items?</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-4">
-                <p>The following items will be deleted:</p>
+                <p>The following items will be deactivated:</p>
                 <ul className="list-disc pl-5 text-sm max-h-40 overflow-y-auto space-y-1">
                   {bulkDeleteItems.names.map((name, i) => (
                     <li key={i} className="font-medium text-foreground">{name}</li>
@@ -208,13 +208,13 @@ export function DataTableToolbar<TData>({
                 </ul>
                 <div className="space-y-2">
                   <Label htmlFor="bulk-confirm-text" className="text-sm font-medium">
-                    Type <span className="font-mono font-semibold">DELETE</span> to confirm:
+                    Type <span className="font-mono font-semibold">DEACTIVATE</span> to confirm:
                   </Label>
                   <Input
                     id="bulk-confirm-text"
                     value={bulkDeleteConfirmText}
                     onChange={(e) => setBulkDeleteConfirmText(e.target.value)}
-                    placeholder="DELETE"
+                    placeholder="DEACTIVATE"
                     autoComplete="off"
                   />
                 </div>
@@ -225,10 +225,10 @@ export function DataTableToolbar<TData>({
             <AlertDialogCancel disabled={isBulkDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleBulkDeleteConfirm}
-              disabled={bulkDeleteConfirmText !== "DELETE" || isBulkDeleting}
+              disabled={bulkDeleteConfirmText !== "DEACTIVATE" || isBulkDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isBulkDeleting ? "Deleting..." : "Delete All"}
+              {isBulkDeleting ? "Deactivating..." : "Deactivate All"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

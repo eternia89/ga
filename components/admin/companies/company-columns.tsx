@@ -106,7 +106,7 @@ export const companyColumns: ColumnDef<Company>[] = [
                 className="h-7 px-2 text-xs text-destructive hover:text-destructive"
                 onClick={() => meta?.onDelete?.(company)}
               >
-                Delete
+                Deactivate
               </Button>
             </>
           ) : (
@@ -116,7 +116,7 @@ export const companyColumns: ColumnDef<Company>[] = [
               className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
               onClick={() => meta?.onRestore?.(company)}
             >
-              Restore
+              Reactivate
             </Button>
           )}
         </div>

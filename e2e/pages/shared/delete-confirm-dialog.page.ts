@@ -22,7 +22,7 @@ export class DeleteConfirmDialogPage {
   }
 
   async confirm() {
-    await this.dialog.getByRole('button', { name: 'Delete' }).click();
+    await this.dialog.getByRole('button', { name: 'Deactivate' }).click();
   }
 
   async cancel() {
@@ -31,13 +31,13 @@ export class DeleteConfirmDialogPage {
 
   async expectDeleteDisabled() {
     await expect(
-      this.dialog.getByRole('button', { name: 'Delete' })
+      this.dialog.getByRole('button', { name: 'Deactivate' })
     ).toBeDisabled();
   }
 
   async expectDeleteEnabled() {
     await expect(
-      this.dialog.getByRole('button', { name: 'Delete' })
+      this.dialog.getByRole('button', { name: 'Deactivate' })
     ).toBeEnabled();
   }
 }

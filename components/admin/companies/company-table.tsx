@@ -5,7 +5,7 @@ import { Company } from "@/lib/types/database";
 import { DataTable } from "@/components/data-table/data-table";
 import { companyColumns } from "./company-columns";
 import { CompanyFormDialog } from "./company-form-dialog";
-import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog";
+import { DeactivateConfirmDialog } from "@/components/delete-confirm-dialog";
 import { InlineFeedback } from "@/components/inline-feedback";
 import {
   deleteCompany,
@@ -53,13 +53,13 @@ export function CompanyTable({ data }: CompanyTableProps) {
       } else {
         setFeedback({
           type: "success",
-          message: `${company.name} restored successfully`,
+          message: `${company.name} reactivated successfully`,
         });
       }
     } catch (error) {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to restore",
+        message: error instanceof Error ? error.message : "Failed to reactivate",
       });
     }
   };
@@ -74,14 +74,14 @@ export function CompanyTable({ data }: CompanyTableProps) {
       } else {
         setFeedback({
           type: "success",
-          message: `${deletingCompany.name} deleted successfully`,
+          message: `${deletingCompany.name} deactivated successfully`,
         });
         setDeletingCompany(null);
       }
     } catch (error) {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to delete",
+        message: error instanceof Error ? error.message : "Failed to deactivate",
       });
     }
   };
@@ -96,19 +96,19 @@ export function CompanyTable({ data }: CompanyTableProps) {
         if (blocked > 0) {
           setFeedback({
             type: "error",
-            message: `Deleted ${deleted} companies. ${blocked} blocked due to dependencies.`,
+            message: `Deactivated ${deleted} companies. ${blocked} blocked due to dependencies.`,
           });
         } else {
           setFeedback({
             type: "success",
-            message: `${deleted} companies deleted successfully`,
+            message: `${deleted} companies deactivated successfully`,
           });
         }
       }
     } catch (error) {
       setFeedback({
         type: "error",
-        message: error instanceof Error ? error.message : "Failed to bulk delete",
+        message: error instanceof Error ? error.message : "Failed to bulk deactivate",
       });
     }
   };
@@ -198,7 +198,7 @@ export function CompanyTable({ data }: CompanyTableProps) {
         onSuccess={handleSuccess}
       />
 
-      <DeleteConfirmDialog
+      <DeactivateConfirmDialog
         open={!!deletingCompany}
         onOpenChange={(open) => !open && setDeletingCompany(null)}
         entityName={deletingCompany?.name || ""}

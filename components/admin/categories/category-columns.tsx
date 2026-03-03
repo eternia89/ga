@@ -117,7 +117,7 @@ export const categoryColumns: ColumnDef<Category>[] = [
                 className="h-7 px-2 text-xs text-destructive hover:text-destructive"
                 onClick={() => meta?.onDelete?.(category)}
               >
-                Delete
+                Deactivate
               </Button>
             </>
           ) : (
@@ -127,7 +127,7 @@ export const categoryColumns: ColumnDef<Category>[] = [
               className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
               onClick={() => meta?.onRestore?.(category)}
             >
-              Restore
+              Reactivate
             </Button>
           )}
         </div>
