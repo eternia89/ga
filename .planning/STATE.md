@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-02 -- Completed quick tasks 1-6: row actions, audit, and 4 UI consolidations
+Last activity: 2026-03-03 - Completed quick task 7: Consistent Deactivate/Reactivate terminology
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -253,15 +253,15 @@ Recent decisions affecting current work:
 
 ### Quick Tasks Completed
 
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 1 | Extract context menu to ghost buttons on all table rows | 2026-03-02 | 57ef422 | [1-extract-context-menu-to-be-shown-directl](./quick/1-extract-context-menu-to-be-shown-directl/) |
-| 2 | Audit redundant UI components (research only) | 2026-03-02 | — | [2-check-for-any-redundant-implementation-o](./quick/2-check-for-any-redundant-implementation-o/) |
-| 3 | Consolidate priority badges into single generic component | 2026-03-02 | — | — |
-| 4 | Consolidate request/job status badges into generic StatusBadge | 2026-03-02 | — | — |
-| 5 | Consolidate 3 photo upload components into single PhotoUpload | 2026-03-02 | b5766af | — |
-| 6 | Extract EntityFormDialog to DRY admin form dialogs | 2026-03-02 | — | — |
-| 7 | Consistent Deactivate/Reactivate terminology for soft-delete | 2026-03-03 | 6f91547 | [3-check-consistency-between-delete-and-dea](./quick/3-check-consistency-between-delete-and-dea/) |
+| # | Description | Date | Commit | Status | Directory |
+|---|-------------|------|--------|--------|-----------|
+| 1 | Extract context menu to ghost buttons on all table rows | 2026-03-02 | 57ef422 | | [1-extract-context-menu-to-be-shown-directl](./quick/1-extract-context-menu-to-be-shown-directl/) |
+| 2 | Audit redundant UI components (research only) | 2026-03-02 | — | | [2-check-for-any-redundant-implementation-o](./quick/2-check-for-any-redundant-implementation-o/) |
+| 3 | Consolidate priority badges into single generic component | 2026-03-02 | — | | — |
+| 4 | Consolidate request/job status badges into generic StatusBadge | 2026-03-02 | — | | — |
+| 5 | Consolidate 3 photo upload components into single PhotoUpload | 2026-03-02 | b5766af | | — |
+| 6 | Extract EntityFormDialog to DRY admin form dialogs | 2026-03-02 | — | | — |
+| 7 | Consistent Deactivate/Reactivate terminology for soft-delete | 2026-03-03 | 6f91547 | Verified | [3-check-consistency-between-delete-and-dea](./quick/3-check-consistency-between-delete-and-dea/) |
 
 ## Session Continuity
 
