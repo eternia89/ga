@@ -261,10 +261,11 @@ Recent decisions affecting current work:
 | 4 | Consolidate request/job status badges into generic StatusBadge | 2026-03-02 | — | — |
 | 5 | Consolidate 3 photo upload components into single PhotoUpload | 2026-03-02 | b5766af | — |
 | 6 | Extract EntityFormDialog to DRY admin form dialogs | 2026-03-02 | — | — |
+| 7 | Consistent Deactivate/Reactivate terminology for soft-delete | 2026-03-03 | 6f91547 | [3-check-consistency-between-delete-and-dea](./quick/3-check-consistency-between-delete-and-dea/) |
 
 ## Session Continuity
 
-Last session: 2026-03-02
-Stopped at: Completed quick task 1: extract context menu to ghost buttons
-Resume file: .planning/quick/1-extract-context-menu-to-be-shown-directl/1-SUMMARY.md
+Last session: 2026-03-03
+Stopped at: Completed quick task 3: consistent deactivate/reactivate terminology
+Resume file: .planning/quick/3-check-consistency-between-delete-and-dea/3-SUMMARY.md
 Next: Ready for next task
