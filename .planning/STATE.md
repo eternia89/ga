@@ -262,7 +262,7 @@ Recent decisions affecting current work:
 | 5 | Consolidate 3 photo upload components into single PhotoUpload | 2026-03-02 | b5766af | | — |
 | 6 | Extract EntityFormDialog to DRY admin form dialogs | 2026-03-02 | — | | — |
 | 7 | Consistent Deactivate/Reactivate terminology for soft-delete | 2026-03-03 | 6f91547 | Verified | [3-check-consistency-between-delete-and-dea](./quick/3-check-consistency-between-delete-and-dea/) |
-| 8 | Separate categories view between request and asset types | 2026-03-03 | bdc86a8 | Complete | [4-separate-categories-view-between-request](./quick/4-separate-categories-view-between-request/) |
+| 8 | Separate categories view between request and asset types | 2026-03-03 | bdc86a8 | Verified | [4-separate-categories-view-between-request](./quick/4-separate-categories-view-between-request/) |
 
 ## Session Continuity
 
