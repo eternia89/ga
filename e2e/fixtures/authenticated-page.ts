@@ -13,12 +13,14 @@ type RoleFixtures = {
 };
 
 const AUTH_DIR = path.resolve(__dirname, '../.auth');
+const BASE_URL = process.env.BASE_URL ?? 'http://localhost:3000';
 
 async function createAuthenticatedPage(
   context: { browser: { newContext: (opts: object) => Promise<BrowserContext> } },
   storageFile: string
 ): Promise<Page> {
   const ctx = await context.browser.newContext({
+    baseURL: BASE_URL,
     storageState: path.join(AUTH_DIR, storageFile),
   });
   return ctx.newPage();
@@ -31,6 +33,7 @@ export const test = base.extend<RoleFixtures>({
 
   adminPage: async ({ browser }, use) => {
     const context = await browser.newContext({
+      baseURL: BASE_URL,
       storageState: path.join(AUTH_DIR, 'admin.json'),
     });
     const page = await context.newPage();
@@ -40,6 +43,7 @@ export const test = base.extend<RoleFixtures>({
 
   gaLeadPage: async ({ browser }, use) => {
     const context = await browser.newContext({
+      baseURL: BASE_URL,
       storageState: path.join(AUTH_DIR, 'ga_lead.json'),
     });
     const page = await context.newPage();
@@ -49,6 +53,7 @@ export const test = base.extend<RoleFixtures>({
 
   gaStaffPage: async ({ browser }, use) => {
     const context = await browser.newContext({
+      baseURL: BASE_URL,
       storageState: path.join(AUTH_DIR, 'ga_staff.json'),
     });
     const page = await context.newPage();
@@ -58,6 +63,7 @@ export const test = base.extend<RoleFixtures>({
 
   financeApproverPage: async ({ browser }, use) => {
     const context = await browser.newContext({
+      baseURL: BASE_URL,
       storageState: path.join(AUTH_DIR, 'finance_approver.json'),
     });
     const page = await context.newPage();
@@ -67,6 +73,7 @@ export const test = base.extend<RoleFixtures>({
 
   generalUserPage: async ({ browser }, use) => {
     const context = await browser.newContext({
+      baseURL: BASE_URL,
       storageState: path.join(AUTH_DIR, 'general_user.json'),
     });
     const page = await context.newPage();
