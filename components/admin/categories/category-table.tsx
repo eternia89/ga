@@ -17,9 +17,10 @@ import { Plus } from "lucide-react";
 
 interface CategoryTableProps {
   data: Category[];
+  categoryType: "request" | "asset";
 }
 
-export function CategoryTable({ data }: CategoryTableProps) {
+export function CategoryTable({ data, categoryType }: CategoryTableProps) {
   const [showDeactivated, setShowDeactivated] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -31,7 +32,7 @@ export function CategoryTable({ data }: CategoryTableProps) {
     message: string;
   } | null>(null);
 
-  // Filter by deactivated status only (type filtering handled by DataTable's filterableColumns)
+  // Filter by deactivated status only (type filtering handled by parent sub-tabs)
   const filteredData = showDeactivated
     ? data
     : data.filter((cat) => !cat.deleted_at);
@@ -117,10 +118,9 @@ export function CategoryTable({ data }: CategoryTableProps) {
       selectedIds.includes(category.id)
     );
 
-    const headers = ["Name", "Type", "Description", "Status"];
+    const headers = ["Name", "Description", "Status"];
     const csvRows = selectedRows.map((category) => [
       category.name,
-      category.type === "request" ? "Request" : "Asset",
       category.description || "",
       category.deleted_at ? "Deactivated" : "Active",
     ]);
@@ -160,7 +160,9 @@ export function CategoryTable({ data }: CategoryTableProps) {
       )}
 
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Categories</h2>
+        <h2 className="text-lg font-semibold">
+          {categoryType === "request" ? "Request Categories" : "Asset Categories"}
+        </h2>
         <Button onClick={handleCreateClick} size="sm">
           <Plus className="mr-2 h-4 w-4" />
           Create Category
@@ -171,16 +173,6 @@ export function CategoryTable({ data }: CategoryTableProps) {
         columns={categoryColumns}
         data={filteredData}
         searchKey="name"
-        filterableColumns={[
-          {
-            id: "type",
-            title: "Type",
-            options: [
-              { label: "Request", value: "request" },
-              { label: "Asset", value: "asset" },
-            ],
-          },
-        ]}
         showDeactivatedToggle
         onDeactivatedToggleChange={setShowDeactivated}
         showDeactivated={showDeactivated}
@@ -196,6 +188,7 @@ export function CategoryTable({ data }: CategoryTableProps) {
       <CategoryFormDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
+        defaultType={categoryType}
         onSuccess={handleSuccess}
       />
 
@@ -203,6 +196,7 @@ export function CategoryTable({ data }: CategoryTableProps) {
         open={!!editingCategory}
         onOpenChange={(open) => !open && setEditingCategory(null)}
         category={editingCategory || undefined}
+        defaultType={categoryType}
         onSuccess={handleSuccess}
       />
 

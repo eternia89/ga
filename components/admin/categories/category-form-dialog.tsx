@@ -101,38 +101,36 @@ export function CategoryFormDialog({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Type <span className="text-destructive">*</span>
-                </FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  disabled={!!category} // Type is immutable after creation
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="request">Request</SelectItem>
-                    <SelectItem value="asset">Asset</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-                {category && (
-                  <p className="text-xs text-muted-foreground">
-                    Type cannot be changed after creation
-                  </p>
-                )}
-              </FormItem>
-            )}
-          />
+          {/* Hide type field when defaultType is provided (sub-tab context) */}
+          {!defaultType && (
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Type <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={!!category}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="request">Request</SelectItem>
+                      <SelectItem value="asset">Asset</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <FormField
             control={form.control}

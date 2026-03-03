@@ -39,18 +39,6 @@ export const categoryColumns: ColumnDef<Category>[] = [
     ),
   },
   {
-    accessorKey: "type",
-    header: "Type",
-    cell: ({ row }) => {
-      const type = row.getValue("type") as "request" | "asset";
-      return (
-        <Badge variant="outline">
-          {type === "request" ? "Request" : "Asset"}
-        </Badge>
-      );
-    },
-  },
-  {
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => {
