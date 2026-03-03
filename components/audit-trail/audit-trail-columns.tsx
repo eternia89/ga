@@ -47,7 +47,7 @@ function getActionLabel(row: AuditLogRow): string {
   const { operation, old_data, new_data } = row;
 
   if (operation === 'INSERT') return 'Created';
-  if (operation === 'DELETE') return 'Deleted';
+  if (operation === 'DELETE') return 'Deactivated';
 
   if (operation === 'UPDATE') {
     // If the status field changed, show "Status Changed" instead of "Updated"
@@ -67,7 +67,7 @@ function getActionVariant(label: string): 'default' | 'secondary' | 'destructive
   switch (label) {
     case 'Created':
       return 'default';
-    case 'Deleted':
+    case 'Deactivated':
       return 'destructive';
     case 'Status Changed':
       return 'secondary';

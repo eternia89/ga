@@ -143,7 +143,7 @@ export const deleteCategory = adminActionClient
           `${inventoryCount} inventory item${inventoryCount > 1 ? "s" : ""}`
         );
 
-      throw new Error(`Cannot delete -- ${deps.join(", ")} assigned`);
+      throw new Error(`Cannot deactivate -- ${deps.join(", ")} assigned`);
     }
 
     // Soft delete
@@ -187,7 +187,7 @@ export const restoreCategory = adminActionClient
       .limit(1);
 
     if (existing && existing.length > 0) {
-      throw new Error(`Cannot restore -- an active ${category.type} category named "${category.name}" already exists`);
+      throw new Error(`Cannot reactivate -- an active ${category.type} category named "${category.name}" already exists`);
     }
 
     const { error } = await supabase

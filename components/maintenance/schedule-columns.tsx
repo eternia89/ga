@@ -176,7 +176,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
               className="h-7 px-2 text-xs text-destructive hover:text-destructive"
               onClick={() => meta?.onDeactivate?.(schedule.id)}
             >
-              Deactivate
+              Pause
             </Button>
           ) : (
             <Button
@@ -185,7 +185,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
               className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
               onClick={() => meta?.onActivate?.(schedule.id)}
             >
-              Activate
+              Resume
             </Button>
           )}
           <Button
@@ -194,7 +194,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
             className="h-7 px-2 text-xs text-destructive hover:text-destructive"
             onClick={() => meta?.onDelete?.(schedule.id)}
           >
-            Delete
+            Deactivate
           </Button>
         </div>
       );

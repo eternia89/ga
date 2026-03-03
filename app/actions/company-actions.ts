@@ -114,7 +114,7 @@ export const deleteCompany = adminActionClient
       if (locationsCount > 0) deps.push(`${locationsCount} location${locationsCount > 1 ? "s" : ""}`);
       if (usersCount > 0) deps.push(`${usersCount} user${usersCount > 1 ? "s" : ""}`);
 
-      throw new Error(`Cannot delete -- ${deps.join(", ")} assigned`);
+      throw new Error(`Cannot deactivate -- ${deps.join(", ")} assigned`);
     }
 
     // Soft delete
@@ -159,7 +159,7 @@ export const restoreCompany = adminActionClient
       .limit(1);
 
     if (existing && existing.length > 0) {
-      throw new Error(`Cannot restore -- an active company named "${company.name}" already exists`);
+      throw new Error(`Cannot reactivate -- an active company named "${company.name}" already exists`);
     }
 
     const { error } = await supabase

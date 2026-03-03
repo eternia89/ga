@@ -26,7 +26,7 @@ const ACTION_OPTIONS = [
   { label: 'Created', value: 'Created' },
   { label: 'Updated', value: 'Updated' },
   { label: 'Status Changed', value: 'Status Changed' },
-  { label: 'Deleted', value: 'Deleted' },
+  { label: 'Deactivated', value: 'Deactivated' },
 ];
 
 const ENTITY_TYPE_OPTIONS = [

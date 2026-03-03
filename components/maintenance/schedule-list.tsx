@@ -28,10 +28,10 @@ export function ScheduleList({ schedules, userRole }: ScheduleListProps) {
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
       } else if (result?.data?.success) {
-        setFeedback({ type: 'success', message: 'Schedule deactivated.' });
+        setFeedback({ type: 'success', message: 'Schedule paused.' });
         router.refresh();
       } else {
-        setFeedback({ type: 'error', message: 'Failed to deactivate schedule.' });
+        setFeedback({ type: 'error', message: 'Failed to pause schedule.' });
       }
     });
   }
@@ -43,10 +43,10 @@ export function ScheduleList({ schedules, userRole }: ScheduleListProps) {
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
       } else if (result?.data?.success) {
-        setFeedback({ type: 'success', message: 'Schedule activated.' });
+        setFeedback({ type: 'success', message: 'Schedule resumed.' });
         router.refresh();
       } else {
-        setFeedback({ type: 'error', message: 'Failed to activate schedule.' });
+        setFeedback({ type: 'error', message: 'Failed to resume schedule.' });
       }
     });
   }
@@ -58,10 +58,10 @@ export function ScheduleList({ schedules, userRole }: ScheduleListProps) {
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
       } else if (result?.data?.success) {
-        setFeedback({ type: 'success', message: 'Schedule deleted.' });
+        setFeedback({ type: 'success', message: 'Schedule deactivated.' });
         router.refresh();
       } else {
-        setFeedback({ type: 'error', message: 'Failed to delete schedule.' });
+        setFeedback({ type: 'error', message: 'Failed to deactivate schedule.' });
       }
     });
   }

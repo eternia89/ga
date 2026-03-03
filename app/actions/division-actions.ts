@@ -120,7 +120,7 @@ export const deleteDivision = adminActionClient
     }
 
     if (count && count > 0) {
-      throw new Error(`Cannot delete -- ${count} user${count > 1 ? "s" : ""} assigned`);
+      throw new Error(`Cannot deactivate -- ${count} user${count > 1 ? "s" : ""} assigned`);
     }
 
     // Soft delete
@@ -164,7 +164,7 @@ export const restoreDivision = adminActionClient
       .limit(1);
 
     if (existing && existing.length > 0) {
-      throw new Error(`Cannot restore -- an active division named "${division.name}" already exists in this company`);
+      throw new Error(`Cannot reactivate -- an active division named "${division.name}" already exists in this company`);
     }
 
     const { error } = await supabase

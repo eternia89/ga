@@ -111,7 +111,7 @@ export const deleteLocation = adminActionClient
           `${inventoryCount} inventory item${inventoryCount > 1 ? "s" : ""}`
         );
 
-      throw new Error(`Cannot delete -- ${deps.join(", ")} assigned`);
+      throw new Error(`Cannot deactivate -- ${deps.join(", ")} assigned`);
     }
 
     // Soft delete
@@ -155,7 +155,7 @@ export const restoreLocation = adminActionClient
       .limit(1);
 
     if (existing && existing.length > 0) {
-      throw new Error(`Cannot restore -- an active location named "${location.name}" already exists in this company`);
+      throw new Error(`Cannot reactivate -- an active location named "${location.name}" already exists in this company`);
     }
 
     const { error } = await supabase

@@ -17,7 +17,7 @@ interface AuditTrailTableProps {
 function getActionLabel(row: AuditLogRow): string {
   const { operation, old_data, new_data } = row;
   if (operation === 'INSERT') return 'Created';
-  if (operation === 'DELETE') return 'Deleted';
+  if (operation === 'DELETE') return 'Deactivated';
   if (operation === 'UPDATE') {
     const oldStatus = old_data?.status;
     const newStatus = new_data?.status;

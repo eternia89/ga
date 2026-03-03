@@ -81,10 +81,10 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
       } else if (result?.data?.success) {
-        setFeedback({ type: 'success', message: 'Schedule deactivated.' });
+        setFeedback({ type: 'success', message: 'Schedule paused.' });
         router.refresh();
       } else {
-        setFeedback({ type: 'error', message: 'Failed to deactivate schedule.' });
+        setFeedback({ type: 'error', message: 'Failed to pause schedule.' });
       }
     });
   }
@@ -96,10 +96,10 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
       } else if (result?.data?.success) {
-        setFeedback({ type: 'success', message: 'Schedule activated.' });
+        setFeedback({ type: 'success', message: 'Schedule resumed.' });
         router.refresh();
       } else {
-        setFeedback({ type: 'error', message: 'Failed to activate schedule.' });
+        setFeedback({ type: 'error', message: 'Failed to resume schedule.' });
       }
     });
   }
@@ -114,7 +114,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
       } else if (result?.data?.success) {
         router.push('/maintenance');
       } else {
-        setFeedback({ type: 'error', message: 'Failed to delete schedule.' });
+        setFeedback({ type: 'error', message: 'Failed to deactivate schedule.' });
         setShowDeleteConfirm(false);
       }
     });
@@ -152,7 +152,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
                 disabled={isPending}
                 className="text-destructive hover:text-destructive"
               >
-                Deactivate
+                Pause
               </Button>
             ) : (
               <Button
@@ -162,7 +162,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
                 onClick={handleActivate}
                 disabled={isPending}
               >
-                Activate
+                Resume
               </Button>
             )}
 
@@ -174,7 +174,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
               disabled={isPending}
               className="text-destructive hover:text-destructive"
             >
-              Delete
+              Deactivate
             </Button>
           </div>
         )}
@@ -184,9 +184,9 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
       {/* Delete confirmation */}
       {showDeleteConfirm && (
         <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 space-y-3">
-          <p className="text-sm font-medium text-destructive">Delete this schedule?</p>
+          <p className="text-sm font-medium text-destructive">Deactivate this schedule?</p>
           <p className="text-sm text-muted-foreground">
-            This will soft-delete the schedule. Historical PM jobs from this schedule will remain.
+            This will deactivate the schedule. Historical PM jobs from this schedule will remain.
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -196,7 +196,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
               onClick={handleDelete}
               disabled={isPending}
             >
-              {isPending ? 'Deleting...' : 'Confirm Delete'}
+              {isPending ? 'Deactivating...' : 'Confirm Deactivate'}
             </Button>
             <Button
               type="button"
