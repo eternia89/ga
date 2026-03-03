@@ -36,6 +36,9 @@ export function SettingsContent({
   const defaultTab = initialTab && VALID_TABS.includes(initialTab) ? initialTab : "companies";
   const [tab, setTab] = useQueryState("tab", { defaultValue: defaultTab });
 
+  const requestCategories = categories.filter((c) => c.type === "request");
+  const assetCategories = categories.filter((c) => c.type === "asset");
+
   return (
     <div className="space-y-6">
       {/* Page header */}
@@ -71,7 +74,18 @@ export function SettingsContent({
         </TabsContent>
 
         <TabsContent value="categories" className="space-y-4">
-          <CategoryTable data={categories} />
+          <Tabs defaultValue="request">
+            <TabsList>
+              <TabsTrigger value="request">Request Categories</TabsTrigger>
+              <TabsTrigger value="asset">Asset Categories</TabsTrigger>
+            </TabsList>
+            <TabsContent value="request" className="space-y-4">
+              <CategoryTable data={requestCategories} categoryType="request" />
+            </TabsContent>
+            <TabsContent value="asset" className="space-y-4">
+              <CategoryTable data={assetCategories} categoryType="asset" />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         <TabsContent value="users" className="space-y-4">
