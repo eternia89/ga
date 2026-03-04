@@ -26,7 +26,6 @@ DECLARE
   v_year_key text;
   v_counter_key text;
   v_next_value integer;
-  v_sentinel_id uuid := '00000000-0000-0000-0000-000000000000'::uuid;
 BEGIN
   -- Validate entity type
   IF p_entity_type NOT IN ('request', 'job', 'asset') THEN
@@ -57,19 +56,21 @@ BEGIN
   -- Get 2-digit year
   v_year_key := TO_CHAR(NOW(), 'YY');
 
-  -- Counter key: uses global sentinel UUID to ensure globally unique counters
-  v_counter_key := p_entity_type || '_global_' || v_year_key;
+  -- Counter key: per-company, per-entity-type, per-year
+  -- Display IDs are globally unique because the company code (2 chars) is
+  -- embedded in the ID: IJK-26-001 vs IAB-26-001 can never collide.
+  v_counter_key := p_entity_type || '_' || v_year_key;
 
-  -- Atomically increment or create counter
+  -- Atomically increment or create counter (company-scoped)
   UPDATE id_counters
   SET current_value = current_value + 1
-  WHERE company_id = v_sentinel_id
+  WHERE company_id = p_company_id
     AND entity_type = v_counter_key
   RETURNING current_value INTO v_next_value;
 
   IF NOT FOUND THEN
     INSERT INTO id_counters (company_id, entity_type, prefix, current_value, reset_period)
-    VALUES (v_sentinel_id, v_counter_key, v_prefix_letter, 1, 'yearly')
+    VALUES (p_company_id, v_counter_key, v_prefix_letter, 1, 'yearly')
     ON CONFLICT (company_id, entity_type)
     DO UPDATE SET current_value = id_counters.current_value + 1
     RETURNING current_value INTO v_next_value;
