@@ -6,6 +6,7 @@ import { requestSubmitSchema, requestEditSchema, triageSchema, rejectSchema } fr
 import { feedbackSchema } from '@/lib/validations/job-schema';
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 // ============================================================================
 // createRequest — any authenticated user, auto-fills division from profile
@@ -312,8 +313,9 @@ export const deleteMediaAttachment = authActionClient
       throw new Error('Cannot delete — request is not in New status or you are not the requester');
     }
 
-    // Soft-delete the attachment
-    const { error } = await supabase
+    // Soft-delete the attachment via admin client to bypass RLS WITH CHECK
+    const adminSupabase = createAdminClient();
+    const { error } = await adminSupabase
       .from('media_attachments')
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', parsedInput.attachmentId);
