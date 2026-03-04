@@ -45,20 +45,18 @@ export default async function NewJobPage({ searchParams }: NewJobPageProps) {
       .is('deleted_at', null)
       .order('name'),
 
-    // Request categories (active only)
+    // Categories (active only, global — not company-scoped)
     supabase
       .from('categories')
       .select('id, name')
-      .eq('type', 'request')
       .is('deleted_at', null)
       .order('name'),
 
-    // GA Staff and GA Lead users for PIC assignment
+    // Active users in same company for PIC assignment
     supabase
       .from('user_profiles')
       .select('id, full_name')
       .eq('company_id', profile.company_id)
-      .in('role', ['ga_staff', 'ga_lead'])
       .is('deleted_at', null)
       .order('full_name'),
 

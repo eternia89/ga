@@ -123,7 +123,7 @@ export const updateJob = authActionClient
     // Fetch existing job
     const { data: existing } = await supabase
       .from('jobs')
-      .select('id, status, company_id')
+      .select('id, status, company_id, estimated_cost, approved_at')
       .eq('id', parsedInput.id)
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
@@ -201,6 +201,29 @@ export const updateJob = authActionClient
     if (updateFields.assigned_to !== undefined) fieldsToUpdate.assigned_to = updateFields.assigned_to;
     if (updateFields.estimated_cost !== undefined) fieldsToUpdate.estimated_cost = updateFields.estimated_cost;
 
+    // Auto-transition: if assigning a PIC on a 'created' job, move to 'assigned'
+    if (fieldsToUpdate.assigned_to && existing.status === 'created') {
+      fieldsToUpdate.status = 'assigned';
+    }
+
+    // Auto-transition: if estimated_cost CHANGED on an in_progress job,
+    // route to pending_approval for CEO review (budget approval required)
+    const newCost = fieldsToUpdate.estimated_cost as number | undefined;
+    const oldCost = existing.estimated_cost ?? 0;
+    const costChanged = newCost !== undefined && newCost !== oldCost;
+    if (
+      costChanged &&
+      newCost > 0 &&
+      existing.status === 'in_progress'
+    ) {
+      fieldsToUpdate.status = 'pending_approval';
+      fieldsToUpdate.approval_submitted_at = new Date().toISOString();
+      // Clear any previous rejection data
+      fieldsToUpdate.approval_rejected_at = null;
+      fieldsToUpdate.approval_rejected_by = null;
+      fieldsToUpdate.approval_rejection_reason = null;
+    }
+
     if (Object.keys(fieldsToUpdate).length > 0) {
       const { error } = await supabase
         .from('jobs')
@@ -209,6 +232,55 @@ export const updateJob = authActionClient
 
       if (error) {
         throw new Error(error.message);
+      }
+
+      // Notify newly assigned PIC
+      if (fieldsToUpdate.assigned_to) {
+        const { data: jobDisplay } = await supabase
+          .from('jobs')
+          .select('display_id')
+          .eq('id', id)
+          .single();
+
+        createNotifications({
+          companyId: profile.company_id,
+          recipientIds: [fieldsToUpdate.assigned_to as string],
+          actorId: profile.id,
+          title: `Job ${jobDisplay?.display_id ?? id} assigned to you`,
+          body: 'You have been assigned as PIC for this job',
+          type: 'assignment',
+          entityType: 'job',
+          entityId: id,
+        });
+      }
+
+      // Notify finance approvers if budget submitted for approval
+      if (fieldsToUpdate.status === 'pending_approval') {
+        const { data: jobDisplay } = await supabase
+          .from('jobs')
+          .select('display_id')
+          .eq('id', id)
+          .single();
+
+        const { data: approvers } = await supabase
+          .from('user_profiles')
+          .select('id')
+          .eq('company_id', profile.company_id)
+          .in('role', ['finance_approver', 'admin'])
+          .is('deleted_at', null);
+
+        if (approvers && approvers.length > 0) {
+          createNotifications({
+            companyId: profile.company_id,
+            recipientIds: approvers.map((a) => a.id),
+            actorId: profile.id,
+            title: `Budget approval needed: ${jobDisplay?.display_id ?? id}`,
+            body: `Estimated cost: Rp ${(newCost ?? 0).toLocaleString('id-ID')}`,
+            type: 'approval',
+            entityType: 'job',
+            entityId: id,
+          });
+        }
       }
     }
 
@@ -332,8 +404,13 @@ export const updateJobStatus = authActionClient
 
     const now = new Date().toISOString();
 
-    // When marking complete, check if completion approval is required
+    // When starting work, if estimated cost is already set, route to budget approval
     let actualStatus: string = parsedInput.status;
+    if (parsedInput.status === 'in_progress' && (job.estimated_cost ?? 0) > 0) {
+      actualStatus = 'pending_approval';
+    }
+
+    // When marking complete, check if completion approval is required
     let requiresCompletionApproval = false;
 
     if (parsedInput.status === 'completed') {
@@ -354,6 +431,12 @@ export const updateJobStatus = authActionClient
     }
 
     const jobUpdate: Record<string, unknown> = { status: actualStatus };
+
+    // Set approval tracking when routing to budget approval
+    if (actualStatus === 'pending_approval' && parsedInput.status === 'in_progress') {
+      jobUpdate.approval_submitted_at = now;
+      jobUpdate.started_at = now;
+    }
 
     if (requiresCompletionApproval) {
       jobUpdate.completion_submitted_at = now;

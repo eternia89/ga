@@ -33,7 +33,6 @@ import {
 import {
   approveJob,
   rejectJob,
-  unapproveJob,
   approveCompletion,
   rejectCompletion,
 } from '@/app/actions/approval-actions';
@@ -44,7 +43,6 @@ import {
   ThumbsUp,
   ThumbsDown,
   RefreshCw,
-  Unlock,
 } from 'lucide-react';
 
 interface JobDetailActionsProps {
@@ -89,26 +87,21 @@ export function JobDetailActions({
     isFinanceApproverOrAdmin && job.status === 'pending_approval';
   const canApproveCompletion =
     isFinanceApproverOrAdmin && job.status === 'pending_completion_approval';
+  // Can only mark complete if in_progress AND budget is approved (or no budget set)
+  const hasPendingBudget = (job.estimated_cost ?? 0) > 0 && !job.approved_at;
   const canMarkComplete =
-    (isGaLeadOrAdmin || isPIC) && job.status === 'in_progress';
+    (isGaLeadOrAdmin || isPIC) && job.status === 'in_progress' && !hasPendingBudget;
   const canCancel =
     isGaLeadOrAdmin &&
     !isFinanceApproverOnly &&
     !['completed', 'cancelled'].includes(job.status);
-
-  // Un-approve: finance_approver/admin can unlock budget on approved in_progress jobs
-  const canUnapprove =
-    isFinanceApproverOrAdmin &&
-    job.status === 'in_progress' &&
-    !!job.approved_at;
 
   const hasAnyAction =
     canStartWork ||
     canApproveReject ||
     canApproveCompletion ||
     canMarkComplete ||
-    canCancel ||
-    canUnapprove;
+    canCancel;
 
   if (!hasAnyAction) return null;
 
@@ -181,24 +174,6 @@ export function JobDetailActions({
       onActionSuccess();
     } catch (err) {
       setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to reject' });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleUnapprove = async () => {
-    setSubmitting(true);
-    setFeedback(null);
-    try {
-      const result = await unapproveJob({ job_id: job.id });
-      if (result?.serverError) {
-        setFeedback({ type: 'error', message: result.serverError });
-        return;
-      }
-      setFeedback({ type: 'success', message: 'Budget unlocked. PIC can now re-edit the estimated cost.' });
-      onActionSuccess();
-    } catch (err) {
-      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to un-approve' });
     } finally {
       setSubmitting(false);
     }
@@ -358,17 +333,6 @@ export function JobDetailActions({
               >
                 <ThumbsDown className="mr-2 h-4 w-4 text-destructive" />
                 <span className="text-destructive">Reject Completion</span>
-              </Button>
-            )}
-
-            {canUnapprove && (
-              <Button
-                variant="outline"
-                onClick={handleUnapprove}
-                disabled={submitting}
-              >
-                <Unlock className="mr-2 h-4 w-4" />
-                Unlock Budget
               </Button>
             )}
 

@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { updateJob, updateJobBudget } from '@/app/actions/job-actions';
+import { updateJob } from '@/app/actions/job-actions';
 import { formatIDR, formatNumber } from '@/lib/utils';
 
 function formatDate(iso: string | null | undefined): string {
@@ -85,6 +85,8 @@ export function JobDetailInfo({
     setSubmitting(true);
     setFeedback(null);
     try {
+      const costValue = editEstimatedCost ? parseInt(editEstimatedCost.replace(/[^0-9]/g, ''), 10) : undefined;
+
       const result = await updateJob({
         id: job.id,
         title: editTitle.trim() || undefined,
@@ -93,21 +95,11 @@ export function JobDetailInfo({
         category_id: editCategoryId || undefined,
         priority: editPriority as typeof PRIORITY_ORDER[number],
         assigned_to: editAssignedTo || undefined,
+        estimated_cost: costValue,
       });
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
         return;
-      }
-
-      // If estimated cost changed, use updateJobBudget to trigger approval flow
-      const newCost = editEstimatedCost ? parseInt(editEstimatedCost.replace(/[^0-9]/g, ''), 10) : 0;
-      const oldCost = job.estimated_cost ?? 0;
-      if (newCost !== oldCost && newCost > 0) {
-        const budgetResult = await updateJobBudget({ id: job.id, estimated_cost: newCost });
-        if (budgetResult?.serverError) {
-          setFeedback({ type: 'error', message: budgetResult.serverError });
-          return;
-        }
       }
 
       setFeedback({ type: 'success', message: 'Job updated successfully.' });
@@ -121,11 +113,11 @@ export function JobDetailInfo({
 
   return (
     <div className="space-y-6">
-      {/* Title row with edit controls */}
+      {/* Title row */}
       <div className="space-y-2">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
           {canEdit ? (
-            <div className="flex-1 space-y-1">
+            <div className="space-y-1">
               <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Title</Label>
               <Input
                 value={editTitle}
@@ -136,18 +128,6 @@ export function JobDetailInfo({
             </div>
           ) : (
             <h2 className="text-xl font-semibold leading-tight">{job.title}</h2>
-          )}
-
-          {/* Save button — fields are directly editable */}
-          {canEdit && (
-            <Button
-              size="sm"
-              onClick={handleEditSave}
-              disabled={submitting}
-            >
-              <Check className="mr-1.5 h-3.5 w-3.5" />
-              {submitting ? 'Saving...' : 'Save'}
-            </Button>
           )}
         </div>
 
@@ -406,6 +386,17 @@ export function JobDetailInfo({
             {job.approval_rejection_reason}
           </p>
         </div>
+      )}
+
+      {/* Save button — at the bottom, consistent with other detail pages */}
+      {canEdit && (
+        <Button
+          onClick={handleEditSave}
+          disabled={submitting}
+        >
+          <Check className="mr-1.5 h-3.5 w-3.5" />
+          {submitting ? 'Saving...' : 'Save Changes'}
+        </Button>
       )}
 
       {/* Inline feedback */}
