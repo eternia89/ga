@@ -21,7 +21,7 @@ interface SettingsContentProps {
   initialUserId?: string;
 }
 
-const VALID_TABS = ["companies", "divisions", "locations", "categories", "users"];
+const VALID_TABS = ["companies", "divisions", "locations", "request-categories", "asset-categories", "users"];
 
 export function SettingsContent({
   companies,
@@ -56,7 +56,8 @@ export function SettingsContent({
             <TabsTrigger value="companies">Companies</TabsTrigger>
             <TabsTrigger value="divisions">Divisions</TabsTrigger>
             <TabsTrigger value="locations">Locations</TabsTrigger>
-            <TabsTrigger value="categories">Categories</TabsTrigger>
+            <TabsTrigger value="request-categories">Request Categories</TabsTrigger>
+            <TabsTrigger value="asset-categories">Asset Categories</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
           </TabsList>
         </div>
@@ -73,19 +74,12 @@ export function SettingsContent({
           <LocationTable data={locations} companies={companies} />
         </TabsContent>
 
-        <TabsContent value="categories" className="space-y-4">
-          <Tabs defaultValue="request">
-            <TabsList>
-              <TabsTrigger value="request">Request Categories</TabsTrigger>
-              <TabsTrigger value="asset">Asset Categories</TabsTrigger>
-            </TabsList>
-            <TabsContent value="request" className="space-y-4">
-              <CategoryTable data={requestCategories} categoryType="request" />
-            </TabsContent>
-            <TabsContent value="asset" className="space-y-4">
-              <CategoryTable data={assetCategories} categoryType="asset" />
-            </TabsContent>
-          </Tabs>
+        <TabsContent value="request-categories" className="space-y-4">
+          <CategoryTable data={requestCategories} categoryType="request" />
+        </TabsContent>
+
+        <TabsContent value="asset-categories" className="space-y-4">
+          <CategoryTable data={assetCategories} categoryType="asset" />
         </TabsContent>
 
         <TabsContent value="users" className="space-y-4">
