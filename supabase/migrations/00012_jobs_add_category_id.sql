@@ -6,6 +6,6 @@
 -- ============================================================================
 
 ALTER TABLE public.jobs
-ADD COLUMN category_id uuid REFERENCES public.categories(id);
+ADD COLUMN IF NOT EXISTS category_id uuid REFERENCES public.categories(id);
 
-CREATE INDEX idx_jobs_company_category ON public.jobs (company_id, category_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_jobs_company_category ON public.jobs (company_id, category_id) WHERE deleted_at IS NULL;

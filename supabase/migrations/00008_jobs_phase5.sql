@@ -68,11 +68,13 @@ CREATE INDEX IF NOT EXISTS idx_job_requests_company ON public.job_requests (comp
 ALTER TABLE public.job_requests ENABLE ROW LEVEL SECURITY;
 
 -- Company-scoped SELECT for all authenticated users
+DROP POLICY IF EXISTS "job_requests_select_own_company" ON public.job_requests;
 CREATE POLICY "job_requests_select_own_company" ON public.job_requests
   FOR SELECT TO authenticated
   USING (company_id = current_user_company_id());
 
 -- INSERT restricted to ga_lead and admin roles
+DROP POLICY IF EXISTS "job_requests_insert_lead_admin" ON public.job_requests;
 CREATE POLICY "job_requests_insert_lead_admin" ON public.job_requests
   FOR INSERT TO authenticated
   WITH CHECK (
@@ -81,6 +83,7 @@ CREATE POLICY "job_requests_insert_lead_admin" ON public.job_requests
   );
 
 -- DELETE restricted to ga_lead and admin roles
+DROP POLICY IF EXISTS "job_requests_delete_lead_admin" ON public.job_requests;
 CREATE POLICY "job_requests_delete_lead_admin" ON public.job_requests
   FOR DELETE TO authenticated
   USING (
@@ -109,11 +112,13 @@ CREATE INDEX IF NOT EXISTS idx_company_settings_company ON public.company_settin
 ALTER TABLE public.company_settings ENABLE ROW LEVEL SECURITY;
 
 -- Company-scoped SELECT for all authenticated users
+DROP POLICY IF EXISTS "company_settings_select_own_company" ON public.company_settings;
 CREATE POLICY "company_settings_select_own_company" ON public.company_settings
   FOR SELECT TO authenticated
   USING (company_id = current_user_company_id());
 
 -- INSERT restricted to admin role only
+DROP POLICY IF EXISTS "company_settings_insert_admin" ON public.company_settings;
 CREATE POLICY "company_settings_insert_admin" ON public.company_settings
   FOR INSERT TO authenticated
   WITH CHECK (
@@ -122,6 +127,7 @@ CREATE POLICY "company_settings_insert_admin" ON public.company_settings
   );
 
 -- UPDATE restricted to admin role only
+DROP POLICY IF EXISTS "company_settings_update_admin" ON public.company_settings;
 CREATE POLICY "company_settings_update_admin" ON public.company_settings
   FOR UPDATE TO authenticated
   USING (
@@ -130,6 +136,7 @@ CREATE POLICY "company_settings_update_admin" ON public.company_settings
   );
 
 -- Add set_updated_at trigger on company_settings
+DROP TRIGGER IF EXISTS set_company_settings_updated_at ON public.company_settings;
 CREATE TRIGGER set_company_settings_updated_at
   BEFORE UPDATE ON public.company_settings
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
@@ -227,11 +234,13 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================================
 
 -- Authenticated users can upload to job-photos bucket
+DROP POLICY IF EXISTS "auth_users_upload_job_photos" ON storage.objects;
 CREATE POLICY "auth_users_upload_job_photos" ON storage.objects
   FOR INSERT TO authenticated
   WITH CHECK (bucket_id = 'job-photos');
 
 -- Authenticated users can read job photos (signed URLs handle authorization)
+DROP POLICY IF EXISTS "auth_users_read_job_photos" ON storage.objects;
 CREATE POLICY "auth_users_read_job_photos" ON storage.objects
   FOR SELECT TO authenticated
   USING (bucket_id = 'job-photos');

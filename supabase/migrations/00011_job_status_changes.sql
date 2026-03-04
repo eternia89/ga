@@ -43,12 +43,14 @@ ALTER TABLE public.job_status_changes ENABLE ROW LEVEL SECURITY;
 --    No UPDATE/DELETE — status changes are immutable audit records
 -- ============================================================================
 
+DROP POLICY IF EXISTS "job_status_changes_select" ON public.job_status_changes;
 CREATE POLICY "job_status_changes_select"
   ON public.job_status_changes
   FOR SELECT
   TO authenticated
   USING (company_id = public.current_user_company_id());
 
+DROP POLICY IF EXISTS "job_status_changes_insert" ON public.job_status_changes;
 CREATE POLICY "job_status_changes_insert"
   ON public.job_status_changes
   FOR INSERT

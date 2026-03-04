@@ -131,11 +131,13 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================================
 
 -- Authenticated users can upload to asset-photos bucket
+DROP POLICY IF EXISTS "auth_users_upload_asset_photos" ON storage.objects;
 CREATE POLICY "auth_users_upload_asset_photos" ON storage.objects
   FOR INSERT TO authenticated
   WITH CHECK (bucket_id = 'asset-photos');
 
 -- Authenticated users can read asset photos (signed URLs handle authorization)
+DROP POLICY IF EXISTS "auth_users_read_asset_photos" ON storage.objects;
 CREATE POLICY "auth_users_read_asset_photos" ON storage.objects
   FOR SELECT TO authenticated
   USING (bucket_id = 'asset-photos');
@@ -145,11 +147,13 @@ CREATE POLICY "auth_users_read_asset_photos" ON storage.objects
 -- ============================================================================
 
 -- Authenticated users can upload to asset-invoices bucket
+DROP POLICY IF EXISTS "auth_users_upload_asset_invoices" ON storage.objects;
 CREATE POLICY "auth_users_upload_asset_invoices" ON storage.objects
   FOR INSERT TO authenticated
   WITH CHECK (bucket_id = 'asset-invoices');
 
 -- Authenticated users can read asset invoices (signed URLs handle authorization)
+DROP POLICY IF EXISTS "auth_users_read_asset_invoices" ON storage.objects;
 CREATE POLICY "auth_users_read_asset_invoices" ON storage.objects
   FOR SELECT TO authenticated
   USING (bucket_id = 'asset-invoices');

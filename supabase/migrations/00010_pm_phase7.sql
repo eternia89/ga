@@ -184,6 +184,8 @@ $$;
 
 DROP POLICY IF EXISTS "maintenance_templates_insert" ON public.maintenance_templates;
 DROP POLICY IF EXISTS "maintenance_templates_update" ON public.maintenance_templates;
+DROP POLICY IF EXISTS "maintenance_templates_insert_ga_lead" ON public.maintenance_templates;
+DROP POLICY IF EXISTS "maintenance_templates_update_ga_lead" ON public.maintenance_templates;
 
 CREATE POLICY "maintenance_templates_insert_ga_lead" ON public.maintenance_templates
   FOR INSERT TO authenticated
@@ -207,6 +209,8 @@ CREATE POLICY "maintenance_templates_update_ga_lead" ON public.maintenance_templ
 
 DROP POLICY IF EXISTS "maintenance_schedules_insert" ON public.maintenance_schedules;
 DROP POLICY IF EXISTS "maintenance_schedules_update" ON public.maintenance_schedules;
+DROP POLICY IF EXISTS "maintenance_schedules_insert_ga_lead" ON public.maintenance_schedules;
+DROP POLICY IF EXISTS "maintenance_schedules_update_ga_lead" ON public.maintenance_schedules;
 
 CREATE POLICY "maintenance_schedules_insert_ga_lead" ON public.maintenance_schedules
   FOR INSERT TO authenticated
