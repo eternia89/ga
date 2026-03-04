@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { RequestWithRelations } from '@/lib/types/database';
 import { RequestDetailInfo } from './request-detail-info';
 import { RequestDetailActions } from './request-detail-actions';
@@ -45,17 +45,26 @@ export function RequestDetailClient({
   linkedJobs,
 }: RequestDetailClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+
+  // Auto-open feedback dialog when ?feedback=1 is in the URL (survives router.refresh)
+  useEffect(() => {
+    if (searchParams.get('feedback') === '1' && request.status === 'accepted' && !request.feedback_rating) {
+      setFeedbackOpen(true);
+      // Clean up the URL param
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, [searchParams, request.status, request.feedback_rating]);
 
   const handleActionSuccess = () => {
     router.refresh();
   };
 
   const handleAccepted = () => {
-    // Small delay to let the acceptance dialog close animation finish
-    setTimeout(() => {
-      setFeedbackOpen(true);
-    }, 300);
+    // Navigate with ?feedback=1 to trigger auto-open after refresh
+    router.push(`${window.location.pathname}?feedback=1`);
+    router.refresh();
   };
 
   const timelineRef = useRef<HTMLDivElement>(null);

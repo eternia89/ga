@@ -38,7 +38,7 @@ This is a **Next.js 16** app using the **App Router** (`app/` directory), **Reac
 - **Duplicate name checks on all write paths:** Create, Update, AND Restore actions must all check for duplicate names among active (non-deleted) entities before proceeding. Restore is easy to miss — a deleted entity's name may conflict with a newly created one.
 - **Feedback messages must be persistent.** Never auto-dismiss success/error messages with a timer. Users may be in another tab or not paying attention. Use the `InlineFeedback` component with an `onDismiss` callback (X button) so users dismiss manually.
 - **Detail pages ARE edit pages (MANDATORY).** Never have separate "view" and "edit" pages/modes. The detail page should allow inline editing for users with edit permission. No separate edit button that navigates to an edit form — fields are directly editable on the detail page.
-- **Detail page max width:** All detail pages (request, job, etc.) must have a `max-w-[1000px]` constraint on the two-column layout (detail + activity timeline). Prevents content from stretching on ultra-wide monitors.
+- **Content max width:** Defined once in `app/(dashboard)/layout.tsx` via the `max-w-[...]` wrapper around `{children}`. Do NOT add max-width constraints in individual page components -- update the layout value instead.
 
 ## Validation Conventions
 
