@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { X, Plus, Pencil } from 'lucide-react';
 import { compressImage } from '@/lib/media/compression';
 import { PhotoAnnotation } from '@/components/media/photo-annotation';
@@ -18,6 +18,7 @@ interface PhotoPreview {
 
 interface PhotoUploadProps {
   onChange: (files: File[]) => void;
+  value?: File[];
   existingPhotos?: ExistingPhoto[];
   onRemoveExisting?: (id: string) => void;
   disabled?: boolean;
@@ -33,6 +34,7 @@ interface PhotoUploadProps {
 
 export function PhotoUpload({
   onChange,
+  value,
   existingPhotos = [],
   onRemoveExisting,
   disabled = false,
@@ -45,7 +47,33 @@ export function PhotoUpload({
   accept = 'image/jpeg,image/png,image/webp',
   maxSizeMB = 5,
 }: PhotoUploadProps) {
-  const [previews, setPreviews] = useState<PhotoPreview[]>([]);
+  const isControlled = value !== undefined;
+
+  // Internal state for uncontrolled mode
+  const [internalPreviews, setInternalPreviews] = useState<PhotoPreview[]>([]);
+
+  // Controlled mode: derive previews from value prop
+  const controlledPreviews = useMemo(() => {
+    if (!isControlled) return [];
+    return value.map((file) => ({
+      url: URL.createObjectURL(file),
+      file,
+    }));
+  }, [isControlled, value]);
+
+  // Cleanup controlled preview URLs when they change
+  useEffect(() => {
+    if (!isControlled) return;
+    return () => {
+      controlledPreviews.forEach((p) => URL.revokeObjectURL(p.url));
+    };
+  }, [isControlled, controlledPreviews]);
+
+  const previews = isControlled ? controlledPreviews : internalPreviews;
+  const setPreviews = isControlled
+    ? () => {} // no-op in controlled mode — parent drives state via onChange
+    : setInternalPreviews;
+
   const [annotatingIndex, setAnnotatingIndex] = useState<number | null>(null);
   const [compressing, setCompressing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -170,7 +198,7 @@ export function PhotoUpload({
             <button
               type="button"
               onClick={() => onRemoveExisting(photo.id)}
-              className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground rounded-full p-0.5 shadow-sm hover:opacity-90"
+              className="absolute -top-1.5 -right-1.5 bg-destructive text-white rounded-full p-0.5 shadow-sm hover:opacity-90"
               aria-label={`Remove ${photo.fileName}`}
             >
               <X className="w-3 h-3" />
@@ -181,7 +209,7 @@ export function PhotoUpload({
 
       {/* New preview thumbnails (removable, optionally annotatable) */}
       {previews.map((preview, index) => (
-        <div key={index} className="relative w-20 h-20 shrink-0 group">
+        <div key={`${preview.file.name}-${preview.file.size}-${preview.file.lastModified}`} className="relative w-20 h-20 shrink-0 group">
           <img
             src={preview.url}
             alt={`Photo ${index + 1}`}
@@ -193,7 +221,7 @@ export function PhotoUpload({
               <button
                 type="button"
                 onClick={() => removePreview(index)}
-                className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground rounded-full p-0.5 shadow-sm hover:opacity-90"
+                className="absolute -top-1.5 -right-1.5 bg-destructive text-white rounded-full p-0.5 shadow-sm hover:opacity-90"
                 aria-label={`Remove photo ${index + 1}`}
               >
                 <X className="w-3 h-3" />

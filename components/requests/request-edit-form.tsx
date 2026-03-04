@@ -214,6 +214,7 @@ export function RequestEditForm({
               {totalPhotos < maxPhotos && (
                 <PhotoUpload
                   onChange={setNewFiles}
+                  value={newFiles}
                   maxPhotos={maxPhotos - existingPhotos.length}
                   enableMobileCapture
                   enableCompression={false}
