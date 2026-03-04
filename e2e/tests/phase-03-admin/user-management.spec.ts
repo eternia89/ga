@@ -24,7 +24,7 @@ test.describe('Phase 03 — User Management', () => {
     await settings.switchTab('Users');
 
     const userTab = new UserTabPage(adminPage);
-    const email = `new-user-${timestamp}@e2e-test.local`;
+    const email = `new-user-${timestamp}@gmail.com`;
     await userTab.createUser(email, 'New Test User', 'General User', 'E2E Test Corp');
 
     await userTab.feedback.expectSuccess(/created|success/i);
@@ -39,7 +39,7 @@ test.describe('Phase 03 — User Management', () => {
     const userTab = new UserTabPage(adminPage);
 
     // Find a test user to edit (the one we created or a seeded one)
-    const email = `new-user-${timestamp}@e2e-test.local`;
+    const email = `new-user-${timestamp}@gmail.com`;
     await userTab.editUser(email);
     await userTab.dialog.expectOpen();
 
@@ -56,7 +56,7 @@ test.describe('Phase 03 — User Management', () => {
     await settings.switchTab('Users');
 
     const userTab = new UserTabPage(adminPage);
-    const email = `new-user-${timestamp}@e2e-test.local`;
+    const email = `new-user-${timestamp}@gmail.com`;
 
     await userTab.deactivateUser(email);
 
@@ -78,7 +78,7 @@ test.describe('Phase 03 — User Management', () => {
     await settings.toggleShowDeactivated();
 
     const userTab = new UserTabPage(adminPage);
-    const email = `new-user-${timestamp}@e2e-test.local`;
+    const email = `new-user-${timestamp}@gmail.com`;
 
     await userTab.reactivateUser(email);
 

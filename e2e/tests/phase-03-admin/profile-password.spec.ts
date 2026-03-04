@@ -47,8 +47,8 @@ test.describe('Phase 03 — Profile & Password', () => {
 
     // Create a temp user for password change test
     const supabase = getAdminClient();
-    const tempEmail = `pwd-test-${Date.now()}@e2e-test.local`;
-    const tempPassword = 'E2eTest!2026';
+    const tempEmail = `pwd-test-${Date.now()}@gmail.com`;
+    const tempPassword = 'asdf1234';
     const newPassword = 'NewE2ePass!2026';
 
     const { data: authUser } = await supabase.auth.admin.createUser({

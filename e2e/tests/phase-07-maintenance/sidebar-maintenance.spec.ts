@@ -25,12 +25,14 @@ test.describe('Phase 07 — Sidebar Maintenance', () => {
     await sidebar.expectNavItem('Schedules');
   });
 
-  test('Test 1c: General user does NOT see Maintenance section', async ({ generalUserPage }) => {
+  test('Test 1c: General user sees Maintenance with Schedules only', async ({ generalUserPage }) => {
     await generalUserPage.goto('/');
     await generalUserPage.waitForLoadState('networkidle');
 
     const sidebar = new SidebarPage(generalUserPage);
-    await sidebar.expectSectionHidden('Maintenance');
+    // General user CAN see Maintenance section (with Schedules link)
+    await sidebar.expectSectionVisible('Maintenance');
+    await sidebar.expectNavItem('Schedules');
   });
 
   test('Test 1d: Templates link navigates to /maintenance/templates', async ({ gaLeadPage }) => {

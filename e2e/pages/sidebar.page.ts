@@ -1,12 +1,19 @@
-import { Page, expect } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 export class SidebarPage {
   private sidebar = this.page.locator('aside');
 
   constructor(private page: Page) {}
 
+  /** Locate a sidebar link by its label text (matches the span inside the link). */
+  private navLink(label: string): Locator {
+    return this.sidebar.locator('a').filter({
+      has: this.page.locator(`span:text-is("${label}")`),
+    });
+  }
+
   async navigateTo(label: string) {
-    await this.sidebar.getByRole('link', { name: label, exact: true }).click();
+    await this.navLink(label).click();
     await this.page.waitForLoadState('networkidle');
   }
 
@@ -23,15 +30,11 @@ export class SidebarPage {
   }
 
   async expectNavItem(label: string) {
-    await expect(
-      this.sidebar.getByRole('link', { name: label, exact: true })
-    ).toBeVisible();
+    await expect(this.navLink(label)).toBeVisible();
   }
 
   async expectNavItemHidden(label: string) {
-    await expect(
-      this.sidebar.getByRole('link', { name: label, exact: true })
-    ).not.toBeVisible();
+    await expect(this.navLink(label)).not.toBeVisible();
   }
 
   async expectCompanyName(name: string | RegExp) {
@@ -39,7 +42,6 @@ export class SidebarPage {
   }
 
   async expectActiveLink(label: string) {
-    const link = this.sidebar.getByRole('link', { name: label, exact: true });
-    await expect(link).toHaveClass(/bg-blue-50/);
+    await expect(this.navLink(label)).toHaveClass(/bg-blue-50/);
   }
 }

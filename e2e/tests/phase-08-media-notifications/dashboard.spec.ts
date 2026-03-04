@@ -2,132 +2,191 @@
  * Phase 08 — Tests 11-18: Dashboard KPIs, date range, charts, tables, summaries
  */
 import { test, expect } from '../../fixtures';
-import { DashboardPage } from '../../pages/dashboard.page';
 
 test.describe('Phase 08 — Dashboard', () => {
-  test('Test 11: Operational dashboard shows 5 KPI cards', async ({ adminPage }) => {
+  test('Test 11: Operational dashboard shows KPI cards for admin', async ({ adminPage }) => {
     await adminPage.goto('/');
     await adminPage.waitForLoadState('networkidle');
 
-    // KPI cards should be in a grid
-    const cards = adminPage.locator('[class*="card"], [class*="Card"]');
-    // Should have at least 5 KPI cards
-    await adminPage.waitForTimeout(1_000);
+    // Welcome greeting should be visible (second h1 — first is sidebar company name)
+    const greeting = adminPage.locator('main h1');
+    await expect(greeting).toBeVisible({ timeout: 10_000 });
+    await expect(greeting).toContainText(/Good/i);
 
-    // Check for KPI-related text
-    await expect(adminPage.locator('text=/open request|untriaged|overdue|open job|completed/i').first()).toBeVisible();
+    // Subheading about operational overview
+    await expect(adminPage.locator('text=/operational overview/i')).toBeVisible({ timeout: 5_000 });
 
-    // Cards should have trend indicators (up/down arrows)
-    const trendIcons = adminPage.locator('svg').filter({ has: adminPage.locator('visible=true') });
-    expect(await trendIcons.count()).toBeGreaterThan(0);
+    // Wait for KPI data to load (may be async)
+    await adminPage.waitForTimeout(2_000);
+
+    // KPI card labels — verify each is visible with generous timeout
+    await expect(adminPage.locator('text="Open Requests"').first()).toBeVisible({ timeout: 10_000 });
+    await expect(adminPage.locator('text="Untriaged"').first()).toBeVisible({ timeout: 5_000 });
+    await expect(adminPage.locator('text="Overdue Jobs"').first()).toBeVisible({ timeout: 5_000 });
+    await expect(adminPage.locator('text="Open Jobs"').first()).toBeVisible({ timeout: 5_000 });
+    await expect(adminPage.locator('text="Completed"').first()).toBeVisible({ timeout: 5_000 });
   });
 
   test('Test 12: Date range filter with presets', async ({ adminPage }) => {
     await adminPage.goto('/');
     await adminPage.waitForLoadState('networkidle');
 
-    // Date range filter should be visible
-    const dateFilter = adminPage.getByRole('button', { name: /today|this week|this month|this quarter|date|range/i }).first();
-    if (await dateFilter.isVisible()) {
-      await dateFilter.click();
-      await adminPage.waitForTimeout(500);
-
-      // Presets should be available
-      const presets = ['Today', 'This Week', 'This Month', 'This Quarter'];
-      for (const preset of presets) {
-        const btn = adminPage.getByRole('button', { name: preset });
-        if (await btn.isVisible()) {
-          // Click a preset
-          await btn.click();
-          await adminPage.waitForTimeout(500);
-
-          // URL should update with from/to params
-          break;
-        }
+    // Preset buttons: Today, This Week, This Month, This Quarter, Custom
+    const presets = ['Today', 'This Week', 'This Month', 'This Quarter', 'Custom'];
+    let foundPresets = 0;
+    for (const preset of presets) {
+      const btn = adminPage.getByRole('button', { name: preset, exact: true });
+      if (await btn.isVisible({ timeout: 2_000 }).catch(() => false)) {
+        foundPresets++;
       }
+    }
+    expect(foundPresets).toBeGreaterThanOrEqual(3);
+
+    // "This Month" should be the default active preset
+    // Click "This Week" and verify it doesn't error
+    const thisWeekBtn = adminPage.getByRole('button', { name: 'This Week', exact: true });
+    if (await thisWeekBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
+      await thisWeekBtn.click();
+      await adminPage.waitForTimeout(1_000);
+
+      // URL should update with from/to params
+      expect(adminPage.url()).toContain('from=');
+    }
+
+    // Click "This Month" to reset
+    const thisMonthBtn = adminPage.getByRole('button', { name: 'This Month', exact: true });
+    if (await thisMonthBtn.isVisible()) {
+      await thisMonthBtn.click();
+      await adminPage.waitForTimeout(500);
     }
   });
 
-  test('Test 13: Non-operational roles see simple welcome', async ({ generalUserPage }) => {
+  test('Test 13: Non-operational roles see simple profile card', async ({ generalUserPage }) => {
     await generalUserPage.goto('/');
     await generalUserPage.waitForLoadState('networkidle');
 
-    // Should NOT see KPI cards
-    const kpiText = generalUserPage.locator('text=/open request|untriaged|overdue job/i');
-    await expect(kpiText).not.toBeVisible();
+    // Should NOT see KPI cards or "operational overview"
+    await expect(generalUserPage.locator('text=/Open Requests/i')).not.toBeVisible({ timeout: 3_000 });
 
-    // Should see a simpler view
-    await expect(generalUserPage.locator('aside')).toBeVisible();
+    // Should see "Your Profile" heading instead
+    await expect(generalUserPage.locator('text=/Your Profile/i')).toBeVisible({ timeout: 5_000 });
+
+    // Profile card should show user info
+    await expect(generalUserPage.locator('text=/Email/i')).toBeVisible();
+    await expect(generalUserPage.locator('text=/Role/i')).toBeVisible();
   });
 
-  test('Test 13b: GA Staff sees simple welcome (not operational dashboard)', async ({ gaStaffPage }) => {
+  test('Test 13b: GA Staff also sees simple welcome (not operational dashboard)', async ({ gaStaffPage }) => {
     await gaStaffPage.goto('/');
     await gaStaffPage.waitForLoadState('networkidle');
 
-    // GA Staff is not operational — should not see full dashboard
-    // (May depend on exact role config)
-    await expect(gaStaffPage.locator('aside')).toBeVisible();
+    // GA Staff is NOT operational — should not see full dashboard
+    await expect(gaStaffPage.locator('text=/Your Profile/i')).toBeVisible({ timeout: 5_000 });
+
+    // Should not see KPI cards
+    await expect(gaStaffPage.locator('text=/Open Requests/i')).not.toBeVisible({ timeout: 3_000 });
   });
 
-  test('Test 14: Status distribution charts visible', async ({ adminPage }) => {
+  test('Test 14: Status distribution charts visible for operational roles', async ({ adminPage }) => {
     await adminPage.goto('/');
     await adminPage.waitForLoadState('networkidle');
 
-    // Look for recharts SVG elements (bar charts render as SVG)
-    const charts = adminPage.locator('.recharts-wrapper, svg.recharts-surface');
-    await adminPage.waitForTimeout(2_000);
-    const chartCount = await charts.count();
-    // Should have at least 2 charts (request + job status distribution)
-    expect(chartCount).toBeGreaterThanOrEqual(0); // May not render if no data
-  });
+    // Look for chart section headings
+    const requestChartTitle = adminPage.locator('text=/Request Status Distribution/i');
+    const jobChartTitle = adminPage.locator('text=/Job Status Distribution/i');
 
-  test('Test 15: Staff workload table', async ({ adminPage }) => {
-    await adminPage.goto('/');
-    await adminPage.waitForLoadState('networkidle');
+    // At least one chart should be visible
+    const hasRequestChart = await requestChartTitle.isVisible({ timeout: 3_000 }).catch(() => false);
+    const hasJobChart = await jobChartTitle.isVisible({ timeout: 3_000 }).catch(() => false);
+    expect(hasRequestChart || hasJobChart).toBeTruthy();
 
-    // Staff workload section
-    const workload = adminPage.locator('text=/staff workload/i');
-    if (await workload.isVisible()) {
-      // Table should be sortable — look for column headers
-      const sortHeaders = adminPage.locator('th button, th [role="button"]');
-      expect(await sortHeaders.count()).toBeGreaterThan(0);
+    // Charts render as SVG via recharts
+    if (hasRequestChart || hasJobChart) {
+      const rechartsSvg = adminPage.locator('.recharts-wrapper');
+      const chartCount = await rechartsSvg.count();
+      expect(chartCount).toBeGreaterThanOrEqual(1);
     }
   });
 
-  test('Test 16: Request aging table with time buckets', async ({ adminPage }) => {
+  test('Test 15: Staff Workload table with sortable columns', async ({ adminPage }) => {
     await adminPage.goto('/');
     await adminPage.waitForLoadState('networkidle');
 
-    // Request aging section
-    const aging = adminPage.locator('text=/request aging|aging/i');
-    if (await aging.isVisible()) {
-      // Should show time bucket headers
-      await expect(adminPage.locator('text=/0-3|4-7|8-14|15\\+/').first()).toBeVisible();
+    // Staff Workload section heading
+    const workloadHeading = adminPage.locator('text=/Staff Workload/i');
+    await expect(workloadHeading).toBeVisible({ timeout: 5_000 });
+
+    // Column headers should be visible
+    for (const header of ['Staff Name', 'Active Jobs', 'Completed', 'Overdue']) {
+      await expect(adminPage.locator(`text=/${header}/i`).first()).toBeVisible();
+    }
+
+    // Headers should be sortable — look for sort indicator arrows (↑↓↕)
+    const sortIndicators = adminPage.locator('th').filter({ hasText: /[↑↓↕]/ });
+    const sortCount = await sortIndicators.count();
+    expect(sortCount).toBeGreaterThanOrEqual(1);
+
+    // Click a header to sort
+    const activeJobsHeader = adminPage.locator('th', { hasText: /Active Jobs/i });
+    if (await activeJobsHeader.isVisible()) {
+      await activeJobsHeader.click();
+      await adminPage.waitForTimeout(500);
     }
   });
 
-  test('Test 17: Maintenance summary with urgency groups', async ({ adminPage }) => {
+  test('Test 16: Request Aging table with time buckets', async ({ adminPage }) => {
     await adminPage.goto('/');
     await adminPage.waitForLoadState('networkidle');
 
-    // Maintenance summary section
-    const maintenance = adminPage.locator('text=/maintenance summary|maintenance/i');
-    if (await maintenance.isVisible()) {
-      // May show overdue (red), due this week (yellow), due this month
-      // Content depends on data — just verify section exists
-      expect(await maintenance.count()).toBeGreaterThan(0);
-    }
+    // Request Aging section heading
+    const agingHeading = adminPage.locator('text=/Request Aging/i');
+    await expect(agingHeading).toBeVisible({ timeout: 5_000 });
+
+    // Time bucket headers should be present (e.g., "0-5 days", "6-10 days", etc.)
+    const bucketHeaders = adminPage.locator('th').filter({ hasText: /days/i });
+    const bucketCount = await bucketHeaders.count();
+    expect(bucketCount).toBeGreaterThanOrEqual(2);
   });
 
-  test('Test 18: Inventory summary with status and category tables', async ({ adminPage }) => {
+  test('Test 17: Maintenance Summary with urgency groups', async ({ adminPage }) => {
     await adminPage.goto('/');
     await adminPage.waitForLoadState('networkidle');
 
-    // Inventory summary section
-    const inventory = adminPage.locator('text=/inventory summary|inventory/i');
-    if (await inventory.isVisible()) {
-      // Should show "By Status" and "By Category" sub-tables
-      await expect(adminPage.locator('text=/by status|by category/i').first()).toBeVisible();
+    // Maintenance Summary section heading
+    const maintenanceHeading = adminPage.locator('text=/Maintenance Summary/i');
+    await expect(maintenanceHeading).toBeVisible({ timeout: 5_000 });
+
+    // May show urgency labels (Overdue, Due This Week, Due This Month) or "No maintenance due"
+    const noMaintenance = adminPage.locator('text=/No maintenance due/i');
+    const hasMaintenance = !(await noMaintenance.isVisible({ timeout: 2_000 }).catch(() => false));
+
+    if (hasMaintenance) {
+      // Should show urgency badges
+      const urgencyLabels = adminPage.locator('text=/Overdue|Due This Week|Due This Month/i');
+      expect(await urgencyLabels.count()).toBeGreaterThanOrEqual(1);
     }
+    // Either way, section heading is visible — that's the key assertion
+  });
+
+  test('Test 18: Inventory Summary with By Status and By Category', async ({ adminPage }) => {
+    await adminPage.goto('/');
+    await adminPage.waitForLoadState('networkidle');
+
+    // Inventory Overview section heading
+    const inventoryHeading = adminPage.locator('text=/Inventory Overview/i');
+    await expect(inventoryHeading).toBeVisible({ timeout: 5_000 });
+
+    // Sub-section headings: "BY STATUS" and "BY CATEGORY"
+    await expect(adminPage.locator('text=/BY STATUS/i').first()).toBeVisible();
+    await expect(adminPage.locator('text=/BY CATEGORY/i').first()).toBeVisible();
+
+    // Table columns: "Status"/"Category" + "Count"
+    const statusHeader = adminPage.locator('th', { hasText: /^Status$/i });
+    const categoryHeader = adminPage.locator('th', { hasText: /^Category$/i });
+    const countHeaders = adminPage.locator('th', { hasText: /^Count$/i });
+
+    await expect(statusHeader).toBeVisible();
+    await expect(categoryHeader).toBeVisible();
+    expect(await countHeaders.count()).toBeGreaterThanOrEqual(2);
   });
 });

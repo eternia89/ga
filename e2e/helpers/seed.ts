@@ -19,8 +19,8 @@ export interface TestData {
   };
 }
 
-const TEST_EMAIL_DOMAIN = 'e2e-test.local';
-const TEST_PASSWORD = 'E2eTest!2026';
+const TEST_EMAIL_DOMAIN = 'gmail.com';
+const TEST_PASSWORD = 'asdf1234';
 const E2E_COMPANY_NAME = 'E2E Test Corp';
 
 function createAdminClient(): SupabaseClient {
@@ -73,16 +73,27 @@ async function upsertUser(
   const { data: existingUsers } = await supabase.auth.admin.listUsers();
   const existing = existingUsers?.users?.find((u) => u.email === email);
 
+  // app_metadata is required for RLS helper functions (current_user_company_id, current_user_role)
+  const appMetadata = {
+    company_id: companyId,
+    role,
+    ...(divisionId ? { division_id: divisionId } : {}),
+  };
+
   let userId: string;
   if (existing) {
     userId = existing.id;
-    // Update password in case it changed
-    await supabase.auth.admin.updateUserById(userId, { password: TEST_PASSWORD });
+    // Update password and app_metadata
+    await supabase.auth.admin.updateUserById(userId, {
+      password: TEST_PASSWORD,
+      app_metadata: appMetadata,
+    });
   } else {
     const { data, error } = await supabase.auth.admin.createUser({
       email,
       password: TEST_PASSWORD,
       email_confirm: true,
+      app_metadata: appMetadata,
     });
     if (error) throw new Error(`Failed to create user ${email}: ${error.message}`);
     userId = data.user.id;

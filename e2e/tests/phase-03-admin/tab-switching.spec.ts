@@ -17,9 +17,9 @@ test.describe('Phase 03 — Tab Switching', () => {
     await settings.switchTab('Locations');
     await expect(adminPage).toHaveURL(/tab=locations/i);
 
-    // Switch to Categories tab
-    await settings.switchTab('Categories');
-    await expect(adminPage).toHaveURL(/tab=categories/i);
+    // Switch to Request Categories tab
+    await settings.switchTab('Request Categories');
+    await expect(adminPage).toHaveURL(/tab=request-categories/i);
 
     // Switch to Users tab
     await settings.switchTab('Users');

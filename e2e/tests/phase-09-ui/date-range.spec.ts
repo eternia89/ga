@@ -1,5 +1,5 @@
 /**
- * Phase 09.1 — Tests 7-8: Date range picker on jobs and requests
+ * Phase 09 — Tests 7-8: Date range picker on jobs and requests
  */
 import { test, expect } from '../../fixtures';
 
@@ -8,34 +8,35 @@ test.describe('Phase 09 — Date Range', () => {
     await gaLeadPage.goto('/jobs');
     await gaLeadPage.waitForLoadState('networkidle');
 
-    // Date range filter should be visible
-    const dateFilter = gaLeadPage.getByRole('button', { name: /date|range|period/i }).first();
-    if (await dateFilter.isVisible()) {
-      // Click to open calendar
-      await dateFilter.click();
+    // Date range filter button — look for "Pick date range" or calendar-related button
+    const dateFilter = gaLeadPage.getByRole('button', { name: /date|range|period|pick date/i }).first();
+    await expect(dateFilter).toBeVisible({ timeout: 5_000 });
 
-      // Calendar popup should appear
-      const calendar = gaLeadPage.locator('[role="dialog"], .rdp, [class*="calendar"]');
-      await expect(calendar).toBeVisible({ timeout: 3_000 });
+    // Click to open calendar popover
+    await dateFilter.click();
+    await gaLeadPage.waitForTimeout(500);
 
-      // Close by pressing Escape
-      await gaLeadPage.keyboard.press('Escape');
-    }
+    // Calendar dialog/popover should appear (use role="dialog" for the popover content)
+    const calendarDialog = gaLeadPage.locator('[role="dialog"]').first();
+    await expect(calendarDialog).toBeVisible({ timeout: 3_000 });
+
+    // Close by pressing Escape
+    await gaLeadPage.keyboard.press('Escape');
   });
 
   test('Test 8: Requests list has date range picker', async ({ gaLeadPage }) => {
     await gaLeadPage.goto('/requests');
     await gaLeadPage.waitForLoadState('networkidle');
 
-    // Date range filter
-    const dateFilter = gaLeadPage.getByRole('button', { name: /date|range|period/i }).first();
-    if (await dateFilter.isVisible()) {
-      await dateFilter.click();
+    const dateFilter = gaLeadPage.getByRole('button', { name: /date|range|period|pick date/i }).first();
+    await expect(dateFilter).toBeVisible({ timeout: 5_000 });
 
-      const calendar = gaLeadPage.locator('[role="dialog"], .rdp, [class*="calendar"]');
-      await expect(calendar).toBeVisible({ timeout: 3_000 });
+    await dateFilter.click();
+    await gaLeadPage.waitForTimeout(500);
 
-      await gaLeadPage.keyboard.press('Escape');
-    }
+    const calendarDialog = gaLeadPage.locator('[role="dialog"]').first();
+    await expect(calendarDialog).toBeVisible({ timeout: 3_000 });
+
+    await gaLeadPage.keyboard.press('Escape');
   });
 });

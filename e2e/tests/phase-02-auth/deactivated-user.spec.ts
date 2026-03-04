@@ -12,8 +12,8 @@ test.describe('Phase 02 — Deactivated User', () => {
     const data = getTestData();
 
     // Create a temporary user for this test
-    const tempEmail = `deactivated-test-${Date.now()}@e2e-test.local`;
-    const tempPassword = 'E2eTest!2026';
+    const tempEmail = `deactivated-test-${Date.now()}@gmail.com`;
+    const tempPassword = 'asdf1234';
 
     const { data: authUser } = await supabase.auth.admin.createUser({
       email: tempEmail,

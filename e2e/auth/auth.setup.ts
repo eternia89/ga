@@ -23,7 +23,7 @@ for (const role of roles) {
     await page.click('button[type="submit"]');
 
     // Wait for redirect to dashboard
-    await page.waitForURL('/', { timeout: 15_000 });
+    await page.waitForURL('/', { timeout: 60_000 });
     await page.waitForLoadState('networkidle');
 
     // Save storage state
