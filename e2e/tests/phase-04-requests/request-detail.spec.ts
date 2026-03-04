@@ -18,8 +18,8 @@ test.describe('Phase 04 — Request Detail', () => {
     // Verify detail layout
     const detail = new RequestDetailPage(generalUserPage);
 
-    // Request ID visible
-    await expect(generalUserPage.locator('text=/REQ-/')).toBeVisible();
+    // Request ID visible (R{CC}-{YY}-{NNN} format)
+    await expect(generalUserPage.locator('text=/R[A-Z0-9]/')).toBeVisible();
 
     // Status badge visible
     await expect(generalUserPage.locator('text=/new|submitted/i')).toBeVisible();

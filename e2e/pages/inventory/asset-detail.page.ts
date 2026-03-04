@@ -17,7 +17,7 @@ export class AssetDetailPage {
   }
 
   async expectAssetId(pattern: string | RegExp) {
-    await expect(this.page.locator('text=/AST-/')).toContainText(pattern);
+    await expect(this.page.locator('text=/(AST-|I[A-Z0-9])/')).toContainText(pattern);
   }
 
   async expectStatus(status: string | RegExp) {

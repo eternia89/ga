@@ -24,7 +24,7 @@ test.describe('Phase 06 — Asset CRUD', () => {
     await sidebar.expectNavItem('Assets');
   });
 
-  test('Test 2: Asset list page loads with AST-YY-NNNN format IDs', async ({ gaStaffPage }) => {
+  test('Test 2: Asset list page loads with I{CC}-{YY}-{NNN} format IDs', async ({ gaStaffPage }) => {
     await gaStaffPage.goto('/inventory');
     await gaStaffPage.waitForLoadState('networkidle');
     await expect(gaStaffPage.locator('h1', { hasText: /inventory|assets/i })).toBeVisible();
@@ -147,7 +147,7 @@ test.describe.serial('Phase 06 — Asset Create & Edit (Tests 4-7)', () => {
       }
     }
 
-    await expect(gaStaffPage.getByRole('heading', { name: /AST-/ })).toBeVisible({ timeout: 10_000 });
+    await expect(gaStaffPage.getByRole('heading', { name: /(AST-|I[A-Z0-9])/ })).toBeVisible({ timeout: 10_000 });
 
     // Extract asset ID from URL
     const url = gaStaffPage.url();
@@ -164,7 +164,7 @@ test.describe.serial('Phase 06 — Asset Create & Edit (Tests 4-7)', () => {
     await gaStaffPage.waitForLoadState('networkidle');
 
     // The detail page IS the edit page for GA Staff — verify edit form is present
-    await expect(gaStaffPage.getByRole('heading', { name: /AST-/ })).toBeVisible({ timeout: 5_000 });
+    await expect(gaStaffPage.getByRole('heading', { name: /(AST-|I[A-Z0-9])/ })).toBeVisible({ timeout: 5_000 });
 
     // Invoice Files section should be present
     await expect(gaStaffPage.locator('text=/Invoice Files/i')).toBeVisible();
@@ -198,8 +198,8 @@ test.describe.serial('Phase 06 — Asset Create & Edit (Tests 4-7)', () => {
     await gaStaffPage.goto(`/inventory/${testAssetId}`);
     await gaStaffPage.waitForLoadState('networkidle');
 
-    // Verify heading with AST-YY-NNNN format
-    await expect(gaStaffPage.getByRole('heading', { name: /AST-/ })).toBeVisible({ timeout: 5_000 });
+    // Verify heading with I{CC}-{YY}-{NNN} format (or legacy AST- format)
+    await expect(gaStaffPage.getByRole('heading', { name: /(AST-|I[A-Z0-9])/ })).toBeVisible({ timeout: 5_000 });
 
     // Verify two-column layout container (grid with max-w)
     const gridContainer = gaStaffPage.locator('.grid.max-w-\\[1000px\\]');

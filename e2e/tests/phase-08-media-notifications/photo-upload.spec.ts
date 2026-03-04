@@ -120,9 +120,9 @@ test.describe('Phase 08 — Photo Upload & Media', () => {
       await generalUserPage.keyboard.press('Escape');
       await expect(lightbox).not.toBeVisible({ timeout: 3_000 });
     } else {
-      // Request created successfully (REQ-ID visible), but photos may render differently
+      // Request created successfully (Request ID visible), but photos may render differently
       // for general_user (read-only view may show img elements without button wrapper)
-      await expect(generalUserPage.locator('text=/REQ-/').first()).toBeVisible({ timeout: 5_000 });
+      await expect(generalUserPage.locator('text=/R[A-Z0-9]/').first()).toBeVisible({ timeout: 5_000 });
     }
   });
 
@@ -136,8 +136,8 @@ test.describe('Phase 08 — Photo Upload & Media', () => {
     await firstRow.click();
     await gaLeadPage.waitForLoadState('networkidle');
 
-    // Verify we navigated to a detail page (REQ-ID in breadcrumb or heading)
-    await expect(gaLeadPage.locator('text=/REQ-/').first()).toBeVisible({ timeout: 5_000 });
+    // Verify we navigated to a detail page (Request ID in breadcrumb or heading)
+    await expect(gaLeadPage.locator('text=/R[A-Z0-9]/').first()).toBeVisible({ timeout: 5_000 });
 
     // The detail page should render without errors
     // Photos section exists in the edit form for GA Lead

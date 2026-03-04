@@ -17,7 +17,7 @@ export class RequestDetailPage {
   }
 
   async expectRequestId(pattern: string | RegExp) {
-    await expect(this.page.locator('text=/REQ-/')).toContainText(pattern);
+    await expect(this.page.locator('text=/R[A-Z0-9]/')).toContainText(pattern);
   }
 
   async expectStatus(status: string | RegExp) {

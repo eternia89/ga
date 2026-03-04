@@ -17,7 +17,7 @@ export class JobDetailPage {
   }
 
   async expectJobId(pattern: string | RegExp) {
-    await expect(this.page.locator('text=/JOB-/')).toContainText(pattern);
+    await expect(this.page.locator('text=/J[A-Z0-9]/')).toContainText(pattern);
   }
 
   async expectStatus(status: string | RegExp) {

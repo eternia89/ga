@@ -22,7 +22,7 @@ import { z } from 'zod';
 
 // ============================================================================
 // createAsset — ga_staff, ga_lead, admin only
-// Generates AST-YY-NNNN display ID atomically via DB function
+// Generates I{CC}-{YY}-{NNN} display ID atomically via DB function
 // ============================================================================
 export const createAsset = authActionClient
   .schema(assetCreateSchema)
@@ -36,7 +36,7 @@ export const createAsset = authActionClient
 
     // Generate display_id atomically via DB function
     const { data: displayId, error: rpcError } = await supabase
-      .rpc('generate_asset_display_id', { p_company_id: profile.company_id });
+      .rpc('generate_entity_display_id', { p_company_id: profile.company_id, p_entity_type: 'asset' });
 
     if (rpcError || !displayId) {
       throw new Error('Failed to generate asset ID. Please try again.');

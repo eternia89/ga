@@ -34,7 +34,7 @@ test.describe('Phase 05 — Job Detail', () => {
     await gaLeadPage.waitForLoadState('networkidle');
 
     // Job ID visible
-    await expect(gaLeadPage.locator('text=/JOB-/')).toBeVisible();
+    await expect(gaLeadPage.locator('text=/J[A-Z0-9]/')).toBeVisible();
 
     // Status badge visible
     await expect(gaLeadPage.locator('.badge, [class*="badge"]').first()).toBeVisible();

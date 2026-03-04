@@ -19,7 +19,7 @@ test.describe('Phase 04 — Request Submit', () => {
     // Should redirect to request detail or list with success
     await generalUserPage.waitForURL(/\/requests\//, { timeout: 10_000 });
 
-    // Verify request ID was generated (REQ-YY-NNNN format)
-    await expect(generalUserPage.locator('text=/REQ-/')).toBeVisible({ timeout: 5_000 });
+    // Verify request ID was generated (R{CC}-{YY}-{NNN} format)
+    await expect(generalUserPage.locator('text=/R[A-Z0-9]/')).toBeVisible({ timeout: 5_000 });
   });
 });

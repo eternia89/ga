@@ -22,7 +22,7 @@ test.describe('Phase 05 — Job CRUD', () => {
 
     // Should redirect to job detail
     await gaLeadPage.waitForURL(/\/jobs\//, { timeout: 10_000 });
-    await expect(gaLeadPage.locator('text=/JOB-/')).toBeVisible({ timeout: 5_000 });
+    await expect(gaLeadPage.locator('text=/J[A-Z0-9]/')).toBeVisible({ timeout: 5_000 });
   });
 
   test('Test 12: Cancel a job', async ({ gaLeadPage }) => {

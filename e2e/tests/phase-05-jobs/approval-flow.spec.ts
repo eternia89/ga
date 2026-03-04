@@ -48,7 +48,7 @@ test.describe('Phase 05 — Approval Flow', () => {
 
     // Should show at least one pending approval
     // Known bug: approval queue is always empty due to FK join issue
-    await approvals.expectApprovalInList(/JOB-/);
+    await approvals.expectApprovalInList(/J[A-Z0-9]/);
   });
 
   test('Test 10: Approve budget', async ({ financeApproverPage }) => {
@@ -98,7 +98,7 @@ test.describe('Phase 05 — Approval Flow', () => {
     await gaLeadPage.waitForURL(/\/jobs\//, { timeout: 10_000 });
 
     // Verify job was created
-    await expect(gaLeadPage.locator('text=/JOB-/')).toBeVisible();
+    await expect(gaLeadPage.locator('text=/J[A-Z0-9]/')).toBeVisible();
   });
 
   test('Retest 6: Budget approval threshold from company settings', async ({ adminPage }) => {

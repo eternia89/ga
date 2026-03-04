@@ -22,7 +22,7 @@ export const createRequest = authActionClient
 
     // Generate display_id atomically via DB function
     const { data: displayId, error: rpcError } = await supabase
-      .rpc('generate_request_display_id', { p_company_id: profile.company_id });
+      .rpc('generate_entity_display_id', { p_company_id: profile.company_id, p_entity_type: 'request' });
 
     if (rpcError || !displayId) {
       throw new Error('Failed to generate request ID. Please try again.');
