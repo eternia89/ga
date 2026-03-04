@@ -54,8 +54,8 @@ export const createAsset = authActionClient
         brand: parsedInput.brand ?? null,
         model: parsedInput.model ?? null,
         serial_number: parsedInput.serial_number ?? null,
-        acquisition_date: parsedInput.acquisition_date ?? null,
-        warranty_expiry: parsedInput.warranty_expiry ?? null,
+        acquisition_date: parsedInput.acquisition_date || null,
+        warranty_expiry: parsedInput.warranty_expiry || null,
         status: 'active',
       })
       .select('id, display_id')
@@ -110,8 +110,8 @@ export const updateAsset = authActionClient
         brand: parsedInput.data.brand ?? null,
         model: parsedInput.data.model ?? null,
         serial_number: parsedInput.data.serial_number ?? null,
-        acquisition_date: parsedInput.data.acquisition_date ?? null,
-        warranty_expiry: parsedInput.data.warranty_expiry ?? null,
+        acquisition_date: parsedInput.data.acquisition_date || null,
+        warranty_expiry: parsedInput.data.warranty_expiry || null,
       })
       .eq('id', parsedInput.asset_id);
 
