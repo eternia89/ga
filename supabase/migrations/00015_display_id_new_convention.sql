@@ -1,89 +1,157 @@
 -- Migration: Change display ID convention to globally unique format
 -- New format: {R/J/I}{2-char-company-code}-{YY}-{NNN}
--- Examples: RAB-26-001 (request), JAB-26-002 (job), IAB-26-003 (inventory)
--- Counter is GLOBAL (not company-scoped) to ensure uniqueness across companies.
+-- Examples: RJK-26-001 (request), JJK-26-002 (job), IJK-26-003 (inventory)
 -- Existing display IDs are NOT retroactively changed.
+--
+-- Strategy: UPDATE the 3 existing functions in-place (already in PostgREST
+-- schema cache) rather than creating a new unified function.
 
 -- ============================================================================
--- 1. Create unified generate_entity_display_id function
---    Replaces generate_request_display_id, generate_job_display_id,
---    generate_asset_display_id for NEW entities.
---    Old functions are NOT dropped (may be referenced elsewhere).
+-- 1. Update generate_request_display_id — new format R{CC}-{YY}-{NNN}
 -- ============================================================================
 
-CREATE OR REPLACE FUNCTION public.generate_entity_display_id(
-  p_company_id uuid,
-  p_entity_type text
-)
+CREATE OR REPLACE FUNCTION public.generate_request_display_id(p_company_id uuid)
 RETURNS text
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
-  v_prefix_letter text;
-  v_company_code text;
+  v_next_value bigint;
   v_year_key text;
+  v_company_code text;
   v_counter_key text;
-  v_next_value integer;
 BEGIN
-  -- Validate entity type
-  IF p_entity_type NOT IN ('request', 'job', 'asset') THEN
-    RAISE EXCEPTION 'Invalid entity type: %. Must be one of: request, job, asset', p_entity_type;
-  END IF;
+  v_year_key := TO_CHAR(NOW(), 'YY');
 
-  -- Map entity type to prefix letter
-  v_prefix_letter := CASE p_entity_type
-    WHEN 'request' THEN 'R'
-    WHEN 'job' THEN 'J'
-    WHEN 'asset' THEN 'I'
-  END;
-
-  -- Look up company code
   SELECT code INTO v_company_code
   FROM companies
   WHERE id = p_company_id AND deleted_at IS NULL;
 
   IF v_company_code IS NULL OR v_company_code = '' THEN
-    RAISE EXCEPTION 'Company code is required for display ID generation';
+    RAISE EXCEPTION 'Company code is required for display ID generation. Set a 2-character code in Admin > Companies.';
   END IF;
-
-  -- Company code must be exactly 2 characters
   IF LENGTH(v_company_code) <> 2 THEN
     RAISE EXCEPTION 'Company code must be exactly 2 characters, got: %', v_company_code;
   END IF;
 
-  -- Get 2-digit year
-  v_year_key := TO_CHAR(NOW(), 'YY');
+  v_counter_key := 'request_' || v_year_key;
 
-  -- Counter key: per-company, per-entity-type, per-year
-  -- Display IDs are globally unique because the company code (2 chars) is
-  -- embedded in the ID: IJK-26-001 vs IAB-26-001 can never collide.
-  v_counter_key := p_entity_type || '_' || v_year_key;
-
-  -- Atomically increment or create counter (company-scoped)
   UPDATE id_counters
-  SET current_value = current_value + 1
-  WHERE company_id = p_company_id
-    AND entity_type = v_counter_key
+  SET current_value = current_value + 1, updated_at = now()
+  WHERE company_id = p_company_id AND entity_type = v_counter_key
   RETURNING current_value INTO v_next_value;
 
   IF NOT FOUND THEN
-    INSERT INTO id_counters (company_id, entity_type, prefix, current_value, reset_period)
-    VALUES (p_company_id, v_counter_key, v_prefix_letter, 1, 'yearly')
+    INSERT INTO id_counters (id, company_id, entity_type, prefix, current_value, reset_period)
+    VALUES (gen_random_uuid(), p_company_id, v_counter_key, 'R', 1, 'yearly')
     ON CONFLICT (company_id, entity_type)
     DO UPDATE SET current_value = id_counters.current_value + 1
     RETURNING current_value INTO v_next_value;
   END IF;
 
-  -- Return format: {prefix}{company_code}-{YY}-{NNN}
-  RETURN v_prefix_letter || v_company_code || '-' || v_year_key || '-' || LPAD(v_next_value::text, 3, '0');
+  RETURN 'R' || v_company_code || '-' || v_year_key || '-' || LPAD(v_next_value::text, 3, '0');
 END;
 $$;
 
 -- ============================================================================
--- 2. Update generate_pm_jobs() to use new unified function
---    Only the display_id generation line changes.
+-- 2. Update generate_job_display_id — new format J{CC}-{YY}-{NNN}
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION public.generate_job_display_id(p_company_id uuid)
+RETURNS text
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_next_value bigint;
+  v_year_key text;
+  v_company_code text;
+  v_counter_key text;
+BEGIN
+  v_year_key := TO_CHAR(NOW(), 'YY');
+
+  SELECT code INTO v_company_code
+  FROM companies
+  WHERE id = p_company_id AND deleted_at IS NULL;
+
+  IF v_company_code IS NULL OR v_company_code = '' THEN
+    RAISE EXCEPTION 'Company code is required for display ID generation. Set a 2-character code in Admin > Companies.';
+  END IF;
+  IF LENGTH(v_company_code) <> 2 THEN
+    RAISE EXCEPTION 'Company code must be exactly 2 characters, got: %', v_company_code;
+  END IF;
+
+  v_counter_key := 'job_' || v_year_key;
+
+  UPDATE id_counters
+  SET current_value = current_value + 1, updated_at = now()
+  WHERE company_id = p_company_id AND entity_type = v_counter_key
+  RETURNING current_value INTO v_next_value;
+
+  IF NOT FOUND THEN
+    INSERT INTO id_counters (id, company_id, entity_type, prefix, current_value, reset_period)
+    VALUES (gen_random_uuid(), p_company_id, v_counter_key, 'J', 1, 'yearly')
+    ON CONFLICT (company_id, entity_type)
+    DO UPDATE SET current_value = id_counters.current_value + 1
+    RETURNING current_value INTO v_next_value;
+  END IF;
+
+  RETURN 'J' || v_company_code || '-' || v_year_key || '-' || LPAD(v_next_value::text, 3, '0');
+END;
+$$;
+
+-- ============================================================================
+-- 3. Update generate_asset_display_id — new format I{CC}-{YY}-{NNN}
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION public.generate_asset_display_id(p_company_id uuid)
+RETURNS text
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_next_value bigint;
+  v_year_key text;
+  v_company_code text;
+  v_counter_key text;
+BEGIN
+  v_year_key := TO_CHAR(NOW(), 'YY');
+
+  SELECT code INTO v_company_code
+  FROM companies
+  WHERE id = p_company_id AND deleted_at IS NULL;
+
+  IF v_company_code IS NULL OR v_company_code = '' THEN
+    RAISE EXCEPTION 'Company code is required for display ID generation. Set a 2-character code in Admin > Companies.';
+  END IF;
+  IF LENGTH(v_company_code) <> 2 THEN
+    RAISE EXCEPTION 'Company code must be exactly 2 characters, got: %', v_company_code;
+  END IF;
+
+  v_counter_key := 'asset_' || v_year_key;
+
+  UPDATE id_counters
+  SET current_value = current_value + 1, updated_at = now()
+  WHERE company_id = p_company_id AND entity_type = v_counter_key
+  RETURNING current_value INTO v_next_value;
+
+  IF NOT FOUND THEN
+    INSERT INTO id_counters (id, company_id, entity_type, prefix, current_value, reset_period)
+    VALUES (gen_random_uuid(), p_company_id, v_counter_key, 'I', 1, 'yearly')
+    ON CONFLICT (company_id, entity_type)
+    DO UPDATE SET current_value = id_counters.current_value + 1
+    RETURNING current_value INTO v_next_value;
+  END IF;
+
+  RETURN 'I' || v_company_code || '-' || v_year_key || '-' || LPAD(v_next_value::text, 3, '0');
+END;
+$$;
+
+-- ============================================================================
+-- 4. Update generate_pm_jobs() to use updated generate_job_display_id
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.generate_pm_jobs()
@@ -117,7 +185,6 @@ BEGIN
       AND ms.is_active = true
       AND mt.is_active = true
       AND ms.next_due_at <= now()
-      -- Deduplication: skip if open PM job exists for this schedule
       AND NOT EXISTS (
         SELECT 1 FROM jobs j
         WHERE j.maintenance_schedule_id = ms.id
@@ -125,7 +192,6 @@ BEGIN
           AND j.status NOT IN ('completed', 'cancelled')
       )
   LOOP
-    -- Use first ga_lead in company as the system creator for auto-generated jobs
     SELECT id INTO v_created_by
     FROM user_profiles
     WHERE company_id = v_schedule.company_id
@@ -133,7 +199,6 @@ BEGIN
       AND deleted_at IS NULL
     LIMIT 1;
 
-    -- Fallback to first admin if no ga_lead found
     IF v_created_by IS NULL THEN
       SELECT id INTO v_created_by
       FROM user_profiles
@@ -143,24 +208,15 @@ BEGIN
       LIMIT 1;
     END IF;
 
-    -- Skip if no valid user found (should not happen in practice)
     IF v_created_by IS NULL THEN
       CONTINUE;
     END IF;
 
-    -- Generate display ID using the new unified function
-    v_display_id := generate_entity_display_id(v_schedule.company_id, 'job');
+    v_display_id := generate_job_display_id(v_schedule.company_id);
 
-    -- Build checklist snapshot: template definition items with null values
-    -- items array uses the template checklist items as-is (definition only, values null)
     INSERT INTO jobs (
-      company_id,
-      display_id,
-      title,
-      job_type,
-      maintenance_schedule_id,
-      status,
-      created_by,
+      company_id, display_id, title, job_type,
+      maintenance_schedule_id, status, created_by,
       checklist_responses
     ) VALUES (
       v_schedule.company_id,
@@ -188,8 +244,6 @@ BEGIN
       )
     );
 
-    -- Advance next_due_at only for FIXED schedules
-    -- FLOATING schedules: next_due_at is updated when the PM job is completed
     IF v_schedule.interval_type = 'fixed' THEN
       UPDATE maintenance_schedules
       SET next_due_at = v_schedule.next_due_at + (v_schedule.interval_days || ' days')::interval
@@ -201,24 +255,17 @@ END;
 $$;
 
 -- ============================================================================
--- 3. Update unique constraints to be globally unique (not company-scoped)
---    New display IDs are globally unique, so constraints should match.
---    Old data may have duplicates across companies, but in practice the
---    old format (REQ-26-0001, JOB-26-0001, AST-26-0001) uses different
---    prefixes so they won't collide.
+-- 5. Update unique constraints to be globally unique (not company-scoped)
 -- ============================================================================
 
--- Requests: drop company-scoped and any existing global unique, then re-add
 ALTER TABLE public.requests DROP CONSTRAINT IF EXISTS requests_display_id_company_unique;
 ALTER TABLE public.requests DROP CONSTRAINT IF EXISTS requests_display_id_key;
 ALTER TABLE public.requests ADD CONSTRAINT requests_display_id_key UNIQUE (display_id);
 
--- Jobs: drop company-scoped and any existing global unique, then re-add
 ALTER TABLE public.jobs DROP CONSTRAINT IF EXISTS jobs_display_id_company_unique;
 ALTER TABLE public.jobs DROP CONSTRAINT IF EXISTS jobs_display_id_key;
 ALTER TABLE public.jobs ADD CONSTRAINT jobs_display_id_key UNIQUE (display_id);
 
--- Assets (inventory_items): drop company-scoped and any existing global unique, then re-add
 ALTER TABLE public.inventory_items DROP CONSTRAINT IF EXISTS assets_display_id_company_unique;
 ALTER TABLE public.inventory_items DROP CONSTRAINT IF EXISTS inventory_items_display_id_key;
 ALTER TABLE public.inventory_items ADD CONSTRAINT inventory_items_display_id_key UNIQUE (display_id);
