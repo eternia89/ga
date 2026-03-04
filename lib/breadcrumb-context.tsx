@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, Fragment, type ReactNode } from 'react';
 import Link from 'next/link';
 import {
   Breadcrumb,
@@ -62,20 +62,20 @@ export function HeaderBreadcrumb() {
         {segments.map((seg, i) => {
           const isLast = i === segments.length - 1;
           return (
-            <BreadcrumbItem key={i}>
-              {isLast ? (
-                <BreadcrumbPage className="max-w-[300px] truncate">
-                  {seg.label}
-                </BreadcrumbPage>
-              ) : (
-                <>
+            <Fragment key={i}>
+              <BreadcrumbItem>
+                {isLast ? (
+                  <BreadcrumbPage className="max-w-[300px] truncate">
+                    {seg.label}
+                  </BreadcrumbPage>
+                ) : (
                   <BreadcrumbLink asChild>
                     <Link href={seg.href!}>{seg.label}</Link>
                   </BreadcrumbLink>
-                  <BreadcrumbSeparator />
-                </>
-              )}
-            </BreadcrumbItem>
+                )}
+              </BreadcrumbItem>
+              {!isLast && <BreadcrumbSeparator />}
+            </Fragment>
           );
         })}
       </BreadcrumbList>
