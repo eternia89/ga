@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-03 - Completed quick task 7: Consistent Deactivate/Reactivate terminology
+Last activity: 2026-03-04 - Completed quick task 9: Consolidate content max-width to dashboard layout
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -263,10 +263,11 @@ Recent decisions affecting current work:
 | 6 | Extract EntityFormDialog to DRY admin form dialogs | 2026-03-02 | — | | — |
 | 7 | Consistent Deactivate/Reactivate terminology for soft-delete | 2026-03-03 | 6f91547 | Verified | [3-check-consistency-between-delete-and-dea](./quick/3-check-consistency-between-delete-and-dea/) |
 | 8 | Separate categories view between request and asset types | 2026-03-03 | bdc86a8 | Verified | [4-separate-categories-view-between-request](./quick/4-separate-categories-view-between-request/) |
+| 9 | Consolidate content max-width to dashboard layout | 2026-03-04 | d05c640 | Verified | [5-ensure-that-implementation-of-max-width-](./quick/5-ensure-that-implementation-of-max-width-/) |
 
 ## Session Continuity
 
-Last session: 2026-03-03
-Stopped at: Completed quick task 8: separate categories view between request and asset
-Resume file: .planning/quick/4-separate-categories-view-between-request/4-SUMMARY.md
+Last session: 2026-03-04
+Stopped at: Completed quick task 9: consolidate content max-width to dashboard layout
+Resume file: .planning/quick/5-ensure-that-implementation-of-max-width-/5-SUMMARY.md
 Next: Ready for next task
