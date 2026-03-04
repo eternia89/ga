@@ -207,14 +207,17 @@ $$;
 --    prefixes so they won't collide.
 -- ============================================================================
 
--- Requests: drop company-scoped, add global unique
+-- Requests: drop company-scoped and any existing global unique, then re-add
 ALTER TABLE public.requests DROP CONSTRAINT IF EXISTS requests_display_id_company_unique;
+ALTER TABLE public.requests DROP CONSTRAINT IF EXISTS requests_display_id_key;
 ALTER TABLE public.requests ADD CONSTRAINT requests_display_id_key UNIQUE (display_id);
 
--- Jobs: drop company-scoped, add global unique
+-- Jobs: drop company-scoped and any existing global unique, then re-add
 ALTER TABLE public.jobs DROP CONSTRAINT IF EXISTS jobs_display_id_company_unique;
+ALTER TABLE public.jobs DROP CONSTRAINT IF EXISTS jobs_display_id_key;
 ALTER TABLE public.jobs ADD CONSTRAINT jobs_display_id_key UNIQUE (display_id);
 
--- Assets (inventory_items): drop company-scoped, add global unique
+-- Assets (inventory_items): drop company-scoped and any existing global unique, then re-add
 ALTER TABLE public.inventory_items DROP CONSTRAINT IF EXISTS assets_display_id_company_unique;
+ALTER TABLE public.inventory_items DROP CONSTRAINT IF EXISTS inventory_items_display_id_key;
 ALTER TABLE public.inventory_items ADD CONSTRAINT inventory_items_display_id_key UNIQUE (display_id);
