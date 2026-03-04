@@ -39,6 +39,10 @@ export const createAsset = authActionClient
       .rpc('generate_entity_display_id', { p_company_id: profile.company_id, p_entity_type: 'asset' });
 
     if (rpcError || !displayId) {
+      const msg = rpcError?.message || '';
+      if (msg.includes('Company code')) {
+        throw new Error('Company code must be set (exactly 2 characters) before creating assets. Update it in Admin > Companies.');
+      }
       throw new Error('Failed to generate asset ID. Please try again.');
     }
 

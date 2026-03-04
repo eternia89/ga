@@ -96,9 +96,11 @@ export function CompanyFormDialog({
             name="code"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Code</FormLabel>
+                <FormLabel>
+                  Code <span className="text-destructive">*</span>
+                </FormLabel>
                 <FormControl>
-                  <Input placeholder="ACME" maxLength={10} {...field} />
+                  <Input placeholder="JK" maxLength={2} className="uppercase" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
