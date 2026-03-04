@@ -43,10 +43,10 @@ INSERT INTO public.divisions (id, company_id, name, code) VALUES
   ('d0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000001', 'Finance', 'FN');
 
 -- 5. Seed locations
-INSERT INTO public.locations (id, company_id, name, code, address) VALUES
-  ('l0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'Jakarta HQ', 'JKT', 'Jl. Sudirman No. 1'),
-  ('l0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', 'Surabaya Office', 'SBY', 'Jl. Basuki Rahmat No. 10'),
-  ('l0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000001', 'Bandung Warehouse', 'BDG', 'Jl. Asia Afrika No. 5');
+INSERT INTO public.locations (id, company_id, name, address) VALUES
+  ('l0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'Jakarta HQ', 'Jl. Sudirman No. 1'),
+  ('l0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', 'Surabaya Office', 'Jl. Basuki Rahmat No. 10'),
+  ('l0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000001', 'Bandung Warehouse', 'Jl. Asia Afrika No. 5');
 
 -- 6. Seed categories (request type + asset type)
 INSERT INTO public.categories (id, company_id, name, type) VALUES
