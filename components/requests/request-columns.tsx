@@ -152,19 +152,22 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
     cell: ({ row, table }) => {
       const meta = table.options.meta as RequestTableMeta | undefined;
       return (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs"
-          onClick={(e) => {
-            e.stopPropagation();
-            meta?.onView?.(row.original);
-          }}
-        >
-          View
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={(e) => {
+              e.stopPropagation();
+              meta?.onView?.(row.original);
+            }}
+          >
+            View
+          </Button>
+        </div>
       );
     },
     size: 80,
+    enableSorting: false,
   },
 ];

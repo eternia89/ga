@@ -174,7 +174,10 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
             variant="ghost"
             size="sm"
             className="h-7 px-2 text-xs"
-            onClick={() => meta?.onView?.(schedule)}
+            onClick={(e) => {
+              e.stopPropagation();
+              meta?.onView?.(schedule);
+            }}
           >
             View
           </Button>
@@ -185,7 +188,10 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
                   variant="ghost"
                   size="sm"
                   className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-                  onClick={() => meta?.onDeactivate?.(schedule.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    meta?.onDeactivate?.(schedule.id);
+                  }}
                 >
                   Pause
                 </Button>
@@ -194,7 +200,10 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
                   variant="ghost"
                   size="sm"
                   className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
-                  onClick={() => meta?.onActivate?.(schedule.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    meta?.onActivate?.(schedule.id);
+                  }}
                 >
                   Resume
                 </Button>
@@ -203,7 +212,10 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
                 variant="ghost"
                 size="sm"
                 className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-                onClick={() => meta?.onDelete?.(schedule.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  meta?.onDelete?.(schedule.id);
+                }}
               >
                 Deactivate
               </Button>

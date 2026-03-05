@@ -101,33 +101,52 @@ export const templateColumns: ColumnDef<MaintenanceTemplate>[] = [
       const meta = table.options.meta as TemplateTableMeta | undefined;
       const canManage = ['ga_lead', 'admin'].includes(meta?.currentUserRole ?? '');
 
-      if (!canManage) return null;
-
       return (
         <div className="flex items-center gap-1">
-          {template.is_active ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-              onClick={() => meta?.onDeactivate?.(template.id)}
-            >
-              Deactivate
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
-              onClick={() => meta?.onReactivate?.(template.id)}
-            >
-              Reactivate
-            </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={(e) => {
+              e.stopPropagation();
+              meta?.onView?.(template);
+            }}
+          >
+            View
+          </Button>
+          {canManage && (
+            <>
+              {template.is_active ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    meta?.onDeactivate?.(template.id);
+                  }}
+                >
+                  Deactivate
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    meta?.onReactivate?.(template.id);
+                  }}
+                >
+                  Reactivate
+                </Button>
+              )}
+            </>
           )}
         </div>
       );
     },
-    size: 100,
+    size: 150,
     enableSorting: false,
   },
 ];

@@ -161,5 +161,6 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
       );
     },
     size: 150,
+    enableSorting: false,
   },
 ];

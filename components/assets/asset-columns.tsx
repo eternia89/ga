@@ -121,7 +121,6 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
   },
   {
     id: 'actions',
-    header: 'Actions',
     cell: ({ row, table }) => {
       const asset = row.original;
       const meta = table.options.meta as AssetTableMeta | undefined;
@@ -132,7 +131,10 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
             variant="ghost"
             size="sm"
             className="h-7 px-2 text-xs"
-            onClick={() => meta?.onView?.(asset)}
+            onClick={(e) => {
+              e.stopPropagation();
+              meta?.onView?.(asset);
+            }}
           >
             View
           </Button>
