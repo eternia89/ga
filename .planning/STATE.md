@@ -269,7 +269,7 @@ Recent decisions affecting current work:
 | 12 | Implement modal view pattern on all table list pages | 2026-03-05 | f856883 | Verified | [9-implement-modal-view-pattern-on-all-tabl](./quick/9-implement-modal-view-pattern-on-all-tabl/) |
 | 13 | Unify table row view links to modal pattern | 2026-03-05 | 071b7c9 | Verified | [10-unify-table-row-view-links-to-modal-patt](./quick/10-unify-table-row-view-links-to-modal-patt/) |
 | 14 | Strip table row actions to View only, add modal action buttons | 2026-03-05 | 785dd14 | Verified | [11-table-rows-show-only-view-action-move-se](./quick/11-table-rows-show-only-view-action-move-se/) |
-| 15 | Strip admin settings table rows to Edit-only, move deactivate/reactivate to FormDialog | 2026-03-05 | d6b13af | Complete | [12-strip-admin-settings-table-rows-to-view-](./quick/12-strip-admin-settings-table-rows-to-view-/) |
+| 15 | Strip admin settings table rows to Edit-only, move deactivate/reactivate to FormDialog | 2026-03-05 | d6b13af | Verified | [12-strip-admin-settings-table-rows-to-view-](./quick/12-strip-admin-settings-table-rows-to-view-/) |
 
 ## Session Continuity
 
