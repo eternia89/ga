@@ -9,6 +9,7 @@ import { ScheduleStatusBadge } from './schedule-status-badge';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 
 export type ScheduleTableMeta = {
+  onView?: (schedule: MaintenanceSchedule) => void;
   onDeactivate?: (id: string) => void;
   onActivate?: (id: string) => void;
   onDelete?: (id: string) => void;
@@ -22,17 +23,19 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Template" />
     ),
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const name = row.original.template?.name;
-      const templateId = row.original.template_id;
+      const schedule = row.original;
+      const meta = table.options.meta as ScheduleTableMeta | undefined;
       return name ? (
-        <Link
-          href={`/maintenance/templates/${templateId}`}
-          className="font-medium text-blue-600 hover:text-blue-800 hover:underline max-w-[200px] truncate block"
+        <button
+          type="button"
+          className="font-medium text-blue-600 hover:text-blue-800 hover:underline max-w-[200px] truncate block text-left"
           title={name}
+          onClick={() => meta?.onView?.(schedule)}
         >
           {name}
-        </Link>
+        </button>
       ) : (
         <span className="text-muted-foreground">—</span>
       );
@@ -165,37 +168,47 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
       const meta = table.options.meta as ScheduleTableMeta | undefined;
       const canManage = ['ga_lead', 'admin'].includes(meta?.currentUserRole ?? '');
 
-      if (!canManage) return null;
-
       return (
         <div className="flex items-center gap-1">
-          {schedule.is_active ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-              onClick={() => meta?.onDeactivate?.(schedule.id)}
-            >
-              Pause
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
-              onClick={() => meta?.onActivate?.(schedule.id)}
-            >
-              Resume
-            </Button>
-          )}
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-            onClick={() => meta?.onDelete?.(schedule.id)}
+            className="h-7 px-2 text-xs"
+            onClick={() => meta?.onView?.(schedule)}
           >
-            Deactivate
+            View
           </Button>
+          {canManage && (
+            <>
+              {schedule.is_active ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+                  onClick={() => meta?.onDeactivate?.(schedule.id)}
+                >
+                  Pause
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
+                  onClick={() => meta?.onActivate?.(schedule.id)}
+                >
+                  Resume
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+                onClick={() => meta?.onDelete?.(schedule.id)}
+              >
+                Deactivate
+              </Button>
+            </>
+          )}
         </div>
       );
     },

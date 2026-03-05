@@ -7,7 +7,12 @@ import { Button } from '@/components/ui/button';
 import { TemplateList } from '@/components/maintenance/template-list';
 import type { MaintenanceTemplate } from '@/lib/types/maintenance';
 
-export default async function MaintenanceTemplatesPage() {
+interface PageProps {
+  searchParams: Promise<{ view?: string }>;
+}
+
+export default async function MaintenanceTemplatesPage({ searchParams }: PageProps) {
+  const { view } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -77,7 +82,7 @@ export default async function MaintenanceTemplatesPage() {
         )}
       </div>
 
-      <TemplateList templates={templateList} userRole={profile.role} />
+      <TemplateList templates={templateList} userRole={profile.role} initialViewId={view} />
     </div>
   );
 }

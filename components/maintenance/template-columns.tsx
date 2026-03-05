@@ -2,12 +2,12 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import type { MaintenanceTemplate } from '@/lib/types/maintenance';
 
 export type TemplateTableMeta = {
+  onView?: (template: MaintenanceTemplate) => void;
   onDeactivate?: (id: string) => void;
   onReactivate?: (id: string) => void;
   currentUserRole?: string;
@@ -19,17 +19,19 @@ export const templateColumns: ColumnDef<MaintenanceTemplate>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const name = row.getValue('name') as string;
-      const id = row.original.id;
+      const template = row.original;
+      const meta = table.options.meta as TemplateTableMeta | undefined;
       return (
-        <Link
-          href={`/maintenance/templates/${id}`}
-          className="font-medium text-blue-600 hover:text-blue-800 hover:underline max-w-[260px] truncate block"
+        <button
+          type="button"
+          className="font-medium text-blue-600 hover:text-blue-800 hover:underline max-w-[260px] truncate block text-left"
           title={name}
+          onClick={() => meta?.onView?.(template)}
         >
           {name}
-        </Link>
+        </button>
       );
     },
     size: 260,

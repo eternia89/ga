@@ -9,7 +9,12 @@ import { ScheduleList } from '@/components/maintenance/schedule-list';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 import { getScheduleDisplayStatus } from '@/lib/constants/schedule-status';
 
-export default async function MaintenanceSchedulesPage() {
+interface PageProps {
+  searchParams: Promise<{ view?: string }>;
+}
+
+export default async function MaintenanceSchedulesPage({ searchParams }: PageProps) {
+  const { view } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -104,7 +109,7 @@ export default async function MaintenanceSchedulesPage() {
         </div>
       </div>
 
-      <ScheduleList schedules={scheduleList} userRole={profile.role} />
+      <ScheduleList schedules={scheduleList} userRole={profile.role} initialViewId={view} />
     </div>
   );
 }

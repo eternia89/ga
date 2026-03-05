@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { DataTable } from '@/components/data-table/data-table';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { scheduleColumns } from './schedule-columns';
+import { ScheduleViewModal } from './schedule-view-modal';
 import { deactivateSchedule, activateSchedule, deleteSchedule } from '@/app/actions/schedule-actions';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 import type { ScheduleTableMeta } from './schedule-columns';
@@ -12,12 +13,16 @@ import type { ScheduleTableMeta } from './schedule-columns';
 interface ScheduleListProps {
   schedules: MaintenanceSchedule[];
   userRole: string;
+  initialViewId?: string;
 }
 
-export function ScheduleList({ schedules, userRole }: ScheduleListProps) {
+export function ScheduleList({ schedules, userRole, initialViewId }: ScheduleListProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // View modal state
+  const [viewScheduleId, setViewScheduleId] = useState<string | null>(initialViewId ?? null);
 
   const canManage = ['ga_lead', 'admin'].includes(userRole);
 
@@ -66,7 +71,17 @@ export function ScheduleList({ schedules, userRole }: ScheduleListProps) {
     });
   }
 
+  const handleView = (schedule: MaintenanceSchedule) => {
+    setViewScheduleId(schedule.id);
+  };
+
+  const handleModalActionSuccess = () => {
+    setFeedback({ type: 'success', message: 'Action completed successfully' });
+    router.refresh();
+  };
+
   const meta: ScheduleTableMeta = {
+    onView: handleView,
     onDeactivate: canManage ? handleDeactivate : undefined,
     onActivate: canManage ? handleActivate : undefined,
     onDelete: canManage ? handleDelete : undefined,
@@ -88,6 +103,16 @@ export function ScheduleList({ schedules, userRole }: ScheduleListProps) {
         data={schedules}
         emptyMessage="No maintenance schedules found."
         meta={meta}
+      />
+
+      {/* Schedule view modal */}
+      <ScheduleViewModal
+        scheduleId={viewScheduleId}
+        onOpenChange={(open) => { if (!open) setViewScheduleId(null); }}
+        userRole={userRole}
+        onActionSuccess={handleModalActionSuccess}
+        scheduleIds={schedules.map((s) => s.id)}
+        onNavigate={setViewScheduleId}
       />
     </div>
   );
