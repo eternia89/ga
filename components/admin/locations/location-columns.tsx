@@ -90,46 +90,19 @@ export const locationColumns: ColumnDef<Location>[] = [
     header: "Actions",
     cell: ({ row, table }) => {
       const location = row.original;
-      const isDeactivated = !!location.deleted_at;
-
       const meta = table.options.meta as {
         onEdit?: (location: Location) => void;
-        onDelete?: (location: Location) => void;
-        onRestore?: (location: Location) => void;
       } | undefined;
 
       return (
-        <div className="flex items-center gap-1">
-          {!isDeactivated ? (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={() => meta?.onEdit?.(location)}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-                onClick={() => meta?.onDelete?.(location)}
-              >
-                Deactivate
-              </Button>
-            </>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
-              onClick={() => meta?.onRestore?.(location)}
-            >
-              Reactivate
-            </Button>
-          )}
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs"
+          onClick={() => meta?.onEdit?.(location)}
+        >
+          Edit
+        </Button>
       );
     },
     size: 120,

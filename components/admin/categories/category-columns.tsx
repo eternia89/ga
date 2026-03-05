@@ -79,46 +79,19 @@ export const categoryColumns: ColumnDef<Category>[] = [
     header: "Actions",
     cell: ({ row, table }) => {
       const category = row.original;
-      const isDeactivated = !!category.deleted_at;
-
       const meta = table.options.meta as {
         onEdit?: (category: Category) => void;
-        onDelete?: (category: Category) => void;
-        onRestore?: (category: Category) => void;
       } | undefined;
 
       return (
-        <div className="flex items-center gap-1">
-          {!isDeactivated ? (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={() => meta?.onEdit?.(category)}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-                onClick={() => meta?.onDelete?.(category)}
-              >
-                Deactivate
-              </Button>
-            </>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
-              onClick={() => meta?.onRestore?.(category)}
-            >
-              Reactivate
-            </Button>
-          )}
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs"
+          onClick={() => meta?.onEdit?.(category)}
+        >
+          Edit
+        </Button>
       );
     },
     size: 120,

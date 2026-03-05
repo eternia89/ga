@@ -41,20 +41,18 @@ export function CompanyTable({ data }: CompanyTableProps) {
     setEditingCompany(company);
   };
 
-  const handleDelete = (company: Company) => {
-    setDeletingCompany(company);
-  };
-
-  const handleRestore = async (company: Company) => {
+  const handleRestore = async () => {
+    if (!editingCompany) return;
     try {
-      const result = await restoreCompany({ id: company.id });
+      const result = await restoreCompany({ id: editingCompany.id });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else {
         setFeedback({
           type: "success",
-          message: `${company.name} reactivated successfully`,
+          message: `${editingCompany.name} reactivated successfully`,
         });
+        setEditingCompany(null);
       }
     } catch (error) {
       setFeedback({
@@ -77,6 +75,7 @@ export function CompanyTable({ data }: CompanyTableProps) {
           message: `${deletingCompany.name} deactivated successfully`,
         });
         setDeletingCompany(null);
+        setEditingCompany(null);
       }
     } catch (error) {
       setFeedback({
@@ -180,8 +179,6 @@ export function CompanyTable({ data }: CompanyTableProps) {
         onBulkExport={handleBulkExport}
         meta={{
           onEdit: handleEdit,
-          onDelete: handleDelete,
-          onRestore: handleRestore,
         }}
       />
 
@@ -196,6 +193,8 @@ export function CompanyTable({ data }: CompanyTableProps) {
         onOpenChange={(open) => !open && setEditingCompany(null)}
         company={editingCompany || undefined}
         onSuccess={handleSuccess}
+        onDeactivate={() => setDeletingCompany(editingCompany)}
+        onReactivate={handleRestore}
       />
 
       <DeactivateConfirmDialog

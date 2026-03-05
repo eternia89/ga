@@ -41,20 +41,18 @@ export function CategoryTable({ data, categoryType }: CategoryTableProps) {
     setEditingCategory(category);
   };
 
-  const handleDelete = (category: Category) => {
-    setDeletingCategory(category);
-  };
-
-  const handleRestore = async (category: Category) => {
+  const handleRestore = async () => {
+    if (!editingCategory) return;
     try {
-      const result = await restoreCategory({ id: category.id });
+      const result = await restoreCategory({ id: editingCategory.id });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else {
         setFeedback({
           type: "success",
-          message: `${category.name} reactivated successfully`,
+          message: `${editingCategory.name} reactivated successfully`,
         });
+        setEditingCategory(null);
       }
     } catch (error) {
       setFeedback({
@@ -77,6 +75,7 @@ export function CategoryTable({ data, categoryType }: CategoryTableProps) {
           message: `${deletingCategory.name} deactivated successfully`,
         });
         setDeletingCategory(null);
+        setEditingCategory(null);
       }
     } catch (error) {
       setFeedback({
@@ -180,8 +179,6 @@ export function CategoryTable({ data, categoryType }: CategoryTableProps) {
         onBulkExport={handleBulkExport}
         meta={{
           onEdit: handleEdit,
-          onDelete: handleDelete,
-          onRestore: handleRestore,
         }}
       />
 
@@ -198,6 +195,8 @@ export function CategoryTable({ data, categoryType }: CategoryTableProps) {
         category={editingCategory || undefined}
         defaultType={categoryType}
         onSuccess={handleSuccess}
+        onDeactivate={() => setDeletingCategory(editingCategory)}
+        onReactivate={handleRestore}
       />
 
       <DeactivateConfirmDialog

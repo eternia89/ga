@@ -95,46 +95,19 @@ export const divisionColumns: ColumnDef<Division>[] = [
     header: "Actions",
     cell: ({ row, table }) => {
       const division = row.original;
-      const isDeactivated = !!division.deleted_at;
-
       const meta = table.options.meta as {
         onEdit?: (division: Division) => void;
-        onDelete?: (division: Division) => void;
-        onRestore?: (division: Division) => void;
       } | undefined;
 
       return (
-        <div className="flex items-center gap-1">
-          {!isDeactivated ? (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs"
-                onClick={() => meta?.onEdit?.(division)}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-                onClick={() => meta?.onDelete?.(division)}
-              >
-                Deactivate
-              </Button>
-            </>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
-              onClick={() => meta?.onRestore?.(division)}
-            >
-              Reactivate
-            </Button>
-          )}
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs"
+          onClick={() => meta?.onEdit?.(division)}
+        >
+          Edit
+        </Button>
       );
     },
     size: 120,

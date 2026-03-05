@@ -73,10 +73,7 @@ export function UserTable({ users, companies, divisions, defaultCompanyId, initi
     window.history.replaceState({}, '', url.toString());
   };
 
-  const handleDeactivate = (user: UserRow) => {
-    setDeactivatingUser(user);
-    setDeactivateDialogOpen(true);
-  };
+  // Removed handleDeactivate from table row - now triggered from FormDialog
 
   const handleDeactivateConfirm = async (reason?: string) => {
     if (!deactivatingUser) return;
@@ -90,6 +87,8 @@ export function UserTable({ users, companies, divisions, defaultCompanyId, initi
         setFeedback({ type: 'success', message: 'User deactivated successfully' });
         setDeactivateDialogOpen(false);
         setDeactivatingUser(null);
+        setFormOpen(false);
+        setEditingUser(undefined);
       } else {
         setFeedback({ type: 'error', message: result?.serverError || 'Failed to deactivate user' });
       }
@@ -103,10 +102,7 @@ export function UserTable({ users, companies, divisions, defaultCompanyId, initi
     }
   };
 
-  const handleReactivate = (user: UserRow) => {
-    setReactivatingUser(user);
-    setReactivateDialogOpen(true);
-  };
+  // Removed handleReactivate from table row - now triggered from FormDialog
 
   const handleReactivateConfirm = async (reason?: string) => {
     if (!reactivatingUser) return;
@@ -120,6 +116,8 @@ export function UserTable({ users, companies, divisions, defaultCompanyId, initi
         setFeedback({ type: 'success', message: 'User reactivated successfully' });
         setReactivateDialogOpen(false);
         setReactivatingUser(null);
+        setFormOpen(false);
+        setEditingUser(undefined);
       } else {
         setFeedback({ type: 'error', message: result?.serverError || 'Failed to reactivate user' });
       }
@@ -195,7 +193,7 @@ export function UserTable({ users, companies, divisions, defaultCompanyId, initi
     URL.revokeObjectURL(url);
   };
 
-  const columns = getUserColumns(handleEdit, handleDeactivate, handleReactivate);
+  const columns = getUserColumns(handleEdit);
 
   return (
     <div className="space-y-4">
@@ -242,6 +240,15 @@ export function UserTable({ users, companies, divisions, defaultCompanyId, initi
         divisions={divisions}
         defaultCompanyId={defaultCompanyId}
         onSuccess={() => setFeedback({ type: 'success', message: 'Changes saved successfully' })}
+        onDeactivate={() => {
+          setDeactivatingUser(editingUser || null);
+          setDeactivateDialogOpen(true);
+        }}
+        onReactivate={() => {
+          setReactivatingUser(editingUser || null);
+          setReactivateDialogOpen(true);
+        }}
+        isDeactivated={!!editingUser?.deleted_at}
       />
 
       <UserDeactivateDialog

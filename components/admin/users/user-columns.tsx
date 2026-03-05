@@ -21,53 +21,8 @@ export type UserRow = {
   company: { name: string } | null;
 };
 
-type UserActionsProps = {
-  user: UserRow;
-  onEdit: (user: UserRow) => void;
-  onDeactivate: (user: UserRow) => void;
-  onReactivate: (user: UserRow) => void;
-};
-
-function UserActions({ user, onEdit, onDeactivate, onReactivate }: UserActionsProps) {
-  const isDeactivated = !!user.deleted_at;
-
-  return (
-    <div className="flex items-center gap-1">
-      <Button
-        variant="ghost"
-        size="sm"
-        className="h-7 px-2 text-xs"
-        onClick={() => onEdit(user)}
-      >
-        Edit
-      </Button>
-      {isDeactivated ? (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
-          onClick={() => onReactivate(user)}
-        >
-          Reactivate
-        </Button>
-      ) : (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-          onClick={() => onDeactivate(user)}
-        >
-          Deactivate
-        </Button>
-      )}
-    </div>
-  );
-}
-
 export function getUserColumns(
   onEdit: (user: UserRow) => void,
-  onDeactivate: (user: UserRow) => void,
-  onReactivate: (user: UserRow) => void
 ): ColumnDef<UserRow>[] {
   const roleColors: Record<string, string> = {
     admin: 'bg-purple-100 text-purple-700',
@@ -189,12 +144,14 @@ export function getUserColumns(
       id: 'actions',
       header: 'Actions',
       cell: ({ row }) => (
-        <UserActions
-          user={row.original}
-          onEdit={onEdit}
-          onDeactivate={onDeactivate}
-          onReactivate={onReactivate}
-        />
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs"
+          onClick={() => onEdit(row.original)}
+        >
+          Edit
+        </Button>
       ),
     },
   ];

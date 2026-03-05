@@ -46,20 +46,18 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
     setEditingDivision(division);
   };
 
-  const handleDelete = (division: Division) => {
-    setDeletingDivision(division);
-  };
-
-  const handleRestore = async (division: Division) => {
+  const handleRestore = async () => {
+    if (!editingDivision) return;
     try {
-      const result = await restoreDivision({ id: division.id });
+      const result = await restoreDivision({ id: editingDivision.id });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else {
         setFeedback({
           type: "success",
-          message: `${division.name} reactivated successfully`,
+          message: `${editingDivision.name} reactivated successfully`,
         });
+        setEditingDivision(null);
       }
     } catch (error) {
       setFeedback({
@@ -82,6 +80,7 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
           message: `${deletingDivision.name} deactivated successfully`,
         });
         setDeletingDivision(null);
+        setEditingDivision(null);
       }
     } catch (error) {
       setFeedback({
@@ -190,8 +189,6 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
         onBulkExport={handleBulkExport}
         meta={{
           onEdit: handleEdit,
-          onDelete: handleDelete,
-          onRestore: handleRestore,
         }}
       />
 
@@ -208,6 +205,8 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
         division={editingDivision || undefined}
         companies={companies}
         onSuccess={handleSuccess}
+        onDeactivate={() => setDeletingDivision(editingDivision)}
+        onReactivate={handleRestore}
       />
 
       <DeactivateConfirmDialog

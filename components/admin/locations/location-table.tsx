@@ -44,20 +44,18 @@ export function LocationTable({ data, companies }: LocationTableProps) {
     setEditingLocation(location);
   };
 
-  const handleDelete = (location: Location) => {
-    setDeletingLocation(location);
-  };
-
-  const handleRestore = async (location: Location) => {
+  const handleRestore = async () => {
+    if (!editingLocation) return;
     try {
-      const result = await restoreLocation({ id: location.id });
+      const result = await restoreLocation({ id: editingLocation.id });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else {
         setFeedback({
           type: "success",
-          message: `${location.name} reactivated successfully`,
+          message: `${editingLocation.name} reactivated successfully`,
         });
+        setEditingLocation(null);
       }
     } catch (error) {
       setFeedback({
@@ -80,6 +78,7 @@ export function LocationTable({ data, companies }: LocationTableProps) {
           message: `${deletingLocation.name} deactivated successfully`,
         });
         setDeletingLocation(null);
+        setEditingLocation(null);
       }
     } catch (error) {
       setFeedback({
@@ -179,8 +178,6 @@ export function LocationTable({ data, companies }: LocationTableProps) {
         onBulkExport={handleBulkExport}
         meta={{
           onEdit: handleEdit,
-          onDelete: handleDelete,
-          onRestore: handleRestore,
         }}
       />
 
@@ -197,6 +194,8 @@ export function LocationTable({ data, companies }: LocationTableProps) {
         location={editingLocation || undefined}
         companies={companies}
         onSuccess={handleSuccess}
+        onDeactivate={() => setDeletingLocation(editingLocation)}
+        onReactivate={handleRestore}
       />
 
       <DeactivateConfirmDialog
