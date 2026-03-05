@@ -4,8 +4,11 @@ import { useState, useEffect, useCallback, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { createClient } from '@/lib/supabase/client';
+import { deactivateTemplate, reactivateTemplate } from '@/app/actions/template-actions';
 import { TemplateDetail } from './template-detail';
-import type { MaintenanceTemplate } from '@/lib/types/maintenance';
+import { CHECKLIST_TYPES } from '@/lib/constants/checklist-types';
+import type { MaintenanceTemplate, ChecklistItem } from '@/lib/types/maintenance';
+import { InlineFeedback } from '@/components/inline-feedback';
 import {
   Dialog,
   DialogContent,
@@ -19,6 +22,15 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+
+const TYPE_COLORS: Record<ChecklistItem['type'], string> = {
+  checkbox:  'bg-blue-100 text-blue-700',
+  pass_fail: 'bg-green-100 text-green-700',
+  numeric:   'bg-purple-100 text-purple-700',
+  text:      'bg-orange-100 text-orange-700',
+  photo:     'bg-pink-100 text-pink-700',
+  dropdown:  'bg-yellow-100 text-yellow-700',
+};
 
 // ============================================================================
 // Types
@@ -149,12 +161,45 @@ export function TemplateViewModal({
     }
   }, [templateId, refreshKey, fetchData]);
 
+  // Sticky bar action state
+  const [actionPending, startActionTransition] = useTransition();
+  const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const canManage = ['ga_lead', 'admin'].includes(userRole);
+
   // Action success handler
   const handleActionSuccess = useCallback(() => {
     setRefreshKey((k) => k + 1);
     router.refresh();
     onActionSuccess?.();
   }, [router, onActionSuccess]);
+
+  const handleDeactivate = () => {
+    setActionFeedback(null);
+    startActionTransition(async () => {
+      if (!template) return;
+      const result = await deactivateTemplate({ id: template.id });
+      if (result?.serverError) {
+        setActionFeedback({ type: 'error', message: result.serverError });
+      } else if (result?.data?.success) {
+        setActionFeedback({ type: 'success', message: 'Template deactivated.' });
+        handleActionSuccess();
+      }
+    });
+  };
+
+  const handleReactivate = () => {
+    setActionFeedback(null);
+    startActionTransition(async () => {
+      if (!template) return;
+      const result = await reactivateTemplate({ id: template.id });
+      if (result?.serverError) {
+        setActionFeedback({ type: 'error', message: result.serverError });
+      } else if (result?.data?.success) {
+        setActionFeedback({ type: 'success', message: 'Template reactivated.' });
+        handleActionSuccess();
+      }
+    });
+  };
 
   return (
     <Dialog open={!!templateId} onOpenChange={onOpenChange}>
@@ -264,20 +309,64 @@ export function TemplateViewModal({
               </p>
             </div>
 
-            {/* Body: TemplateDetail component (scrollable) */}
-            <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4">
-              <TemplateDetail
-                template={template}
-                categories={categories}
-                userRole={userRole}
-              />
+            {/* Split layout: Details left, Checklist right */}
+            <div className="flex-1 min-h-0 grid grid-cols-[1fr_350px] max-lg:grid-cols-1">
+              <div className="overflow-y-auto px-6 py-4 max-lg:border-b">
+                <TemplateDetail
+                  template={template}
+                  categories={categories}
+                  userRole={userRole}
+                />
+              </div>
+              <div className="overflow-y-auto border-l max-lg:border-l-0 px-6 py-4">
+                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
+                  Checklist Items ({template.checklist.length})
+                </h3>
+                {template.checklist.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No checklist items.</p>
+                ) : (
+                  <ol className="space-y-2">
+                    {template.checklist
+                      .slice()
+                      .sort((a: ChecklistItem, b: ChecklistItem) => a.sort_order - b.sort_order)
+                      .map((item: ChecklistItem, index: number) => (
+                        <li key={item.id} className="flex items-start gap-2 text-sm">
+                          <span className="text-muted-foreground tabular-nums shrink-0">{index + 1}.</span>
+                          <span className={`shrink-0 inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${TYPE_COLORS[item.type]}`}>
+                            {CHECKLIST_TYPES[item.type]}
+                          </span>
+                          <span className="truncate">{item.label || 'No label'}</span>
+                        </li>
+                      ))}
+                  </ol>
+                )}
+              </div>
             </div>
 
             {/* Sticky action bar */}
-            <div className="border-t px-6 py-3 flex items-center justify-end gap-2 shrink-0 bg-background">
-              <span className="text-xs text-muted-foreground">
-                {template.name}
-              </span>
+            <div className="border-t px-6 py-3 flex items-center justify-between gap-2 shrink-0 bg-background">
+              <div className="flex items-center gap-2">
+                {actionFeedback && (
+                  <InlineFeedback
+                    type={actionFeedback.type}
+                    message={actionFeedback.message}
+                    onDismiss={() => setActionFeedback(null)}
+                  />
+                )}
+              </div>
+              {canManage && (
+                <div className="flex items-center gap-2">
+                  {template.is_active ? (
+                    <Button variant="outline" size="sm" onClick={handleDeactivate} disabled={actionPending} className="text-destructive hover:text-destructive">
+                      {actionPending ? 'Processing...' : 'Deactivate'}
+                    </Button>
+                  ) : (
+                    <Button variant="outline" size="sm" onClick={handleReactivate} disabled={actionPending}>
+                      {actionPending ? 'Processing...' : 'Reactivate'}
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </>
         )}

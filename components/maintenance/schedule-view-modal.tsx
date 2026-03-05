@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { createClient } from '@/lib/supabase/client';
+import { deactivateSchedule, activateSchedule } from '@/app/actions/schedule-actions';
 import { ScheduleDetail, PMJobRef } from './schedule-detail';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
+import { InlineFeedback } from '@/components/inline-feedback';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +22,22 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+
+const JOB_STATUS_LABELS: Record<string, string> = {
+  created: 'Created', assigned: 'Assigned', in_progress: 'In Progress',
+  completed: 'Completed', cancelled: 'Cancelled',
+};
+
+function jobStatusColor(status: string): string {
+  switch (status) {
+    case 'created': return 'bg-gray-100 text-gray-700';
+    case 'assigned': return 'bg-blue-100 text-blue-700';
+    case 'in_progress': return 'bg-yellow-100 text-yellow-700';
+    case 'completed': return 'bg-green-100 text-green-700';
+    case 'cancelled': return 'bg-red-100 text-red-700';
+    default: return 'bg-gray-100 text-gray-700';
+  }
+}
 
 // ============================================================================
 // Types
@@ -164,12 +182,45 @@ export function ScheduleViewModal({
     }
   }, [scheduleId, refreshKey, fetchData]);
 
+  // Sticky bar action state
+  const [actionPending, startActionTransition] = useTransition();
+  const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const canManage = ['ga_lead', 'admin'].includes(userRole);
+
   // Action success handler
   const handleActionSuccess = useCallback(() => {
     setRefreshKey((k) => k + 1);
     router.refresh();
     onActionSuccess?.();
   }, [router, onActionSuccess]);
+
+  const handlePause = () => {
+    setActionFeedback(null);
+    startActionTransition(async () => {
+      if (!schedule) return;
+      const result = await deactivateSchedule({ id: schedule.id });
+      if (result?.serverError) {
+        setActionFeedback({ type: 'error', message: result.serverError });
+      } else if (result?.data?.success) {
+        setActionFeedback({ type: 'success', message: 'Schedule paused.' });
+        handleActionSuccess();
+      }
+    });
+  };
+
+  const handleResume = () => {
+    setActionFeedback(null);
+    startActionTransition(async () => {
+      if (!schedule) return;
+      const result = await activateSchedule({ id: schedule.id });
+      if (result?.serverError) {
+        setActionFeedback({ type: 'error', message: result.serverError });
+      } else if (result?.data?.success) {
+        setActionFeedback({ type: 'success', message: 'Schedule resumed.' });
+        handleActionSuccess();
+      }
+    });
+  };
 
   return (
     <Dialog open={!!scheduleId} onOpenChange={onOpenChange}>
@@ -282,21 +333,59 @@ export function ScheduleViewModal({
               </p>
             </div>
 
-            {/* Body: ScheduleDetail component (scrollable) */}
-            <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4">
-              <ScheduleDetail
-                schedule={schedule}
-                pmJobs={pmJobs}
-                userRole={userRole}
-              />
+            {/* Split layout: Details left, PM Jobs right */}
+            <div className="flex-1 min-h-0 grid grid-cols-[1fr_350px] max-lg:grid-cols-1">
+              <div className="overflow-y-auto px-6 py-4 max-lg:border-b">
+                <ScheduleDetail
+                  schedule={schedule}
+                  pmJobs={pmJobs}
+                  userRole={userRole}
+                />
+              </div>
+              <div className="overflow-y-auto border-l max-lg:border-l-0 px-6 py-4">
+                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
+                  PM Jobs ({pmJobs.length})
+                </h3>
+                {pmJobs.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No PM jobs generated yet.</p>
+                ) : (
+                  <ul className="space-y-2">
+                    {pmJobs.map((job) => (
+                      <li key={job.id} className="flex items-center justify-between rounded-md border bg-muted/30 px-3 py-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium font-mono">{job.display_id}</span>
+                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${jobStatusColor(job.status)}`}>
+                            {JOB_STATUS_LABELS[job.status] ?? job.status}
+                          </span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">{format(new Date(job.created_at), 'dd-MM-yyyy')}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
 
             {/* Sticky action bar */}
-            <div className="border-t px-6 py-3 flex items-center justify-end gap-2 shrink-0 bg-background">
-              <span className="text-xs text-muted-foreground">
-                {schedule.template?.name ?? 'Schedule'}
-                {schedule.asset?.name && ` \u00b7 ${schedule.asset.name}`}
-              </span>
+            <div className="border-t px-6 py-3 flex items-center justify-between gap-2 shrink-0 bg-background">
+              <div className="flex items-center gap-2">
+                {actionFeedback && (
+                  <InlineFeedback type={actionFeedback.type} message={actionFeedback.message} onDismiss={() => setActionFeedback(null)} />
+                )}
+              </div>
+              {canManage && (
+                <div className="flex items-center gap-2">
+                  {schedule.is_active ? (
+                    <Button variant="outline" size="sm" onClick={handlePause} disabled={actionPending} className="text-destructive hover:text-destructive">
+                      {actionPending ? 'Processing...' : 'Pause'}
+                    </Button>
+                  ) : (
+                    <Button variant="outline" size="sm" onClick={handleResume} disabled={actionPending}>
+                      {actionPending ? 'Processing...' : 'Resume'}
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </>
         )}
