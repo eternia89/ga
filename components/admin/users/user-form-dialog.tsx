@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { createUserSchema, updateUserSchema } from '@/lib/validations/user-schema';
 import { createUser, updateUser } from '@/app/actions/user-actions';
+import { extractActionError } from '@/lib/utils';
 import type { Role } from '@/lib/auth/types';
 import {
   FormControl,
@@ -59,6 +60,9 @@ type UserFormDialogProps = {
   divisions: Division[];
   defaultCompanyId?: string;
   onSuccess?: () => void;
+  onDeactivate?: () => void;
+  onReactivate?: () => void;
+  isDeactivated?: boolean;
 };
 
 const roleOptions = [
@@ -77,6 +81,9 @@ export function UserFormDialog({
   divisions,
   defaultCompanyId,
   onSuccess,
+  onDeactivate,
+  onReactivate,
+  isDeactivated,
 }: UserFormDialogProps) {
   const isEditMode = !!user;
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>(
@@ -107,12 +114,16 @@ export function UserFormDialog({
       // For update, we don't send email
       const { email, ...updateData } = data;
       const result = await updateUser({ id: user.id!, ...updateData });
-      if (result?.data?.success) return {};
-      return { error: result?.serverError || 'Failed to update user' };
+      const error = extractActionError(result);
+      if (error) return { error };
+      if (!result?.data?.success) return { error: 'Failed to update user' };
+      return {};
     } else {
       const result = await createUser(data as any);
-      if (result?.data?.success) return {};
-      return { error: result?.serverError || 'Failed to create user' };
+      const error = extractActionError(result);
+      if (error) return { error };
+      if (!result?.data?.success) return { error: 'Failed to create user' };
+      return {};
     }
   };
 
@@ -137,6 +148,13 @@ export function UserFormDialog({
       }
       submitLabel={isEditMode ? 'Update User' : 'Create User'}
       submittingLabel="Saving..."
+      secondaryAction={
+        isEditMode && isDeactivated && onReactivate
+          ? { label: 'Reactivate', variant: 'success', onClick: onReactivate }
+          : isEditMode && !isDeactivated && onDeactivate
+            ? { label: 'Deactivate', variant: 'destructive', onClick: onDeactivate }
+            : undefined
+      }
     >
       {(form) => (
         <>

@@ -7,6 +7,7 @@ import {
 } from "@/lib/validations/company-schema";
 import { Company } from "@/lib/types/database";
 import { createCompany, updateCompany } from "@/app/actions/company-actions";
+import { extractActionError } from "@/lib/utils";
 import {
   FormControl,
   FormField,
@@ -22,6 +23,8 @@ interface CompanyFormDialogProps {
   onOpenChange: (open: boolean) => void;
   company?: Company;
   onSuccess?: () => void;
+  onDeactivate?: () => void;
+  onReactivate?: () => void;
 }
 
 export function CompanyFormDialog({
@@ -29,6 +32,8 @@ export function CompanyFormDialog({
   onOpenChange,
   company,
   onSuccess,
+  onDeactivate,
+  onReactivate,
 }: CompanyFormDialogProps) {
   const defaultValues = useMemo(
     () =>
@@ -53,10 +58,12 @@ export function CompanyFormDialog({
   const handleSubmit = async (data: CompanyFormData) => {
     if (company) {
       const result = await updateCompany({ id: company.id, data });
-      if (result?.serverError) return { error: result.serverError };
+      const error = extractActionError(result);
+      if (error) return { error };
     } else {
       const result = await createCompany(data);
-      if (result?.serverError) return { error: result.serverError };
+      const error = extractActionError(result);
+      if (error) return { error };
     }
     return {};
   };
@@ -72,6 +79,13 @@ export function CompanyFormDialog({
       title={company ? "Edit Company" : "Create Company"}
       submitLabel={company ? "Save Changes" : "Create Company"}
       submittingLabel={company ? "Saving..." : "Creating..."}
+      secondaryAction={
+        company && company.deleted_at && onReactivate
+          ? { label: "Reactivate", variant: "success", onClick: onReactivate }
+          : company && !company.deleted_at && onDeactivate
+            ? { label: "Deactivate", variant: "destructive", onClick: onDeactivate }
+            : undefined
+      }
     >
       {(form) => (
         <>

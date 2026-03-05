@@ -27,6 +27,11 @@ export interface EntityFormDialogProps<T extends FieldValues> {
   submitLabel: string;
   submittingLabel: string;
   children: (form: UseFormReturn<T>) => React.ReactNode;
+  secondaryAction?: {
+    label: string;
+    variant: "destructive" | "success";
+    onClick: () => void;
+  };
 }
 
 export function EntityFormDialog<T extends FieldValues>({
@@ -41,6 +46,7 @@ export function EntityFormDialog<T extends FieldValues>({
   submitLabel,
   submittingLabel,
   children,
+  secondaryAction,
 }: EntityFormDialogProps<T>) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{
@@ -113,18 +119,35 @@ export function EntityFormDialog<T extends FieldValues>({
               />
             )}
 
-            <div className="flex justify-end gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? submittingLabel : submitLabel}
-              </Button>
+            <div className={`flex ${secondaryAction ? "justify-between" : "justify-end"} gap-3`}>
+              {secondaryAction && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className={
+                    secondaryAction.variant === "destructive"
+                      ? "text-destructive hover:text-destructive"
+                      : "text-green-600 hover:text-green-700"
+                  }
+                  onClick={secondaryAction.onClick}
+                  disabled={isSubmitting}
+                >
+                  {secondaryAction.label}
+                </Button>
+              )}
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? submittingLabel : submitLabel}
+                </Button>
+              </div>
             </div>
           </form>
         </Form>

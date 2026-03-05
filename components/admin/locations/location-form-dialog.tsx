@@ -10,6 +10,7 @@ import {
   createLocation,
   updateLocation,
 } from "@/app/actions/location-actions";
+import { extractActionError } from "@/lib/utils";
 import { useUser } from "@/lib/auth/hooks";
 import {
   FormControl,
@@ -34,6 +35,8 @@ interface LocationFormDialogProps {
   location?: Location;
   companies: Company[];
   onSuccess?: () => void;
+  onDeactivate?: () => void;
+  onReactivate?: () => void;
 }
 
 export function LocationFormDialog({
@@ -42,6 +45,8 @@ export function LocationFormDialog({
   location,
   companies,
   onSuccess,
+  onDeactivate,
+  onReactivate,
 }: LocationFormDialogProps) {
   const { profile } = useUser();
 
@@ -64,10 +69,12 @@ export function LocationFormDialog({
   const handleSubmit = async (data: LocationFormData) => {
     if (location) {
       const result = await updateLocation({ id: location.id, data });
-      if (result?.serverError) return { error: result.serverError };
+      const error = extractActionError(result);
+      if (error) return { error };
     } else {
       const result = await createLocation(data);
-      if (result?.serverError) return { error: result.serverError };
+      const error = extractActionError(result);
+      if (error) return { error };
     }
     return {};
   };
@@ -83,6 +90,13 @@ export function LocationFormDialog({
       title={location ? "Edit Location" : "Create Location"}
       submitLabel={location ? "Save Changes" : "Create Location"}
       submittingLabel={location ? "Saving..." : "Creating..."}
+      secondaryAction={
+        location && location.deleted_at && onReactivate
+          ? { label: "Reactivate", variant: "success", onClick: onReactivate }
+          : location && !location.deleted_at && onDeactivate
+            ? { label: "Deactivate", variant: "destructive", onClick: onDeactivate }
+            : undefined
+      }
     >
       {(form) => (
         <>

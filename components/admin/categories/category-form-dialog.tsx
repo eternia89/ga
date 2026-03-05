@@ -10,6 +10,7 @@ import {
   createCategory,
   updateCategory,
 } from "@/app/actions/category-actions";
+import { extractActionError } from "@/lib/utils";
 import {
   FormControl,
   FormField,
@@ -33,6 +34,8 @@ interface CategoryFormDialogProps {
   category?: Category;
   defaultType?: "request" | "asset";
   onSuccess?: () => void;
+  onDeactivate?: () => void;
+  onReactivate?: () => void;
 }
 
 export function CategoryFormDialog({
@@ -41,6 +44,8 @@ export function CategoryFormDialog({
   category,
   defaultType,
   onSuccess,
+  onDeactivate,
+  onReactivate,
 }: CategoryFormDialogProps) {
   const defaultValues = useMemo(
     () =>
@@ -63,10 +68,12 @@ export function CategoryFormDialog({
       // Update existing category (without type)
       const { type, ...updateData } = data;
       const result = await updateCategory({ id: category.id, data: updateData });
-      if (result?.serverError) return { error: result.serverError };
+      const error = extractActionError(result);
+      if (error) return { error };
     } else {
       const result = await createCategory(data);
-      if (result?.serverError) return { error: result.serverError };
+      const error = extractActionError(result);
+      if (error) return { error };
     }
     return {};
   };
@@ -82,6 +89,13 @@ export function CategoryFormDialog({
       title={category ? "Edit Category" : "Create Category"}
       submitLabel={category ? "Save Changes" : "Create Category"}
       submittingLabel={category ? "Saving..." : "Creating..."}
+      secondaryAction={
+        category && category.deleted_at && onReactivate
+          ? { label: "Reactivate", variant: "success", onClick: onReactivate }
+          : category && !category.deleted_at && onDeactivate
+            ? { label: "Deactivate", variant: "destructive", onClick: onDeactivate }
+            : undefined
+      }
     >
       {(form) => (
         <>

@@ -10,6 +10,7 @@ import {
   createDivision,
   updateDivision,
 } from "@/app/actions/division-actions";
+import { extractActionError } from "@/lib/utils";
 import { useUser } from "@/lib/auth/hooks";
 import {
   FormControl,
@@ -34,6 +35,8 @@ interface DivisionFormDialogProps {
   division?: Division;
   companies: Company[];
   onSuccess?: () => void;
+  onDeactivate?: () => void;
+  onReactivate?: () => void;
 }
 
 export function DivisionFormDialog({
@@ -42,6 +45,8 @@ export function DivisionFormDialog({
   division,
   companies,
   onSuccess,
+  onDeactivate,
+  onReactivate,
 }: DivisionFormDialogProps) {
   const { profile } = useUser();
 
@@ -66,10 +71,12 @@ export function DivisionFormDialog({
   const handleSubmit = async (data: DivisionFormData) => {
     if (division) {
       const result = await updateDivision({ id: division.id, data });
-      if (result?.serverError) return { error: result.serverError };
+      const error = extractActionError(result);
+      if (error) return { error };
     } else {
       const result = await createDivision(data);
-      if (result?.serverError) return { error: result.serverError };
+      const error = extractActionError(result);
+      if (error) return { error };
     }
     return {};
   };
@@ -85,6 +92,13 @@ export function DivisionFormDialog({
       title={division ? "Edit Division" : "Create Division"}
       submitLabel={division ? "Save Changes" : "Create Division"}
       submittingLabel={division ? "Saving..." : "Creating..."}
+      secondaryAction={
+        division && division.deleted_at && onReactivate
+          ? { label: "Reactivate", variant: "success", onClick: onReactivate }
+          : division && !division.deleted_at && onDeactivate
+            ? { label: "Deactivate", variant: "destructive", onClick: onDeactivate }
+            : undefined
+      }
     >
       {(form) => (
         <>
