@@ -7,7 +7,12 @@ import { Button } from '@/components/ui/button';
 import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 
-export default async function RequestsPage() {
+interface PageProps {
+  searchParams: Promise<{ view?: string }>;
+}
+
+export default async function RequestsPage({ searchParams }: PageProps) {
+  const { view } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -141,6 +146,7 @@ export default async function RequestsPage() {
         currentUserId={profile.id}
         currentUserRole={profile.role}
         photosByRequest={photosByRequest}
+        initialViewId={view}
       />
     </div>
   );

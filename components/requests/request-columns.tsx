@@ -16,12 +16,7 @@ interface PhotoItem {
 }
 
 export type RequestTableMeta = {
-  onTriage?: (request: RequestWithRelations) => void;
-  onReject?: (request: RequestWithRelations) => void;
-  onCancel?: (request: RequestWithRelations) => void;
   onView?: (request: RequestWithRelations) => void;
-  onAccept?: (request: RequestWithRelations) => void;
-  onRejectWork?: (request: RequestWithRelations) => void;
   onPhotoClick?: (photos: PhotoItem[], index: number) => void;
   photosByRequest?: Record<string, PhotoItem[]>;
   currentUserId?: string;
@@ -155,108 +150,21 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
   {
     id: 'actions',
     cell: ({ row, table }) => {
-      const request = row.original;
       const meta = table.options.meta as RequestTableMeta | undefined;
-      const currentUserId = meta?.currentUserId;
-      const currentUserRole = meta?.currentUserRole;
-
-      const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole ?? '');
-      const isRequester = request.requester_id === currentUserId;
-      const isAdmin = currentUserRole === 'admin';
-
-      const canTriage = isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request.status);
-      const canReject =
-        isGaLeadOrAdmin &&
-        (request.status === 'submitted' || request.status === 'triaged');
-      const canCancel = isRequester && request.status === 'submitted';
-      const canAcceptOrRejectWork =
-        (isRequester || isAdmin) && request.status === 'pending_acceptance';
-
       return (
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 px-2 text-xs"
-            onClick={(e) => {
-              e.stopPropagation();
-              meta?.onView?.(request);
-            }}
-          >
-            View
-          </Button>
-
-          {canTriage && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs"
-              onClick={(e) => {
-                e.stopPropagation();
-                meta?.onTriage?.(request);
-              }}
-            >
-              Triage
-            </Button>
-          )}
-
-          {canAcceptOrRejectWork && (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  meta?.onAccept?.(request);
-                }}
-              >
-                Accept
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  meta?.onRejectWork?.(request);
-                }}
-              >
-                Reject
-              </Button>
-            </>
-          )}
-
-          {canReject && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-              onClick={(e) => {
-                e.stopPropagation();
-                meta?.onReject?.(request);
-              }}
-            >
-              Reject
-            </Button>
-          )}
-
-          {canCancel && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-              onClick={(e) => {
-                e.stopPropagation();
-                meta?.onCancel?.(request);
-              }}
-            >
-              Cancel
-            </Button>
-          )}
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs"
+          onClick={(e) => {
+            e.stopPropagation();
+            meta?.onView?.(row.original);
+          }}
+        >
+          View
+        </Button>
       );
     },
-    size: 180,
+    size: 80,
   },
 ];

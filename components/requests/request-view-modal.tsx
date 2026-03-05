@@ -422,8 +422,6 @@ export function RequestViewModal({
     }
   };
 
-  const hasActions = canTriage || canReject || canCancel || canAcceptOrReject || canGiveFeedback;
-
   return (
     <>
       <Dialog open={!!requestId} onOpenChange={onOpenChange}>

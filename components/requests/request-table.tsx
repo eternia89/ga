@@ -7,13 +7,9 @@ import { isAfter, isBefore, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { RequestWithRelations } from '@/lib/types/database';
 import { DataTable } from '@/components/data-table/data-table';
 import { InlineFeedback } from '@/components/inline-feedback';
-import { getRequestPhotos } from '@/app/actions/request-actions';
 import { requestColumns } from './request-columns';
 import { RequestFilters, filterParsers } from './request-filters';
-import { RequestTriageDialog } from './request-triage-dialog';
-import { RequestRejectDialog } from './request-reject-dialog';
-import { RequestCancelDialog } from './request-cancel-dialog';
-import { RequestAcceptanceDialog } from './request-acceptance-dialog';
+import { RequestViewModal } from './request-view-modal';
 import { PhotoLightbox } from './request-photo-lightbox';
 
 interface PhotoItem {
@@ -29,6 +25,7 @@ interface RequestTableProps {
   currentUserId: string;
   currentUserRole: string;
   photosByRequest: Record<string, PhotoItem[]>;
+  initialViewId?: string;
 }
 
 export function RequestTable({
@@ -38,27 +35,13 @@ export function RequestTable({
   currentUserId,
   currentUserRole,
   photosByRequest,
+  initialViewId,
 }: RequestTableProps) {
   const router = useRouter();
   const [filters] = useQueryStates(filterParsers);
 
-  // Dialog states
-  const [triageOpen, setTriageOpen] = useState(false);
-  const [triagingRequest, setTriagingRequest] = useState<RequestWithRelations | null>(null);
-  const [triagePhotos, setTriagePhotos] = useState<PhotoItem[]>([]);
-
-  const [rejectOpen, setRejectOpen] = useState(false);
-  const [rejectingRequestId, setRejectingRequestId] = useState<string | null>(null);
-  const [rejectingDisplayId, setRejectingDisplayId] = useState('');
-
-  const [cancelOpen, setCancelOpen] = useState(false);
-  const [cancellingRequestId, setCancellingRequestId] = useState<string | null>(null);
-  const [cancellingDisplayId, setCancellingDisplayId] = useState('');
-
-  // Acceptance dialog state (handles both accept and reject-work modes)
-  const [acceptanceOpen, setAcceptanceOpen] = useState(false);
-  const [acceptanceMode, setAcceptanceMode] = useState<'accept' | 'reject'>('accept');
-  const [acceptanceRequest, setAcceptanceRequest] = useState<RequestWithRelations | null>(null);
+  // View modal state
+  const [viewRequestId, setViewRequestId] = useState<string | null>(initialViewId ?? null);
 
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -108,54 +91,8 @@ export function RequestTable({
     });
   }, [data, filters, currentUserId]);
 
-  const handleTriage = async (request: RequestWithRelations) => {
-    // Fetch signed photo URLs before opening dialog
-    try {
-      const result = await getRequestPhotos({ requestId: request.id });
-      if (result?.data?.success && result.data.photos) {
-        setTriagePhotos(
-          result.data.photos.map((p) => ({
-            id: p.id,
-            url: p.url,
-            fileName: p.fileName,
-          }))
-        );
-      } else {
-        setTriagePhotos([]);
-      }
-    } catch {
-      setTriagePhotos([]);
-    }
-    setTriagingRequest(request);
-    setTriageOpen(true);
-  };
-
-  const handleReject = (request: RequestWithRelations) => {
-    setRejectingRequestId(request.id);
-    setRejectingDisplayId(request.display_id);
-    setRejectOpen(true);
-  };
-
-  const handleCancel = (request: RequestWithRelations) => {
-    setCancellingRequestId(request.id);
-    setCancellingDisplayId(request.display_id);
-    setCancelOpen(true);
-  };
-
-  const handleAccept = (request: RequestWithRelations) => {
-    setAcceptanceRequest(request);
-    setAcceptanceMode('accept');
-    setAcceptanceOpen(true);
-  };
-
-  const handleRejectWork = (request: RequestWithRelations) => {
-    setAcceptanceRequest(request);
-    setAcceptanceMode('reject');
-    setAcceptanceOpen(true);
-  };
-
   const handleView = (request: RequestWithRelations) => {
-    router.push(`/requests/${request.id}`);
+    setViewRequestId(request.id);
   };
 
   const handlePhotoClick = (photos: PhotoItem[], index: number) => {
@@ -164,26 +101,9 @@ export function RequestTable({
     setLightboxOpen(true);
   };
 
-  const handleTriageSuccess = () => {
-    setFeedback({ type: 'success', message: 'Request triaged successfully' });
-  };
-
-  const handleRejectSuccess = () => {
-    setFeedback({ type: 'success', message: 'Request rejected' });
-  };
-
-  const handleCancelSuccess = () => {
-    setFeedback({ type: 'success', message: 'Request cancelled' });
-  };
-
-  const handleAcceptanceSuccess = () => {
-    setFeedback({
-      type: 'success',
-      message:
-        acceptanceMode === 'accept'
-          ? 'Work accepted successfully'
-          : 'Work rejected and sent back to In Progress',
-    });
+  const handleModalActionSuccess = () => {
+    setFeedback({ type: 'success', message: 'Action completed successfully' });
+    router.refresh();
   };
 
   return (
@@ -208,11 +128,6 @@ export function RequestTable({
         data={filteredData}
         emptyMessage="No requests found"
         meta={{
-          onTriage: handleTriage,
-          onReject: handleReject,
-          onCancel: handleCancel,
-          onAccept: handleAccept,
-          onRejectWork: handleRejectWork,
           onView: handleView,
           onPhotoClick: handlePhotoClick,
           photosByRequest,
@@ -221,43 +136,16 @@ export function RequestTable({
         }}
       />
 
-      {/* Dialogs */}
-      <RequestTriageDialog
-        open={triageOpen}
-        onOpenChange={setTriageOpen}
-        request={triagingRequest}
+      {/* Request view modal */}
+      <RequestViewModal
+        requestId={viewRequestId}
+        onOpenChange={(open) => { if (!open) setViewRequestId(null); }}
         categories={categories}
         users={users}
-        photoUrls={triagePhotos}
-        onSuccess={handleTriageSuccess}
+        currentUserId={currentUserId}
+        currentUserRole={currentUserRole}
+        onActionSuccess={handleModalActionSuccess}
       />
-
-      <RequestRejectDialog
-        open={rejectOpen}
-        onOpenChange={setRejectOpen}
-        requestId={rejectingRequestId}
-        requestDisplayId={rejectingDisplayId}
-        onSuccess={handleRejectSuccess}
-      />
-
-      <RequestCancelDialog
-        open={cancelOpen}
-        onOpenChange={setCancelOpen}
-        requestId={cancellingRequestId}
-        requestDisplayId={cancellingDisplayId}
-        onSuccess={handleCancelSuccess}
-      />
-
-      {acceptanceRequest && (
-        <RequestAcceptanceDialog
-          open={acceptanceOpen}
-          onOpenChange={setAcceptanceOpen}
-          mode={acceptanceMode}
-          requestId={acceptanceRequest.id}
-          requestDisplayId={acceptanceRequest.display_id}
-          onSuccess={handleAcceptanceSuccess}
-        />
-      )}
 
       {lightboxOpen && lightboxPhotos.length > 0 && (
         <PhotoLightbox
