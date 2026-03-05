@@ -12,7 +12,6 @@ import { OverdueBadge } from '@/components/maintenance/overdue-badge';
 
 export type JobTableMeta = {
   onView?: (job: JobWithRelations) => void;
-  onEdit?: (job: JobWithRelations) => void;
   onCancel?: (job: JobWithRelations) => void;
   currentUserId?: string;
   currentUserRole?: string;
@@ -144,20 +143,6 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
           >
             View
           </Button>
-
-          {isGaLeadOrAdmin && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs"
-              onClick={(e) => {
-                e.stopPropagation();
-                meta?.onEdit?.(job);
-              }}
-            >
-              Edit
-            </Button>
-          )}
 
           {canCancel && (
             <Button

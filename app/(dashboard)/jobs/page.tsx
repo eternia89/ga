@@ -7,7 +7,12 @@ import { Button } from '@/components/ui/button';
 import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 
-export default async function JobsPage() {
+interface PageProps {
+  searchParams: Promise<{ view?: string }>;
+}
+
+export default async function JobsPage({ searchParams }: PageProps) {
+  const { view } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -99,6 +104,7 @@ export default async function JobsPage() {
         users={users}
         currentUserId={profile.id}
         currentUserRole={profile.role}
+        initialViewId={view}
       />
     </div>
   );

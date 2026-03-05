@@ -10,12 +10,14 @@ import { InlineFeedback } from '@/components/inline-feedback';
 import { jobColumns } from './job-columns';
 import { JobFilters, jobFilterParsers } from './job-filters';
 import { JobCancelDialog } from './job-cancel-dialog';
+import { JobViewModal } from './job-view-modal';
 
 interface JobTableProps {
   data: JobWithRelations[];
   users: { id: string; name: string }[];
   currentUserId: string;
   currentUserRole: string;
+  initialViewId?: string;
 }
 
 export function JobTable({
@@ -23,9 +25,13 @@ export function JobTable({
   users,
   currentUserId,
   currentUserRole,
+  initialViewId,
 }: JobTableProps) {
   const router = useRouter();
   const [filters] = useQueryStates(jobFilterParsers);
+
+  // View modal state
+  const [viewJobId, setViewJobId] = useState<string | null>(initialViewId ?? null);
 
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancellingJobId, setCancellingJobId] = useState<string | null>(null);
@@ -71,11 +77,12 @@ export function JobTable({
   }, [data, filters, currentUserId]);
 
   const handleView = (job: JobWithRelations) => {
-    router.push(`/jobs/${job.id}`);
+    setViewJobId(job.id);
   };
 
-  const handleEdit = (job: JobWithRelations) => {
-    router.push(`/jobs/${job.id}`);
+  const handleModalActionSuccess = () => {
+    setFeedback({ type: 'success', message: 'Action completed successfully' });
+    router.refresh();
   };
 
   const handleCancel = (job: JobWithRelations) => {
@@ -107,7 +114,6 @@ export function JobTable({
         emptyMessage="No jobs found"
         meta={{
           onView: handleView,
-          onEdit: handleEdit,
           onCancel: handleCancel,
           currentUserId,
           currentUserRole,
@@ -120,6 +126,17 @@ export function JobTable({
         jobId={cancellingJobId}
         jobDisplayId={cancellingDisplayId}
         onSuccess={handleCancelSuccess}
+      />
+
+      {/* Job view modal */}
+      <JobViewModal
+        jobId={viewJobId}
+        onOpenChange={(open) => { if (!open) setViewJobId(null); }}
+        currentUserId={currentUserId}
+        currentUserRole={currentUserRole}
+        onActionSuccess={handleModalActionSuccess}
+        jobIds={filteredData.map((j) => j.id)}
+        onNavigate={setViewJobId}
       />
     </div>
   );
