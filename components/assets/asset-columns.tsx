@@ -15,7 +15,6 @@ export interface PendingTransfer {
 
 export type AssetTableMeta = {
   onView?: (asset: InventoryItemWithRelations) => void;
-  onEdit?: (asset: InventoryItemWithRelations) => void;
   pendingTransfers?: Record<string, PendingTransfer>;
   currentUserRole?: string;
 };
@@ -126,8 +125,6 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
     cell: ({ row, table }) => {
       const asset = row.original;
       const meta = table.options.meta as AssetTableMeta | undefined;
-      const currentUserRole = meta?.currentUserRole;
-      const canEdit = ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole ?? '');
 
       return (
         <div className="flex items-center gap-1">
@@ -139,16 +136,6 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
           >
             View
           </Button>
-          {canEdit && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs"
-              onClick={() => meta?.onEdit?.(asset)}
-            >
-              Edit
-            </Button>
-          )}
         </div>
       );
     },

@@ -1,19 +1,23 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryStates } from 'nuqs';
 import { InventoryItemWithRelations } from '@/lib/types/database';
 import { DataTable } from '@/components/data-table/data-table';
+import { InlineFeedback } from '@/components/inline-feedback';
 import { assetColumns, PendingTransfer } from './asset-columns';
 import { AssetFilters, filterParsers } from './asset-filters';
+import { AssetViewModal } from './asset-view-modal';
 
 interface AssetTableProps {
   data: InventoryItemWithRelations[];
   pendingTransfers: Record<string, PendingTransfer>;
   categories: { id: string; name: string }[];
   locations: { id: string; name: string }[];
+  currentUserId: string;
   currentUserRole: string;
+  initialViewId?: string;
 }
 
 export function AssetTable({
@@ -21,10 +25,17 @@ export function AssetTable({
   pendingTransfers,
   categories,
   locations,
+  currentUserId,
   currentUserRole,
+  initialViewId,
 }: AssetTableProps) {
   const router = useRouter();
   const [filters] = useQueryStates(filterParsers);
+
+  // View modal state
+  const [viewAssetId, setViewAssetId] = useState<string | null>(initialViewId ?? null);
+
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Client-side filtering based on URL params
   const filteredData = useMemo(() => {
@@ -66,11 +77,12 @@ export function AssetTable({
   }, [data, filters, pendingTransfers]);
 
   const handleView = (asset: InventoryItemWithRelations) => {
-    router.push(`/inventory/${asset.id}`);
+    setViewAssetId(asset.id);
   };
 
-  const handleEdit = (asset: InventoryItemWithRelations) => {
-    router.push(`/inventory/${asset.id}?edit=true`);
+  const handleModalActionSuccess = () => {
+    setFeedback({ type: 'success', message: 'Action completed successfully' });
+    router.refresh();
   };
 
   return (
@@ -78,16 +90,34 @@ export function AssetTable({
       {/* Filter bar */}
       <AssetFilters categories={categories} locations={locations} />
 
+      {feedback && (
+        <InlineFeedback
+          type={feedback.type}
+          message={feedback.message}
+          onDismiss={() => setFeedback(null)}
+        />
+      )}
+
       <DataTable
         columns={assetColumns}
         data={filteredData}
         emptyMessage="No assets found"
         meta={{
           onView: handleView,
-          onEdit: handleEdit,
           pendingTransfers,
           currentUserRole,
         }}
+      />
+
+      {/* Asset view modal */}
+      <AssetViewModal
+        assetId={viewAssetId}
+        onOpenChange={(open) => { if (!open) setViewAssetId(null); }}
+        currentUserId={currentUserId}
+        currentUserRole={currentUserRole}
+        onActionSuccess={handleModalActionSuccess}
+        assetIds={filteredData.map((a) => a.id)}
+        onNavigate={setViewAssetId}
       />
     </div>
   );

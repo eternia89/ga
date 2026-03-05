@@ -8,7 +8,12 @@ import { Button } from '@/components/ui/button';
 import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 
-export default async function InventoryPage() {
+interface PageProps {
+  searchParams: Promise<{ view?: string }>;
+}
+
+export default async function InventoryPage({ searchParams }: PageProps) {
+  const { view } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -113,7 +118,9 @@ export default async function InventoryPage() {
         pendingTransfers={pendingTransfersMap}
         categories={categories ?? []}
         locations={locations ?? []}
+        currentUserId={profile.id}
         currentUserRole={profile.role}
+        initialViewId={view}
       />
     </div>
   );
