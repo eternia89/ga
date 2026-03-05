@@ -266,7 +266,7 @@ Recent decisions affecting current work:
 | 9 | Consolidate content max-width to dashboard layout | 2026-03-04 | d05c640 | Verified | [5-ensure-that-implementation-of-max-width-](./quick/5-ensure-that-implementation-of-max-width-/) |
 | 10 | Change display ID convention to globally unique format | 2026-03-04 | afd9d29 | Verified | [6-change-display-id-convention-to-globally](./quick/6-change-display-id-convention-to-globally/) |
 | 11 | Fix photo upload bugs: duplicate thumbnails, black icon, RLS delete | 2026-03-04 | 96f6330 | Complete | [7-fix-photo-upload-bugs-duplicate-thumbnai](./quick/7-fix-photo-upload-bugs-duplicate-thumbnai/) |
-| 12 | Implement modal view pattern on all table list pages | 2026-03-05 | 25b8b53 | Complete | [9-implement-modal-view-pattern-on-all-tabl](./quick/9-implement-modal-view-pattern-on-all-tabl/) |
+| 12 | Implement modal view pattern on all table list pages | 2026-03-05 | f856883 | Verified | [9-implement-modal-view-pattern-on-all-tabl](./quick/9-implement-modal-view-pattern-on-all-tabl/) |
 
 ## Session Continuity
 
