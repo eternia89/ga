@@ -36,19 +36,21 @@ must_haves:
     - "All modals sync ?view=entityId to the URL for permalink support"
     - "All modals have prev/next navigation arrows when opened from a filtered list"
     - "All modals follow the 800px, max-h-[90vh], full-screen-on-mobile pattern from RequestViewModal"
+    - "All modals use the split-view layout (left panel + right panel) per locked layout decision"
+    - "All modals have a sticky action bar at the bottom per locked layout decision"
   artifacts:
     - path: "components/jobs/job-view-modal.tsx"
-      provides: "Job view modal with client-side data fetching, split layout, action bar"
+      provides: "Job view modal with client-side data fetching, split layout, sticky action bar"
       min_lines: 200
     - path: "components/assets/asset-view-modal.tsx"
-      provides: "Asset view modal with client-side data fetching, split layout, action bar"
+      provides: "Asset view modal with client-side data fetching, split layout, sticky action bar"
       min_lines: 200
     - path: "components/maintenance/template-view-modal.tsx"
-      provides: "Template view modal with client-side data fetching, detail/edit content"
-      min_lines: 100
+      provides: "Template view modal with client-side data fetching, split layout (metadata left, checklist right), sticky action bar"
+      min_lines: 150
     - path: "components/maintenance/schedule-view-modal.tsx"
-      provides: "Schedule view modal with client-side data fetching, detail content, linked PM jobs"
-      min_lines: 100
+      provides: "Schedule view modal with client-side data fetching, split layout (detail left, PM jobs right), sticky action bar"
+      min_lines: 150
   key_links:
     - from: "components/jobs/job-table.tsx"
       to: "components/jobs/job-view-modal.tsx"
@@ -200,12 +202,12 @@ NOTE: The job detail page currently does ALL data fetching and timeline processi
 
 **Layout** (same Dialog shell as RequestViewModal):
 - Header: prev/next arrows, display_id (mono), JobStatusBadge, PriorityBadge, PM badge if job_type=preventive_maintenance, subtitle with created_by name + created date
-- Split body: Left scrollable panel with JobDetailInfo + JobDetailActions + PMChecklist (if applicable), Right scrollable panel with timeline heading + JobTimeline + JobCommentForm (if canComment)
-- Sticky action bar: Currently JobDetailActions handles its own actions (status changes, cancel). The modal should render JobDetailActions inside the left panel as it does on the detail page. No separate bottom bar needed UNLESS there are form-level actions like the request update button. For jobs, actions are individual buttons in JobDetailActions. So: no sticky bottom bar for jobs — actions live inline in JobDetailInfo/JobDetailActions.
+- Split body: Left scrollable panel with JobDetailInfo + PMChecklist (if applicable), Right scrollable panel with timeline heading + JobTimeline + JobCommentForm (if canComment)
+- **Sticky action bar at bottom (per locked layout decision):** A `border-t px-6 py-3 flex items-center justify-between gap-2 shrink-0 bg-background` bar at the bottom of the modal, same structure as RequestViewModal's action bar. Left side: primary actions based on job status — Start Work (if status=assigned, user is PIC or ga_lead/admin), Approve (if pending_approval, user is ga_lead/admin), Approve Completion (if pending_completion_approval, user is ga_lead/admin), Mark Complete (if in_progress, user is PIC or ga_lead/admin). Right side: destructive actions — Reject (if pending_approval), Reject Completion (if pending_completion_approval), Cancel (if not completed/cancelled, user is ga_lead/admin). Each button triggers the same server actions as JobDetailActions (updateJobStatus, cancelJob, approveJob, rejectJob, approveCompletion, rejectCompletion). The action bar replaces JobDetailActions as the primary action surface. Do NOT render JobDetailActions in the left panel — move its action logic into the sticky bar instead. The left panel should only contain JobDetailInfo + PMChecklist. Sub-dialogs for rejection reason (rejectJob, rejectCompletion) and cancel confirmation should be rendered OUTSIDE the main Dialog (same z-index stacking pattern as RequestViewModal sub-dialogs).
 
-IMPORTANT: JobDetailInfo, JobDetailActions, JobTimeline, JobCommentForm, and PMChecklist are existing components that accept props. Reuse them inside the modal body. The modal's job is to fetch data client-side and pass it to these existing components. Do NOT recreate the detail rendering — just wrap the existing components.
+IMPORTANT: JobDetailInfo, JobTimeline, JobCommentForm, and PMChecklist are existing components that accept props. Reuse them inside the modal body. The modal's job is to fetch data client-side and pass it to these existing components. Do NOT recreate the detail rendering — just wrap the existing components. However, for the action bar, implement the action buttons directly in the modal (copying the permission logic and server action calls from JobDetailActions) rather than embedding JobDetailActions as a component.
 
-**Sub-dialogs:** JobCancelDialog is already used in job-table.tsx. Move the cancel functionality into the modal's action handling (JobDetailActions already has its own dialogs for status changes). If there are sub-dialogs inside JobDetailActions, they should work fine since they use their own Dialog wrappers.
+**Sub-dialogs:** Rejection reason dialogs (for rejectJob and rejectCompletion) and cancel confirmation dialog need to be rendered OUTSIDE the main Dialog for z-index stacking. Use the same pattern as RequestViewModal's sub-dialogs (separate AlertDialog/Dialog components after the main DialogContent).
 
 **Wire into JobTable (`components/jobs/job-table.tsx`):**
 - Add `initialViewId?: string` prop
@@ -230,7 +232,8 @@ IMPORTANT: JobDetailInfo, JobDetailActions, JobTimeline, JobCommentForm, and PMC
   <done>
     - JobViewModal component exists with client-side data fetching
     - Clicking View in job table opens modal (no navigation away)
-    - Modal shows job info, timeline, comments, PM checklist, actions
+    - Modal shows job info, timeline, comments, PM checklist in split layout
+    - Sticky action bar at bottom with context-sensitive job actions
     - URL syncs to ?view=jobId
     - Prev/next navigation works
     - TypeScript compiles without errors
@@ -324,12 +327,14 @@ Create `components/maintenance/template-view-modal.tsx`:
 - Normalize: checklist as array, item_count, category flatten
 - Fetch categories (type='asset', non-deleted) for edit form
 
-**Layout:** This is a simpler entity — NO split layout (no timeline). Use single-column scrollable content.
+**Layout (split view per locked layout decision — ALL entities use split layout):**
 - Header: prev/next arrows, template name, Active/Inactive badge, item count, created date
-- Body: Render TemplateDetail component directly (it handles both edit form and read-only view based on userRole)
-- No sticky action bar — TemplateDetail has its own Save/Deactivate/Reactivate buttons inline
+- Split body (same `grid-cols-[1fr_350px] max-lg:grid-cols-1` structure as RequestViewModal):
+  - Left panel (scrollable): Template metadata (name, category, description, created/updated dates) and the edit form section from TemplateDetail. If userRole is ga_lead/admin, show the editable form fields (name, category, description). If read-only, show the metadata as static fields.
+  - Right panel (scrollable, border-l): Checklist Items section — heading "Checklist Items ({count})" followed by the checklist item list (type label + description for each item). This is the natural "detail" content for templates, analogous to timeline for other entities. In edit mode, this is where the draggable checklist editor goes.
+- **Sticky action bar at bottom (per locked layout decision):** `border-t px-6 py-3 flex items-center justify-between gap-2 shrink-0 bg-background`. Left side: Save Changes button (if form is dirty, userRole is ga_lead/admin). Right side: Deactivate button (if template is active) or Reactivate button (if inactive). These actions call the same server actions as TemplateDetail.
 
-IMPORTANT: Reuse the existing TemplateDetail component inside the modal body. Just fetch data client-side and pass as props.
+NOTE: You may need to split TemplateDetail's rendering — rather than embedding the entire TemplateDetail component as-is (which has its own save/deactivate buttons inline), extract the form fields and checklist display into the two panels, and move the action buttons to the sticky bar. Alternatively, render TemplateDetail in the left panel but hide its inline buttons (via a prop like `hideActions={true}`) and replicate the actions in the sticky bar. Use whichever approach is cleaner — this is Claude's discretion. The key requirement is: split layout with two panels + sticky action bar.
 
 **Wire into TemplateList (`components/maintenance/template-list.tsx`):**
 - Add `initialViewId?: string` prop
@@ -359,11 +364,14 @@ Create `components/maintenance/schedule-view-modal.tsx`:
 - Normalize FK arrays
 - Fetch PM jobs: jobs where maintenance_schedule_id=id, non-deleted, ordered by created_at desc
 
-**Layout:** Single-column (no timeline). Simpler entity.
+**Layout (split view per locked layout decision — ALL entities use split layout):**
 - Header: prev/next arrows, template name, asset name link, ScheduleStatusBadge
-- Body: Render ScheduleDetail component with schedule + pmJobs + userRole
+- Split body (same `grid-cols-[1fr_350px] max-lg:grid-cols-1` structure as RequestViewModal):
+  - Left panel (scrollable): Schedule detail info — template name, asset name + link, interval (type + days), next due date, last completed date, status, auto-pause warning if applicable. If userRole is ga_lead/admin, show editable form fields for interval and other settings.
+  - Right panel (scrollable, border-l): PM Jobs list — heading "PM Jobs ({count})" followed by the list of linked preventive maintenance jobs (each showing display_id, status badge, created date, with click to open job). This is the natural "related items" content for schedules, analogous to timeline for other entities.
+- **Sticky action bar at bottom (per locked layout decision):** `border-t px-6 py-3 flex items-center justify-between gap-2 shrink-0 bg-background`. Left side: Save Changes button (if form is dirty, ga_lead/admin only). Right side: Pause button (if active and not paused), Resume button (if paused), Deactivate button. These actions call the same server actions as ScheduleDetail.
 
-IMPORTANT: Reuse existing ScheduleDetail component.
+NOTE: Similar to TemplateViewModal, you may need to split ScheduleDetail's rendering or pass a `hideActions` prop. The existing ScheduleDetail component has inline Pause/Resume/Deactivate buttons and the PM Jobs list together. For the modal, the PM Jobs section moves to the right panel and actions move to the sticky bar. Use whichever approach is cleanest.
 
 **Wire into ScheduleList (`components/maintenance/schedule-list.tsx`):**
 - Add `initialViewId?: string` prop
@@ -387,11 +395,12 @@ NOTE: The schedules page is `app/(dashboard)/maintenance/page.tsx`, NOT `app/(da
   </verify>
   <done>
     - TemplateViewModal and ScheduleViewModal components exist
+    - Both modals use split-view layout (left detail panel + right content panel)
+    - Both modals have sticky action bar at bottom
     - Clicking template name in table opens modal (no navigation away)
     - Clicking View on schedule row opens modal (no navigation away)
     - Both modals sync ?view=id to URL
     - Both modals have prev/next navigation
-    - TemplateDetail and ScheduleDetail render correctly inside modals
     - TypeScript compiles without errors
   </done>
 </task>
@@ -404,13 +413,17 @@ After all 3 tasks complete:
 2. `npm run build` succeeds
 3. All 4 entity tables open modals instead of navigating on View click
 4. All modals show full entity detail content (reusing existing detail components)
-5. URL ?view= param syncs on open/close/navigate
-6. Prev/next arrows work in all modals
-7. Actions within modals (status changes, edits, cancellations) work and refresh data
+5. All modals use split-view layout (left + right panels) per locked layout decision
+6. All modals have sticky action bar at bottom per locked layout decision
+7. URL ?view= param syncs on open/close/navigate
+8. Prev/next arrows work in all modals
+9. Actions within modals (status changes, edits, cancellations) work and refresh data
 </verification>
 
 <success_criteria>
 - 4 new *ViewModal components created, each following the RequestViewModal pattern
+- All modals use split-view layout (details left, related content right) per locked decision
+- All modals have sticky action bar at bottom per locked decision
 - All table list pages wire modals via viewEntityId state
 - URL permalink support with ?view= param on all 4 pages
 - Prev/next navigation in all modals
