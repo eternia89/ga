@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-05 - Completed quick task 14: Strip table row actions to View only, add modal action buttons
+Last activity: 2026-03-05 - Completed quick task 15: Strip admin settings table rows to Edit-only, move deactivate/reactivate to FormDialog
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -269,10 +269,11 @@ Recent decisions affecting current work:
 | 12 | Implement modal view pattern on all table list pages | 2026-03-05 | f856883 | Verified | [9-implement-modal-view-pattern-on-all-tabl](./quick/9-implement-modal-view-pattern-on-all-tabl/) |
 | 13 | Unify table row view links to modal pattern | 2026-03-05 | 071b7c9 | Verified | [10-unify-table-row-view-links-to-modal-patt](./quick/10-unify-table-row-view-links-to-modal-patt/) |
 | 14 | Strip table row actions to View only, add modal action buttons | 2026-03-05 | 785dd14 | Verified | [11-table-rows-show-only-view-action-move-se](./quick/11-table-rows-show-only-view-action-move-se/) |
+| 15 | Strip admin settings table rows to Edit-only, move deactivate/reactivate to FormDialog | 2026-03-05 | d6b13af | Complete | [12-strip-admin-settings-table-rows-to-view-](./quick/12-strip-admin-settings-table-rows-to-view-/) |
 
 ## Session Continuity
 
 Last session: 2026-03-05
-Stopped at: Completed quick task 14: strip table row actions to View only, move actions to modal sticky bars
-Resume file: .planning/quick/11-table-rows-show-only-view-action-move-se/11-SUMMARY.md
+Stopped at: Completed quick task 15: strip admin settings table rows to Edit-only, move deactivate/reactivate to FormDialog
+Resume file: .planning/quick/12-strip-admin-settings-table-rows-to-view-/12-SUMMARY.md
 Next: Ready for next task
