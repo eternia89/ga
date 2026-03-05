@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
@@ -22,7 +22,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
 import { PRIORITY_LABELS } from '@/lib/constants/request-status';
 
 interface PhotoItem {
@@ -49,6 +48,12 @@ interface RequestDetailInfoProps {
   onEditSuccess: () => void;
   onTriageSuccess: () => void;
   linkedJobs: LinkedJob[];
+  /** HTML form id — allows external button to submit via form={formId} */
+  formId?: string;
+  /** Called when dirty state changes */
+  onDirtyChange?: (isDirty: boolean) => void;
+  /** Called when submitting state changes */
+  onSubmittingChange?: (isSubmitting: boolean) => void;
 }
 
 export function RequestDetailInfo({
@@ -62,6 +67,9 @@ export function RequestDetailInfo({
   onEditSuccess,
   onTriageSuccess,
   linkedJobs,
+  formId,
+  onDirtyChange,
+  onSubmittingChange,
 }: RequestDetailInfoProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [triageSubmitting, setTriageSubmitting] = useState(false);
@@ -112,6 +120,21 @@ export function RequestDetailInfo({
     }
   };
 
+  // Track triage form dirty/submitting for external submit button
+  const { isDirty: triageIsDirty } = triageForm.formState;
+  useEffect(() => {
+    // Only report dirty state for triage form when it's the active form (not editable mode)
+    if (!isEditable && canTriage) {
+      onDirtyChange?.(triageIsDirty);
+    }
+  }, [triageIsDirty, isEditable, canTriage, onDirtyChange]);
+
+  useEffect(() => {
+    if (!isEditable && canTriage) {
+      onSubmittingChange?.(triageSubmitting);
+    }
+  }, [triageSubmitting, isEditable, canTriage, onSubmittingChange]);
+
   const categoryOptions = categories.map((c) => ({ label: c.name, value: c.id }));
   const priorityOptions = Object.entries(PRIORITY_LABELS).map(([value, label]) => ({
     label,
@@ -128,6 +151,9 @@ export function RequestDetailInfo({
           locations={locations}
           existingPhotos={photoUrls}
           onSuccess={onEditSuccess}
+          formId={formId}
+          onDirtyChange={onDirtyChange}
+          onSubmittingChange={onSubmittingChange}
         />
         {lightboxIndex !== null && (
           <PhotoLightbox
@@ -262,6 +288,7 @@ export function RequestDetailInfo({
               /* Inline triage form for GA Lead/Admin on submitted requests */
               <Form {...triageForm}>
                 <form
+                  id={formId}
                   onSubmit={triageForm.handleSubmit(handleTriageSubmit)}
                   className="space-y-4"
                 >
@@ -341,16 +368,6 @@ export function RequestDetailInfo({
                       onDismiss={() => setTriageFeedback(null)}
                     />
                   )}
-
-                  <Button type="submit" disabled={triageSubmitting}>
-                    {triageSubmitting
-                      ? request.status === 'submitted'
-                        ? 'Triaging...'
-                        : 'Updating...'
-                      : request.status === 'submitted'
-                        ? 'Save Triage'
-                        : 'Update Triage'}
-                  </Button>
                 </form>
               </Form>
             ) : (

@@ -19,7 +19,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 interface ExistingPhoto {
@@ -33,6 +32,12 @@ interface RequestEditFormProps {
   locations: { id: string; name: string }[];
   existingPhotos: ExistingPhoto[];
   onSuccess: () => void;
+  /** HTML form id — allows external button to submit via form={formId} */
+  formId?: string;
+  /** Called when dirty state changes (includes photo changes) */
+  onDirtyChange?: (isDirty: boolean) => void;
+  /** Called when submitting state changes */
+  onSubmittingChange?: (isSubmitting: boolean) => void;
 }
 
 export function RequestEditForm({
@@ -40,6 +45,9 @@ export function RequestEditForm({
   locations,
   existingPhotos: initialPhotos,
   onSuccess,
+  formId,
+  onDirtyChange,
+  onSubmittingChange,
 }: RequestEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -65,6 +73,19 @@ export function RequestEditForm({
     setFeedback(null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [request.id, initialPhotos, form]);
+
+  // Track composite dirty state (form fields + photo changes)
+  const { isDirty: formIsDirty } = form.formState;
+  const photosChanged = newFiles.length > 0 || existingPhotos.length !== initialPhotos.length;
+  const compositeIsDirty = formIsDirty || photosChanged;
+
+  useEffect(() => {
+    onDirtyChange?.(compositeIsDirty);
+  }, [compositeIsDirty, onDirtyChange]);
+
+  useEffect(() => {
+    onSubmittingChange?.(isSubmitting);
+  }, [isSubmitting, onSubmittingChange]);
 
   const locationOptions = locations.map((l) => ({ label: l.name, value: l.id }));
 
@@ -134,7 +155,7 @@ export function RequestEditForm({
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
             name="description"
@@ -210,17 +231,15 @@ export function RequestEditForm({
                 </div>
               ))}
 
-              {/* New photo upload placeholder */}
-              {totalPhotos < maxPhotos && (
-                <PhotoUpload
-                  onChange={setNewFiles}
-                  value={newFiles}
-                  maxPhotos={maxPhotos - existingPhotos.length}
-                  enableMobileCapture
-                  enableCompression={false}
-                  enableAnnotation={false}
-                />
-              )}
+              {/* New photo upload (always rendered — hides add button internally when max reached) */}
+              <PhotoUpload
+                onChange={setNewFiles}
+                value={newFiles}
+                maxPhotos={maxPhotos - existingPhotos.length}
+                enableMobileCapture
+
+                enableAnnotation={false}
+              />
             </div>
 
             <p className="text-xs text-muted-foreground">
@@ -237,10 +256,6 @@ export function RequestEditForm({
               onDismiss={() => setFeedback(null)}
             />
           )}
-
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Saving...' : 'Save Changes'}
-          </Button>
         </form>
       </Form>
 

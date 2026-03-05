@@ -23,7 +23,6 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import {
-  ClipboardList,
   XCircle,
   Ban,
   CheckCircle,
@@ -110,6 +109,10 @@ export function RequestViewModal({
   const [acceptanceOpen, setAcceptanceOpen] = useState(false);
   const [acceptanceMode, setAcceptanceMode] = useState<'accept' | 'reject'>('accept');
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+
+  // Form state (tracked from child form components)
+  const [formDirty, setFormDirty] = useState(false);
+  const [formSubmitting, setFormSubmitting] = useState(false);
 
   // Timeline scroll ref
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -398,6 +401,8 @@ export function RequestViewModal({
       setLocations([]);
       setLinkedJobs([]);
       setError(null);
+      setFormDirty(false);
+      setFormSubmitting(false);
     }
   }, [requestId, refreshKey, fetchData]);
 
@@ -429,18 +434,10 @@ export function RequestViewModal({
   const isRequester = request?.requester_id === currentUserId;
   const isAdmin = currentUserRole === 'admin';
 
-  const canTriage = isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request?.status ?? '');
   const canReject = isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request?.status ?? '');
   const canCancel = isRequester && request?.status === 'submitted';
   const canAcceptOrReject = (isRequester || isAdmin) && request?.status === 'pending_acceptance';
   const canGiveFeedback = isRequester && request?.status === 'accepted' && !request?.feedback_rating;
-
-  const scrollToTriage = () => {
-    const el = document.getElementById('triage-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
 
   return (
     <>
@@ -582,6 +579,9 @@ export function RequestViewModal({
                     onEditSuccess={handleActionSuccess}
                     onTriageSuccess={handleActionSuccess}
                     linkedJobs={linkedJobs}
+                    formId="request-update-form"
+                    onDirtyChange={setFormDirty}
+                    onSubmittingChange={setFormSubmitting}
                   />
                 </div>
 
@@ -601,10 +601,14 @@ export function RequestViewModal({
               <div className="border-t px-6 py-3 flex items-center justify-between gap-2 shrink-0 bg-background">
                 {/* Left: Primary actions */}
                 <div className="flex flex-wrap items-center gap-2">
-                  {canTriage && (
-                    <Button size="sm" onClick={scrollToTriage}>
-                      <ClipboardList className="mr-2 h-4 w-4" />
-                      {request.status === 'submitted' ? 'Triage' : 'Edit Triage'}
+                  {formDirty && (
+                    <Button
+                      type="submit"
+                      form="request-update-form"
+                      size="sm"
+                      disabled={formSubmitting}
+                    >
+                      {formSubmitting ? 'Updating...' : 'Update Request'}
                     </Button>
                   )}
 
