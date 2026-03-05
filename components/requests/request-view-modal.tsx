@@ -13,7 +13,6 @@ import { RequestRejectDialog } from './request-reject-dialog';
 import { RequestCancelDialog } from './request-cancel-dialog';
 import { RequestAcceptanceDialog } from './request-acceptance-dialog';
 import { RequestFeedbackDialog } from './request-feedback-dialog';
-import { PhotoLightbox } from './request-photo-lightbox';
 import { RequestStatusBadge } from './request-status-badge';
 import { PriorityBadge } from '@/components/priority-badge';
 import {
@@ -21,7 +20,6 @@ import {
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,6 +30,8 @@ import {
   Star,
   AlertCircle,
   RefreshCw,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 // ============================================================================
@@ -59,6 +59,10 @@ interface RequestViewModalProps {
   currentUserId: string;
   currentUserRole: string;
   onActionSuccess?: () => void;
+  /** Ordered list of request IDs for prev/next navigation */
+  requestIds?: string[];
+  /** Called when user navigates to a different request */
+  onNavigate?: (requestId: string) => void;
 }
 
 // ============================================================================
@@ -83,6 +87,8 @@ export function RequestViewModal({
   currentUserId,
   currentUserRole,
   onActionSuccess,
+  requestIds = [],
+  onNavigate,
 }: RequestViewModalProps) {
   const router = useRouter();
 
@@ -105,11 +111,25 @@ export function RequestViewModal({
   const [acceptanceMode, setAcceptanceMode] = useState<'accept' | 'reject'>('accept');
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
-  // Photo lightbox
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-
   // Timeline scroll ref
   const timelineRef = useRef<HTMLDivElement>(null);
+
+  // Navigation
+  const currentIndex = requestId ? requestIds.indexOf(requestId) : -1;
+  const hasPrev = currentIndex > 0;
+  const hasNext = currentIndex >= 0 && currentIndex < requestIds.length - 1;
+
+  const goToPrev = () => {
+    if (hasPrev) {
+      onNavigate?.(requestIds[currentIndex - 1]);
+    }
+  };
+
+  const goToNext = () => {
+    if (hasNext) {
+      onNavigate?.(requestIds[currentIndex + 1]);
+    }
+  };
 
   // URL sync
   useEffect(() => {
@@ -427,7 +447,7 @@ export function RequestViewModal({
       <Dialog open={!!requestId} onOpenChange={onOpenChange}>
         <DialogContent
           className="max-w-6xl max-h-[90vh] flex flex-col p-0 gap-0 max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0"
-          showCloseButton={false}
+          showCloseButton={true}
         >
           {/* Loading state */}
           {loading && (
@@ -438,18 +458,24 @@ export function RequestViewModal({
                 <Skeleton className="h-5 w-16" />
               </div>
               <Skeleton className="h-4 w-48" />
-              <Skeleton className="h-8 w-64 mt-4" />
-              <div className="space-y-3 mt-4">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6" />
-                <Skeleton className="h-4 w-3/4" />
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i}>
-                      <Skeleton className="h-3 w-16 mb-1" />
-                      <Skeleton className="h-4 w-24" />
-                    </div>
-                  ))}
+              <div className="grid grid-cols-[1fr_350px] max-lg:grid-cols-1 gap-6 mt-4">
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i}>
+                        <Skeleton className="h-3 w-16 mb-1" />
+                        <Skeleton className="h-4 w-24" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-20 w-full" />
+                  <Skeleton className="h-20 w-full" />
                 </div>
               </div>
             </div>
@@ -486,11 +512,40 @@ export function RequestViewModal({
           {request && !loading && !error && (
             <>
               {/* Header (non-scrollable) */}
-              <div className="px-6 pt-6 pb-4 border-b shrink-0">
+              <div className="px-6 pt-6 pb-4 border-b shrink-0 pr-12">
                 <DialogTitle className="sr-only">
                   Request {request.display_id}
                 </DialogTitle>
                 <div className="flex flex-wrap items-center gap-3">
+                  {/* Prev/Next navigation */}
+                  {requestIds.length > 1 && (
+                    <div className="flex items-center gap-1 mr-1">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-7 w-7"
+                        disabled={!hasPrev}
+                        onClick={goToPrev}
+                        aria-label="Previous request"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-7 w-7"
+                        disabled={!hasNext}
+                        onClick={goToNext}
+                        aria-label="Next request"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                      <span className="text-xs text-muted-foreground ml-1">
+                        {currentIndex + 1}/{requestIds.length}
+                      </span>
+                    </div>
+                  )}
+
                   <h2 className="text-xl font-bold tracking-tight font-mono">
                     {request.display_id}
                   </h2>
@@ -512,19 +567,10 @@ export function RequestViewModal({
                 )}
               </div>
 
-              {/* Tabs (scrollable content) */}
-              <Tabs defaultValue="details" className="flex-1 min-h-0 flex flex-col">
-                <div className="px-6 pt-3 shrink-0">
-                  <TabsList>
-                    <TabsTrigger value="details">Details</TabsTrigger>
-                    <TabsTrigger value="photos">
-                      Photos{photos.length > 0 && ` (${photos.length})`}
-                    </TabsTrigger>
-                    <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                  </TabsList>
-                </div>
-
-                <TabsContent value="details" className="overflow-y-auto flex-1 min-h-0 px-6 py-4">
+              {/* Split layout: Details left, Timeline right */}
+              <div className="flex-1 min-h-0 grid grid-cols-[1fr_350px] max-lg:grid-cols-1">
+                {/* Left: Details (scrollable) */}
+                <div className="overflow-y-auto px-6 py-4 max-lg:border-b">
                   <RequestDetailInfo
                     request={request}
                     photoUrls={photos}
@@ -537,45 +583,19 @@ export function RequestViewModal({
                     onTriageSuccess={handleActionSuccess}
                     linkedJobs={linkedJobs}
                   />
-                </TabsContent>
+                </div>
 
-                <TabsContent value="photos" className="overflow-y-auto flex-1 min-h-0 px-6 py-4">
-                  {photos.length === 0 ? (
-                    <div className="text-sm text-muted-foreground text-center py-8">
-                      No photos attached to this request.
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                        Photos ({photos.length})
-                      </h3>
-                      <div className="grid grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-2 gap-3">
-                        {photos.map((photo, index) => (
-                          <button
-                            key={photo.id}
-                            type="button"
-                            onClick={() => setLightboxIndex(index)}
-                            className="aspect-square rounded-lg border border-border overflow-hidden hover:opacity-80 transition-opacity"
-                            aria-label={`View photo: ${photo.fileName}`}
-                          >
-                            <img
-                              src={photo.url}
-                              alt={photo.fileName}
-                              className="w-full h-full object-cover"
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="timeline" className="overflow-y-auto flex-1 min-h-0 px-6 py-4">
-                  <div ref={timelineRef}>
-                    <RequestTimeline events={timelineEvents} />
-                  </div>
-                </TabsContent>
-              </Tabs>
+                {/* Right: Timeline (scrollable) */}
+                <div
+                  ref={timelineRef}
+                  className="overflow-y-auto border-l max-lg:border-l-0 px-6 py-4"
+                >
+                  <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
+                    Timeline
+                  </h3>
+                  <RequestTimeline events={timelineEvents} />
+                </div>
+              </div>
 
               {/* Sticky action bar */}
               <div className="border-t px-6 py-3 flex items-center justify-between gap-2 shrink-0 bg-background">
@@ -610,7 +630,7 @@ export function RequestViewModal({
                   )}
                 </div>
 
-                {/* Right: Secondary/destructive + close */}
+                {/* Right: Secondary/destructive */}
                 <div className="flex flex-wrap items-center gap-2">
                   {canAcceptOrReject && (
                     <Button
@@ -647,14 +667,6 @@ export function RequestViewModal({
                       <span className="text-destructive">Cancel Request</span>
                     </Button>
                   )}
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onOpenChange(false)}
-                  >
-                    Close
-                  </Button>
                 </div>
               </div>
             </>
@@ -699,15 +711,6 @@ export function RequestViewModal({
             onSuccess={handleActionSuccess}
           />
         </>
-      )}
-
-      {/* Photo lightbox */}
-      {lightboxIndex !== null && photos.length > 0 && (
-        <PhotoLightbox
-          photos={photos}
-          initialIndex={lightboxIndex}
-          onClose={() => setLightboxIndex(null)}
-        />
       )}
     </>
   );

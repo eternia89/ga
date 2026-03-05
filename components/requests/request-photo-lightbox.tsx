@@ -1,7 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useCallback, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface PhotoItem {
   id: string;
@@ -49,11 +54,10 @@ export function PhotoLightbox(props: PhotoLightboxProps) {
     setCurrentIndex((i) => (i - 1 + photos.length) % photos.length);
   }, [photos.length]);
 
+  // Arrow key navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      } else if (e.key === 'ArrowRight' && isMulti) {
+      if (e.key === 'ArrowRight' && isMulti) {
         goNext();
       } else if (e.key === 'ArrowLeft' && isMulti) {
         goPrev();
@@ -62,76 +66,64 @@ export function PhotoLightbox(props: PhotoLightboxProps) {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose, isMulti, goNext, goPrev]);
+  }, [isMulti, goNext, goPrev]);
 
   const current = photos[currentIndex];
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Photo lightbox"
-      onClick={onClose}
-    >
-      {/* Close button */}
-      <button
-        type="button"
-        onClick={onClose}
-        className="absolute top-4 right-4 z-10 rounded-full bg-black/60 p-2 text-white hover:bg-black/80 transition-colors"
-        aria-label="Close lightbox"
+    <Dialog open={true} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent
+        className="max-w-[95vw] max-h-[95vh] bg-black border-black/80 p-0 gap-0 flex flex-col items-center justify-center overflow-hidden"
+        showCloseButton={true}
       >
-        <X className="h-5 w-5" />
-      </button>
+        <DialogTitle className="sr-only">
+          Photo {currentIndex + 1} of {photos.length}
+        </DialogTitle>
 
-      {/* Previous button */}
-      {isMulti && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            goPrev();
-          }}
-          className="absolute left-4 z-10 rounded-full bg-black/60 p-2 text-white hover:bg-black/80 transition-colors"
-          aria-label="Previous photo"
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </button>
-      )}
+        {/* Image with side navigation */}
+        <div className="flex items-center w-full flex-1 min-h-0">
+          {/* Previous button */}
+          {isMulti && (
+            <button
+              type="button"
+              onClick={goPrev}
+              className="shrink-0 flex items-center justify-center w-12 h-full text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label="Previous photo"
+            >
+              <ChevronLeft className="h-8 w-8" />
+            </button>
+          )}
 
-      {/* Next button */}
-      {isMulti && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            goNext();
-          }}
-          className="absolute right-4 z-10 rounded-full bg-black/60 p-2 text-white hover:bg-black/80 transition-colors"
-          aria-label="Next photo"
-        >
-          <ChevronRight className="h-6 w-6" />
-        </button>
-      )}
+          {/* Image */}
+          <div className="flex-1 min-w-0 flex items-center justify-center h-full p-2">
+            <img
+              src={current.url}
+              alt={current.fileName}
+              className="max-h-[85vh] max-w-full object-contain"
+              style={{ touchAction: 'pinch-zoom' }}
+            />
+          </div>
 
-      {/* Image */}
-      <img
-        src={current.url}
-        alt={current.fileName}
-        className="max-h-screen max-w-screen object-contain"
-        style={{ touchAction: 'pinch-zoom' }}
-        onClick={(e) => e.stopPropagation()}
-      />
-
-      {/* Counter */}
-      {isMulti && (
-        <div
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-4 py-1.5 text-sm text-white"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {currentIndex + 1} / {photos.length}
+          {/* Next button */}
+          {isMulti && (
+            <button
+              type="button"
+              onClick={goNext}
+              className="shrink-0 flex items-center justify-center w-12 h-full text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label="Next photo"
+            >
+              <ChevronRight className="h-8 w-8" />
+            </button>
+          )}
         </div>
-      )}
-    </div>
+
+        {/* Counter */}
+        {isMulti && (
+          <div className="shrink-0 py-2 text-sm text-white/70">
+            {currentIndex + 1} / {photos.length}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -145,6 +145,8 @@ export function RequestTable({
         currentUserId={currentUserId}
         currentUserRole={currentUserRole}
         onActionSuccess={handleModalActionSuccess}
+        requestIds={filteredData.map((r) => r.id)}
+        onNavigate={setViewRequestId}
       />
 
       {lightboxOpen && lightboxPhotos.length > 0 && (
