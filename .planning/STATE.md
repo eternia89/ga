@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-05 - Completed quick task 12: Implement modal view pattern on all table list pages
+Last activity: 2026-03-05 - Completed quick task 13: Unify table row view links to modal pattern
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -267,7 +267,7 @@ Recent decisions affecting current work:
 | 10 | Change display ID convention to globally unique format | 2026-03-04 | afd9d29 | Verified | [6-change-display-id-convention-to-globally](./quick/6-change-display-id-convention-to-globally/) |
 | 11 | Fix photo upload bugs: duplicate thumbnails, black icon, RLS delete | 2026-03-04 | 96f6330 | Complete | [7-fix-photo-upload-bugs-duplicate-thumbnai](./quick/7-fix-photo-upload-bugs-duplicate-thumbnai/) |
 | 12 | Implement modal view pattern on all table list pages | 2026-03-05 | f856883 | Verified | [9-implement-modal-view-pattern-on-all-tabl](./quick/9-implement-modal-view-pattern-on-all-tabl/) |
-| 13 | Unify table row view links to modal pattern | 2026-03-05 | 071b7c9 | Complete | [10-unify-table-row-view-links-to-modal-patt](./quick/10-unify-table-row-view-links-to-modal-patt/) |
+| 13 | Unify table row view links to modal pattern | 2026-03-05 | 071b7c9 | Verified | [10-unify-table-row-view-links-to-modal-patt](./quick/10-unify-table-row-view-links-to-modal-patt/) |
 
 ## Session Continuity
 
