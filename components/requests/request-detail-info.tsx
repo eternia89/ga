@@ -123,17 +123,16 @@ export function RequestDetailInfo({
   // Track triage form dirty/submitting for external submit button
   const { isDirty: triageIsDirty } = triageForm.formState;
   useEffect(() => {
-    // Only report dirty state for triage form when it's the active form (not editable mode)
-    if (!isEditable && canTriage) {
+    if (canTriage) {
       onDirtyChange?.(triageIsDirty);
     }
-  }, [triageIsDirty, isEditable, canTriage, onDirtyChange]);
+  }, [triageIsDirty, canTriage, onDirtyChange]);
 
   useEffect(() => {
-    if (!isEditable && canTriage) {
+    if (canTriage) {
       onSubmittingChange?.(triageSubmitting);
     }
-  }, [triageSubmitting, isEditable, canTriage, onSubmittingChange]);
+  }, [triageSubmitting, canTriage, onSubmittingChange]);
 
   const categoryOptions = categories.map((c) => ({ label: c.name, value: c.id }));
   const priorityOptions = Object.entries(PRIORITY_LABELS).map(([value, label]) => ({
@@ -151,10 +150,104 @@ export function RequestDetailInfo({
           locations={locations}
           existingPhotos={photoUrls}
           onSuccess={onEditSuccess}
-          formId={formId}
-          onDirtyChange={onDirtyChange}
-          onSubmittingChange={onSubmittingChange}
+          formId={canTriage ? undefined : formId}
+          onDirtyChange={canTriage ? undefined : onDirtyChange}
+          onSubmittingChange={canTriage ? undefined : onSubmittingChange}
         />
+
+        {/* Triage fields when user is both requester and GA Lead/Admin */}
+        {canTriage && (
+          <div id="triage-section" className="mt-6">
+            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-3">
+              Triage Details
+            </h3>
+            <Form {...triageForm}>
+              <form
+                id={formId}
+                onSubmit={triageForm.handleSubmit(handleTriageSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={triageForm.control}
+                  name="category_id"
+                  render={({ field }) => (
+                    <FormItem className="max-w-xs">
+                      <FormLabel>
+                        Category <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Combobox
+                          options={categoryOptions}
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          placeholder="Select category..."
+                          searchPlaceholder="Search categories..."
+                          emptyText="No categories found."
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={triageForm.control}
+                  name="priority"
+                  render={({ field }) => (
+                    <FormItem className="max-w-xs">
+                      <FormLabel>
+                        Priority <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Combobox
+                          options={priorityOptions}
+                          value={field.value ?? ''}
+                          onValueChange={field.onChange}
+                          placeholder="Select priority..."
+                          searchPlaceholder="Search priorities..."
+                          emptyText="No priorities found."
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={triageForm.control}
+                  name="assigned_to"
+                  render={({ field }) => (
+                    <FormItem className="max-w-xs">
+                      <FormLabel>
+                        PIC <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Combobox
+                          options={userOptions}
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          placeholder="Select PIC..."
+                          searchPlaceholder="Search users..."
+                          emptyText="No users found."
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {triageFeedback && (
+                  <InlineFeedback
+                    type={triageFeedback.type}
+                    message={triageFeedback.message}
+                    onDismiss={() => setTriageFeedback(null)}
+                  />
+                )}
+              </form>
+            </Form>
+          </div>
+        )}
+
         {lightboxIndex !== null && (
           <PhotoLightbox
             photos={photoUrls}

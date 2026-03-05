@@ -443,7 +443,7 @@ export function RequestViewModal({
     <>
       <Dialog open={!!requestId} onOpenChange={onOpenChange}>
         <DialogContent
-          className="max-w-6xl max-h-[90vh] flex flex-col p-0 gap-0 max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0"
+          className="max-w-[800px] max-h-[90vh] flex flex-col p-0 gap-0 max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0"
           showCloseButton={true}
         >
           {/* Loading state */}
@@ -601,16 +601,14 @@ export function RequestViewModal({
               <div className="border-t px-6 py-3 flex items-center justify-between gap-2 shrink-0 bg-background">
                 {/* Left: Primary actions */}
                 <div className="flex flex-wrap items-center gap-2">
-                  {formDirty && (
-                    <Button
-                      type="submit"
-                      form="request-update-form"
-                      size="sm"
-                      disabled={formSubmitting}
-                    >
-                      {formSubmitting ? 'Updating...' : 'Update Request'}
-                    </Button>
-                  )}
+                  <Button
+                    type="submit"
+                    form="request-update-form"
+                    size="sm"
+                    disabled={!formDirty || formSubmitting}
+                  >
+                    {formSubmitting ? 'Updating...' : 'Update Request'}
+                  </Button>
 
                   {canAcceptOrReject && (
                     <Button
