@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { InlineFeedback } from '@/components/inline-feedback';
 import {
   AlertCircle,
   RefreshCw,
@@ -77,6 +78,7 @@ export function AssetViewModal({
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showTransferRespondDialog, setShowTransferRespondDialog] = useState(false);
   const [transferRespondMode, setTransferRespondMode] = useState<'accept' | 'reject'>('accept');
+  const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Navigation
   const currentIndex = assetId ? assetIds.indexOf(assetId) : -1;
@@ -499,11 +501,39 @@ export function AssetViewModal({
               </div>
             </div>
 
-            {/* Sticky action bar - minimal since actions are already in AssetDetailActions */}
-            <div className="border-t px-6 py-3 flex items-center justify-end gap-2 shrink-0 bg-background">
-              <span className="text-xs text-muted-foreground">
-                {asset.display_id} \u00b7 {asset.name}
-              </span>
+            {/* Sticky action bar */}
+            <div className="border-t px-6 py-3 flex items-center justify-between gap-2 shrink-0 bg-background">
+              <div className="flex items-center gap-2 min-w-0">
+                {actionFeedback ? (
+                  <InlineFeedback type={actionFeedback.type} message={actionFeedback.message} onDismiss={() => setActionFeedback(null)} />
+                ) : (
+                  <span className="text-xs text-muted-foreground truncate">
+                    {asset.display_id} &middot; {asset.name}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) && asset.status !== 'sold_disposed' && !pendingTransfer && (
+                  <Button variant="outline" size="sm" onClick={() => setShowStatusDialog(true)}>
+                    Change Status
+                  </Button>
+                )}
+                {['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) && asset.status !== 'sold_disposed' && !pendingTransfer && (
+                  <Button variant="outline" size="sm" onClick={() => setShowTransferDialog(true)}>
+                    Transfer
+                  </Button>
+                )}
+                {pendingTransfer && (currentUserId === pendingTransfer.receiver_id || ['ga_lead', 'admin'].includes(currentUserRole)) && (
+                  <>
+                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => openTransferRespond('accept')}>
+                      Accept Transfer
+                    </Button>
+                    <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => openTransferRespond('reject')}>
+                      Reject Transfer
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </>
         )}

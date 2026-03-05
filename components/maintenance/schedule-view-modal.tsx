@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { createClient } from '@/lib/supabase/client';
-import { deactivateSchedule, activateSchedule } from '@/app/actions/schedule-actions';
+import { deactivateSchedule, activateSchedule, deleteSchedule } from '@/app/actions/schedule-actions';
 import { ScheduleDetail, PMJobRef } from './schedule-detail';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 import { InlineFeedback } from '@/components/inline-feedback';
@@ -222,6 +222,21 @@ export function ScheduleViewModal({
     });
   };
 
+  const handleDeactivate = () => {
+    setActionFeedback(null);
+    startActionTransition(async () => {
+      if (!schedule) return;
+      const result = await deleteSchedule({ id: schedule.id });
+      if (result?.serverError) {
+        setActionFeedback({ type: 'error', message: result.serverError });
+      } else if (result?.data?.success) {
+        setActionFeedback({ type: 'success', message: 'Schedule deactivated.' });
+        handleActionSuccess();
+        onOpenChange(false);
+      }
+    });
+  };
+
   return (
     <Dialog open={!!scheduleId} onOpenChange={onOpenChange}>
       <DialogContent
@@ -384,6 +399,9 @@ export function ScheduleViewModal({
                       {actionPending ? 'Processing...' : 'Resume'}
                     </Button>
                   )}
+                  <Button variant="outline" size="sm" onClick={handleDeactivate} disabled={actionPending} className="text-destructive hover:text-destructive">
+                    {actionPending ? 'Processing...' : 'Deactivate'}
+                  </Button>
                 </div>
               )}
             </div>
