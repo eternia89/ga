@@ -67,9 +67,6 @@ export function TemplateList({ templates, userRole, initialViewId }: TemplateLis
 
   const meta: TemplateTableMeta = {
     onView: handleView,
-    onDeactivate: canManage ? handleDeactivate : undefined,
-    onReactivate: canManage ? handleReactivate : undefined,
-    currentUserRole: userRole,
   };
 
   return (

@@ -8,9 +8,6 @@ import type { MaintenanceTemplate } from '@/lib/types/maintenance';
 
 export type TemplateTableMeta = {
   onView?: (template: MaintenanceTemplate) => void;
-  onDeactivate?: (id: string) => void;
-  onReactivate?: (id: string) => void;
-  currentUserRole?: string;
 };
 
 export const templateColumns: ColumnDef<MaintenanceTemplate>[] = [
@@ -99,54 +96,22 @@ export const templateColumns: ColumnDef<MaintenanceTemplate>[] = [
     cell: ({ row, table }) => {
       const template = row.original;
       const meta = table.options.meta as TemplateTableMeta | undefined;
-      const canManage = ['ga_lead', 'admin'].includes(meta?.currentUserRole ?? '');
 
       return (
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 px-2 text-xs"
-            onClick={(e) => {
-              e.stopPropagation();
-              meta?.onView?.(template);
-            }}
-          >
-            View
-          </Button>
-          {canManage && (
-            <>
-              {template.is_active ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    meta?.onDeactivate?.(template.id);
-                  }}
-                >
-                  Deactivate
-                </Button>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    meta?.onReactivate?.(template.id);
-                  }}
-                >
-                  Reactivate
-                </Button>
-              )}
-            </>
-          )}
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs"
+          onClick={(e) => {
+            e.stopPropagation();
+            meta?.onView?.(template);
+          }}
+        >
+          View
+        </Button>
       );
     },
-    size: 150,
+    size: 80,
     enableSorting: false,
   },
 ];

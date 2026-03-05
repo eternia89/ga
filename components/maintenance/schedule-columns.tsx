@@ -10,10 +10,6 @@ import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 
 export type ScheduleTableMeta = {
   onView?: (schedule: MaintenanceSchedule) => void;
-  onDeactivate?: (id: string) => void;
-  onActivate?: (id: string) => void;
-  onDelete?: (id: string) => void;
-  currentUserRole?: string;
 };
 
 export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
@@ -166,65 +162,22 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
     cell: ({ row, table }) => {
       const schedule = row.original;
       const meta = table.options.meta as ScheduleTableMeta | undefined;
-      const canManage = ['ga_lead', 'admin'].includes(meta?.currentUserRole ?? '');
 
       return (
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 px-2 text-xs"
-            onClick={(e) => {
-              e.stopPropagation();
-              meta?.onView?.(schedule);
-            }}
-          >
-            View
-          </Button>
-          {canManage && (
-            <>
-              {schedule.is_active ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    meta?.onDeactivate?.(schedule.id);
-                  }}
-                >
-                  Pause
-                </Button>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2 text-xs text-green-600 hover:text-green-700"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    meta?.onActivate?.(schedule.id);
-                  }}
-                >
-                  Resume
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  meta?.onDelete?.(schedule.id);
-                }}
-              >
-                Deactivate
-              </Button>
-            </>
-          )}
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs"
+          onClick={(e) => {
+            e.stopPropagation();
+            meta?.onView?.(schedule);
+          }}
+        >
+          View
+        </Button>
       );
     },
-    size: 120,
+    size: 80,
     enableSorting: false,
   },
 ];

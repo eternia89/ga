@@ -12,9 +12,6 @@ import { OverdueBadge } from '@/components/maintenance/overdue-badge';
 
 export type JobTableMeta = {
   onView?: (job: JobWithRelations) => void;
-  onCancel?: (job: JobWithRelations) => void;
-  currentUserId?: string;
-  currentUserRole?: string;
 };
 
 export const jobColumns: ColumnDef<JobWithRelations>[] = [
@@ -125,42 +122,22 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
     cell: ({ row, table }) => {
       const job = row.original;
       const meta = table.options.meta as JobTableMeta | undefined;
-      const currentUserRole = meta?.currentUserRole;
-
-      const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole ?? '');
-      const canCancel = isGaLeadOrAdmin && job.status !== 'completed' && job.status !== 'cancelled';
 
       return (
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 px-2 text-xs"
-            onClick={(e) => {
-              e.stopPropagation();
-              meta?.onView?.(job);
-            }}
-          >
-            View
-          </Button>
-
-          {canCancel && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs text-destructive hover:text-destructive"
-              onClick={(e) => {
-                e.stopPropagation();
-                meta?.onCancel?.(job);
-              }}
-            >
-              Cancel
-            </Button>
-          )}
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs"
+          onClick={(e) => {
+            e.stopPropagation();
+            meta?.onView?.(job);
+          }}
+        >
+          View
+        </Button>
       );
     },
-    size: 150,
+    size: 80,
     enableSorting: false,
   },
 ];

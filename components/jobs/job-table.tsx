@@ -114,9 +114,6 @@ export function JobTable({
         emptyMessage="No jobs found"
         meta={{
           onView: handleView,
-          onCancel: handleCancel,
-          currentUserId,
-          currentUserRole,
         }}
       />
 

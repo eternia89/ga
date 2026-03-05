@@ -82,10 +82,6 @@ export function ScheduleList({ schedules, userRole, initialViewId }: ScheduleLis
 
   const meta: ScheduleTableMeta = {
     onView: handleView,
-    onDeactivate: canManage ? handleDeactivate : undefined,
-    onActivate: canManage ? handleActivate : undefined,
-    onDelete: canManage ? handleDelete : undefined,
-    currentUserRole: userRole,
   };
 
   return (
