@@ -9,6 +9,7 @@ import { deactivateUser, reactivateUser } from '@/app/actions/user-actions';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { InlineFeedback } from '@/components/inline-feedback';
+import { downloadCSV } from '@/lib/utils';
 
 type Company = {
   id: string;
@@ -184,13 +185,7 @@ export function UserTable({ users, companies, divisions, defaultCompanyId, initi
     ]);
 
     const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `users-export-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCSV(csv, 'users-export');
   };
 
   const columns = getUserColumns(handleEdit);

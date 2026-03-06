@@ -14,6 +14,7 @@ import {
 } from "@/app/actions/category-actions";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { downloadCSV } from "@/lib/utils";
 
 interface CategoryTableProps {
   data: Category[];
@@ -129,13 +130,7 @@ export function CategoryTable({ data, categoryType }: CategoryTableProps) {
       ...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
     ].join("\n");
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `categories-${new Date().toISOString().split("T")[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCSV(csvContent, 'categories');
   };
 
   const handleSuccess = () => {

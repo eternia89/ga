@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -14,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { formatIDR } from '@/lib/utils';
+import { formatIDR, formatDate } from '@/lib/utils';
 
 // ============================================================================
 // Types
@@ -56,11 +55,6 @@ interface ApprovalQueueProps {
 // ============================================================================
 // Helpers
 // ============================================================================
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '—';
-  return format(new Date(dateStr), 'dd-MM-yyyy');
-}
 
 function getDecisionDate(job: ApprovalJob): string | null {
   if (job.approval_type === 'completion') {

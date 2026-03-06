@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { format } from 'date-fns';
 import { JobWithRelations } from '@/lib/types/database';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { RequestPreviewDialog } from './request-preview-dialog';
@@ -21,12 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { updateJob } from '@/app/actions/job-actions';
-import { formatIDR, formatNumber } from '@/lib/utils';
-
-function formatDate(iso: string | null | undefined): string {
-  if (!iso) return '—';
-  return format(new Date(iso), 'dd-MM-yyyy, HH:mm:ss');
-}
+import { formatIDR, formatNumber, formatDateTime, formatDate } from '@/lib/utils';
 
 const PRIORITY_ORDER = ['low', 'medium', 'high', 'urgent'] as const;
 
@@ -134,7 +128,7 @@ export function JobDetailInfo({
         {job.created_by_user?.full_name && (
           <p className="text-sm text-muted-foreground">
             Created by {job.created_by_user.full_name}
-            <span> {'\u00b7'} {format(new Date(job.created_at), 'dd-MM-yyyy')}</span>
+            <span> {'\u00b7'} {formatDate(job.created_at)}</span>
           </p>
         )}
       </div>
@@ -295,7 +289,7 @@ export function JobDetailInfo({
           <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
             Created At
           </dt>
-          <dd className="text-sm">{formatDate(job.created_at)}</dd>
+          <dd className="text-sm">{formatDateTime(job.created_at)}</dd>
         </div>
 
         {job.started_at && (
@@ -303,7 +297,7 @@ export function JobDetailInfo({
             <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
               Started At
             </dt>
-            <dd className="text-sm">{formatDate(job.started_at)}</dd>
+            <dd className="text-sm">{formatDateTime(job.started_at)}</dd>
           </div>
         )}
 
@@ -312,7 +306,7 @@ export function JobDetailInfo({
             <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
               Completed At
             </dt>
-            <dd className="text-sm">{formatDate(job.completed_at)}</dd>
+            <dd className="text-sm">{formatDateTime(job.completed_at)}</dd>
           </div>
         )}
 
@@ -322,7 +316,7 @@ export function JobDetailInfo({
             <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
               Submitted for Approval
             </dt>
-            <dd className="text-sm">{formatDate(job.approval_submitted_at)}</dd>
+            <dd className="text-sm">{formatDateTime(job.approval_submitted_at)}</dd>
           </div>
         )}
 
@@ -332,7 +326,7 @@ export function JobDetailInfo({
               <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                 Approved At
               </dt>
-              <dd className="text-sm">{formatDate(job.approved_at)}</dd>
+              <dd className="text-sm">{formatDateTime(job.approved_at)}</dd>
             </div>
             {approvedByName && (
               <div>
@@ -378,7 +372,7 @@ export function JobDetailInfo({
             )}
             {job.approval_rejected_at && (
               <span className="font-normal ml-1 text-xs text-red-500">
-                — {formatDate(job.approval_rejected_at)}
+                — {formatDateTime(job.approval_rejected_at)}
               </span>
             )}
           </p>

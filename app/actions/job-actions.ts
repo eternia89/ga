@@ -6,6 +6,7 @@ import { createJobSchema, updateJobSchema, jobCommentSchema } from '@/lib/valida
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
 import { highestPriority } from '@/lib/jobs/priority';
+import { formatIDR } from '@/lib/utils';
 
 // ============================================================================
 // createJob — ga_lead or admin only
@@ -279,7 +280,7 @@ export const updateJob = authActionClient
             recipientIds: approvers.map((a) => a.id),
             actorId: profile.id,
             title: `Budget approval needed: ${jobDisplay?.display_id ?? id}`,
-            body: `Estimated cost: Rp ${(newCost ?? 0).toLocaleString('id-ID')}`,
+            body: `Estimated cost: ${formatIDR(newCost ?? 0)}`,
             type: 'approval',
             entityType: 'job',
             entityId: id,
@@ -497,7 +498,7 @@ export const updateJobStatus = authActionClient
           recipientIds: financeApprovers.map((u) => u.id),
           actorId: profile.id,
           title: `Job ${job.display_id} requires completion approval`,
-          body: `Estimated cost: Rp ${(job.estimated_cost ?? 0).toLocaleString('id-ID')}`,
+          body: `Estimated cost: ${formatIDR(job.estimated_cost ?? 0)}`,
           type: 'approval',
           entityType: 'job',
           entityId: parsedInput.id,
@@ -646,13 +647,12 @@ export const updateJobBudget = authActionClient
       .is('deleted_at', null);
 
     if (financeApprovers && financeApprovers.length > 0) {
-      const formattedCost = parsedInput.estimated_cost.toLocaleString('id-ID');
       createNotifications({
         companyId: job.company_id,
         recipientIds: financeApprovers.map((u) => u.id),
         actorId: profile.id,
         title: `Job ${job.display_id} requires budget approval`,
-        body: `Estimated cost: Rp ${formattedCost}`,
+        body: `Estimated cost: ${formatIDR(parsedInput.estimated_cost)}`,
         type: 'approval',
         entityType: 'job',
         entityId: parsedInput.id,

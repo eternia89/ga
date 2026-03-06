@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { JobStatusBadge } from './job-status-badge';
@@ -15,7 +14,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
-import { formatIDR } from '@/lib/utils';
+import { formatIDR, formatDateTime } from '@/lib/utils';
 
 // ============================================================================
 // Types
@@ -48,11 +47,6 @@ interface JobPreviewData {
 // ============================================================================
 // Helpers
 // ============================================================================
-
-function formatDate(iso: string | null | undefined): string {
-  if (!iso) return '—';
-  return format(new Date(iso), 'dd-MM-yyyy, HH:mm:ss');
-}
 
 // ============================================================================
 // Props
@@ -212,18 +206,18 @@ export function JobPreviewDialog({ open, onOpenChange, jobId }: JobPreviewDialog
                 </div>
                 <div>
                   <dt className="text-xs font-medium text-muted-foreground">Created</dt>
-                  <dd className="text-sm mt-0.5">{formatDate(job.created_at)}</dd>
+                  <dd className="text-sm mt-0.5">{formatDateTime(job.created_at)}</dd>
                 </div>
                 {job.started_at && (
                   <div>
                     <dt className="text-xs font-medium text-muted-foreground">Started</dt>
-                    <dd className="text-sm mt-0.5">{formatDate(job.started_at)}</dd>
+                    <dd className="text-sm mt-0.5">{formatDateTime(job.started_at)}</dd>
                   </div>
                 )}
                 {job.completed_at && (
                   <div>
                     <dt className="text-xs font-medium text-muted-foreground">Completed</dt>
-                    <dd className="text-sm mt-0.5">{formatDate(job.completed_at)}</dd>
+                    <dd className="text-sm mt-0.5">{formatDateTime(job.completed_at)}</dd>
                   </div>
                 )}
               </dl>

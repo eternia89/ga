@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { format } from 'date-fns';
+import { formatDateTime } from '@/lib/utils';
 import {
   Plus,
   Pencil,
@@ -63,10 +63,6 @@ const EVENT_COLORS: Record<AssetTimelineEventType, string> = {
   transfer_rejected: 'bg-red-100 text-red-700',
   transfer_cancelled: 'bg-stone-100 text-stone-600',
 };
-
-function formatTimestamp(iso: string): string {
-  return format(new Date(iso), 'dd-MM-yyyy, HH:mm:ss');
-}
 
 // Human-readable field name mapping
 const FIELD_LABELS: Record<string, string> = {
@@ -423,7 +419,7 @@ export function AssetTimeline({
                 <div className="text-sm leading-relaxed">
                   <EventContent event={event} />
                 </div>
-                <p className="text-xs text-muted-foreground">{formatTimestamp(event.at)}</p>
+                <p className="text-xs text-muted-foreground">{formatDateTime(event.at)}</p>
               </div>
             </div>
           ))}

@@ -14,6 +14,7 @@ import {
 } from "@/app/actions/location-actions";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { downloadCSV } from "@/lib/utils";
 
 interface LocationTableProps {
   data: Location[];
@@ -134,13 +135,7 @@ export function LocationTable({ data, companies }: LocationTableProps) {
       ...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
     ].join("\n");
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `locations-${new Date().toISOString().split("T")[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCSV(csvContent, 'locations');
   };
 
   const handleSuccess = () => {

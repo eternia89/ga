@@ -14,6 +14,7 @@ import {
 } from "@/app/actions/division-actions";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { downloadCSV } from "@/lib/utils";
 
 interface DivisionTableProps {
   data: Division[];
@@ -141,13 +142,7 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
       ...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
     ].join("\n");
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `divisions-${new Date().toISOString().split("T")[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCSV(csvContent, 'divisions');
   };
 
   const handleSuccess = () => {

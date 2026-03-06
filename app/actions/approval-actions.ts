@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
+import { formatIDR } from '@/lib/utils';
 
 // ============================================================================
 // submitForApproval — ga_lead or admin only
@@ -87,7 +88,7 @@ export const submitForApproval = authActionClient
         recipientIds: financeApprovers.map((u) => u.id),
         actorId: profile.id,
         title: `Job ${job.display_id} requires approval`,
-        body: `Estimated cost: Rp ${(estimatedCost).toLocaleString('id-ID')}`,
+        body: `Estimated cost: ${formatIDR(estimatedCost)}`,
         type: 'approval',
         entityType: 'job',
         entityId: parsedInput.job_id,

@@ -1,6 +1,6 @@
 'use client';
 
-import { format } from 'date-fns';
+import { formatDateTime } from '@/lib/utils';
 import {
   Plus,
   ArrowRight,
@@ -62,10 +62,6 @@ const EVENT_COLORS: Record<TimelineEvent['type'], string> = {
   auto_acceptance: 'bg-teal-100 text-teal-700',
   feedback: 'bg-amber-100 text-amber-700',
 };
-
-function formatTimestamp(iso: string): string {
-  return format(new Date(iso), 'dd-MM-yyyy, HH:mm:ss');
-}
 
 function EventContent({ event }: { event: TimelineEvent }) {
   switch (event.type) {
@@ -226,7 +222,7 @@ export function RequestTimeline({ events }: RequestTimelineProps) {
                 <div className="text-sm leading-relaxed">
                   <EventContent event={event} />
                 </div>
-                <p className="text-xs text-muted-foreground">{formatTimestamp(event.at)}</p>
+                <p className="text-xs text-muted-foreground">{formatDateTime(event.at)}</p>
               </div>
             </div>
           ))}

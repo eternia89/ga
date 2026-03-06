@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { format } from 'date-fns';
+import { formatDateTime } from '@/lib/utils';
 import {
   Plus,
   ArrowRight,
@@ -76,10 +76,6 @@ const EVENT_COLORS: Record<JobTimelineEventType, string> = {
   field_update: 'bg-gray-100 text-gray-600',
   comment: 'bg-muted text-muted-foreground',
 };
-
-function formatTimestamp(iso: string): string {
-  return format(new Date(iso), 'dd-MM-yyyy, HH:mm:ss');
-}
 
 function EventContent({ event }: { event: JobTimelineEvent }) {
   switch (event.type) {
@@ -241,7 +237,7 @@ export function JobTimeline({ events, comments, commentPhotos }: JobTimelineProp
                         <EventContent event={event} />
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {formatTimestamp(event.at)}
+                        {formatDateTime(event.at)}
                       </p>
                       {hasGps && (
                         <a
@@ -277,7 +273,7 @@ export function JobTimeline({ events, comments, commentPhotos }: JobTimelineProp
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-xs font-medium">{authorName}</span>
                         <span className="text-xs text-muted-foreground">
-                          {formatTimestamp(comment.created_at)}
+                          {formatDateTime(comment.created_at)}
                         </span>
                       </div>
                       <p className="text-sm whitespace-pre-wrap leading-relaxed">

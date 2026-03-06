@@ -14,6 +14,7 @@ import {
 } from "@/app/actions/company-actions";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { downloadCSV } from "@/lib/utils";
 
 interface CompanyTableProps {
   data: Company[];
@@ -131,13 +132,7 @@ export function CompanyTable({ data }: CompanyTableProps) {
       ...csvRows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
     ].join("\n");
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `companies-${new Date().toISOString().split("T")[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCSV(csvContent, 'companies');
   };
 
   const handleSuccess = () => {

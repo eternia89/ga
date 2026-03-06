@@ -1,8 +1,32 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { format } from "date-fns"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+/** Format an ISO date string as dd-MM-yyyy */
+export function formatDate(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  return format(new Date(iso), 'dd-MM-yyyy');
+}
+
+/** Format an ISO date string as dd-MM-yyyy, HH:mm:ss */
+export function formatDateTime(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  return format(new Date(iso), 'dd-MM-yyyy, HH:mm:ss');
+}
+
+/** Download a CSV string as a file with a dated filename */
+export function downloadCSV(csvContent: string, filenamePrefix: string): void {
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${filenamePrefix}-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 /** Convert empty strings to null for DB inserts (avoids unique constraint violations on optional fields) */
@@ -37,4 +61,23 @@ export function formatNumber(amount: number): string {
 export function parseIDR(formatted: string): number {
   const digits = formatted.replace(/[^0-9]/g, '');
   return digits ? parseInt(digits, 10) : 0;
+}
+
+/** Extract error message from next-safe-action result (handles serverError + validationErrors) */
+export function extractActionError(result: Record<string, unknown> | undefined): string | undefined {
+  if (!result) return undefined;
+  if (result.serverError) return result.serverError as string;
+  if (result.validationErrors) {
+    // Flatten nested validation errors into a single message
+    const errors = result.validationErrors as Record<string, { _errors?: string[] }>;
+    const messages: string[] = [];
+    for (const key in errors) {
+      const fieldErrors = errors[key]?._errors;
+      if (fieldErrors?.length) {
+        messages.push(`${key}: ${fieldErrors.join(', ')}`);
+      }
+    }
+    return messages.length > 0 ? messages.join('; ') : 'Validation failed';
+  }
+  return undefined;
 }
