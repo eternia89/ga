@@ -271,7 +271,7 @@ Recent decisions affecting current work:
 | 14 | Strip table row actions to View only, add modal action buttons | 2026-03-05 | 785dd14 | Verified | [11-table-rows-show-only-view-action-move-se](./quick/11-table-rows-show-only-view-action-move-se/) |
 | 15 | Strip admin settings table rows to Edit-only, move deactivate/reactivate to FormDialog | 2026-03-05 | d6b13af | Verified | [12-strip-admin-settings-table-rows-to-view-](./quick/12-strip-admin-settings-table-rows-to-view-/) |
 | 16 | Convert CTA create buttons to modal dialogs | 2026-03-06 | 4b5eabd | Verified | [13-convert-cta-create-buttons-to-modal-dial](./quick/13-convert-cta-create-buttons-to-modal-dial/) |
-| 17 | Find and fix UI/UX inconsistencies across all pages | 2026-03-06 | 72e0ed1 | Complete | [14-find-any-inconsistencies-in-ui-and-ux-im](./quick/14-find-any-inconsistencies-in-ui-and-ux-im/) |
+| 17 | Find and fix UI/UX inconsistencies across all pages | 2026-03-06 | 72e0ed1 | Verified | [14-find-any-inconsistencies-in-ui-and-ux-im](./quick/14-find-any-inconsistencies-in-ui-and-ux-im/) |
 
 ## Session Continuity
 
