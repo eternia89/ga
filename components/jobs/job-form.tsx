@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'lucide-react';
 import { createJobSchema } from '@/lib/validations/job-schema';
-import { createJob } from '@/app/actions/job-actions';
+import { createJob, updateJob } from '@/app/actions/job-actions';
 import {
   Form,
   FormControl,
@@ -27,6 +27,8 @@ import {
 } from '@/components/ui/select';
 import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
+import { RequestStatusBadge } from '@/components/requests/request-status-badge';
+import { RequestPreviewDialog } from './request-preview-dialog';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
 import { formatNumber } from '@/lib/utils';
 
@@ -43,7 +45,7 @@ function highestPriority(priorities: (string | null)[]): Priority {
   return maxIndex >= 0 ? PRIORITY_ORDER[maxIndex] : 'low';
 }
 
-interface EligibleRequest {
+export interface EligibleRequest {
   id: string;
   display_id: string;
   title: string;
@@ -64,6 +66,17 @@ interface PrefillRequest {
   description: string | null;
 }
 
+interface JobFormInitialData {
+  title: string;
+  description: string;
+  location_id: string | null;
+  category_id: string | null;
+  priority: string | null;
+  assigned_to: string | null;
+  estimated_cost: number | null;
+  linked_request_ids: string[];
+}
+
 interface JobFormProps {
   locations: { id: string; name: string }[];
   categories: { id: string; name: string }[];
@@ -72,6 +85,23 @@ interface JobFormProps {
   requestJobLinks: Record<string, string>; // request_id -> job display_id
   prefillRequest?: PrefillRequest | null;
   mode: 'create' | 'edit';
+  jobId?: string;
+  initialData?: JobFormInitialData;
+  readOnly?: boolean;
+  /** For view mode: linked request objects with status info for read-only display */
+  linkedRequestDetails?: {
+    id: string;
+    display_id: string;
+    title: string;
+    status: string;
+    description: string | null;
+    priority: string | null;
+    created_at: string;
+    location?: { name: string } | null;
+    category?: { name: string } | null;
+    requester?: { full_name: string } | null;
+    assigned_user?: { full_name: string } | null;
+  }[];
   onSuccess?: () => void;
 }
 
@@ -83,14 +113,21 @@ export function JobForm({
   requestJobLinks,
   prefillRequest,
   mode,
+  jobId,
+  initialData,
+  readOnly = false,
+  linkedRequestDetails,
   onSuccess,
 }: JobFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewRequest, setPreviewRequest] = useState<NonNullable<JobFormProps['linkedRequestDetails']>[number] | null>(null);
   const [linkedRequests, setLinkedRequests] = useState<EligibleRequest[]>(() => {
+    if (mode === 'edit' && initialData?.linked_request_ids && initialData.linked_request_ids.length > 0) {
+      return eligibleRequests.filter((r) => initialData.linked_request_ids.includes(r.id));
+    }
     if (prefillRequest) {
-      // Pre-add the prefill request if it's in the eligible list
       const found = eligibleRequests.find((r) => r.id === prefillRequest.id);
       return found ? [found] : [];
     }
@@ -123,34 +160,45 @@ export function JobForm({
       return { label, value: r.id };
     });
 
-  // Determine prefill values
-  const prefillPriority = prefillRequest?.priority as Priority | undefined;
-  const prefillLocationId = prefillRequest?.location_id ?? '';
-  const prefillCategoryId = prefillRequest?.category_id ?? '';
-  const prefillTitle = prefillRequest?.title ?? '';
-  const prefillDescription = prefillRequest?.description ?? '';
+  // Determine default values based on mode
+  const isEditMode = mode === 'edit' && initialData;
+
+  const defaultTitle = isEditMode ? initialData.title : (prefillRequest?.title ?? '');
+  const defaultDescription = isEditMode ? initialData.description : (prefillRequest?.description ?? '');
+  const defaultLocationId = isEditMode ? (initialData.location_id ?? '') : (prefillRequest?.location_id ?? '');
+  const defaultCategoryId = isEditMode ? (initialData.category_id ?? '') : (prefillRequest?.category_id ?? '');
+  const defaultPriority = isEditMode
+    ? ((initialData.priority ?? 'medium') as Priority)
+    : ((prefillRequest?.priority ?? 'medium') as Priority);
+  const defaultAssignedTo = isEditMode ? (initialData.assigned_to ?? undefined) : undefined;
+  const defaultEstimatedCost = isEditMode
+    ? (initialData.estimated_cost ?? undefined)
+    : undefined;
+  const defaultLinkedRequestIds = isEditMode
+    ? initialData.linked_request_ids
+    : (prefillRequest ? [prefillRequest.id] : []);
 
   const form = useForm({
     resolver: zodResolver(createJobSchema),
     defaultValues: {
-      title: prefillTitle,
-      description: prefillDescription,
-      location_id: prefillLocationId,
-      category_id: prefillCategoryId,
-      priority: (prefillPriority ?? 'medium') as 'low' | 'medium' | 'high' | 'urgent',
-      assigned_to: undefined as string | undefined,
-      estimated_cost: undefined as number | undefined,
-      linked_request_ids: (prefillRequest ? [prefillRequest.id] : []) as string[],
+      title: defaultTitle,
+      description: defaultDescription,
+      location_id: defaultLocationId,
+      category_id: defaultCategoryId,
+      priority: defaultPriority as 'low' | 'medium' | 'high' | 'urgent',
+      assigned_to: defaultAssignedTo as string | undefined,
+      estimated_cost: defaultEstimatedCost as number | undefined,
+      linked_request_ids: defaultLinkedRequestIds as string[],
     },
   });
 
-  // Auto-calculate priority when linked requests change
+  // Auto-calculate priority when linked requests change (create mode only)
   useEffect(() => {
-    if (linkedRequests.length > 0) {
+    if (mode === 'create' && linkedRequests.length > 0) {
       const computed = highestPriority(linkedRequests.map((r) => r.priority));
       form.setValue('priority', computed, { shouldValidate: false });
     }
-  }, [linkedRequests, form]);
+  }, [linkedRequests, form, mode]);
 
   // Keep linked_request_ids in sync with linkedRequests state
   useEffect(() => {
@@ -186,22 +234,30 @@ export function JobForm({
     setError(null);
 
     try {
-      const result = await createJob(data);
-
-      if (result?.serverError) {
-        setError(result.serverError);
-        return;
-      }
-
-      if (!result?.data?.jobId) {
-        setError('Failed to create job. Please try again.');
-        return;
-      }
-
-      if (onSuccess) {
-        onSuccess();
+      if (mode === 'edit' && jobId) {
+        const result = await updateJob({ id: jobId, ...data });
+        if (result?.serverError) {
+          setError(result.serverError);
+          return;
+        }
+        if (onSuccess) {
+          onSuccess();
+        }
       } else {
-        router.push(`/jobs/${result.data.jobId}`);
+        const result = await createJob(data);
+        if (result?.serverError) {
+          setError(result.serverError);
+          return;
+        }
+        if (!result?.data?.jobId) {
+          setError('Failed to create job. Please try again.');
+          return;
+        }
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          router.push(`/jobs/${result.data.jobId}`);
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
@@ -209,6 +265,8 @@ export function JobForm({
       setIsSubmitting(false);
     }
   };
+
+  const disabled = isSubmitting || readOnly;
 
   return (
     <Form {...form}>
@@ -226,7 +284,7 @@ export function JobForm({
                 <Input
                   placeholder="Enter job title..."
                   maxLength={150}
-                  disabled={isSubmitting}
+                  disabled={disabled}
                   {...field}
                 />
               </FormControl>
@@ -249,7 +307,7 @@ export function JobForm({
                   placeholder="Describe the work to be done..."
                   className="min-h-28 resize-y"
                   maxLength={1000}
-                  disabled={isSubmitting}
+                  disabled={disabled}
                   {...field}
                 />
               </FormControl>
@@ -278,7 +336,7 @@ export function JobForm({
                   placeholder="Select location..."
                   searchPlaceholder="Search locations..."
                   emptyText="No locations found."
-                  disabled={isSubmitting}
+                  disabled={disabled}
                 />
               </FormControl>
               <FormMessage />
@@ -303,7 +361,7 @@ export function JobForm({
                   placeholder="Select category..."
                   searchPlaceholder="Search categories..."
                   emptyText="No categories found."
-                  disabled={isSubmitting}
+                  disabled={disabled}
                 />
               </FormControl>
               <FormMessage />
@@ -323,7 +381,7 @@ export function JobForm({
               <Select
                 onValueChange={field.onChange}
                 value={field.value}
-                disabled={isSubmitting}
+                disabled={disabled}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -338,7 +396,7 @@ export function JobForm({
                   ))}
                 </SelectContent>
               </Select>
-              {linkedRequests.length > 0 && (
+              {mode === 'create' && linkedRequests.length > 0 && (
                 <p className="text-xs text-muted-foreground">
                   Auto-set to highest priority among linked requests
                 </p>
@@ -363,12 +421,14 @@ export function JobForm({
                   placeholder="Select PIC (optional)..."
                   searchPlaceholder="Search users..."
                   emptyText="No users found."
-                  disabled={isSubmitting}
+                  disabled={disabled}
                 />
               </FormControl>
-              <p className="text-xs text-muted-foreground">
-                Assigning a PIC will set the job status to &quot;Assigned&quot;
-              </p>
+              {mode === 'create' && (
+                <p className="text-xs text-muted-foreground">
+                  Assigning a PIC will set the job status to &quot;Assigned&quot;
+                </p>
+              )}
               <FormMessage />
             </FormItem>
           )}
@@ -391,7 +451,7 @@ export function JobForm({
                     inputMode="numeric"
                     placeholder="0"
                     className="pl-10"
-                    disabled={isSubmitting}
+                    disabled={disabled}
                     value={field.value ? formatNumber(field.value) : ''}
                     onChange={(e) => {
                       const digits = e.target.value.replace(/[^0-9]/g, '');
@@ -413,51 +473,81 @@ export function JobForm({
           <div>
             <p className="text-sm font-medium">Linked Requests</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Link triaged requests to this job. Priority will be auto-set to the highest among linked requests.
+              {readOnly
+                ? 'Requests linked to this job.'
+                : 'Link triaged requests to this job. Priority will be auto-set to the highest among linked requests.'}
             </p>
           </div>
 
-          {/* Request search combobox */}
-          <Combobox
-            options={requestOptions}
-            value=""
-            onValueChange={handleAddRequest}
-            placeholder="Search and add requests..."
-            searchPlaceholder="Search by ID or title..."
-            emptyText="No eligible requests found."
-            disabled={isSubmitting}
-          />
-
-          {/* Linked requests chips */}
-          {linkedRequests.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {linkedRequests.map((req) => {
-                const jobLink = requestJobLinks[req.id];
-                return (
-                  <div
-                    key={req.id}
-                    className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-sm"
-                  >
-                    <span className="font-mono text-xs text-muted-foreground">{req.display_id}</span>
-                    <span className="max-w-[180px] truncate">{req.title}</span>
-                    {jobLink && (
-                      <span className="text-xs text-amber-600">
-                        ({jobLink})
-                      </span>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveRequest(req.id)}
-                      disabled={isSubmitting}
-                      className="ml-0.5 rounded-full hover:bg-foreground/10 p-0.5 transition-colors"
-                      aria-label={`Remove ${req.display_id}`}
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
+          {/* Read-only linked request list (view mode) */}
+          {readOnly && linkedRequestDetails && linkedRequestDetails.length > 0 ? (
+            <div className="space-y-2">
+              {linkedRequestDetails.map((request) => (
+                <button
+                  key={request.id}
+                  type="button"
+                  onClick={() => setPreviewRequest(request)}
+                  className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm hover:bg-muted/40 transition-colors w-full text-left cursor-pointer"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="font-mono text-xs font-semibold text-muted-foreground shrink-0">
+                      {request.display_id}
+                    </span>
+                    <span className="truncate text-sm">{request.title}</span>
                   </div>
-                );
-              })}
+                  <div className="shrink-0">
+                    <RequestStatusBadge status={request.status} />
+                  </div>
+                </button>
+              ))}
             </div>
+          ) : readOnly && (!linkedRequestDetails || linkedRequestDetails.length === 0) ? (
+            <p className="text-sm text-muted-foreground">No linked requests.</p>
+          ) : (
+            <>
+              {/* Request search combobox */}
+              <Combobox
+                options={requestOptions}
+                value=""
+                onValueChange={handleAddRequest}
+                placeholder="Search and add requests..."
+                searchPlaceholder="Search by ID or title..."
+                emptyText="No eligible requests found."
+                disabled={disabled}
+              />
+
+              {/* Linked requests chips */}
+              {linkedRequests.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {linkedRequests.map((req) => {
+                    const jobLink = requestJobLinks[req.id];
+                    return (
+                      <div
+                        key={req.id}
+                        className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-sm"
+                      >
+                        <span className="font-mono text-xs text-muted-foreground">{req.display_id}</span>
+                        <span className="max-w-[180px] truncate">{req.title}</span>
+                        {jobLink && (
+                          <span className="text-xs text-amber-600">
+                            ({jobLink})
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveRequest(req.id)}
+                          disabled={disabled}
+                          className="ml-0.5 rounded-full hover:bg-foreground/10 p-0.5 transition-colors"
+                          aria-label={`Remove ${req.display_id}`}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
           )}
 
           {/* Hidden field to carry linked_request_ids errors */}
@@ -481,29 +571,40 @@ export function JobForm({
           />
         )}
 
-        {/* Submit */}
-        <div className="flex gap-3">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting
-              ? mode === 'create'
-                ? 'Creating...'
-                : 'Saving...'
-              : mode === 'create'
-              ? 'Create Job'
-              : 'Save Changes'}
-          </Button>
-          {!onSuccess && (
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isSubmitting}
-              onClick={() => router.push('/jobs')}
-            >
-              Cancel
+        {/* Submit — hide in readOnly mode */}
+        {!readOnly && (
+          <div className="flex gap-3">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting
+                ? mode === 'create'
+                  ? 'Creating...'
+                  : 'Saving...'
+                : mode === 'create'
+                ? 'Create Job'
+                : 'Save Changes'}
             </Button>
-          )}
-        </div>
+            {!onSuccess && (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isSubmitting}
+                onClick={() => router.push('/jobs')}
+              >
+                Cancel
+              </Button>
+            )}
+          </div>
+        )}
       </form>
+
+      {/* Request Preview Dialog for read-only linked requests */}
+      {readOnly && previewRequest && (
+        <RequestPreviewDialog
+          request={previewRequest}
+          open={!!previewRequest}
+          onOpenChange={(open) => { if (!open) setPreviewRequest(null); }}
+        />
+      )}
     </Form>
   );
 }
