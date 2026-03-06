@@ -9,7 +9,6 @@ files_modified:
   - components/jobs/job-modal.tsx
   - components/jobs/job-create-dialog.tsx
   - components/jobs/job-view-modal.tsx
-  - components/jobs/job-table.tsx
   - app/(dashboard)/jobs/page.tsx
 autonomous: true
 requirements: [QUICK-14]
@@ -53,7 +52,6 @@ Output: Unified JobModal, extended JobForm with edit support, updated consumers.
 @components/jobs/job-view-modal.tsx
 @components/jobs/job-create-dialog.tsx
 @components/jobs/job-detail-info.tsx
-@components/jobs/job-table.tsx
 @app/(dashboard)/jobs/page.tsx
 @lib/validations/job-schema.ts
 </context>
@@ -91,10 +89,10 @@ Key imports to add: `import { updateJob } from '@/app/actions/job-actions';` and
 </task>
 
 <task type="auto">
-  <name>Task 2: Create unified JobModal and wire up consumers</name>
-  <files>components/jobs/job-modal.tsx, components/jobs/job-create-dialog.tsx, components/jobs/job-view-modal.tsx, components/jobs/job-table.tsx, app/(dashboard)/jobs/page.tsx</files>
+  <name>Task 2: Create JobModal shell with create mode and view mode layout</name>
+  <files>components/jobs/job-modal.tsx</files>
   <action>
-Create `components/jobs/job-modal.tsx` — a unified modal component that handles both create and view modes. This replaces both `JobCreateDialog` (70 lines) and `JobViewModal` (1083 lines).
+Create `components/jobs/job-modal.tsx` — the unified modal component with create and view mode rendering. This task builds the modal shell, data fetching, header, and main content layout. Action bar and sub-dialogs are added in Task 3.
 
 **JobModal props:**
 ```typescript
@@ -110,71 +108,87 @@ interface JobModalProps {
   onActionSuccess?: () => void;
   jobIds?: string[];
   onNavigate?: (jobId: string) => void;
-  // Shared props (passed from server page)
-  locations: { id: string; name: string }[];
-  categories: { id: string; name: string }[];
-  users: { id: string; full_name: string }[];
-  eligibleRequests: EligibleRequest[];
-  requestJobLinks: Record<string, string>;
+  // Create mode reference data (view mode fetches its own)
+  locations?: { id: string; name: string }[];
+  categories?: { id: string; name: string }[];
+  users?: { id: string; full_name: string }[];
+  eligibleRequests?: EligibleRequest[];
+  requestJobLinks?: Record<string, string>;
 }
 ```
 
-**Create mode (replaces JobCreateDialog):**
-- Dialog with `max-w-[700px]`, same mobile fullscreen classes as current
+**Create mode:**
+- Dialog with `max-w-[700px]`, same mobile fullscreen classes as current JobCreateDialog
 - Header: "New Job"
 - Body: `<JobForm mode="create" ...props onSuccess={close + router.refresh} />`
 - No timeline, no action bar
-- The trigger button (Plus icon "New Job") stays in JobCreateDialog — keep that file but make it render `<JobModal mode="create" .../>` internally. OR better: keep JobCreateDialog as a thin wrapper that manages open state and renders `<JobModal mode="create" open={open} onOpenChange={setOpen} ... />`
+- Reference data (locations, categories, users, eligibleRequests, requestJobLinks) received as props from parent
 
-**View mode (replaces JobViewModal):**
-- Dialog with `max-w-[800px]`, same mobile fullscreen classes
-- Move ALL data fetching logic from current JobViewModal (lines 169-486) into this component
-- Header: display_id, status badge, priority badge, PM badge, prev/next nav — same as current JobViewModal
-- Split layout: `grid-cols-[1fr_350px] max-lg:grid-cols-1`
-  - Left panel: `<JobForm mode="edit" jobId={job.id} initialData={...fromFetchedJob} readOnly={!canEdit} locations={...} categories={...} users={...} eligibleRequests={...} requestJobLinks={...} onSuccess={handleActionSuccess} />`
-    - Extract initialData from fetched job: `{ title: job.title, description: job.description, location_id: job.location_id, category_id: job.category_id, priority: job.priority, assigned_to: job.assigned_to, estimated_cost: job.estimated_cost, linked_request_ids: job.job_requests.map(jr => jr.request.id) }`
-    - `canEdit` = isGaLeadOrAdmin AND not terminal status (same logic as JobDetailInfo)
-  - Right panel: Timeline + comment form (same as current JobViewModal lines 858-883)
-- Sticky action bar at bottom: ALL action handlers from current JobViewModal (start work, approve, reject, mark complete, cancel) — move verbatim
-- Sub-dialogs for reject budget, reject completion, cancel — move verbatim from current JobViewModal (lines 971-1081)
-- PM Checklist rendering — preserve from current JobViewModal (lines 844-855), render BELOW the JobForm in the left panel
-- Loading/error states — preserve from current JobViewModal
+**View mode — data fetching:**
+- Move ALL data fetching logic from current JobViewModal (lines 169-486) into this component: Supabase queries for job, timeline events, comments, comment photos, categories, locations, users
+- Preserve all derived state: canEdit, canStartWork, canApproveReject, canApproveCompletion, canMarkComplete, canCancel, canComment, approvedByName, approvalRejectedByName
+- Preserve URL sync (window.history.replaceState with ?view=)
+- Preserve loading/error states with Skeleton and error message UI
+
+**View mode — header:**
+- display_id, status badge, priority badge, PM badge, prev/next nav buttons — same as current JobViewModal (lines 770-824)
+- Created by user and date line
+
+**View mode — content layout:**
+- Split: `grid-cols-[1fr_350px] max-lg:grid-cols-1`
+- Left panel (scrollable):
+  - `<JobForm mode="edit" jobId={job.id} initialData={...fromFetchedJob} readOnly={!canEdit} locations={categories} categories={categories} users={users} eligibleRequests={eligibleRequests} requestJobLinks={requestJobLinks} onSuccess={handleActionSuccess} />`
+  - Extract initialData from fetched job: `{ title: job.title, description: job.description, location_id: job.location_id, category_id: job.category_id, priority: job.priority, assigned_to: job.assigned_to, estimated_cost: job.estimated_cost, linked_request_ids: job.job_requests.map(jr => jr.request.id) }`
+  - `canEdit` = isGaLeadOrAdmin AND not terminal status (same logic as current JobDetailInfo)
+- Right panel: Timeline + comment form (same as current JobViewModal lines 858-883), with timelineRef for scroll-to-bottom on load
+
+**Temporary placeholder for action bar:** Render an empty `<div className="border-t px-6 py-3 shrink-0" />` at the bottom where the sticky action bar will go (Task 3 fills this in).
+
+**Linked requests in view mode:** In readOnly mode, JobForm should show linked requests as read-only list with RequestPreviewDialog click behavior. Import RequestPreviewDialog into JobForm for this.
+  </action>
+  <verify>npm run build 2>&1 | head -30</verify>
+  <done>JobModal component exists with create mode (700px, form only, closes on success) and view mode (800px, data fetching, header with nav, form+timeline split layout). Placeholder for action bar. Build passes.</done>
+</task>
+
+<task type="auto">
+  <name>Task 3: Add action bar, sub-dialogs, PM checklist, and wire up wrappers</name>
+  <files>components/jobs/job-modal.tsx, components/jobs/job-create-dialog.tsx, components/jobs/job-view-modal.tsx</files>
+  <action>
+Complete JobModal view mode and update consumer wrappers.
+
+**Action bar (in job-modal.tsx):**
+Replace the placeholder div with the full sticky action bar from current JobViewModal (lines 886-965). Move verbatim:
+- Left side: feedback InlineFeedback, Start Work button (with GPS capture), Approve Budget, Approve Completion, Mark Complete (with GPS capture)
+- Right side: Reject Budget, Reject Completion, Cancel Job buttons
+- All action handlers: handleStartWork, handleApprove, handleReject, handleApproveCompletion, handleRejectCompletion, handleMarkComplete, handleCancel — move from current JobViewModal
+- State: submitting, capturingGps, feedback, rejectOpen, rejectReason, rejectCompletionOpen, rejectCompletionReason, cancelOpen
+- useGeolocation hook for GPS capture
+
+**Sub-dialogs (in job-modal.tsx):**
+Move verbatim from current JobViewModal (lines 971-1081), render outside the main Dialog for z-index stacking:
+- Reject Budget Dialog (with reason textarea, 1000 char limit)
+- Reject Completion Dialog (with reason textarea, 1000 char limit)
+- Cancel Job AlertDialog (confirmation with warning text)
+
+**PM Checklist (in job-modal.tsx):**
+Render below JobForm in the left panel for preventive_maintenance jobs (lines 844-855 from current):
+```
+{job.job_type === 'preventive_maintenance' && job.checklist_responses && (
+  <PMChecklist jobId={job.id} checklist={job.checklist_responses} jobStatus={job.status} canEdit={...} />
+)}
+```
 
 **Update JobCreateDialog** (`components/jobs/job-create-dialog.tsx`):
-- Keep as thin wrapper: manages `open` state, renders trigger Button, renders `<JobModal mode="create" open={open} onOpenChange={setOpen} ... />`
-- Props stay the same (locations, categories, users, eligibleRequests, requestJobLinks)
+- Keep as thin wrapper: manages `open` state, renders trigger Button ("New Job" with Plus icon), renders `<JobModal mode="create" open={open} onOpenChange={setOpen} locations={...} categories={...} users={...} eligibleRequests={...} requestJobLinks={...} />`
+- Props interface stays the same for consumers
 
 **Update JobViewModal** (`components/jobs/job-view-modal.tsx`):
-- Replace entire implementation to be a thin wrapper around `<JobModal mode="view" ... />`
-- Props stay the same (jobId, onOpenChange, currentUserId, currentUserRole, onActionSuccess, jobIds, onNavigate)
-- Need to pass locations/categories/users as empty arrays since view mode fetches its own data internally — OR better: have JobModal in view mode fetch its own reference data like current JobViewModal does (it already fetches categories, locations, users). So the view wrapper does NOT need to pass these.
-
-Actually, re-evaluating: The cleanest approach is:
-- JobModal in **create mode** receives reference data as props (from server page)
-- JobModal in **view mode** fetches its own reference data client-side (like current JobViewModal already does)
-- This means the props interface should use optional for reference data props, required only when mode='create'
-
-**Update job-table.tsx:**
-- Change import from `JobViewModal` — it still imports JobViewModal which is now a thin wrapper, so NO change needed here.
-
-**Update jobs/page.tsx:**
-- No changes needed if JobCreateDialog wrapper is preserved with same props.
-
-**Key: preserve ALL existing behavior:**
-- URL sync (window.history.replaceState with ?view=)
-- Timeline scroll to bottom on load
-- Comment form visibility (canComment check)
-- Approval name resolution (approvedByName, approvalRejectedByName)
-- GPS capture for start work and mark complete
-- Linked request preview dialog in view mode (currently in JobDetailInfo — move to JobForm or keep rendering)
-
-Note on linked requests in view mode: JobDetailInfo shows linked requests as clickable buttons opening RequestPreviewDialog. In the unified form, linked requests display needs to work for both modes:
-- Create mode: Combobox to add/remove requests (current behavior)
-- Edit mode with canEdit: Same Combobox to add/remove requests
-- View mode (readOnly): Show linked requests as read-only list with RequestPreviewDialog click behavior. Import RequestPreviewDialog into JobForm for this.
+- Replace entire implementation to be a thin wrapper around `<JobModal mode="view" jobId={...} currentUserId={...} currentUserRole={...} onActionSuccess={...} jobIds={...} onNavigate={...} />`
+- Props interface stays the same for consumers (job-table.tsx continues importing JobViewModal unchanged)
+- View mode fetches its own reference data client-side, so no need to pass locations/categories/users from wrapper
   </action>
   <verify>npm run build 2>&1 | tail -5</verify>
-  <done>JobModal renders create mode (700px, form only, closes on success) and view mode (800px, form+timeline, sticky actions, all sub-dialogs). JobCreateDialog and JobViewModal are thin wrappers. All existing functionality preserved: prev/next nav, GPS actions, PM checklist, comments, approval flows, URL sync. Build passes with no errors.</done>
+  <done>JobModal has full action bar with all action handlers, three sub-dialogs (reject budget, reject completion, cancel), PM checklist rendering. JobCreateDialog and JobViewModal are thin wrappers delegating to JobModal. All existing functionality preserved: prev/next nav, GPS actions, PM checklist, comments, approval flows, URL sync. Build passes with no errors.</done>
 </task>
 
 </tasks>
