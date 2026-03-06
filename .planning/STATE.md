@@ -272,10 +272,11 @@ Recent decisions affecting current work:
 | 15 | Strip admin settings table rows to Edit-only, move deactivate/reactivate to FormDialog | 2026-03-05 | d6b13af | Verified | [12-strip-admin-settings-table-rows-to-view-](./quick/12-strip-admin-settings-table-rows-to-view-/) |
 | 16 | Convert CTA create buttons to modal dialogs | 2026-03-06 | 4b5eabd | Verified | [13-convert-cta-create-buttons-to-modal-dial](./quick/13-convert-cta-create-buttons-to-modal-dial/) |
 | 17 | Unify job create and view modals into single JobModal | 2026-03-06 | 8c76703 | Verified | [14-new-job-and-view-job-modal-should-be-sim](./quick/14-new-job-and-view-job-modal-should-be-sim/) |
+| 18 | Hide priority field in read-only job form | 2026-03-06 | 1d4715c | Complete | [15-in-job-detail-modal-non-editable-informa](./quick/15-in-job-detail-modal-non-editable-informa/) |
 
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed quick task 17: Unify job create and view modals
-Resume file: .planning/quick/14-new-job-and-view-job-modal-should-be-sim/14-SUMMARY.md
+Stopped at: Completed quick task 18: Hide priority field in read-only job form
+Resume file: .planning/quick/15-in-job-detail-modal-non-editable-informa/15-SUMMARY.md
 Next: Ready for next task
