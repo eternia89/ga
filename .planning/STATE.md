@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-06 - Completed quick task 18: Table action buttons blue link styling
+Last activity: 2026-03-06 - Completed quick task 20: Unify asset detail page layout
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -274,10 +274,11 @@ Recent decisions affecting current work:
 | 17 | Find and fix UI/UX inconsistencies across all pages | 2026-03-06 | 72e0ed1 | Verified | [14-find-any-inconsistencies-in-ui-and-ux-im](./quick/14-find-any-inconsistencies-in-ui-and-ux-im/) |
 | 18 | Table action buttons blue link styling | 2026-03-06 | d733641 | Verified | [15-table-action-should-have-the-same-size-a](./quick/15-table-action-should-have-the-same-size-a/) |
 | 19 | Simplify new asset modal form layout | 2026-03-06 | 2603c0b | Verified | [16-simplify-new-asset-modal-form-layout-sim](./quick/16-simplify-new-asset-modal-form-layout-sim/) |
+| 20 | Unify asset detail page to match new asset form | 2026-03-06 | dc938bf | Complete | [17-unify-asset-detail-page-to-match-new-ass](./quick/17-unify-asset-detail-page-to-match-new-ass/) |
 
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed quick task 19: Simplify new asset modal form layout
-Resume file: .planning/quick/16-simplify-new-asset-modal-form-layout-sim/16-SUMMARY.md
+Stopped at: Completed quick task 20: Unify asset detail page layout
+Resume file: .planning/quick/17-unify-asset-detail-page-to-match-new-ass/17-SUMMARY.md
 Next: Ready for next task
