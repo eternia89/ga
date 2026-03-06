@@ -1,11 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { Plus } from 'lucide-react';
 import { RequestTable } from '@/components/requests/request-table';
-import { Button } from '@/components/ui/button';
 import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
+import { RequestCreateDialog } from '@/components/requests/request-create-dialog';
 
 interface PageProps {
   searchParams: Promise<{ view?: string }>;
@@ -50,7 +48,7 @@ export default async function RequestsPage({ searchParams }: PageProps) {
   // All other roles see all company requests (RLS enforces company isolation)
 
   // Fetch all data in parallel
-  const [requestsResult, categoriesResult, usersResult] = await Promise.all([
+  const [requestsResult, categoriesResult, usersResult, locationsResult] = await Promise.all([
     requestQuery,
     supabase
       .from('categories')
@@ -64,11 +62,19 @@ export default async function RequestsPage({ searchParams }: PageProps) {
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .order('full_name'),
+    // Locations for the create dialog
+    supabase
+      .from('locations')
+      .select('id, name')
+      .eq('company_id', profile.company_id)
+      .is('deleted_at', null)
+      .order('name'),
   ]);
 
   const requests = requestsResult.data ?? [];
   const categories = categoriesResult.data ?? [];
   const users = usersResult.data ?? [];
+  const locations = locationsResult.data ?? [];
 
   // Batch-fetch photos for all requests
   const requestIds = requests.map((r) => r.id);
@@ -130,12 +136,7 @@ export default async function RequestsPage({ searchParams }: PageProps) {
           {['ga_lead', 'admin', 'finance_approver'].includes(profile.role) && (
             <ExportButton exportUrl="/api/exports/requests" />
           )}
-          <Button asChild size="sm">
-            <Link href="/requests/new">
-              <Plus className="mr-2 h-4 w-4" />
-              New Request
-            </Link>
-          </Button>
+          <RequestCreateDialog locations={locations} />
         </div>
       </div>
 

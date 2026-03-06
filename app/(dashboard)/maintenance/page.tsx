@@ -1,12 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { Plus } from 'lucide-react';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
-import { Button } from '@/components/ui/button';
 import { ExportButton } from '@/components/export-button';
 import { ScheduleList } from '@/components/maintenance/schedule-list';
+import { ScheduleCreateDialog } from '@/components/maintenance/schedule-create-dialog';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
+import type { TemplateListItem, AssetListItem } from '@/components/maintenance/schedule-form';
 import { getScheduleDisplayStatus } from '@/lib/constants/schedule-status';
 
 interface PageProps {
@@ -62,6 +61,37 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
+  // Fetch templates and assets for create dialog
+  const [templatesResult, assetsResult] = await Promise.all([
+    supabase
+      .from('maintenance_templates')
+      .select('id, name, category_id')
+      .eq('company_id', profile.company_id)
+      .eq('is_active', true)
+      .is('deleted_at', null)
+      .order('name'),
+    supabase
+      .from('inventory_items')
+      .select('id, name, display_id, category_id')
+      .eq('company_id', profile.company_id)
+      .neq('status', 'sold_disposed')
+      .is('deleted_at', null)
+      .order('name'),
+  ]);
+
+  const templateList: TemplateListItem[] = (templatesResult.data ?? []).map((t) => ({
+    id: t.id,
+    name: t.name,
+    category_id: t.category_id ?? null,
+  }));
+
+  const assetList: AssetListItem[] = (assetsResult.data ?? []).map((a) => ({
+    id: a.id,
+    name: a.name,
+    display_id: a.display_id,
+    category_id: a.category_id ?? null,
+  }));
+
   // Normalize Supabase FK array returns and compute display_status
   const scheduleList: MaintenanceSchedule[] = (schedules ?? []).map((s) => {
     const templateRaw = Array.isArray(s.template) ? s.template[0] : s.template;
@@ -99,12 +129,7 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
             <ExportButton exportUrl="/api/exports/maintenance" />
           )}
           {['ga_lead', 'admin'].includes(profile.role) && (
-            <Button asChild size="sm">
-              <Link href="/maintenance/schedules/new">
-                <Plus className="mr-2 h-4 w-4" />
-                New Schedule
-              </Link>
-            </Button>
+            <ScheduleCreateDialog templates={templateList} assets={assetList} />
           )}
         </div>
       </div>

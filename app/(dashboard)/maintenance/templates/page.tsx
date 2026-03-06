@@ -1,10 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { Plus } from 'lucide-react';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
-import { Button } from '@/components/ui/button';
 import { TemplateList } from '@/components/maintenance/template-list';
+import { TemplateCreateDialog } from '@/components/maintenance/template-create-dialog';
 import type { MaintenanceTemplate } from '@/lib/types/maintenance';
 
 interface PageProps {
@@ -32,6 +30,14 @@ export default async function MaintenanceTemplatesPage({ searchParams }: PagePro
   if (!profile || profile.deleted_at) {
     redirect('/login');
   }
+
+  // Fetch asset-type categories for create dialog
+  const { data: assetCategories } = await supabase
+    .from('categories')
+    .select('id, name')
+    .eq('type', 'asset')
+    .is('deleted_at', null)
+    .order('name');
 
   // Fetch all templates for this company with category join
   const { data: templates } = await supabase
@@ -73,12 +79,7 @@ export default async function MaintenanceTemplatesPage({ searchParams }: PagePro
           </p>
         </div>
         {['ga_lead', 'admin'].includes(profile.role) && (
-          <Button asChild size="sm">
-            <Link href="/maintenance/templates/new">
-              <Plus className="mr-2 h-4 w-4" />
-              New Template
-            </Link>
-          </Button>
+          <TemplateCreateDialog categories={assetCategories ?? []} />
         )}
       </div>
 

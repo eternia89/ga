@@ -1,12 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { Plus } from 'lucide-react';
 import { AssetTable } from '@/components/assets/asset-table';
 import { PendingTransfer } from '@/components/assets/asset-columns';
-import { Button } from '@/components/ui/button';
 import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
+import { AssetCreateDialog } from '@/components/assets/asset-create-dialog';
 
 interface PageProps {
   searchParams: Promise<{ view?: string }>;
@@ -103,12 +101,10 @@ export default async function InventoryPage({ searchParams }: PageProps) {
             <ExportButton exportUrl="/api/exports/inventory" />
           )}
           {['ga_staff', 'ga_lead', 'admin'].includes(profile.role) && (
-            <Button asChild size="sm">
-              <Link href="/inventory/new">
-                <Plus className="mr-2 h-4 w-4" />
-                New Asset
-              </Link>
-            </Button>
+            <AssetCreateDialog
+              categories={categories ?? []}
+              locations={locations ?? []}
+            />
           )}
         </div>
       </div>

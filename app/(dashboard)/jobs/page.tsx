@@ -1,11 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { Plus } from 'lucide-react';
 import { JobTable } from '@/components/jobs/job-table';
-import { Button } from '@/components/ui/button';
 import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
+import { JobCreateDialog } from '@/components/jobs/job-create-dialog';
 
 interface PageProps {
   searchParams: Promise<{ view?: string }>;
@@ -57,7 +55,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
     jobsQuery = jobsQuery.eq('assigned_to', profile.id);
   }
 
-  const [jobsResult, usersResult] = await Promise.all([
+  const [jobsResult, usersResult, locationsResult, allCategoriesResult, allUsersResult, eligibleRequestsResult] = await Promise.all([
     jobsQuery,
 
     // GA Staff/Lead users for PIC filter
@@ -68,10 +66,69 @@ export default async function JobsPage({ searchParams }: PageProps) {
       .in('role', ['ga_staff', 'ga_lead'])
       .is('deleted_at', null)
       .order('full_name'),
+
+    // Locations for create dialog
+    supabase
+      .from('locations')
+      .select('id, name')
+      .eq('company_id', profile.company_id)
+      .is('deleted_at', null)
+      .order('name'),
+
+    // All categories for create dialog
+    supabase
+      .from('categories')
+      .select('id, name')
+      .is('deleted_at', null)
+      .order('name'),
+
+    // All active users for PIC assignment in create dialog
+    supabase
+      .from('user_profiles')
+      .select('id, full_name')
+      .eq('company_id', profile.company_id)
+      .is('deleted_at', null)
+      .order('full_name'),
+
+    // Eligible requests (triaged + in_progress) for create dialog
+    supabase
+      .from('requests')
+      .select('id, display_id, title, priority, status, location_id, category_id, description')
+      .eq('company_id', profile.company_id)
+      .in('status', ['triaged', 'in_progress'])
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false }),
   ]);
 
   const jobs = (jobsResult.data ?? []) as unknown as import('@/lib/types/database').JobWithRelations[];
   const users = usersResult.data ?? [];
+  const formLocations = locationsResult.data ?? [];
+  const formCategories = allCategoriesResult.data ?? [];
+  const formUsers = allUsersResult.data ?? [];
+  const eligibleRequests = eligibleRequestsResult.data ?? [];
+
+  // Fetch job links for in_progress requests (for create dialog)
+  const inProgressRequestIds = eligibleRequests
+    .filter((r) => r.status === 'in_progress')
+    .map((r) => r.id);
+
+  let requestJobLinks: Record<string, string> = {};
+
+  if (inProgressRequestIds.length > 0) {
+    const { data: jobLinks } = await supabase
+      .from('job_requests')
+      .select('request_id, job:jobs(display_id)')
+      .in('request_id', inProgressRequestIds);
+
+    if (jobLinks) {
+      for (const link of jobLinks) {
+        const jobData = link.job as unknown as { display_id: string } | null;
+        if (jobData?.display_id) {
+          requestJobLinks[link.request_id] = jobData.display_id;
+        }
+      }
+    }
+  }
 
   return (
     <div className="space-y-6 py-6">
@@ -89,12 +146,13 @@ export default async function JobsPage({ searchParams }: PageProps) {
             <ExportButton exportUrl="/api/exports/jobs" />
           )}
           {['ga_lead', 'admin'].includes(profile.role) && (
-            <Button asChild size="sm">
-              <Link href="/jobs/new">
-                <Plus className="mr-2 h-4 w-4" />
-                New Job
-              </Link>
-            </Button>
+            <JobCreateDialog
+              locations={formLocations}
+              categories={formCategories}
+              users={formUsers}
+              eligibleRequests={eligibleRequests}
+              requestJobLinks={requestJobLinks}
+            />
           )}
         </div>
       </div>
