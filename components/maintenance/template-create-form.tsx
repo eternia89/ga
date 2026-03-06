@@ -30,9 +30,10 @@ interface Category {
 
 interface TemplateCreateFormProps {
   categories: Category[];
+  onSuccess?: () => void;
 }
 
-export function TemplateCreateForm({ categories }: TemplateCreateFormProps) {
+export function TemplateCreateForm({ categories, onSuccess }: TemplateCreateFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,8 +73,12 @@ export function TemplateCreateForm({ categories }: TemplateCreateFormProps) {
         return;
       }
 
-      // Redirect to templates list on success
-      router.push('/maintenance/templates');
+      // Close dialog or redirect to templates list on success
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push('/maintenance/templates');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
@@ -83,7 +88,7 @@ export function TemplateCreateForm({ categories }: TemplateCreateFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl">
+      <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-8 ${onSuccess ? '' : 'max-w-2xl'}`}>
 
         {/* Section 1: Basic Info */}
         <div className="rounded-lg border border-border p-6 space-y-4">
@@ -205,14 +210,16 @@ export function TemplateCreateForm({ categories }: TemplateCreateFormProps) {
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Creating Template...' : 'Create Template'}
           </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            disabled={isSubmitting}
-            onClick={() => router.push('/maintenance/templates')}
-          >
-            Cancel
-          </Button>
+          {!onSuccess && (
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={isSubmitting}
+              onClick={() => router.push('/maintenance/templates')}
+            >
+              Cancel
+            </Button>
+          )}
         </div>
       </form>
     </Form>

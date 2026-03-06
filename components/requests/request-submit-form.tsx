@@ -27,9 +27,10 @@ interface Location {
 
 interface RequestSubmitFormProps {
   locations: Location[];
+  onSuccess?: () => void;
 }
 
-export function RequestSubmitForm({ locations }: RequestSubmitFormProps) {
+export function RequestSubmitForm({ locations, onSuccess }: RequestSubmitFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -88,8 +89,12 @@ export function RequestSubmitForm({ locations }: RequestSubmitFormProps) {
         }
       }
 
-      // Redirect to request list
-      router.push('/requests');
+      // Close dialog or redirect to request list
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push('/requests');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
@@ -99,7 +104,7 @@ export function RequestSubmitForm({ locations }: RequestSubmitFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl">
+      <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-6 ${onSuccess ? '' : 'max-w-2xl'}`}>
         {/* Description */}
         <FormField
           control={form.control}
@@ -159,7 +164,6 @@ export function RequestSubmitForm({ locations }: RequestSubmitFormProps) {
               disabled={isSubmitting}
               maxPhotos={3}
               enableMobileCapture
-              enableCompression={false}
               enableAnnotation={false}
             />
           </div>

@@ -112,9 +112,10 @@ interface CreateFormProps {
   assets: AssetListItem[];
   defaultTemplateId?: string;
   defaultAssetId?: string;
+  onSuccess?: () => void;
 }
 
-function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAssetId }: CreateFormProps) {
+function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAssetId, onSuccess }: CreateFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -188,13 +189,17 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
         setFeedback({ type: 'error', message: 'Failed to create schedule. Please try again.' });
         return;
       }
-      router.push('/maintenance');
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push('/maintenance');
+      }
     });
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl">
+      <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-8 ${onSuccess ? '' : 'max-w-2xl'}`}>
 
         {/* Section 1: Template & Asset */}
         <div className="rounded-lg border border-border p-6 space-y-4">
@@ -362,14 +367,16 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
           <Button type="submit" disabled={isPending}>
             {isPending ? 'Creating...' : 'Create Schedule'}
           </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            disabled={isPending}
-            onClick={() => router.push('/maintenance')}
-          >
-            Cancel
-          </Button>
+          {!onSuccess && (
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={isPending}
+              onClick={() => router.push('/maintenance')}
+            >
+              Cancel
+            </Button>
+          )}
         </div>
       </form>
     </Form>
@@ -509,6 +516,7 @@ interface ScheduleFormProps {
   defaultAssetId?: string;
   mode: 'create' | 'edit';
   schedule?: MaintenanceSchedule;
+  onSuccess?: () => void;
 }
 
 export function ScheduleForm({
@@ -518,6 +526,7 @@ export function ScheduleForm({
   defaultAssetId,
   mode,
   schedule,
+  onSuccess,
 }: ScheduleFormProps) {
   if (mode === 'edit' && schedule) {
     return <ScheduleEditForm schedule={schedule} />;
@@ -529,6 +538,7 @@ export function ScheduleForm({
       assets={assets}
       defaultTemplateId={defaultTemplateId}
       defaultAssetId={defaultAssetId}
+      onSuccess={onSuccess}
     />
   );
 }

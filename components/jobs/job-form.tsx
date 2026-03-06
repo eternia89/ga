@@ -72,6 +72,7 @@ interface JobFormProps {
   requestJobLinks: Record<string, string>; // request_id -> job display_id
   prefillRequest?: PrefillRequest | null;
   mode: 'create' | 'edit';
+  onSuccess?: () => void;
 }
 
 export function JobForm({
@@ -82,6 +83,7 @@ export function JobForm({
   requestJobLinks,
   prefillRequest,
   mode,
+  onSuccess,
 }: JobFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -196,7 +198,11 @@ export function JobForm({
         return;
       }
 
-      router.push(`/jobs/${result.data.jobId}`);
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push(`/jobs/${result.data.jobId}`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
@@ -206,7 +212,7 @@ export function JobForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl">
+      <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-6 ${onSuccess ? '' : 'max-w-2xl'}`}>
         {/* Title */}
         <FormField
           control={form.control}
@@ -486,14 +492,16 @@ export function JobForm({
               ? 'Create Job'
               : 'Save Changes'}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={isSubmitting}
-            onClick={() => router.push('/jobs')}
-          >
-            Cancel
-          </Button>
+          {!onSuccess && (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSubmitting}
+              onClick={() => router.push('/jobs')}
+            >
+              Cancel
+            </Button>
+          )}
         </div>
       </form>
     </Form>

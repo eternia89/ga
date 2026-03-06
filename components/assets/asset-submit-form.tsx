@@ -41,13 +41,14 @@ interface InvoiceFile {
 interface AssetSubmitFormProps {
   categories: Category[];
   locations: Location[];
+  onSuccess?: () => void;
 }
 
 const MAX_INVOICE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 const ALLOWED_INVOICE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 const MAX_INVOICES = 5;
 
-export function AssetSubmitForm({ categories, locations }: AssetSubmitFormProps) {
+export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmitFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -156,12 +157,16 @@ export function AssetSubmitForm({ categories, locations }: AssetSubmitFormProps)
 
       if (!photoUploadResponse.ok) {
         // Photos failed but asset was created — show warning and continue
-        setSuccess(
-          `Asset created (${result.data.displayId}), but condition photo upload failed. You can add photos from the detail page.`
-        );
-        setTimeout(() => {
-          router.push(`/inventory/${assetId}`);
-        }, 2000);
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          setSuccess(
+            `Asset created (${result.data.displayId}), but condition photo upload failed. You can add photos from the detail page.`
+          );
+          setTimeout(() => {
+            router.push(`/inventory/${assetId}`);
+          }, 2000);
+        }
         return;
       }
 
@@ -180,18 +185,26 @@ export function AssetSubmitForm({ categories, locations }: AssetSubmitFormProps)
 
         if (!invoiceUploadResponse.ok) {
           // Invoice upload failed but asset and photos are fine
-          setSuccess(
-            `Asset created (${result.data.displayId}), but invoice upload failed. You can add invoices from the detail page.`
-          );
-          setTimeout(() => {
-            router.push(`/inventory/${assetId}`);
-          }, 2000);
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            setSuccess(
+              `Asset created (${result.data.displayId}), but invoice upload failed. You can add invoices from the detail page.`
+            );
+            setTimeout(() => {
+              router.push(`/inventory/${assetId}`);
+            }, 2000);
+          }
           return;
         }
       }
 
-      // All done — redirect to detail page
-      router.push(`/inventory/${assetId}`);
+      // All done — close dialog or redirect to detail page
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push(`/inventory/${assetId}`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
     } finally {
@@ -446,7 +459,6 @@ export function AssetSubmitForm({ categories, locations }: AssetSubmitFormProps)
             required
             showCount
             disabled={isSubmitting}
-            enableCompression={false}
             enableAnnotation={false}
           />
 
