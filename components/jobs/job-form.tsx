@@ -369,42 +369,44 @@ export function JobForm({
           )}
         />
 
-        {/* Priority */}
-        <FormField
-          control={form.control}
-          name="priority"
-          render={({ field }) => (
-            <FormItem className="max-w-xs">
-              <FormLabel>
-                Priority <span className="text-destructive">*</span>
-              </FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-                disabled={disabled}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select priority..." />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {PRIORITY_ORDER.map((p) => (
-                    <SelectItem key={p} value={p}>
-                      {PRIORITY_LABELS[p]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {mode === 'create' && linkedRequests.length > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Auto-set to highest priority among linked requests
-                </p>
-              )}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Priority — hidden in readOnly mode; shown as PriorityBadge in modal header */}
+        {!readOnly && (
+          <FormField
+            control={form.control}
+            name="priority"
+            render={({ field }) => (
+              <FormItem className="max-w-xs">
+                <FormLabel>
+                  Priority <span className="text-destructive">*</span>
+                </FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  disabled={disabled}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select priority..." />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {PRIORITY_ORDER.map((p) => (
+                      <SelectItem key={p} value={p}>
+                        {PRIORITY_LABELS[p]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {mode === 'create' && linkedRequests.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Auto-set to highest priority among linked requests
+                  </p>
+                )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {/* PIC (Person in Charge) */}
         <FormField
