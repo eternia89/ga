@@ -2,19 +2,14 @@
 
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { FileText, Truck } from 'lucide-react';
-import type { InventoryItemWithRelations, InventoryMovementWithRelations } from '@/lib/types/database';
-import { AssetStatusBadge } from './asset-status-badge';
+import { FileText } from 'lucide-react';
+import type { InventoryItemWithRelations } from '@/lib/types/database';
 import { AssetEditForm } from './asset-edit-form';
-import { AssetStatusChangeDialog } from './asset-status-change-dialog';
 import { PhotoLightbox } from '@/components/requests/request-photo-lightbox';
 import type { ConditionPhoto, InvoiceItem } from './asset-detail-client';
-import { ASSET_STATUS_TRANSITIONS } from '@/lib/constants/asset-status';
-import type { AssetStatus } from '@/lib/constants/asset-status';
 
 interface AssetDetailInfoProps {
   asset: InventoryItemWithRelations;
-  pendingTransfer: InventoryMovementWithRelations | null;
   conditionPhotos: ConditionPhoto[];
   invoices: InvoiceItem[];
   categories: { id: string; name: string }[];
@@ -22,15 +17,10 @@ interface AssetDetailInfoProps {
   currentUserId: string;
   currentUserRole: string;
   onEditSuccess: () => void;
-  onStatusBadgeClick: () => void;
-  showStatusDialog: boolean;
-  onStatusDialogChange: (open: boolean) => void;
-  onStatusSuccess: () => void;
 }
 
 export function AssetDetailInfo({
   asset,
-  pendingTransfer,
   conditionPhotos,
   invoices,
   categories,
@@ -38,28 +28,13 @@ export function AssetDetailInfo({
   currentUserId,
   currentUserRole,
   onEditSuccess,
-  onStatusBadgeClick,
-  showStatusDialog,
-  onStatusDialogChange,
-  onStatusSuccess,
 }: AssetDetailInfoProps) {
   const [lightboxPhotos, setLightboxPhotos] = useState<Array<{ id: string; url: string; fileName: string }> | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number>(0);
 
-  const canChangeStatus =
-    ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) &&
-    asset.status !== 'sold_disposed';
-
   const canEdit =
     ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) &&
     asset.status !== 'sold_disposed';
-
-  const isTerminalStatus = asset.status === 'sold_disposed';
-  const allowedTransitions = isTerminalStatus
-    ? []
-    : ASSET_STATUS_TRANSITIONS[asset.status as AssetStatus] ?? [];
-
-  const isStatusClickable = canChangeStatus && allowedTransitions.length > 0;
 
   const openLightbox = (photos: Array<{ id: string; url: string; fileName: string }>, index: number) => {
     setLightboxPhotos(photos);
@@ -81,67 +56,14 @@ export function AssetDetailInfo({
     }));
 
     return (
-      <>
-        <div className="rounded-lg border p-6 space-y-6">
-          {/* Header: display ID + status badge */}
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight font-mono">
-              {asset.display_id}
-            </h1>
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={isStatusClickable ? onStatusBadgeClick : undefined}
-                disabled={!isStatusClickable}
-                className={isStatusClickable ? 'cursor-pointer' : 'cursor-default'}
-                aria-label={isStatusClickable ? 'Click to change status' : undefined}
-              >
-                <AssetStatusBadge
-                  status={asset.status}
-                  clickable={isStatusClickable}
-                  showInTransit={!!pendingTransfer}
-                />
-              </button>
-            </div>
-
-            {/* In Transit details */}
-            {pendingTransfer && (
-              <div className="rounded-md border border-blue-200 bg-blue-50 p-3 flex items-start gap-2">
-                <Truck className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
-                <div className="text-sm">
-                  <p className="font-medium text-blue-700">Transfer in Progress</p>
-                  <p className="text-blue-600 mt-0.5">
-                    {pendingTransfer.from_location?.name ?? '—'} &rarr; {pendingTransfer.to_location?.name ?? '—'}
-                  </p>
-                  <p className="text-blue-600">
-                    Receiver: {pendingTransfer.receiver?.full_name ?? '—'}
-                  </p>
-                  <p className="text-blue-500 text-xs mt-0.5">
-                    Initiated: {format(new Date(pendingTransfer.created_at), 'dd-MM-yyyy')}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <AssetEditForm
-          asset={asset}
-          categories={categories}
-          locations={locations}
-          existingPhotos={editExistingPhotos}
-          existingInvoices={editExistingInvoices}
-          onSuccess={onEditSuccess}
-        />
-
-        {/* Status change dialog */}
-        <AssetStatusChangeDialog
-          open={showStatusDialog}
-          onOpenChange={onStatusDialogChange}
-          asset={asset}
-          onSuccess={onStatusSuccess}
-        />
-      </>
+      <AssetEditForm
+        asset={asset}
+        categories={categories}
+        locations={locations}
+        existingPhotos={editExistingPhotos}
+        existingInvoices={editExistingInvoices}
+        onSuccess={onEditSuccess}
+      />
     );
   }
 
@@ -152,48 +74,7 @@ export function AssetDetailInfo({
 
   return (
     <>
-      <div className="rounded-lg border p-6 space-y-6">
-        {/* Header: display ID + status badge */}
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight font-mono">
-            {asset.display_id}
-          </h1>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={isStatusClickable ? onStatusBadgeClick : undefined}
-              disabled={!isStatusClickable}
-              className={isStatusClickable ? 'cursor-pointer' : 'cursor-default'}
-              aria-label={isStatusClickable ? 'Click to change status' : undefined}
-            >
-              <AssetStatusBadge
-                status={asset.status}
-                clickable={isStatusClickable}
-                showInTransit={!!pendingTransfer}
-              />
-            </button>
-          </div>
-
-          {/* In Transit details */}
-          {pendingTransfer && (
-            <div className="rounded-md border border-blue-200 bg-blue-50 p-3 flex items-start gap-2">
-              <Truck className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
-              <div className="text-sm">
-                <p className="font-medium text-blue-700">Transfer in Progress</p>
-                <p className="text-blue-600 mt-0.5">
-                  {pendingTransfer.from_location?.name ?? '—'} &rarr; {pendingTransfer.to_location?.name ?? '—'}
-                </p>
-                <p className="text-blue-600">
-                  Receiver: {pendingTransfer.receiver?.full_name ?? '—'}
-                </p>
-                <p className="text-blue-500 text-xs mt-0.5">
-                  Initiated: {format(new Date(pendingTransfer.created_at), 'dd-MM-yyyy')}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
+      <div className="space-y-6">
         {/* Asset fields */}
         <dl className="space-y-3">
           <div>
@@ -314,14 +195,6 @@ export function AssetDetailInfo({
           )}
         </div>
       </div>
-
-      {/* Status change dialog */}
-      <AssetStatusChangeDialog
-        open={showStatusDialog}
-        onOpenChange={onStatusDialogChange}
-        asset={asset}
-        onSuccess={onStatusSuccess}
-      />
 
       {/* Lightbox */}
       {lightboxPhotos && (

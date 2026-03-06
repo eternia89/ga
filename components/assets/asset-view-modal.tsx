@@ -10,6 +10,7 @@ import { AssetDetailInfo } from './asset-detail-info';
 import { AssetDetailActions } from './asset-detail-actions';
 import { AssetTimeline } from './asset-timeline';
 import { AssetStatusBadge } from './asset-status-badge';
+import { AssetStatusChangeDialog } from './asset-status-change-dialog';
 import {
   Dialog,
   DialogContent,
@@ -455,7 +456,6 @@ export function AssetViewModal({
               <div className="overflow-y-auto px-6 py-4 max-lg:border-b space-y-6">
                 <AssetDetailInfo
                   asset={asset}
-                  pendingTransfer={pendingTransfer}
                   conditionPhotos={conditionPhotos}
                   invoices={invoices}
                   categories={categories}
@@ -463,10 +463,6 @@ export function AssetViewModal({
                   currentUserId={currentUserId}
                   currentUserRole={currentUserRole}
                   onEditSuccess={handleActionSuccess}
-                  onStatusBadgeClick={() => setShowStatusDialog(true)}
-                  showStatusDialog={showStatusDialog}
-                  onStatusDialogChange={setShowStatusDialog}
-                  onStatusSuccess={handleActionSuccess}
                 />
 
                 <AssetDetailActions
@@ -536,6 +532,16 @@ export function AssetViewModal({
               </div>
             </div>
           </>
+        )}
+
+        {/* Status change dialog */}
+        {asset && (
+          <AssetStatusChangeDialog
+            open={showStatusDialog}
+            onOpenChange={setShowStatusDialog}
+            asset={asset}
+            onSuccess={handleActionSuccess}
+          />
         )}
       </DialogContent>
     </Dialog>
