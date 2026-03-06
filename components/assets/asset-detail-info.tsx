@@ -77,18 +77,6 @@ export function AssetDetailInfo({
       <div className="space-y-6">
         {/* Asset fields */}
         <dl className="space-y-3">
-          <div>
-            <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</dt>
-            <dd className="text-sm mt-0.5">{asset.name}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Category</dt>
-            <dd className="text-sm mt-0.5">{asset.category?.name ?? <span className="text-muted-foreground">—</span>}</dd>
-          </div>
-          <div>
-            <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Location</dt>
-            <dd className="text-sm mt-0.5">{asset.location?.name ?? <span className="text-muted-foreground">—</span>}</dd>
-          </div>
           {asset.brand && (
             <div>
               <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Brand</dt>
@@ -131,39 +119,41 @@ export function AssetDetailInfo({
           </div>
         </dl>
 
-        {/* Condition Photos */}
+        {/* Attachments */}
         <div>
-          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-            Condition Photos
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+            Attachments
           </h3>
-          {assetConditionPhotos.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No condition photos.</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {assetConditionPhotos.map((photo, index) => (
-                <button
-                  key={photo.id}
-                  type="button"
-                  onClick={() => openLightbox(assetConditionPhotos, index)}
-                  className="w-20 h-20 shrink-0 rounded border border-border overflow-hidden hover:opacity-80 transition-opacity"
-                  aria-label={`View photo: ${photo.fileName}`}
-                >
-                  <img
-                    src={photo.url}
-                    alt={photo.fileName}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Invoices */}
-        <div>
-          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-            Invoices
-          </h3>
+          {/* Condition Photos */}
+          <div className="mb-3">
+            <p className="text-xs text-muted-foreground mb-1">Condition Photos</p>
+            {assetConditionPhotos.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No condition photos.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {assetConditionPhotos.map((photo, index) => (
+                  <button
+                    key={photo.id}
+                    type="button"
+                    onClick={() => openLightbox(assetConditionPhotos, index)}
+                    className="w-20 h-20 shrink-0 rounded border border-border overflow-hidden hover:opacity-80 transition-opacity"
+                    aria-label={`View photo: ${photo.fileName}`}
+                  >
+                    <img
+                      src={photo.url}
+                      alt={photo.fileName}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Invoices */}
+          <div>
+            <p className="text-xs text-muted-foreground mb-1">Invoices</p>
           {invoices.length === 0 ? (
             <p className="text-sm text-muted-foreground">No invoices attached.</p>
           ) : (
@@ -193,6 +183,7 @@ export function AssetDetailInfo({
               })}
             </div>
           )}
+          </div>
         </div>
       </div>
 

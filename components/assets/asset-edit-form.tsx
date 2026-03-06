@@ -7,7 +7,6 @@ import { X, FileText } from 'lucide-react';
 import { assetEditSchema, AssetEditFormData } from '@/lib/validations/asset-schema';
 import type { InventoryItemWithRelations } from '@/lib/types/database';
 import { updateAsset, deleteAssetPhotos } from '@/app/actions/asset-actions';
-import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { PhotoUpload } from '@/components/media/photo-upload';
 import {
@@ -75,9 +74,6 @@ export function AssetEditForm({
   const [visibleExistingInvoices, setVisibleExistingInvoices] = useState(existingInvoices);
   const [invoiceError, setInvoiceError] = useState<string | null>(null);
   const invoiceInputRef = useRef<HTMLInputElement>(null);
-
-  const categoryOptions = categories.map((c) => ({ label: c.name, value: c.id }));
-  const locationOptions = locations.map((l) => ({ label: l.name, value: l.id }));
 
   const form = useForm<AssetEditFormData>({
     resolver: zodResolver(assetEditSchema),
@@ -235,80 +231,12 @@ export function AssetEditForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Asset Details */}
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-          Asset Details
-        </h2>
-        <Separator />
-
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Name <span className="text-destructive">*</span>
-              </FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="e.g. Air Conditioner Unit 1"
-                  maxLength={100}
-                  disabled={isSubmitting}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="category_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Category <span className="text-destructive">*</span>
-              </FormLabel>
-              <FormControl>
-                <Combobox
-                  options={categoryOptions}
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  placeholder="Select category..."
-                  searchPlaceholder="Search categories..."
-                  emptyText="No categories found."
-                  disabled={isSubmitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="location_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Location <span className="text-destructive">*</span>
-              </FormLabel>
-              <FormControl>
-                <Combobox
-                  options={locationOptions}
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  placeholder="Select location..."
-                  searchPlaceholder="Search locations..."
-                  emptyText="No locations found."
-                  disabled={isSubmitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Section 1: Asset Details */}
+        <div className="space-y-4">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+            Asset Details
+          </h2>
+          <Separator />
 
         <FormField
           control={form.control}
@@ -416,129 +344,133 @@ export function AssetEditForm({
             </FormItem>
           )}
         />
+        </div>
 
-        {/* Condition Photos */}
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-          Condition Photos
-        </h2>
-        <p className="text-xs text-muted-foreground">
-          Up to 5 photos. JPEG, PNG, or WebP. Max 5MB each.
-        </p>
-        <Separator />
+        {/* Section 2: Attachments */}
+        <div className="space-y-4">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+            Attachments
+          </h2>
+          <Separator />
 
-        <PhotoUpload
-          onChange={setNewPhotos}
-          maxPhotos={5}
-          existingPhotos={visibleExistingPhotos}
-          onRemoveExisting={handleExistingPhotoRemove}
-          disabled={isSubmitting}
-          showCount
-          enableAnnotation={false}
-        />
-
-        {/* Invoice Files */}
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-          Invoice Files
-        </h2>
-        <p className="text-xs text-muted-foreground">
-          Up to {MAX_INVOICES} files. PDF, JPEG, PNG, or WebP. Max 10MB each.
-        </p>
-        <Separator />
-
+          {/* Condition Photos */}
           <div className="space-y-2">
-            {/* Existing invoices (removable) */}
-            {visibleExistingInvoices.map((invoice) => {
-              const isImage = /\.(jpe?g|png|webp)$/i.test(invoice.fileName);
-              return (
+            <p className="text-sm font-medium">Condition Photos</p>
+            <p className="text-xs text-muted-foreground">
+              Up to 5 photos. JPEG, PNG, or WebP. Max 5MB each.
+            </p>
+
+            <PhotoUpload
+              onChange={setNewPhotos}
+              maxPhotos={5}
+              existingPhotos={visibleExistingPhotos}
+              onRemoveExisting={handleExistingPhotoRemove}
+              disabled={isSubmitting}
+              showCount
+              enableAnnotation={false}
+            />
+          </div>
+
+          {/* Invoice Files */}
+          <div className="space-y-2 mt-4">
+            <p className="text-sm font-medium">Invoice Files</p>
+            <p className="text-xs text-muted-foreground">
+              Up to {MAX_INVOICES} files. PDF, JPEG, PNG, or WebP. Max 10MB each.
+            </p>
+
+            <div className="space-y-2">
+              {visibleExistingInvoices.map((invoice) => {
+                const isImage = /\.(jpe?g|png|webp)$/i.test(invoice.fileName);
+                return (
+                  <div
+                    key={invoice.id}
+                    className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
+                  >
+                    <a
+                      href={invoice.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity"
+                    >
+                      {isImage ? (
+                        <img
+                          src={invoice.url}
+                          alt={invoice.fileName}
+                          className="w-10 h-10 object-cover rounded shrink-0"
+                        />
+                      ) : (
+                        <FileText className="h-5 w-5 text-muted-foreground shrink-0" />
+                      )}
+                      <span className="text-sm truncate">{invoice.fileName}</span>
+                    </a>
+                    {!isSubmitting && (
+                      <button
+                        type="button"
+                        onClick={() => handleExistingInvoiceRemove(invoice.id)}
+                        className="shrink-0 rounded p-0.5 text-muted-foreground hover:text-destructive"
+                        aria-label={`Remove ${invoice.fileName}`}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+
+              {newInvoices.map((invoice, index) => (
                 <div
-                  key={invoice.id}
+                  key={index}
                   className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
                 >
-                  <a
-                    href={invoice.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity"
-                  >
-                    {isImage ? (
-                      <img
-                        src={invoice.url}
-                        alt={invoice.fileName}
-                        className="w-10 h-10 object-cover rounded shrink-0"
-                      />
-                    ) : (
-                      <FileText className="h-5 w-5 text-muted-foreground shrink-0" />
-                    )}
-                    <span className="text-sm truncate">{invoice.fileName}</span>
-                  </a>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="text-sm truncate">{invoice.name}</span>
+                    <span className="text-xs text-blue-600 shrink-0">New</span>
+                  </div>
                   {!isSubmitting && (
                     <button
                       type="button"
-                      onClick={() => handleExistingInvoiceRemove(invoice.id)}
+                      onClick={() => removeNewInvoice(index)}
                       className="shrink-0 rounded p-0.5 text-muted-foreground hover:text-destructive"
-                      aria-label={`Remove ${invoice.fileName}`}
+                      aria-label={`Remove ${invoice.name}`}
                     >
                       <X className="h-4 w-4" />
                     </button>
                   )}
                 </div>
-              );
-            })}
+              ))}
 
-            {/* New invoice files (removable) */}
-            {newInvoices.map((invoice, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <span className="text-sm truncate">{invoice.name}</span>
-                  <span className="text-xs text-blue-600 shrink-0">New</span>
-                </div>
-                {!isSubmitting && (
-                  <button
-                    type="button"
-                    onClick={() => removeNewInvoice(index)}
-                    className="shrink-0 rounded p-0.5 text-muted-foreground hover:text-destructive"
-                    aria-label={`Remove ${invoice.name}`}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-            ))}
+              {totalInvoiceCount < MAX_INVOICES && !isSubmitting && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => invoiceInputRef.current?.click()}
+                >
+                  Add Invoice File
+                </Button>
+              )}
 
-            {/* Add invoice button */}
-            {totalInvoiceCount < MAX_INVOICES && !isSubmitting && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => invoiceInputRef.current?.click()}
-              >
-                Add Invoice File
-              </Button>
-            )}
+              <p className="text-xs text-muted-foreground">
+                {totalInvoiceCount} / {MAX_INVOICES} files
+              </p>
 
-            <p className="text-xs text-muted-foreground">
-              {totalInvoiceCount} / {MAX_INVOICES} files
-            </p>
-
-            {invoiceError && (
-              <p className="text-sm text-destructive">{invoiceError}</p>
-            )}
+              {invoiceError && (
+                <p className="text-sm text-destructive">{invoiceError}</p>
+              )}
+            </div>
           </div>
 
-        <input
-          ref={invoiceInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,application/pdf"
-          className="sr-only"
-          onChange={handleInvoiceFileChange}
-          multiple
-          disabled={isSubmitting}
-        />
+          <input
+            ref={invoiceInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,application/pdf"
+            className="sr-only"
+            onChange={handleInvoiceFileChange}
+            multiple
+            disabled={isSubmitting}
+          />
+        </div>
 
         {/* Feedback */}
         {feedback && (
