@@ -353,7 +353,7 @@ export const assignJob = authActionClient
   });
 
 // ============================================================================
-// updateJobStatus — ga_lead/admin OR assigned PIC
+// updateJobStatus — ga_lead/admin OR assigned PIC (Start Work: PIC only)
 // When transitioning to 'completed': check budget_threshold to determine if
 // completion approval is required. If cost >= threshold, transition to
 // 'pending_completion_approval' instead of 'completed' directly.
@@ -388,6 +388,11 @@ export const updateJobStatus = authActionClient
 
     if (!isLead && !isPIC) {
       throw new Error('Permission denied — only GA Lead, Admin, or assigned PIC can update job status');
+    }
+
+    // Start Work (in_progress) restricted to PIC only — defense in depth
+    if (parsedInput.status === 'in_progress' && !isPIC) {
+      throw new Error('Permission denied — only the assigned PIC can start work');
     }
 
     // Validate allowed transitions
