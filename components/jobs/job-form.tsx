@@ -88,6 +88,8 @@ interface JobFormProps {
   jobId?: string;
   initialData?: JobFormInitialData;
   readOnly?: boolean;
+  /** Lock PIC field independently (when job status is past 'assigned') */
+  picLocked?: boolean;
   /** For view mode: linked request objects with status info for read-only display */
   linkedRequestDetails?: {
     id: string;
@@ -116,6 +118,7 @@ export function JobForm({
   jobId,
   initialData,
   readOnly = false,
+  picLocked = false,
   linkedRequestDetails,
   onSuccess,
 }: JobFormProps) {
@@ -423,7 +426,7 @@ export function JobForm({
                   placeholder="Select PIC (optional)..."
                   searchPlaceholder="Search users..."
                   emptyText="No users found."
-                  disabled={disabled}
+                  disabled={disabled || picLocked}
                 />
               </FormControl>
               {mode === 'create' && (

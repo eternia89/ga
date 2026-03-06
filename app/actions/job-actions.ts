@@ -139,6 +139,12 @@ export const updateJob = authActionClient
 
     const { id, linked_request_ids, ...updateFields } = parsedInput;
 
+    // Block PIC changes once job is past 'assigned' status
+    const PIC_EDITABLE_STATUSES = ['created', 'assigned'];
+    if (updateFields.assigned_to !== undefined && !PIC_EDITABLE_STATUSES.includes(existing.status)) {
+      throw new Error('Cannot change PIC after work has started');
+    }
+
     // If linked_request_ids changed, diff and update
     if (linked_request_ids !== undefined) {
       // Fetch current links

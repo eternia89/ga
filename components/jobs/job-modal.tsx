@@ -573,6 +573,7 @@ export function JobModal({
   const isPIC = job?.assigned_to === currentUserId;
 
   const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job?.status ?? '');
+  const picLocked = !!job && !['created', 'assigned'].includes(job.status);
   const canStartWork = isPIC && job?.status === 'assigned';
   const canApproveReject = isFinanceApproverOrAdmin && job?.status === 'pending_approval';
   const canApproveCompletion = isFinanceApproverOrAdmin && job?.status === 'pending_completion_approval';
@@ -947,6 +948,7 @@ export function JobModal({
                     jobId={job.id}
                     initialData={initialData}
                     readOnly={!canEdit}
+                    picLocked={picLocked}
                     locations={viewLocations}
                     categories={viewCategories}
                     users={formUsers}
