@@ -17,6 +17,7 @@ interface AssetDetailInfoProps {
   currentUserId: string;
   currentUserRole: string;
   onEditSuccess: () => void;
+  onSubmittingChange?: (submitting: boolean) => void;
 }
 
 export function AssetDetailInfo({
@@ -28,6 +29,7 @@ export function AssetDetailInfo({
   currentUserId,
   currentUserRole,
   onEditSuccess,
+  onSubmittingChange,
 }: AssetDetailInfoProps) {
   const [lightboxPhotos, setLightboxPhotos] = useState<Array<{ id: string; url: string; fileName: string }> | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number>(0);
@@ -63,6 +65,7 @@ export function AssetDetailInfo({
         existingPhotos={editExistingPhotos}
         existingInvoices={editExistingInvoices}
         onSuccess={onEditSuccess}
+        onSubmittingChange={onSubmittingChange}
       />
     );
   }

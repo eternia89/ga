@@ -80,6 +80,7 @@ export function AssetViewModal({
   const [showTransferRespondDialog, setShowTransferRespondDialog] = useState(false);
   const [transferRespondMode, setTransferRespondMode] = useState<'accept' | 'reject'>('accept');
   const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
 
   // Navigation
   const currentIndex = assetId ? assetIds.indexOf(assetId) : -1;
@@ -463,6 +464,7 @@ export function AssetViewModal({
                   currentUserId={currentUserId}
                   currentUserRole={currentUserRole}
                   onEditSuccess={handleActionSuccess}
+                  onSubmittingChange={setIsEditSubmitting}
                 />
 
                 <AssetDetailActions
@@ -500,15 +502,16 @@ export function AssetViewModal({
             {/* Sticky action bar */}
             <div className="border-t px-6 py-3 flex items-center justify-between gap-2 shrink-0 bg-background">
               <div className="flex items-center gap-2 min-w-0">
-                {actionFeedback ? (
+                {actionFeedback && (
                   <InlineFeedback type={actionFeedback.type} message={actionFeedback.message} onDismiss={() => setActionFeedback(null)} />
-                ) : (
-                  <span className="text-xs text-muted-foreground truncate">
-                    {asset.display_id} &middot; {asset.name}
-                  </span>
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
+                {['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) && asset.status !== 'sold_disposed' && !pendingTransfer && (
+                  <Button type="submit" form="asset-edit-form" size="sm" disabled={isEditSubmitting}>
+                    {isEditSubmitting ? 'Saving...' : 'Save Changes'}
+                  </Button>
+                )}
                 {['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) && asset.status !== 'sold_disposed' && !pendingTransfer && (
                   <Button variant="outline" size="sm" onClick={() => setShowStatusDialog(true)}>
                     Change Status
