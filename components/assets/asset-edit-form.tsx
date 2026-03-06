@@ -51,6 +51,7 @@ interface AssetEditFormProps {
   existingPhotos?: ExistingPhoto[];
   existingInvoices?: ExistingInvoice[];
   onSuccess: () => void;
+  onSubmittingChange?: (submitting: boolean) => void;
 }
 
 export function AssetEditForm({
@@ -60,6 +61,7 @@ export function AssetEditForm({
   existingPhotos = [],
   existingInvoices = [],
   onSuccess,
+  onSubmittingChange,
 }: AssetEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -136,6 +138,7 @@ export function AssetEditForm({
 
   const onSubmit = async (data: AssetEditFormData) => {
     setIsSubmitting(true);
+    onSubmittingChange?.(true);
     setFeedback(null);
 
     try {
@@ -226,6 +229,7 @@ export function AssetEditForm({
       });
     } finally {
       setIsSubmitting(false);
+      onSubmittingChange?.(false);
     }
   };
 
@@ -233,7 +237,7 @@ export function AssetEditForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form id="asset-edit-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Section 1: Asset Details */}
         <div className="space-y-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
@@ -529,10 +533,6 @@ export function AssetEditForm({
           />
         )}
 
-        {/* Save button */}
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Saving...' : 'Save Changes'}
-        </Button>
       </form>
     </Form>
   );
