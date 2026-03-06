@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-06 - Completed quick task 19: Standardize all modal widths
+Last activity: 2026-03-06 - Completed quick task 20: Restrict Start Work action to PIC only
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -274,10 +274,11 @@ Recent decisions affecting current work:
 | 17 | Unify job create and view modals into single JobModal | 2026-03-06 | 8c76703 | Verified | [14-new-job-and-view-job-modal-should-be-sim](./quick/14-new-job-and-view-job-modal-should-be-sim/) |
 | 18 | Hide priority field in read-only job form | 2026-03-06 | 1d4715c | Verified | [15-in-job-detail-modal-non-editable-informa](./quick/15-in-job-detail-modal-non-editable-informa/) |
 | 19 | Standardize all modal widths (form 600px, view 1000px) | 2026-03-06 | 1f27e49 | Verified | [16-standardize-all-modal-widths-form-600px-](./quick/16-standardize-all-modal-widths-form-600px-/) |
+| 20 | Restrict Start Work action to PIC only | 2026-03-06 | 9bbd4f0 | Complete | [17-restrict-start-work-action-to-pic-only](./quick/17-restrict-start-work-action-to-pic-only/) |
 
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed quick task 19: Standardize all modal widths
-Resume file: .planning/quick/16-standardize-all-modal-widths-form-600px-/16-SUMMARY.md
+Stopped at: Completed quick task 20: Restrict Start Work action to PIC only
+Resume file: .planning/quick/17-restrict-start-work-action-to-pic-only/17-SUMMARY.md
 Next: Ready for next task
