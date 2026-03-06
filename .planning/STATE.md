@@ -275,10 +275,11 @@ Recent decisions affecting current work:
 | 18 | Hide priority field in read-only job form | 2026-03-06 | 1d4715c | Verified | [15-in-job-detail-modal-non-editable-informa](./quick/15-in-job-detail-modal-non-editable-informa/) |
 | 19 | Standardize all modal widths (form 600px, view 1000px) | 2026-03-06 | 1f27e49 | Verified | [16-standardize-all-modal-widths-form-600px-](./quick/16-standardize-all-modal-widths-form-600px-/) |
 | 20 | Restrict Start Work action to PIC only | 2026-03-06 | 9bbd4f0 | Verified | [17-restrict-start-work-action-to-pic-only](./quick/17-restrict-start-work-action-to-pic-only/) |
+| 21 | Lock PIC field once job status moves past assigned | 2026-03-06 | ab78e9b | Complete | [18-lock-pic-field-once-job-status-moves-pas](./quick/18-lock-pic-field-once-job-status-moves-pas/) |
 
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed quick task 20: Restrict Start Work action to PIC only
-Resume file: .planning/quick/17-restrict-start-work-action-to-pic-only/17-SUMMARY.md
+Stopped at: Completed quick task 21: Lock PIC field once job status moves past assigned
+Resume file: .planning/quick/18-lock-pic-field-once-job-status-moves-pas/18-SUMMARY.md
 Next: Ready for next task
