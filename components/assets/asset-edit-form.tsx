@@ -235,230 +235,215 @@ export function AssetEditForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Asset Fields */}
-        <div className="rounded-lg border p-6 space-y-4">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Asset Details
-          </h2>
-          <Separator />
+        {/* Asset Details */}
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+          Asset Details
+        </h2>
+        <Separator />
 
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Name <span className="text-destructive">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="e.g. Air Conditioner Unit 1"
-                    maxLength={100}
-                    disabled={isSubmitting}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Name <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g. Air Conditioner Unit 1"
+                  maxLength={100}
+                  disabled={isSubmitting}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
-            <FormField
-              control={form.control}
-              name="category_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Category <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Combobox
-                      options={categoryOptions}
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      placeholder="Select category..."
-                      searchPlaceholder="Search categories..."
-                      emptyText="No categories found."
-                      disabled={isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <FormField
+          control={form.control}
+          name="category_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Category <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Combobox
+                  options={categoryOptions}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  placeholder="Select category..."
+                  searchPlaceholder="Search categories..."
+                  emptyText="No categories found."
+                  disabled={isSubmitting}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="location_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Location <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Combobox
-                      options={locationOptions}
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      placeholder="Select location..."
-                      searchPlaceholder="Search locations..."
-                      emptyText="No locations found."
-                      disabled={isSubmitting}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+        <FormField
+          control={form.control}
+          name="location_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Location <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Combobox
+                  options={locationOptions}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  placeholder="Select location..."
+                  searchPlaceholder="Search locations..."
+                  emptyText="No locations found."
+                  disabled={isSubmitting}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <div className="grid grid-cols-3 gap-4 max-md:grid-cols-1">
-            <FormField
-              control={form.control}
-              name="brand"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Brand</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g. Daikin"
-                      maxLength={100}
-                      disabled={isSubmitting}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <FormField
+          control={form.control}
+          name="brand"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Brand</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g. Daikin"
+                  maxLength={100}
+                  disabled={isSubmitting}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="model"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Model</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g. FTV20AXV14"
-                      maxLength={100}
-                      disabled={isSubmitting}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <FormField
+          control={form.control}
+          name="model"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Model</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g. FTV20AXV14"
+                  maxLength={100}
+                  disabled={isSubmitting}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="serial_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Serial Number</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g. SN123456789"
-                      maxLength={100}
-                      disabled={isSubmitting}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+        <FormField
+          control={form.control}
+          name="serial_number"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Serial Number</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g. SN123456789"
+                  maxLength={100}
+                  disabled={isSubmitting}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
-            <FormField
-              control={form.control}
-              name="acquisition_date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Acquisition Date <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input type="date" disabled={isSubmitting} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <FormField
+          control={form.control}
+          name="acquisition_date"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Acquisition Date <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input type="date" disabled={isSubmitting} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="warranty_expiry"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Warranty Expiry</FormLabel>
-                  <FormControl>
-                    <Input type="date" disabled={isSubmitting} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+        <FormField
+          control={form.control}
+          name="warranty_expiry"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Warranty Expiry</FormLabel>
+              <FormControl>
+                <Input type="date" disabled={isSubmitting} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Optional notes or description..."
-                    className="min-h-20 resize-y"
-                    maxLength={200}
-                    disabled={isSubmitting}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Optional notes or description..."
+                  className="min-h-20 resize-y"
+                  maxLength={200}
+                  disabled={isSubmitting}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Condition Photos */}
-        <div className="rounded-lg border p-6 space-y-4">
-          <div>
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              Condition Photos
-            </h2>
-            <p className="text-xs text-muted-foreground mt-1">
-              Up to 5 photos. JPEG, PNG, or WebP. Max 5MB each.
-            </p>
-          </div>
-          <Separator />
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+          Condition Photos
+        </h2>
+        <p className="text-xs text-muted-foreground">
+          Up to 5 photos. JPEG, PNG, or WebP. Max 5MB each.
+        </p>
+        <Separator />
 
-          <PhotoUpload
-            onChange={setNewPhotos}
-            maxPhotos={5}
-            existingPhotos={visibleExistingPhotos}
-            onRemoveExisting={handleExistingPhotoRemove}
-            disabled={isSubmitting}
-            showCount
-            enableAnnotation={false}
-          />
-        </div>
+        <PhotoUpload
+          onChange={setNewPhotos}
+          maxPhotos={5}
+          existingPhotos={visibleExistingPhotos}
+          onRemoveExisting={handleExistingPhotoRemove}
+          disabled={isSubmitting}
+          showCount
+          enableAnnotation={false}
+        />
 
-        {/* Invoices */}
-        <div className="rounded-lg border p-6 space-y-4">
-          <div>
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              Invoice Files
-            </h2>
-            <p className="text-xs text-muted-foreground mt-1">
-              Up to {MAX_INVOICES} files. PDF, JPEG, PNG, or WebP. Max 10MB each.
-            </p>
-          </div>
-          <Separator />
+        {/* Invoice Files */}
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+          Invoice Files
+        </h2>
+        <p className="text-xs text-muted-foreground">
+          Up to {MAX_INVOICES} files. PDF, JPEG, PNG, or WebP. Max 10MB each.
+        </p>
+        <Separator />
 
           <div className="space-y-2">
             {/* Existing invoices (removable) */}
@@ -545,16 +530,15 @@ export function AssetEditForm({
             )}
           </div>
 
-          <input
-            ref={invoiceInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp,application/pdf"
-            className="sr-only"
-            onChange={handleInvoiceFileChange}
-            multiple
-            disabled={isSubmitting}
-          />
-        </div>
+        <input
+          ref={invoiceInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,application/pdf"
+          className="sr-only"
+          onChange={handleInvoiceFileChange}
+          multiple
+          disabled={isSubmitting}
+        />
 
         {/* Feedback */}
         {feedback && (
