@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-06 - Completed quick task 21: Asset detail modal cleanup (remove duplication, collapse sections)
+Last activity: 2026-03-06 - Completed quick task 22: Move Save button to sticky bottom bar, remove info text
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -276,10 +276,11 @@ Recent decisions affecting current work:
 | 19 | Simplify new asset modal form layout | 2026-03-06 | 2603c0b | Verified | [16-simplify-new-asset-modal-form-layout-sim](./quick/16-simplify-new-asset-modal-form-layout-sim/) |
 | 20 | Unify asset detail page to match new asset form | 2026-03-06 | dc938bf | Verified | [17-unify-asset-detail-page-to-match-new-ass](./quick/17-unify-asset-detail-page-to-match-new-ass/) |
 | 21 | Asset detail modal cleanup — remove duplication, collapse sections | 2026-03-06 | 0bf54ff | Verified | [18-asset-detail-modal-is-overloaded-and-dup](./quick/18-asset-detail-modal-is-overloaded-and-dup/) |
+| 22 | Move Save button to sticky bottom bar, remove info text | 2026-03-06 | d052605 | Complete | [19-move-save-button-to-sticky-bottom-bar-an](./quick/19-move-save-button-to-sticky-bottom-bar-an/) |
 
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed quick task 20: Unify asset detail page layout
-Resume file: .planning/quick/17-unify-asset-detail-page-to-match-new-ass/17-SUMMARY.md
+Stopped at: Completed quick task 22: Move Save button to sticky bottom bar
+Resume file: .planning/quick/19-move-save-button-to-sticky-bottom-bar-an/19-SUMMARY.md
 Next: Ready for next task
