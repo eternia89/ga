@@ -775,7 +775,7 @@ export function JobModal({
   if (mode === 'create') {
     return (
       <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
-        <DialogContent className="max-w-[700px] max-h-[90vh] overflow-y-auto max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0">
+        <DialogContent className="max-w-[600px] max-h-[90vh] overflow-y-auto max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0">
           <DialogHeader>
             <DialogTitle>New Job</DialogTitle>
           </DialogHeader>
@@ -821,7 +821,7 @@ export function JobModal({
     <>
       <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
         <DialogContent
-          className="max-w-[800px] max-h-[90vh] flex flex-col p-0 gap-0 max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0"
+          className="max-w-[1000px] max-h-[90vh] flex flex-col p-0 gap-0 max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0"
           showCloseButton={true}
         >
           {/* Loading state */}
@@ -833,7 +833,7 @@ export function JobModal({
                 <Skeleton className="h-5 w-16" />
               </div>
               <Skeleton className="h-4 w-48" />
-              <div className="grid grid-cols-[1fr_350px] max-lg:grid-cols-1 gap-6 mt-4">
+              <div className="grid grid-cols-[600px_400px] max-lg:grid-cols-1 gap-6 mt-4">
                 <div className="space-y-3">
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-5/6" />
@@ -939,7 +939,7 @@ export function JobModal({
               </div>
 
               {/* Split layout: Form left, Timeline right */}
-              <div className="flex-1 min-h-0 grid grid-cols-[1fr_350px] max-lg:grid-cols-1">
+              <div className="flex-1 min-h-0 grid grid-cols-[600px_400px] max-lg:grid-cols-1">
                 {/* Left: Form (scrollable) */}
                 <div className="overflow-y-auto px-6 py-4 max-lg:border-b space-y-4">
                   <JobForm
