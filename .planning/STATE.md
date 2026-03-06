@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-05 - Completed quick task 15: Strip admin settings table rows to Edit-only, move deactivate/reactivate to FormDialog
+Last activity: 2026-03-06 - Completed quick task 16: Convert CTA create buttons to modal dialogs
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -270,10 +270,11 @@ Recent decisions affecting current work:
 | 13 | Unify table row view links to modal pattern | 2026-03-05 | 071b7c9 | Verified | [10-unify-table-row-view-links-to-modal-patt](./quick/10-unify-table-row-view-links-to-modal-patt/) |
 | 14 | Strip table row actions to View only, add modal action buttons | 2026-03-05 | 785dd14 | Verified | [11-table-rows-show-only-view-action-move-se](./quick/11-table-rows-show-only-view-action-move-se/) |
 | 15 | Strip admin settings table rows to Edit-only, move deactivate/reactivate to FormDialog | 2026-03-05 | d6b13af | Verified | [12-strip-admin-settings-table-rows-to-view-](./quick/12-strip-admin-settings-table-rows-to-view-/) |
+| 16 | Convert CTA create buttons to modal dialogs | 2026-03-06 | 4b5eabd | Complete | [13-convert-cta-create-buttons-to-modal-dial](./quick/13-convert-cta-create-buttons-to-modal-dial/) |
 
 ## Session Continuity
 
-Last session: 2026-03-05
-Stopped at: Completed quick task 15: strip admin settings table rows to Edit-only, move deactivate/reactivate to FormDialog
-Resume file: .planning/quick/12-strip-admin-settings-table-rows-to-view-/12-SUMMARY.md
+Last session: 2026-03-06
+Stopped at: Completed quick task 16: Convert CTA create buttons to modal dialogs
+Resume file: .planning/quick/13-convert-cta-create-buttons-to-modal-dial/13-SUMMARY.md
 Next: Ready for next task
