@@ -216,10 +216,10 @@ export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmi
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
-        {/* Section 1: Basic Info */}
+        {/* Section 1: Asset Details */}
         <div className="space-y-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Basic Information
+            Asset Details
           </h2>
           <Separator />
 
@@ -291,14 +291,6 @@ export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmi
               </FormItem>
             )}
           />
-        </div>
-
-        {/* Section 2: Identification */}
-        <div className="space-y-4">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Identification
-          </h2>
-          <Separator />
 
           <FormField
             control={form.control}
@@ -356,14 +348,6 @@ export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmi
               </FormItem>
             )}
           />
-        </div>
-
-        {/* Section 3: Dates */}
-        <div className="space-y-4">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Dates
-          </h2>
-          <Separator />
 
           <FormField
             control={form.control}
@@ -402,14 +386,6 @@ export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmi
               </FormItem>
             )}
           />
-        </div>
-
-        {/* Section 4: Description */}
-        <div className="space-y-4">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-            Description
-          </h2>
-          <Separator />
 
           <FormField
             control={form.control}
@@ -435,91 +411,89 @@ export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmi
           />
         </div>
 
-        {/* Section 5: Condition Photos (required) */}
+        {/* Section 2: Attachments */}
         <div className="space-y-4">
-          <div>
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+            Attachments
+          </h2>
+          <Separator />
+
+          {/* Condition Photos (required) */}
+          <div className="space-y-2">
+            <p className="text-sm font-medium">
               Condition Photos <span className="text-destructive">*</span>
-            </h2>
-            <p className="text-xs text-muted-foreground mt-1">
+            </p>
+            <p className="text-xs text-muted-foreground">
               At least 1 photo is required. Up to 5 photos. JPEG, PNG, or WebP. Max 5MB each.
             </p>
+
+            <PhotoUpload
+              onChange={setPhotoFiles}
+              maxPhotos={5}
+              required
+              showCount
+              disabled={isSubmitting}
+              enableAnnotation={false}
+            />
+
+            {photoError && (
+              <p className="text-sm text-destructive">{photoError}</p>
+            )}
           </div>
-          <Separator />
 
-          <PhotoUpload
-            onChange={setPhotoFiles}
-            maxPhotos={5}
-            required
-            showCount
-            disabled={isSubmitting}
-            enableAnnotation={false}
-          />
-
-          {photoError && (
-            <p className="text-sm text-destructive">{photoError}</p>
-          )}
-        </div>
-
-        {/* Section 6: Invoice Files (optional) */}
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              Invoice Files
-            </h2>
-            <p className="text-xs text-muted-foreground mt-1">
+          {/* Invoice Files (optional) */}
+          <div className="space-y-2 mt-4">
+            <p className="text-sm font-medium">Invoice Files</p>
+            <p className="text-xs text-muted-foreground">
               Optional. Up to {MAX_INVOICES} files. PDF, JPEG, PNG, or WebP. Max 10MB each.
             </p>
-          </div>
-          <Separator />
 
-          <div className="space-y-2">
-            {/* Invoice file list */}
-            {invoiceFiles.length > 0 && (
-              <div className="space-y-2">
-                {invoiceFiles.map((invoice, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <span className="text-sm truncate">{invoice.name}</span>
+            <div className="space-y-2">
+              {invoiceFiles.length > 0 && (
+                <div className="space-y-2">
+                  {invoiceFiles.map((invoice, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-sm truncate">{invoice.name}</span>
+                      </div>
+                      {!isSubmitting && (
+                        <button
+                          type="button"
+                          onClick={() => removeInvoice(index)}
+                          className="shrink-0 rounded p-0.5 text-muted-foreground hover:text-destructive"
+                          aria-label={`Remove ${invoice.name}`}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      )}
                     </div>
-                    {!isSubmitting && (
-                      <button
-                        type="button"
-                        onClick={() => removeInvoice(index)}
-                        className="shrink-0 rounded p-0.5 text-muted-foreground hover:text-destructive"
-                        aria-label={`Remove ${invoice.name}`}
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
 
-            {/* Add invoice button */}
-            {invoiceFiles.length < MAX_INVOICES && !isSubmitting && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => invoiceInputRef.current?.click()}
-              >
-                Add Invoice File
-              </Button>
-            )}
+              {invoiceFiles.length < MAX_INVOICES && !isSubmitting && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => invoiceInputRef.current?.click()}
+                >
+                  Add Invoice File
+                </Button>
+              )}
 
-            <p className="text-xs text-muted-foreground">
-              {invoiceFiles.length} / {MAX_INVOICES} files
-            </p>
+              <p className="text-xs text-muted-foreground">
+                {invoiceFiles.length} / {MAX_INVOICES} files
+              </p>
 
-            {invoiceError && (
-              <p className="text-sm text-destructive">{invoiceError}</p>
-            )}
+              {invoiceError && (
+                <p className="text-sm text-destructive">{invoiceError}</p>
+              )}
+            </div>
           </div>
 
           <input
