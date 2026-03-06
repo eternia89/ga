@@ -196,7 +196,6 @@ export function AssetTransferDialog({
               required
               showCount
               disabled={isSubmitting}
-              enableCompression={false}
               enableAnnotation={false}
             />
           </div>

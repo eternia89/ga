@@ -293,6 +293,11 @@ max_frequency = "5s"
 # enroll_enabled = true
 # verify_enabled = true
 
+[auth.external.google]
+enabled = true
+client_id = "205025509306-hkbjq1rvho4ulk5nhcnjuaptoue91m4i.apps.googleusercontent.com"
+secret = "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"
+
 # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`, `twitch`,
 # `twitter`, `slack`, `spotify`, `workos`, `zoom`.

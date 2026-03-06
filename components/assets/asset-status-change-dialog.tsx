@@ -187,7 +187,6 @@ export function AssetStatusChangeDialog({
               required
               showCount
               disabled={isSubmitting}
-              enableCompression={false}
               enableAnnotation={false}
             />
           </div>

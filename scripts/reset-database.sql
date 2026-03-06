@@ -28,7 +28,7 @@ DELETE FROM auth.users;
 -- 3. Seed company (code MUST be exactly 2 chars)
 INSERT INTO public.companies (id, name, code, address, phone, email)
 VALUES (
-  'a0000000-0000-0000-0000-000000000001',
+  'a0000000-0000-4000-8000-000000000001',
   'Jaknot Group',
   'JK',
   'Jl. Sudirman No. 1, Jakarta',
@@ -38,123 +38,136 @@ VALUES (
 
 -- 4. Seed divisions
 INSERT INTO public.divisions (id, company_id, name, code) VALUES
-  ('d0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'Head Office', 'HO'),
-  ('d0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', 'Operations', 'OP'),
-  ('d0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000001', 'Finance', 'FN');
+  ('d0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000001', 'Head Office', 'HO'),
+  ('d0000000-0000-4000-8000-000000000002', 'a0000000-0000-4000-8000-000000000001', 'Operations', 'OP'),
+  ('d0000000-0000-4000-8000-000000000003', 'a0000000-0000-4000-8000-000000000001', 'Finance', 'FN');
 
 -- 5. Seed locations
 INSERT INTO public.locations (id, company_id, name, address) VALUES
-  ('10000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'Jakarta HQ', 'Jl. Sudirman No. 1'),
-  ('10000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', 'Surabaya Office', 'Jl. Basuki Rahmat No. 10'),
-  ('10000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000001', 'Bandung Warehouse', 'Jl. Asia Afrika No. 5');
+  ('10000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000001', 'Jakarta HQ', 'Jl. Sudirman No. 1'),
+  ('10000000-0000-4000-8000-000000000002', 'a0000000-0000-4000-8000-000000000001', 'Surabaya Office', 'Jl. Basuki Rahmat No. 10'),
+  ('10000000-0000-4000-8000-000000000003', 'a0000000-0000-4000-8000-000000000001', 'Bandung Warehouse', 'Jl. Asia Afrika No. 5');
 
 -- 6. Seed categories (request type + asset type)
 INSERT INTO public.categories (id, company_id, name, type) VALUES
-  ('c0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'Electrical', 'request'),
-  ('c0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', 'Plumbing', 'request'),
-  ('c0000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000001', 'IT Equipment', 'request'),
-  ('c0000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000001', 'Furniture', 'asset'),
-  ('c0000000-0000-0000-0000-000000000005', 'a0000000-0000-0000-0000-000000000001', 'Vehicle', 'asset'),
-  ('c0000000-0000-0000-0000-000000000006', 'a0000000-0000-0000-0000-000000000001', 'Electronics', 'asset');
+  ('c0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000001', 'Electrical', 'request'),
+  ('c0000000-0000-4000-8000-000000000002', 'a0000000-0000-4000-8000-000000000001', 'Plumbing', 'request'),
+  ('c0000000-0000-4000-8000-000000000003', 'a0000000-0000-4000-8000-000000000001', 'IT Equipment', 'request'),
+  ('c0000000-0000-4000-8000-000000000004', 'a0000000-0000-4000-8000-000000000001', 'Furniture', 'asset'),
+  ('c0000000-0000-4000-8000-000000000005', 'a0000000-0000-4000-8000-000000000001', 'Vehicle', 'asset'),
+  ('c0000000-0000-4000-8000-000000000006', 'a0000000-0000-4000-8000-000000000001', 'Electronics', 'asset');
 
 -- 7. Create auth users (password: Password123!)
+-- Note: UUIDs must be valid v4 format (version=4 at pos 13, variant=8/9/a/b at pos 17)
+-- otherwise Zod's strict UUID validation rejects them in server actions.
+
 -- Admin
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token)
 VALUES (
-  '00000000-0000-0000-0000-000000000001',
+  'b0000000-0000-4000-8000-000000000001',
   '00000000-0000-0000-0000-000000000000',
   'admin@jaknot.com',
   crypt('Password123!', gen_salt('bf')),
-  now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Admin User"}',
-  'authenticated', 'authenticated', now(), now(), ''
+  now(),
+  '{"provider":"email","providers":["email"],"role":"admin","company_id":"a0000000-0000-4000-8000-000000000001","division_id":"d0000000-0000-4000-8000-000000000001"}',
+  '{"full_name":"Admin User"}',
+  'authenticated', 'authenticated', now(), now(), '', '', '', ''
 );
 INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
 VALUES (
-  '00000000-0000-0000-0000-000000000001',
-  '00000000-0000-0000-0000-000000000001',
-  jsonb_build_object('sub', '00000000-0000-0000-0000-000000000001', 'email', 'admin@jaknot.com'),
-  'email', '00000000-0000-0000-0000-000000000001', now(), now(), now()
+  'b0000000-0000-4000-8000-000000000001',
+  'b0000000-0000-4000-8000-000000000001',
+  jsonb_build_object('sub', 'b0000000-0000-4000-8000-000000000001', 'email', 'admin@jaknot.com'),
+  'email', 'b0000000-0000-4000-8000-000000000001', now(), now(), now()
 );
 
 -- GA Lead
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token)
 VALUES (
-  '00000000-0000-0000-0000-000000000002',
+  'b0000000-0000-4000-8000-000000000002',
   '00000000-0000-0000-0000-000000000000',
   'galead@jaknot.com',
   crypt('Password123!', gen_salt('bf')),
-  now(), '{"provider":"email","providers":["email"]}', '{"full_name":"GA Lead User"}',
-  'authenticated', 'authenticated', now(), now(), ''
+  now(),
+  '{"provider":"email","providers":["email"],"role":"ga_lead","company_id":"a0000000-0000-4000-8000-000000000001","division_id":"d0000000-0000-4000-8000-000000000001"}',
+  '{"full_name":"GA Lead User"}',
+  'authenticated', 'authenticated', now(), now(), '', '', '', ''
 );
 INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
 VALUES (
-  '00000000-0000-0000-0000-000000000002',
-  '00000000-0000-0000-0000-000000000002',
-  jsonb_build_object('sub', '00000000-0000-0000-0000-000000000002', 'email', 'galead@jaknot.com'),
-  'email', '00000000-0000-0000-0000-000000000002', now(), now(), now()
+  'b0000000-0000-4000-8000-000000000002',
+  'b0000000-0000-4000-8000-000000000002',
+  jsonb_build_object('sub', 'b0000000-0000-4000-8000-000000000002', 'email', 'galead@jaknot.com'),
+  'email', 'b0000000-0000-4000-8000-000000000002', now(), now(), now()
 );
 
 -- GA Staff
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token)
 VALUES (
-  '00000000-0000-0000-0000-000000000003',
+  'b0000000-0000-4000-8000-000000000003',
   '00000000-0000-0000-0000-000000000000',
   'gastaff@jaknot.com',
   crypt('Password123!', gen_salt('bf')),
-  now(), '{"provider":"email","providers":["email"]}', '{"full_name":"GA Staff User"}',
-  'authenticated', 'authenticated', now(), now(), ''
+  now(),
+  '{"provider":"email","providers":["email"],"role":"ga_staff","company_id":"a0000000-0000-4000-8000-000000000001","division_id":"d0000000-0000-4000-8000-000000000002"}',
+  '{"full_name":"GA Staff User"}',
+  'authenticated', 'authenticated', now(), now(), '', '', '', ''
 );
 INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
 VALUES (
-  '00000000-0000-0000-0000-000000000003',
-  '00000000-0000-0000-0000-000000000003',
-  jsonb_build_object('sub', '00000000-0000-0000-0000-000000000003', 'email', 'gastaff@jaknot.com'),
-  'email', '00000000-0000-0000-0000-000000000003', now(), now(), now()
+  'b0000000-0000-4000-8000-000000000003',
+  'b0000000-0000-4000-8000-000000000003',
+  jsonb_build_object('sub', 'b0000000-0000-4000-8000-000000000003', 'email', 'gastaff@jaknot.com'),
+  'email', 'b0000000-0000-4000-8000-000000000003', now(), now(), now()
 );
 
 -- Finance Approver
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token)
 VALUES (
-  '00000000-0000-0000-0000-000000000004',
+  'b0000000-0000-4000-8000-000000000004',
   '00000000-0000-0000-0000-000000000000',
   'finance@jaknot.com',
   crypt('Password123!', gen_salt('bf')),
-  now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Finance Approver"}',
-  'authenticated', 'authenticated', now(), now(), ''
+  now(),
+  '{"provider":"email","providers":["email"],"role":"finance_approver","company_id":"a0000000-0000-4000-8000-000000000001","division_id":"d0000000-0000-4000-8000-000000000003"}',
+  '{"full_name":"Finance Approver"}',
+  'authenticated', 'authenticated', now(), now(), '', '', '', ''
 );
 INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
 VALUES (
-  '00000000-0000-0000-0000-000000000004',
-  '00000000-0000-0000-0000-000000000004',
-  jsonb_build_object('sub', '00000000-0000-0000-0000-000000000004', 'email', 'finance@jaknot.com'),
-  'email', '00000000-0000-0000-0000-000000000004', now(), now(), now()
+  'b0000000-0000-4000-8000-000000000004',
+  'b0000000-0000-4000-8000-000000000004',
+  jsonb_build_object('sub', 'b0000000-0000-4000-8000-000000000004', 'email', 'finance@jaknot.com'),
+  'email', 'b0000000-0000-4000-8000-000000000004', now(), now(), now()
 );
 
 -- General User
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token)
 VALUES (
-  '00000000-0000-0000-0000-000000000005',
+  'b0000000-0000-4000-8000-000000000005',
   '00000000-0000-0000-0000-000000000000',
   'user@jaknot.com',
   crypt('Password123!', gen_salt('bf')),
-  now(), '{"provider":"email","providers":["email"]}', '{"full_name":"General User"}',
-  'authenticated', 'authenticated', now(), now(), ''
+  now(),
+  '{"provider":"email","providers":["email"],"role":"general_user","company_id":"a0000000-0000-4000-8000-000000000001","division_id":"d0000000-0000-4000-8000-000000000002"}',
+  '{"full_name":"General User"}',
+  'authenticated', 'authenticated', now(), now(), '', '', '', ''
 );
 INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
 VALUES (
-  '00000000-0000-0000-0000-000000000005',
-  '00000000-0000-0000-0000-000000000005',
-  jsonb_build_object('sub', '00000000-0000-0000-0000-000000000005', 'email', 'user@jaknot.com'),
-  'email', '00000000-0000-0000-0000-000000000005', now(), now(), now()
+  'b0000000-0000-4000-8000-000000000005',
+  'b0000000-0000-4000-8000-000000000005',
+  jsonb_build_object('sub', 'b0000000-0000-4000-8000-000000000005', 'email', 'user@jaknot.com'),
+  'email', 'b0000000-0000-4000-8000-000000000005', now(), now(), now()
 );
 
 -- 8. Seed user_profiles (linked to auth users)
 INSERT INTO public.user_profiles (id, company_id, division_id, full_name, email, role) VALUES
-  ('00000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'd0000000-0000-0000-0000-000000000001', 'Admin User',       'admin@jaknot.com',   'admin'),
-  ('00000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', 'd0000000-0000-0000-0000-000000000001', 'GA Lead User',      'galead@jaknot.com',  'ga_lead'),
-  ('00000000-0000-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000001', 'd0000000-0000-0000-0000-000000000002', 'GA Staff User',     'gastaff@jaknot.com', 'ga_staff'),
-  ('00000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000001', 'd0000000-0000-0000-0000-000000000003', 'Finance Approver',  'finance@jaknot.com', 'finance_approver'),
-  ('00000000-0000-0000-0000-000000000005', 'a0000000-0000-0000-0000-000000000001', 'd0000000-0000-0000-0000-000000000002', 'General User',      'user@jaknot.com',    'general_user');
+  ('b0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000001', 'd0000000-0000-4000-8000-000000000001', 'Admin User',       'admin@jaknot.com',   'admin'),
+  ('b0000000-0000-4000-8000-000000000002', 'a0000000-0000-4000-8000-000000000001', 'd0000000-0000-4000-8000-000000000001', 'GA Lead User',      'galead@jaknot.com',  'ga_lead'),
+  ('b0000000-0000-4000-8000-000000000003', 'a0000000-0000-4000-8000-000000000001', 'd0000000-0000-4000-8000-000000000002', 'GA Staff User',     'gastaff@jaknot.com', 'ga_staff'),
+  ('b0000000-0000-4000-8000-000000000004', 'a0000000-0000-4000-8000-000000000001', 'd0000000-0000-4000-8000-000000000003', 'Finance Approver',  'finance@jaknot.com', 'finance_approver'),
+  ('b0000000-0000-4000-8000-000000000005', 'a0000000-0000-4000-8000-000000000001', 'd0000000-0000-4000-8000-000000000002', 'General User',      'user@jaknot.com',    'general_user');
 
 -- Done! All accounts use password: Password123!
 --

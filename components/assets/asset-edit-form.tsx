@@ -444,7 +444,6 @@ export function AssetEditForm({
             onRemoveExisting={handleExistingPhotoRemove}
             disabled={isSubmitting}
             showCount
-            enableCompression={false}
             enableAnnotation={false}
           />
         </div>
