@@ -82,7 +82,7 @@ export function JobDetailActions({
   const isPIC = job.assigned_to === currentUserId;
 
   // Determine available actions per role + status
-  const canStartWork = (isGaLeadOrAdmin || isPIC) && job.status === 'assigned';
+  const canStartWork = isPIC && job.status === 'assigned';
   const canApproveReject =
     isFinanceApproverOrAdmin && job.status === 'pending_approval';
   const canApproveCompletion =

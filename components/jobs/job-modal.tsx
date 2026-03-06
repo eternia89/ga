@@ -573,7 +573,7 @@ export function JobModal({
   const isPIC = job?.assigned_to === currentUserId;
 
   const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job?.status ?? '');
-  const canStartWork = (isGaLeadOrAdmin || isPIC) && job?.status === 'assigned';
+  const canStartWork = isPIC && job?.status === 'assigned';
   const canApproveReject = isFinanceApproverOrAdmin && job?.status === 'pending_approval';
   const canApproveCompletion = isFinanceApproverOrAdmin && job?.status === 'pending_completion_approval';
   const hasPendingBudget = (job?.estimated_cost ?? 0) > 0 && !job?.approved_at;
