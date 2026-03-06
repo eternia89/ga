@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-06 - Completed quick task 16: Convert CTA create buttons to modal dialogs
+Last activity: 2026-03-06 - Completed quick task 17: Unify job create and view modals into single JobModal
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -271,10 +271,11 @@ Recent decisions affecting current work:
 | 14 | Strip table row actions to View only, add modal action buttons | 2026-03-05 | 785dd14 | Verified | [11-table-rows-show-only-view-action-move-se](./quick/11-table-rows-show-only-view-action-move-se/) |
 | 15 | Strip admin settings table rows to Edit-only, move deactivate/reactivate to FormDialog | 2026-03-05 | d6b13af | Verified | [12-strip-admin-settings-table-rows-to-view-](./quick/12-strip-admin-settings-table-rows-to-view-/) |
 | 16 | Convert CTA create buttons to modal dialogs | 2026-03-06 | 4b5eabd | Verified | [13-convert-cta-create-buttons-to-modal-dial](./quick/13-convert-cta-create-buttons-to-modal-dial/) |
+| 17 | Unify job create and view modals into single JobModal | 2026-03-06 | 8d37a63 | Complete | [14-new-job-and-view-job-modal-should-be-sim](./quick/14-new-job-and-view-job-modal-should-be-sim/) |
 
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed quick task 16: Convert CTA create buttons to modal dialogs
-Resume file: .planning/quick/13-convert-cta-create-buttons-to-modal-dial/13-SUMMARY.md
+Stopped at: Completed quick task 17: Unify job create and view modals
+Resume file: .planning/quick/14-new-job-and-view-job-modal-should-be-sim/14-SUMMARY.md
 Next: Ready for next task
