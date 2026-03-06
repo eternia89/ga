@@ -274,7 +274,7 @@ Recent decisions affecting current work:
 | 17 | Find and fix UI/UX inconsistencies across all pages | 2026-03-06 | 72e0ed1 | Verified | [14-find-any-inconsistencies-in-ui-and-ux-im](./quick/14-find-any-inconsistencies-in-ui-and-ux-im/) |
 | 18 | Table action buttons blue link styling | 2026-03-06 | d733641 | Verified | [15-table-action-should-have-the-same-size-a](./quick/15-table-action-should-have-the-same-size-a/) |
 | 19 | Simplify new asset modal form layout | 2026-03-06 | 2603c0b | Verified | [16-simplify-new-asset-modal-form-layout-sim](./quick/16-simplify-new-asset-modal-form-layout-sim/) |
-| 20 | Unify asset detail page to match new asset form | 2026-03-06 | dc938bf | Complete | [17-unify-asset-detail-page-to-match-new-ass](./quick/17-unify-asset-detail-page-to-match-new-ass/) |
+| 20 | Unify asset detail page to match new asset form | 2026-03-06 | dc938bf | Verified | [17-unify-asset-detail-page-to-match-new-ass](./quick/17-unify-asset-detail-page-to-match-new-ass/) |
 
 ## Session Continuity
 
