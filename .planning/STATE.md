@@ -277,7 +277,7 @@ Recent decisions affecting current work:
 | 20 | Unify asset detail page to match new asset form | 2026-03-06 | dc938bf | Verified | [17-unify-asset-detail-page-to-match-new-ass](./quick/17-unify-asset-detail-page-to-match-new-ass/) |
 | 21 | Asset detail modal cleanup — remove duplication, collapse sections | 2026-03-06 | 0bf54ff | Verified | [18-asset-detail-modal-is-overloaded-and-dup](./quick/18-asset-detail-modal-is-overloaded-and-dup/) |
 | 22 | Move Save button to sticky bottom bar, remove info text | 2026-03-06 | d052605 | Verified | [19-move-save-button-to-sticky-bottom-bar-an](./quick/19-move-save-button-to-sticky-bottom-bar-an/) |
-| 23 | Audit all flows for deadlocks (analysis only) | 2026-03-06 | 92af395 | Complete | [20-test-all-flow-of-request-jobs-approvals-](./quick/20-test-all-flow-of-request-jobs-approvals-/) |
+| 23 | Audit all flows for deadlocks (analysis only) | 2026-03-06 | 92af395 | Verified | [20-test-all-flow-of-request-jobs-approvals-](./quick/20-test-all-flow-of-request-jobs-approvals-/) |
 
 ## Session Continuity
 
