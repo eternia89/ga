@@ -156,7 +156,7 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2 text-xs"
+            className="h-7 px-2 text-sm text-blue-600 hover:underline"
             onClick={(e) => {
               e.stopPropagation();
               meta?.onView?.(row.original);
