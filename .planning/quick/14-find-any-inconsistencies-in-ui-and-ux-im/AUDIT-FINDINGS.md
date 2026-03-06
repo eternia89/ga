@@ -17,8 +17,8 @@ Total issues: 17
 
 | # | File | Issue | Severity | Fix | Status |
 |---|------|-------|----------|-----|--------|
-| A1 | `app/(dashboard)/page.tsx` | Wrapper uses `space-y-6` without `py-6`. h1 uses `text-2xl font-bold text-foreground` instead of `text-2xl font-bold tracking-tight` | major | Add `py-6` to wrapper, replace `text-foreground` with `tracking-tight` on h1 | PENDING |
-| A2 | `app/(dashboard)/admin/settings/page.tsx` | Wrapper uses `space-y-4` without `py-6`. Standard is `space-y-6 py-6` | major | Change to `space-y-6 py-6` | PENDING |
+| A1 | `app/(dashboard)/page.tsx` | Wrapper uses `space-y-6` without `py-6`. h1 uses `text-2xl font-bold text-foreground` instead of `text-2xl font-bold tracking-tight` | major | Add `py-6` to wrapper, replace `text-foreground` with `tracking-tight` on h1 | FIXED |
+| A2 | `app/(dashboard)/admin/settings/page.tsx` | Wrapper uses `space-y-4` without `py-6`. Standard is `space-y-6 py-6` | major | Change to `space-y-6 py-6` | FIXED |
 
 ### Pages with correct pattern (confirmed):
 - `requests/page.tsx` -- space-y-6 py-6, text-2xl font-bold tracking-tight
@@ -47,21 +47,21 @@ Routes missing `loading.tsx` (confirmed by filesystem check):
 
 | # | Route | Type | Skeleton to use | Status |
 |---|-------|------|-----------------|--------|
-| B1 | `jobs/` | list | ListSkeleton | PENDING |
-| B2 | `jobs/[id]/` | detail | DetailSkeleton | PENDING |
-| B3 | `jobs/new/` | form | FormSkeleton | PENDING |
-| B4 | `inventory/` | list | ListSkeleton | PENDING |
-| B5 | `inventory/[id]/` | detail | DetailSkeleton | PENDING |
-| B6 | `inventory/new/` | form | FormSkeleton | PENDING |
-| B7 | `maintenance/` | list | ListSkeleton | PENDING |
-| B8 | `maintenance/templates/` | list | ListSkeleton | PENDING |
-| B9 | `maintenance/templates/[id]/` | detail | DetailSkeleton | PENDING |
-| B10 | `maintenance/templates/new/` | form | FormSkeleton | PENDING |
-| B11 | `maintenance/schedules/[id]/` | detail | DetailSkeleton | PENDING |
-| B12 | `maintenance/schedules/new/` | form | FormSkeleton | PENDING |
-| B13 | `approvals/` | list | ListSkeleton | PENDING |
-| B14 | `notifications/` | list | ListSkeleton | PENDING |
-| B15 | `admin/company-settings/` | form | FormSkeleton | PENDING |
+| B1 | `jobs/` | list | ListSkeleton | FIXED |
+| B2 | `jobs/[id]/` | detail | DetailSkeleton | FIXED |
+| B3 | `jobs/new/` | form | FormSkeleton | FIXED |
+| B4 | `inventory/` | list | ListSkeleton | FIXED |
+| B5 | `inventory/[id]/` | detail | DetailSkeleton | FIXED |
+| B6 | `inventory/new/` | form | FormSkeleton | FIXED |
+| B7 | `maintenance/` | list | ListSkeleton | FIXED |
+| B8 | `maintenance/templates/` | list | ListSkeleton | FIXED |
+| B9 | `maintenance/templates/[id]/` | detail | DetailSkeleton | FIXED |
+| B10 | `maintenance/templates/new/` | form | FormSkeleton | FIXED |
+| B11 | `maintenance/schedules/[id]/` | detail | DetailSkeleton | FIXED |
+| B12 | `maintenance/schedules/new/` | form | FormSkeleton | FIXED |
+| B13 | `approvals/` | list | ListSkeleton | FIXED |
+| B14 | `notifications/` | list | ListSkeleton | FIXED |
+| B15 | `admin/company-settings/` | form | FormSkeleton | FIXED |
 
 ### Routes with existing loading.tsx (confirmed):
 - `(dashboard)/` -- DashboardSkeleton

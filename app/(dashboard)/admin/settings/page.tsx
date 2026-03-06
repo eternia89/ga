@@ -53,7 +53,7 @@ export default async function SettingsPage({
   const defaultCompanyId = adminProfile?.company_id || companies?.[0]?.id || '';
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 py-6">
       <SetBreadcrumbs items={[{ label: 'Dashboard', href: '/' }, { label: 'Settings' }]} />
 
       <SettingsContent

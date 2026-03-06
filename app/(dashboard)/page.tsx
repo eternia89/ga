@@ -122,11 +122,11 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     : [[], [], [], [], [], [], { byStatus: [], byCategory: [] }];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 py-6">
       {/* Welcome header */}
       <div className="flex items-start justify-between gap-4 max-md:flex-col">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold tracking-tight">
             {greeting}, {profile.full_name.split(' ')[0]}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
