@@ -77,6 +77,14 @@ export function AssetDetailInfo({
       <div className="space-y-6">
         {/* Asset fields */}
         <dl className="space-y-3">
+          <div>
+            <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</dt>
+            <dd className="text-sm mt-0.5">{asset.name}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Category</dt>
+            <dd className="text-sm mt-0.5">{asset.category?.name ?? <span className="text-muted-foreground">—</span>}</dd>
+          </div>
           {asset.brand && (
             <div>
               <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Brand</dt>

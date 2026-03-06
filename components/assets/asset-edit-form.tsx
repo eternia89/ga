@@ -7,6 +7,7 @@ import { X, FileText } from 'lucide-react';
 import { assetEditSchema, AssetEditFormData } from '@/lib/validations/asset-schema';
 import type { InventoryItemWithRelations } from '@/lib/types/database';
 import { updateAsset, deleteAssetPhotos } from '@/app/actions/asset-actions';
+import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { PhotoUpload } from '@/components/media/photo-upload';
 import {
@@ -74,6 +75,8 @@ export function AssetEditForm({
   const [visibleExistingInvoices, setVisibleExistingInvoices] = useState(existingInvoices);
   const [invoiceError, setInvoiceError] = useState<string | null>(null);
   const invoiceInputRef = useRef<HTMLInputElement>(null);
+
+  const categoryOptions = categories.map((c) => ({ label: c.name, value: c.id }));
 
   const form = useForm<AssetEditFormData>({
     resolver: zodResolver(assetEditSchema),
@@ -237,6 +240,51 @@ export function AssetEditForm({
             Asset Details
           </h2>
           <Separator />
+
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Name <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="e.g. Air Conditioner Unit 1"
+                  maxLength={100}
+                  disabled={isSubmitting}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="category_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Category <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Combobox
+                  options={categoryOptions}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  placeholder="Select category..."
+                  searchPlaceholder="Search categories..."
+                  emptyText="No categories found."
+                  disabled={isSubmitting}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
