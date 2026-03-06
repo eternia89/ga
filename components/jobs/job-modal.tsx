@@ -133,6 +133,12 @@ export function JobModal({
   const [viewUsers, setViewUsers] = useState<{ id: string; name: string }[]>([]);
   const [viewEligibleRequests, setViewEligibleRequests] = useState<EligibleRequest[]>([]);
   const [viewRequestJobLinks, setViewRequestJobLinks] = useState<Record<string, string>>({});
+  const [viewLinkedRequestDetails, setViewLinkedRequestDetails] = useState<{
+    id: string; display_id: string; title: string; status: string;
+    description: string | null; priority: string | null; created_at: string;
+    location?: { name: string } | null; category?: { name: string } | null;
+    requester?: { full_name: string } | null; assigned_user?: { full_name: string } | null;
+  }[]>([]);
 
   // UI states
   const [loading, setLoading] = useState(false);
@@ -208,7 +214,7 @@ export function JobModal({
           pic:user_profiles!assigned_to(full_name),
           created_by_user:user_profiles!created_by(full_name),
           maintenance_schedule:maintenance_schedules(id, next_due_at, interval_type, interval_days),
-          job_requests(request:requests(id, display_id, title, description, status, priority, created_at, location:locations(name), category:categories(name), requester:user_profiles!created_by(full_name)))`
+          job_requests(request:requests(id, display_id, title, status))`
         )
         .eq('id', id)
         .is('deleted_at', null)
@@ -306,6 +312,18 @@ export function JobModal({
           }
           setViewRequestJobLinks(links);
         }
+      }
+
+      // Fetch full details for linked requests (for read-only display)
+      const linkedReqIds = (fetchedJob.job_requests ?? []).map((jr: { request: { id: string } }) => jr.request.id);
+      if (linkedReqIds.length > 0) {
+        const { data: fullRequests } = await supabase
+          .from('requests')
+          .select('id, display_id, title, status, description, priority, created_at, location:locations(name), category:categories(name), requester:user_profiles!created_by(full_name)')
+          .in('id', linkedReqIds);
+        setViewLinkedRequestDetails((fullRequests ?? []) as unknown as typeof viewLinkedRequestDetails);
+      } else {
+        setViewLinkedRequestDetails([]);
       }
 
       // Build GPS lookup
@@ -525,6 +543,7 @@ export function JobModal({
       setViewUsers([]);
       setViewEligibleRequests([]);
       setViewRequestJobLinks({});
+      setViewLinkedRequestDetails([]);
       setError(null);
       setFeedback(null);
     }
@@ -796,7 +815,7 @@ export function JobModal({
     linked_request_ids: (job.job_requests ?? []).map((jr) => jr.request.id),
   } : undefined;
 
-  const linkedRequestDetails = job?.job_requests?.map((jr) => jr.request) ?? [];
+  const linkedRequestDetails = viewLinkedRequestDetails;
 
   return (
     <>
