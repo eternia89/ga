@@ -273,7 +273,7 @@ Recent decisions affecting current work:
 | 16 | Convert CTA create buttons to modal dialogs | 2026-03-06 | 4b5eabd | Verified | [13-convert-cta-create-buttons-to-modal-dial](./quick/13-convert-cta-create-buttons-to-modal-dial/) |
 | 17 | Unify job create and view modals into single JobModal | 2026-03-06 | 8c76703 | Verified | [14-new-job-and-view-job-modal-should-be-sim](./quick/14-new-job-and-view-job-modal-should-be-sim/) |
 | 18 | Hide priority field in read-only job form | 2026-03-06 | 1d4715c | Verified | [15-in-job-detail-modal-non-editable-informa](./quick/15-in-job-detail-modal-non-editable-informa/) |
-| 19 | Standardize all modal widths (form 600px, view 1000px) | 2026-03-06 | 1f27e49 | Complete | [16-standardize-all-modal-widths-form-600px-](./quick/16-standardize-all-modal-widths-form-600px-/) |
+| 19 | Standardize all modal widths (form 600px, view 1000px) | 2026-03-06 | 1f27e49 | Verified | [16-standardize-all-modal-widths-form-600px-](./quick/16-standardize-all-modal-widths-form-600px-/) |
 
 ## Session Continuity
 
