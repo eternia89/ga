@@ -26,7 +26,14 @@
       "Bash([ -f \"/Users/melfice/code/ga/.planning/phases/01-database-schema-supabase-setup/01-01-SUMMARY.md\" ])",
       "Bash([ -f \"/Users/melfice/code/ga/.planning/phases/01-database-schema-supabase-setup/01-02-SUMMARY.md\" ])",
       "Bash(npx supabase db push:*)",
-      "Bash(npm run build:*)",
+      "Bash(npm run *)",
+      "Bash(git commit *)",
+      "Bash(git * main)",
+      "Bash(* --version)",
+      "Bash(* --help *)",
+      "Bash(* --version *)",
+      "Bash(* --help *)",
+      "Bash(* --version *)",
       "mcp__context7__resolve-library-id",
       "mcp__context7__query-docs",
       "Bash(npx tsc:*)",
@@ -55,7 +62,13 @@
       "Bash(xargs:*)",
       "Bash(test:*)",
       "Bash(git check-ignore:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(supabase db:*)",
+      "Bash(PGHOST=\"aws-1-ap-northeast-1.pooler.supabase.com\" PGPORT=\"5432\" PGUSER=\"cli_login_postgres.cqlwysgofhaudiyzveww\" PGPASSWORD=\"ZpHsTPVIFZMshxBmYxgdxPCZJcWNdIcl\" PGDATABASE=\"postgres\" psql:*)",
+      "Bash(brew list:*)",
+      "Bash(PGHOST=\"aws-1-ap-northeast-1.pooler.supabase.com\" PGPORT=\"5432\" PGUSER=\"cli_login_postgres.cqlwysgofhaudiyzveww\" PGPASSWORD=\"ZpHsTPVIFZMshxBmYxgdxPCZJcWNdIcl\" PGDATABASE=\"postgres\" npx:*)",
+      "Bash(docker ps:*)",
+      "Bash(lsof:*)"
     ]
   }
 }
