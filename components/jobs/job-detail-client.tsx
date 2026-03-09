@@ -21,6 +21,7 @@ interface JobDetailClientProps {
   timelineEvents: JobTimelineEvent[];
   comments: JobComment[];
   commentPhotos: PhotoItem[];
+  photoUrls: { id: string; url: string; fileName: string }[];
   currentUserId: string;
   currentUserRole: string;
   users: { id: string; name: string }[];
@@ -35,6 +36,7 @@ export function JobDetailClient({
   timelineEvents,
   comments,
   commentPhotos,
+  photoUrls,
   currentUserId,
   currentUserRole,
   users,
@@ -70,6 +72,7 @@ export function JobDetailClient({
           currentUserId={currentUserId}
           currentUserRole={currentUserRole}
           approvedByName={approvedByName}
+          photoUrls={photoUrls}
           approvalRejectedByName={approvalRejectedByName}
           onActionSuccess={handleActionSuccess}
           categories={categories}
