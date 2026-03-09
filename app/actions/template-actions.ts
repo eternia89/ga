@@ -22,26 +22,29 @@ export const createTemplate = authActionClient
 
     // Validate that category_id references an 'asset' type category
     // (maintenance templates are for assets, not requests)
-    const { data: category } = await supabase
-      .from('categories')
-      .select('id, type')
-      .eq('id', parsedInput.category_id)
-      .is('deleted_at', null)
-      .single();
+    // Skip validation when category_id is null (general template)
+    if (parsedInput.category_id) {
+      const { data: category } = await supabase
+        .from('categories')
+        .select('id, type')
+        .eq('id', parsedInput.category_id)
+        .is('deleted_at', null)
+        .single();
 
-    if (!category) {
-      throw new Error('Category not found');
-    }
+      if (!category) {
+        throw new Error('Category not found');
+      }
 
-    if (category.type !== 'asset') {
-      throw new Error('Maintenance templates can only be linked to asset categories');
+      if (category.type !== 'asset') {
+        throw new Error('Maintenance templates can only be linked to asset categories');
+      }
     }
 
     const { data, error } = await supabase
       .from('maintenance_templates')
       .insert({
         company_id:  profile.company_id,
-        category_id: parsedInput.category_id,
+        category_id: parsedInput.category_id ?? null,
         name:        parsedInput.name,
         description: parsedInput.description ?? null,
         checklist:   parsedInput.checklist,
@@ -89,19 +92,22 @@ export const updateTemplate = authActionClient
     }
 
     // Validate that new category_id references an 'asset' type category
-    const { data: category } = await supabase
-      .from('categories')
-      .select('id, type')
-      .eq('id', parsedInput.data.category_id)
-      .is('deleted_at', null)
-      .single();
+    // Skip validation when category_id is null (general template)
+    if (parsedInput.data.category_id) {
+      const { data: category } = await supabase
+        .from('categories')
+        .select('id, type')
+        .eq('id', parsedInput.data.category_id)
+        .is('deleted_at', null)
+        .single();
 
-    if (!category) {
-      throw new Error('Category not found');
-    }
+      if (!category) {
+        throw new Error('Category not found');
+      }
 
-    if (category.type !== 'asset') {
-      throw new Error('Maintenance templates can only be linked to asset categories');
+      if (category.type !== 'asset') {
+        throw new Error('Maintenance templates can only be linked to asset categories');
+      }
     }
 
     const { error } = await supabase
@@ -109,7 +115,7 @@ export const updateTemplate = authActionClient
       .update({
         name:        parsedInput.data.name,
         description: parsedInput.data.description ?? null,
-        category_id: parsedInput.data.category_id,
+        category_id: parsedInput.data.category_id ?? null,
         checklist:   parsedInput.data.checklist,
       })
       .eq('id', parsedInput.id);

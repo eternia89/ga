@@ -124,12 +124,12 @@ export function TemplateCreateForm({ categories, onSuccess }: TemplateCreateForm
             render={({ field }) => (
               <FormItem className="max-w-xs">
                 <FormLabel>
-                  Category <span className="text-destructive">*</span>
+                  Category
                 </FormLabel>
                 <FormControl>
                   <Combobox
-                    options={categoryOptions}
-                    value={field.value}
+                    options={[{ label: 'None (General)', value: '' }, ...categoryOptions]}
+                    value={field.value ?? ''}
                     onValueChange={field.onChange}
                     placeholder="Select asset category..."
                     searchPlaceholder="Search categories..."

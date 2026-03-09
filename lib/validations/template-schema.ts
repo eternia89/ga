@@ -48,7 +48,7 @@ export const checklistItemSchema = z.discriminatedUnion('type', [
 export const templateCreateSchema = z.object({
   name:        z.string().min(1, 'Name is required').max(100),
   description: z.string().max(200).optional(),
-  category_id: z.string().uuid({ message: 'Category is required' }),
+  category_id: z.string().uuid().or(z.literal('')).optional().nullable().transform(val => val || null),
   checklist:   z.array(checklistItemSchema).min(1, 'At least one checklist item required'),
 });
 
@@ -60,5 +60,5 @@ export const templateEditSchema = templateCreateSchema;
 // ============================================================================
 
 export type ChecklistItemFormData = z.infer<typeof checklistItemSchema>;
-export type TemplateCreateFormData = z.infer<typeof templateCreateSchema>;
-export type TemplateEditFormData = z.infer<typeof templateEditSchema>;
+export type TemplateCreateFormData = z.input<typeof templateCreateSchema>;
+export type TemplateEditFormData = z.input<typeof templateEditSchema>;

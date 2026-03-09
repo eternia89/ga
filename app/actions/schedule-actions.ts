@@ -55,7 +55,8 @@ export const createSchedule = authActionClient
     }
 
     // Category matching validation (Pitfall 7): template category must match asset category
-    if (template.category_id !== asset.category_id) {
+    // General templates (null category_id) can pair with any asset
+    if (template.category_id && template.category_id !== asset.category_id) {
       throw new Error(
         'Template and asset must have the same category. Select a template that matches the asset category.'
       );

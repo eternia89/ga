@@ -217,12 +217,12 @@ export function TemplateDetail({ template, categories, userRole }: TemplateDetai
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Category <span className="text-destructive">*</span>
+                      Category
                     </FormLabel>
                     <FormControl>
                       <Combobox
-                        options={categoryOptions}
-                        value={field.value}
+                        options={[{ label: 'None (General)', value: '' }, ...categoryOptions]}
+                        value={field.value ?? ''}
                         onValueChange={field.onChange}
                         placeholder="Select asset category..."
                         searchPlaceholder="Search categories..."
