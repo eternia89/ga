@@ -333,11 +333,6 @@ export const updateJobStatus = authActionClient
       throw new Error(`Cannot transition from '${job.status}' to '${parsedInput.status}'`);
     }
 
-    // Gate: cannot start work unless budget is approved
-    if (parsedInput.status === 'in_progress' && !job.approved_at) {
-      throw new Error('Cannot start work — budget approval is required first');
-    }
-
     const now = new Date().toISOString();
 
     let actualStatus: string = parsedInput.status;
@@ -519,8 +514,8 @@ export const requestApproval = authActionClient
       throw new Error('Only the assigned PIC can request approval');
     }
 
-    if (job.status !== 'assigned') {
-      throw new Error('Job must be in Assigned status to request approval');
+    if (job.status !== 'in_progress') {
+      throw new Error('Job must be In Progress to request approval');
     }
 
     const now = new Date().toISOString();
@@ -565,7 +560,7 @@ export const requestApproval = authActionClient
       .insert({
         job_id: parsedInput.job_id,
         company_id: job.company_id,
-        from_status: 'assigned',
+        from_status: 'in_progress',
         to_status: 'pending_approval',
         changed_by: profile.id,
       });
