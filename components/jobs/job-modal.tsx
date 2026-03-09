@@ -12,7 +12,7 @@ import { JobCommentForm } from './job-comment-form';
 import { PMChecklist } from '@/components/maintenance/pm-checklist';
 import { JobStatusBadge } from './job-status-badge';
 import { PriorityBadge } from '@/components/priority-badge';
-import { useGeolocation } from '@/hooks/use-geolocation';
+import { useGeolocation, useGeolocationPermission } from '@/hooks/use-geolocation';
 import {
   updateJobStatus,
   cancelJob,
@@ -59,6 +59,7 @@ import {
   Ban,
   ThumbsUp,
   ThumbsDown,
+  MapPin,
 } from 'lucide-react';
 
 // ============================================================================
@@ -167,6 +168,8 @@ export function JobModal({
 
   // GPS hook
   const { capturing: capturingGps, capturePosition } = useGeolocation();
+  const { permissionState } = useGeolocationPermission();
+  const locationActivated = permissionState === 'granted';
 
   // Timeline scroll ref
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -596,6 +599,19 @@ export function JobModal({
   // ========================================================================
   // Action handlers (view mode)
   // ========================================================================
+
+  const handleActivateLocation = async () => {
+    setFeedback(null);
+    try {
+      await capturePosition();
+      setFeedback({ type: 'success', message: 'Location activated. You can now start work.' });
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Failed to get location. Please allow location access.',
+      });
+    }
+  };
 
   const handleStartWork = async () => {
     setFeedback(null);
@@ -1086,7 +1102,14 @@ export function JobModal({
                       </>
                     )}
 
-                    {canStartWork && (
+                    {canStartWork && !locationActivated && (
+                      <Button size="sm" onClick={handleActivateLocation} disabled={submitting || capturingGps}>
+                        <MapPin className="mr-2 h-4 w-4" />
+                        {capturingGps ? 'Getting location...' : 'Activate Location'}
+                      </Button>
+                    )}
+
+                    {canStartWork && locationActivated && (
                       <Button size="sm" onClick={handleStartWork} disabled={submitting || capturingGps}>
                         <Play className="mr-2 h-4 w-4" />
                         {capturingGps ? 'Getting location...' : 'Start Work'}

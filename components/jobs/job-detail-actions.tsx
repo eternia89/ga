@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { JobWithRelations } from '@/lib/types/database';
-import { useGeolocation } from '@/hooks/use-geolocation';
+import { useGeolocation, useGeolocationPermission } from '@/hooks/use-geolocation';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -45,6 +45,7 @@ import {
   ThumbsUp,
   ThumbsDown,
   RefreshCw,
+  MapPin,
 } from 'lucide-react';
 import { Combobox } from '@/components/combobox';
 import { Input } from '@/components/ui/input';
@@ -69,6 +70,8 @@ export function JobDetailActions({
 
   // GPS hook for status changes
   const { capturing: capturingGps, capturePosition } = useGeolocation();
+  const { permissionState } = useGeolocationPermission();
+  const locationActivated = permissionState === 'granted';
 
   // Dialog states
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -159,6 +162,19 @@ export function JobDetailActions({
       setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to request approval' });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleActivateLocation = async () => {
+    setFeedback(null);
+    try {
+      await capturePosition();
+      setFeedback({ type: 'success', message: 'Location activated. You can now start work.' });
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Failed to get location. Please allow location access.',
+      });
     }
   };
 
@@ -353,7 +369,14 @@ export function JobDetailActions({
               </>
             )}
 
-            {canStartWork && (
+            {canStartWork && !locationActivated && (
+              <Button onClick={handleActivateLocation} disabled={submitting || capturingGps}>
+                <MapPin className="mr-2 h-4 w-4" />
+                {capturingGps ? 'Getting location...' : 'Activate Location'}
+              </Button>
+            )}
+
+            {canStartWork && locationActivated && (
               <Button onClick={handleStartWork} disabled={submitting || capturingGps}>
                 <Play className="mr-2 h-4 w-4" />
                 {capturingGps ? 'Getting location...' : 'Start Work'}
