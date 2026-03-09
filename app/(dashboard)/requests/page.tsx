@@ -6,11 +6,11 @@ import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { RequestCreateDialog } from '@/components/requests/request-create-dialog';
 
 interface PageProps {
-  searchParams: Promise<{ view?: string }>;
+  searchParams: Promise<{ view?: string; action?: string }>;
 }
 
 export default async function RequestsPage({ searchParams }: PageProps) {
-  const { view } = await searchParams;
+  const { view, action } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -136,7 +136,7 @@ export default async function RequestsPage({ searchParams }: PageProps) {
           {['ga_lead', 'admin', 'finance_approver'].includes(profile.role) && (
             <ExportButton exportUrl="/api/exports/requests" />
           )}
-          <RequestCreateDialog locations={locations} />
+          <RequestCreateDialog locations={locations} initialOpen={action === 'create'} />
         </div>
       </div>
 

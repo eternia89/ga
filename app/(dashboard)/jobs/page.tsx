@@ -6,11 +6,11 @@ import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { JobCreateDialog } from '@/components/jobs/job-create-dialog';
 
 interface PageProps {
-  searchParams: Promise<{ view?: string }>;
+  searchParams: Promise<{ view?: string; action?: string }>;
 }
 
 export default async function JobsPage({ searchParams }: PageProps) {
-  const { view } = await searchParams;
+  const { view, action } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -152,6 +152,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
               users={formUsers}
               eligibleRequests={eligibleRequests}
               requestJobLinks={requestJobLinks}
+              initialOpen={action === 'create'}
             />
           )}
         </div>

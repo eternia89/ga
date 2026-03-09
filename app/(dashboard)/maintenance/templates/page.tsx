@@ -6,11 +6,11 @@ import { TemplateCreateDialog } from '@/components/maintenance/template-create-d
 import type { MaintenanceTemplate } from '@/lib/types/maintenance';
 
 interface PageProps {
-  searchParams: Promise<{ view?: string }>;
+  searchParams: Promise<{ view?: string; action?: string }>;
 }
 
 export default async function MaintenanceTemplatesPage({ searchParams }: PageProps) {
-  const { view } = await searchParams;
+  const { view, action } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -79,7 +79,7 @@ export default async function MaintenanceTemplatesPage({ searchParams }: PagePro
           </p>
         </div>
         {['ga_lead', 'admin'].includes(profile.role) && (
-          <TemplateCreateDialog categories={assetCategories ?? []} />
+          <TemplateCreateDialog categories={assetCategories ?? []} initialOpen={action === 'create'} />
         )}
       </div>
 

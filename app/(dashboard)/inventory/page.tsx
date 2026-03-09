@@ -7,11 +7,11 @@ import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { AssetCreateDialog } from '@/components/assets/asset-create-dialog';
 
 interface PageProps {
-  searchParams: Promise<{ view?: string }>;
+  searchParams: Promise<{ view?: string; action?: string }>;
 }
 
 export default async function InventoryPage({ searchParams }: PageProps) {
-  const { view } = await searchParams;
+  const { view, action } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -104,6 +104,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
             <AssetCreateDialog
               categories={categories ?? []}
               locations={locations ?? []}
+              initialOpen={action === 'create'}
             />
           )}
         </div>

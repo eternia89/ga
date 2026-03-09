@@ -9,11 +9,11 @@ import type { TemplateListItem, AssetListItem } from '@/components/maintenance/s
 import { getScheduleDisplayStatus } from '@/lib/constants/schedule-status';
 
 interface PageProps {
-  searchParams: Promise<{ view?: string }>;
+  searchParams: Promise<{ view?: string; action?: string }>;
 }
 
 export default async function MaintenanceSchedulesPage({ searchParams }: PageProps) {
-  const { view } = await searchParams;
+  const { view, action } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -129,7 +129,7 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
             <ExportButton exportUrl="/api/exports/maintenance" />
           )}
           {['ga_lead', 'admin'].includes(profile.role) && (
-            <ScheduleCreateDialog templates={templateList} assets={assetList} />
+            <ScheduleCreateDialog templates={templateList} assets={assetList} initialOpen={action === 'create'} />
           )}
         </div>
       </div>
