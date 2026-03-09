@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-09 - Completed quick task 28: Asset location tracking & transfer flow
+Last activity: 2026-03-09 - Completed quick task 27: Remove Created date column from admin settings tables
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -299,10 +299,11 @@ Recent decisions affecting current work:
 | 27 | Add location field to user profiles | 2026-03-09 | ac80bee | Verified | [24-add-location-field-to-user-profiles-indi](./quick/24-add-location-field-to-user-profiles-indi/) |
 | 28 | Asset location tracking & transfer flow refinements | 2026-03-09 | 14b9629 | Verified | [25-asset-location-tracking-transfer-flow-st](./quick/25-asset-location-tracking-transfer-flow-st/) |
 | 29 | Users table: role beside name, remove Division + Last Login | 2026-03-09 | f5aadbc | Verified | [26-users-table-role-beside-name-remove-divi](./quick/26-users-table-role-beside-name-remove-divi/) |
+| 30 | Remove Created date column from admin settings tables | 2026-03-09 | 62ff88a | Complete | [27-remove-created-date-column-from-categori](./quick/27-remove-created-date-column-from-categori/) |
 
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Completed quick task 26: Users table role beside name, remove Division + Last Login
+Stopped at: Completed quick task 27: Remove Created date column from admin settings tables
 Resume file: None
 Next: Ready for next task
