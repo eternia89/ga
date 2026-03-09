@@ -6,6 +6,7 @@ export const createUserSchema = z.object({
   role: z.enum(["general_user", "ga_staff", "ga_lead", "finance_approver", "admin"]),
   company_id: z.string().uuid("Company is required"),
   division_id: z.string().uuid("Division is required"),
+  location_id: z.string().uuid("Location is required"),
 });
 
 export const updateUserSchema = z.object({
@@ -13,6 +14,7 @@ export const updateUserSchema = z.object({
   role: z.enum(["general_user", "ga_staff", "ga_lead", "finance_approver", "admin"]),
   company_id: z.string().uuid("Company is required"),
   division_id: z.string().uuid("Division is required").optional().or(z.literal("")),
+  location_id: z.string().uuid("Location is required").optional().or(z.literal("")),
 });
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
