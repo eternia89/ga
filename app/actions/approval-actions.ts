@@ -4,113 +4,15 @@ import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
-import { formatIDR } from '@/lib/utils';
 
 // ============================================================================
-// submitForApproval — ga_lead or admin only
-// Checks estimated_cost >= company budget_threshold before allowing transition
-// ============================================================================
-export const submitForApproval = authActionClient
-  .schema(z.object({ job_id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
-    const { supabase, profile } = ctx;
-
-    // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
-      throw new Error('GA Lead or Admin access required');
-    }
-
-    // Fetch the job
-    const { data: job } = await supabase
-      .from('jobs')
-      .select('id, status, estimated_cost, company_id, display_id')
-      .eq('id', parsedInput.job_id)
-      .eq('company_id', profile.company_id)
-      .is('deleted_at', null)
-      .single();
-
-    if (!job) {
-      throw new Error('Job not found');
-    }
-
-    if (!['assigned', 'in_progress'].includes(job.status)) {
-      throw new Error('Job must be in Assigned or In Progress status to submit for approval');
-    }
-
-    // Fetch company budget threshold
-    const { data: setting } = await supabase
-      .from('company_settings')
-      .select('value')
-      .eq('company_id', job.company_id)
-      .eq('key', 'budget_threshold')
-      .single();
-
-    const budgetThreshold = setting ? parseInt(setting.value, 10) : null;
-
-    if (budgetThreshold === null) {
-      throw new Error('Budget threshold not configured. Please configure it in Company Settings before submitting for approval.');
-    }
-
-    const estimatedCost = job.estimated_cost ?? 0;
-    if (estimatedCost < budgetThreshold) {
-      throw new Error(
-        `Estimated cost (${estimatedCost}) is below the approval threshold (${budgetThreshold}). Approval is only required for jobs at or above this amount.`
-      );
-    }
-
-    const { error } = await supabase
-      .from('jobs')
-      .update({
-        status: 'pending_approval',
-        approval_submitted_at: new Date().toISOString(),
-      })
-      .eq('id', parsedInput.job_id);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    revalidatePath('/jobs');
-    revalidatePath(`/jobs/${parsedInput.job_id}`);
-    revalidatePath('/approvals');
-
-    // Non-blocking notification: notify finance approvers and admins
-    const { data: financeApprovers } = await supabase
-      .from('user_profiles')
-      .select('id')
-      .eq('company_id', job.company_id)
-      .in('role', ['finance_approver', 'admin'])
-      .is('deleted_at', null);
-
-    if (financeApprovers && financeApprovers.length > 0) {
-      createNotifications({
-        companyId: job.company_id,
-        recipientIds: financeApprovers.map((u) => u.id),
-        actorId: profile.id,
-        title: `Job ${job.display_id} requires approval`,
-        body: `Estimated cost: ${formatIDR(estimatedCost)}`,
-        type: 'approval',
-        entityType: 'job',
-        entityId: parsedInput.job_id,
-      });
-    }
-
-    return { success: true };
-  });
-
-// ============================================================================
-// approveJob — finance_approver or admin only
-// Sets job status back to in_progress (approval granted, work continues)
+// approveJob — job creator only
+// Sets job status from pending_approval to created (so PIC can be assigned)
 // ============================================================================
 export const approveJob = authActionClient
   .schema(z.object({ job_id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
     const { supabase, profile } = ctx;
-
-    // Role check
-    if (!['finance_approver', 'admin'].includes(profile.role)) {
-      throw new Error('Finance Approver or Admin access required');
-    }
 
     const { data: job } = await supabase
       .from('jobs')
@@ -124,6 +26,11 @@ export const approveJob = authActionClient
       throw new Error('Job not found');
     }
 
+    // Only the job creator can approve budget
+    if (job.created_by !== profile.id) {
+      throw new Error('Only the job creator can approve the budget');
+    }
+
     if (job.status !== 'pending_approval') {
       throw new Error('Job is not pending approval');
     }
@@ -131,7 +38,7 @@ export const approveJob = authActionClient
     const { error } = await supabase
       .from('jobs')
       .update({
-        status: 'in_progress',
+        status: 'created',
         approved_at: new Date().toISOString(),
         approved_by: profile.id,
       })
@@ -141,18 +48,19 @@ export const approveJob = authActionClient
       throw new Error(error.message);
     }
 
-    // Non-blocking notification: notify job creator and assigned PIC
-    const approvalRecipients = [job.created_by, job.assigned_to].filter(Boolean) as string[];
-    createNotifications({
-      companyId: job.company_id,
-      recipientIds: approvalRecipients,
-      actorId: profile.id,
-      title: `Job ${job.display_id} approved`,
-      body: 'Budget approved — work continues',
-      type: 'approval',
-      entityType: 'job',
-      entityId: parsedInput.job_id,
-    });
+    // Notify PIC if assigned
+    if (job.assigned_to) {
+      createNotifications({
+        companyId: job.company_id,
+        recipientIds: [job.assigned_to],
+        actorId: profile.id,
+        title: `Job ${job.display_id} budget approved`,
+        body: 'Budget approved — PIC can now be assigned',
+        type: 'approval',
+        entityType: 'job',
+        entityId: parsedInput.job_id,
+      });
+    }
 
     revalidatePath('/jobs');
     revalidatePath(`/jobs/${parsedInput.job_id}`);
@@ -161,8 +69,8 @@ export const approveJob = authActionClient
   });
 
 // ============================================================================
-// rejectJob — finance_approver or admin only; reason required
-// Sends job back to 'in_progress' so PIC can revise cost and resubmit
+// rejectJob — job creator only; reason required
+// Sends job back to 'created' with rejection info recorded
 // ============================================================================
 export const rejectJob = authActionClient
   .schema(z.object({
@@ -174,11 +82,6 @@ export const rejectJob = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { supabase, profile } = ctx;
 
-    // Role check
-    if (!['finance_approver', 'admin'].includes(profile.role)) {
-      throw new Error('Finance Approver or Admin access required');
-    }
-
     const { data: job } = await supabase
       .from('jobs')
       .select('id, status, company_id, display_id, created_by, assigned_to')
@@ -189,6 +92,11 @@ export const rejectJob = authActionClient
 
     if (!job) {
       throw new Error('Job not found');
+    }
+
+    // Only the job creator can reject budget
+    if (job.created_by !== profile.id) {
+      throw new Error('Only the job creator can reject the budget');
     }
 
     if (job.status !== 'pending_approval') {
@@ -200,7 +108,7 @@ export const rejectJob = authActionClient
     const { error } = await supabase
       .from('jobs')
       .update({
-        status: 'in_progress',
+        status: 'created',
         approval_submitted_at: null,
         approval_rejected_at: now,
         approval_rejected_by: profile.id,
@@ -212,19 +120,19 @@ export const rejectJob = authActionClient
       throw new Error(error.message);
     }
 
-    // Non-blocking notification: notify job creator and assigned PIC with reason
-    const rejectionRecipients = [job.created_by, job.assigned_to].filter(Boolean) as string[];
-    const truncatedReason = parsedInput.reason.substring(0, 100);
-    createNotifications({
-      companyId: job.company_id,
-      recipientIds: rejectionRecipients,
-      actorId: profile.id,
-      title: `Job ${job.display_id} approval rejected`,
-      body: truncatedReason,
-      type: 'approval',
-      entityType: 'job',
-      entityId: parsedInput.job_id,
-    });
+    // Notify PIC if assigned
+    if (job.assigned_to) {
+      createNotifications({
+        companyId: job.company_id,
+        recipientIds: [job.assigned_to],
+        actorId: profile.id,
+        title: `Job ${job.display_id} budget rejected`,
+        body: parsedInput.reason.substring(0, 100),
+        type: 'approval',
+        entityType: 'job',
+        entityId: parsedInput.job_id,
+      });
+    }
 
     revalidatePath('/jobs');
     revalidatePath(`/jobs/${parsedInput.job_id}`);
@@ -233,7 +141,7 @@ export const rejectJob = authActionClient
   });
 
 // ============================================================================
-// approveCompletion — finance_approver or admin only
+// approveCompletion — job creator only
 // Transitions job from pending_completion_approval → completed.
 // Moves linked requests to pending_acceptance (same as direct completion path).
 // ============================================================================
@@ -241,11 +149,6 @@ export const approveCompletion = authActionClient
   .schema(z.object({ job_id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
     const { supabase, profile } = ctx;
-
-    // Role check
-    if (!['finance_approver', 'admin'].includes(profile.role)) {
-      throw new Error('Finance Approver or Admin access required');
-    }
 
     const { data: job } = await supabase
       .from('jobs')
@@ -257,6 +160,11 @@ export const approveCompletion = authActionClient
 
     if (!job) {
       throw new Error('Job not found');
+    }
+
+    // Only the job creator can approve completion
+    if (job.created_by !== profile.id) {
+      throw new Error('Only the job creator can approve completion');
     }
 
     if (job.status !== 'pending_completion_approval') {
@@ -319,18 +227,19 @@ export const approveCompletion = authActionClient
       }
     }
 
-    // Notify job creator and PIC about completion approval
-    const completionRecipients = [job.created_by, job.assigned_to].filter(Boolean) as string[];
-    createNotifications({
-      companyId: job.company_id,
-      recipientIds: completionRecipients,
-      actorId: profile.id,
-      title: `Job ${job.display_id} completion approved`,
-      body: 'Completion approved — linked requests moved to pending acceptance',
-      type: 'approval',
-      entityType: 'job',
-      entityId: parsedInput.job_id,
-    });
+    // Notify PIC about completion approval
+    if (job.assigned_to) {
+      createNotifications({
+        companyId: job.company_id,
+        recipientIds: [job.assigned_to],
+        actorId: profile.id,
+        title: `Job ${job.display_id} completion approved`,
+        body: 'Completion approved — linked requests moved to pending acceptance',
+        type: 'approval',
+        entityType: 'job',
+        entityId: parsedInput.job_id,
+      });
+    }
 
     revalidatePath('/jobs');
     revalidatePath(`/jobs/${parsedInput.job_id}`);
@@ -340,7 +249,7 @@ export const approveCompletion = authActionClient
   });
 
 // ============================================================================
-// rejectCompletion — finance_approver or admin only; reason required
+// rejectCompletion — job creator only; reason required
 // Sends job back to 'in_progress' so PIC can rework and resubmit.
 // ============================================================================
 export const rejectCompletion = authActionClient
@@ -353,11 +262,6 @@ export const rejectCompletion = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { supabase, profile } = ctx;
 
-    // Role check
-    if (!['finance_approver', 'admin'].includes(profile.role)) {
-      throw new Error('Finance Approver or Admin access required');
-    }
-
     const { data: job } = await supabase
       .from('jobs')
       .select('id, status, company_id, display_id, created_by, assigned_to')
@@ -368,6 +272,11 @@ export const rejectCompletion = authActionClient
 
     if (!job) {
       throw new Error('Job not found');
+    }
+
+    // Only the job creator can reject completion
+    if (job.created_by !== profile.id) {
+      throw new Error('Only the job creator can reject completion');
     }
 
     if (job.status !== 'pending_completion_approval') {
@@ -391,19 +300,19 @@ export const rejectCompletion = authActionClient
       throw new Error(error.message);
     }
 
-    // Notify job creator and PIC about completion rejection
-    const rejectionRecipients = [job.created_by, job.assigned_to].filter(Boolean) as string[];
-    const truncatedReason = parsedInput.reason.substring(0, 100);
-    createNotifications({
-      companyId: job.company_id,
-      recipientIds: rejectionRecipients,
-      actorId: profile.id,
-      title: `Job ${job.display_id} completion rejected`,
-      body: truncatedReason,
-      type: 'approval',
-      entityType: 'job',
-      entityId: parsedInput.job_id,
-    });
+    // Notify PIC about completion rejection
+    if (job.assigned_to) {
+      createNotifications({
+        companyId: job.company_id,
+        recipientIds: [job.assigned_to],
+        actorId: profile.id,
+        title: `Job ${job.display_id} completion rejected`,
+        body: parsedInput.reason.substring(0, 100),
+        type: 'approval',
+        entityType: 'job',
+        entityId: parsedInput.job_id,
+      });
+    }
 
     revalidatePath('/jobs');
     revalidatePath(`/jobs/${parsedInput.job_id}`);
@@ -411,62 +320,3 @@ export const rejectCompletion = authActionClient
     return { success: true };
   });
 
-// ============================================================================
-// unapproveJob — finance_approver or admin only
-// Clears approval so the PIC can re-edit the budget. Status stays in_progress.
-// ============================================================================
-export const unapproveJob = authActionClient
-  .schema(z.object({ job_id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
-    const { supabase, profile } = ctx;
-
-    if (!['finance_approver', 'admin'].includes(profile.role)) {
-      throw new Error('Finance Approver or Admin access required');
-    }
-
-    const { data: job } = await supabase
-      .from('jobs')
-      .select('id, status, company_id, display_id, created_by, assigned_to, approved_at')
-      .eq('id', parsedInput.job_id)
-      .eq('company_id', profile.company_id)
-      .is('deleted_at', null)
-      .single();
-
-    if (!job) {
-      throw new Error('Job not found');
-    }
-
-    if (job.status !== 'in_progress' || !job.approved_at) {
-      throw new Error('Job must be in progress and previously approved to un-approve');
-    }
-
-    const { error } = await supabase
-      .from('jobs')
-      .update({
-        approved_at: null,
-        approved_by: null,
-        approval_submitted_at: null,
-      })
-      .eq('id', parsedInput.job_id);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    const recipients = [job.created_by, job.assigned_to].filter(Boolean) as string[];
-    createNotifications({
-      companyId: job.company_id,
-      recipientIds: recipients,
-      actorId: profile.id,
-      title: `Job ${job.display_id} budget unlocked`,
-      body: 'Approval revoked — budget can be edited again',
-      type: 'approval',
-      entityType: 'job',
-      entityId: parsedInput.job_id,
-    });
-
-    revalidatePath('/jobs');
-    revalidatePath(`/jobs/${parsedInput.job_id}`);
-    revalidatePath('/approvals');
-    return { success: true };
-  });
