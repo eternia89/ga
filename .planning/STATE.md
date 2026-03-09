@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-09 - Completed quick task 26: Remove duplication from detail pages, add sticky save bar
+Last activity: 2026-03-09 - Completed quick task 27: Add location field to user profiles
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -296,7 +296,7 @@ Recent decisions affecting current work:
 | 24 | Fix deadlock analysis issues: wire advanceFloatingSchedule, rework Start Work, threshold gates, remove dead statuses | 2026-03-09 | 7584eed | Verified | [21-fix-deadlock-analysis-issues-wire-advanc](./quick/21-fix-deadlock-analysis-issues-wire-advanc/) |
 | 25 | Add permalink support (?action=create) to all 5 create modals | 2026-03-09 | d6258a7 | Verified | [22-add-permalink-support-to-all-5-create-mo](./quick/22-add-permalink-support-to-all-5-create-mo/) |
 | 26 | Remove duplication from detail pages, add sticky save bar | 2026-03-09 | 5374429 | Verified | [23-remove-duplication-of-information-in-det](./quick/23-remove-duplication-of-information-in-det/) |
-| 27 | Add location field to user profiles | 2026-03-09 | ac80bee | Complete | [24-add-location-field-to-user-profiles-indi](./quick/24-add-location-field-to-user-profiles-indi/) |
+| 27 | Add location field to user profiles | 2026-03-09 | ac80bee | Verified | [24-add-location-field-to-user-profiles-indi](./quick/24-add-location-field-to-user-profiles-indi/) |
 
 ## Session Continuity
 
