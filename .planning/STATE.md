@@ -302,7 +302,7 @@ Recent decisions affecting current work:
 | 30 | Rework job lifecycle: budget at creation, creator-based approval | 2026-03-09 | 8600294 | Verified | [27-rework-job-lifecycle-budget-approval-by-](./quick/27-rework-job-lifecycle-budget-approval-by-/) |
 | 31 | Enforce request-job linking rules: PIC-only, status filter, one-to-one | 2026-03-09 | c79afce | Verified | [28-request-job-linking-rules-only-pic-handl](./quick/28-request-job-linking-rules-only-pic-handl/) |
 | 32 | Allow PIC or GA Lead to complete a request directly | 2026-03-09 | d25debc | Verified | [29-allow-pic-or-ga-lead-to-complete-a-reque](./quick/29-allow-pic-or-ga-lead-to-complete-a-reque/) |
-| 33 | Add photo attachments to job creation form and detail page | 2026-03-09 | 064a282 | Complete | [30-add-photo-attachments-to-job-creation-fo](./quick/30-add-photo-attachments-to-job-creation-fo/) |
+| 33 | Add photo attachments to job creation form and detail page | 2026-03-09 | 064a282 | Verified | [30-add-photo-attachments-to-job-creation-fo](./quick/30-add-photo-attachments-to-job-creation-fo/) |
 
 ## Session Continuity
 
