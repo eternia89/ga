@@ -48,11 +48,6 @@ export function TemplateBuilderItem({ item, onUpdate, onDelete }: TemplateBuilde
     onUpdate({ ...item, label: value });
   }
 
-  function handleUnitChange(value: string) {
-    if (item.type !== 'numeric') return;
-    onUpdate({ ...item, unit: value });
-  }
-
   function handleAddOption() {
     if (item.type !== 'dropdown') return;
     const trimmed = newOption.trim();
@@ -119,16 +114,6 @@ export function TemplateBuilderItem({ item, onUpdate, onDelete }: TemplateBuilde
         />
 
         {/* Type-specific configuration */}
-        {item.type === 'numeric' && (
-          <Input
-            value={item.unit ?? ''}
-            onChange={(e) => handleUnitChange(e.target.value)}
-            placeholder="Unit (e.g., PSI, °C, kg)"
-            maxLength={20}
-            className="h-8 max-w-[200px]"
-          />
-        )}
-
         {item.type === 'dropdown' && (
           <div className="space-y-2">
             {/* Existing options as chips */}

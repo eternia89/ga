@@ -16,7 +16,7 @@ export type ChecklistItemBase = {
 
 export type CheckboxItem = ChecklistItemBase & { type: 'checkbox' };
 export type PassFailItem = ChecklistItemBase & { type: 'pass_fail' };
-export type NumericItem = ChecklistItemBase & { type: 'numeric'; unit?: string };
+export type NumericItem = ChecklistItemBase & { type: 'numeric' };
 export type TextItem = ChecklistItemBase & { type: 'text' };
 export type PhotoItem = ChecklistItemBase & { type: 'photo' };
 export type DropdownItem = ChecklistItemBase & { type: 'dropdown'; options: string[] };

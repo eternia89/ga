@@ -38,7 +38,7 @@ function createItem(type: ChecklistItemType, sortOrder: number): ChecklistItem {
     case 'pass_fail':
       return { ...base, type: 'pass_fail' };
     case 'numeric':
-      return { ...base, type: 'numeric', unit: undefined };
+      return { ...base, type: 'numeric' };
     case 'text':
       return { ...base, type: 'text' };
     case 'photo':

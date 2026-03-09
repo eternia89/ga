@@ -91,7 +91,7 @@ export function TemplateCreateForm({ categories, onSuccess }: TemplateCreateForm
       <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-8 ${onSuccess ? '' : 'max-w-2xl'}`}>
 
         {/* Section 1: Basic Info */}
-        <div className="rounded-lg border border-border p-6 space-y-4">
+        <div className="space-y-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
             Template Information
           </h2>
@@ -168,7 +168,7 @@ export function TemplateCreateForm({ categories, onSuccess }: TemplateCreateForm
         </div>
 
         {/* Section 2: Checklist Items */}
-        <div className="rounded-lg border border-border p-6 space-y-4">
+        <div className="space-y-4">
           <div>
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               Checklist Items <span className="text-destructive">*</span>

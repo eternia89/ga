@@ -207,7 +207,7 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
         <Form {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
-            <div className="rounded-lg border border-border p-6 space-y-4">
+            <div className="space-y-4">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                 Template Information
               </h2>
@@ -283,7 +283,7 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
               />
             </div>
 
-            <div className="rounded-lg border border-border p-6 space-y-4">
+            <div className="space-y-4">
               <div>
                 <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                   Checklist Items <span className="text-destructive">*</span>
@@ -316,8 +316,8 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
       ) : (
         /* Read-only view */
         <div className="space-y-6">
-          {/* Basic info card */}
-          <div className="rounded-lg border border-border p-6 space-y-4">
+          {/* Basic info */}
+          <div className="space-y-4">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               Template Information
             </h2>
@@ -343,7 +343,7 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
           </div>
 
           {/* Checklist preview */}
-          <div className="rounded-lg border border-border p-6 space-y-4">
+          <div className="space-y-4">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               Checklist Items ({template.checklist.length})
             </h2>
@@ -376,9 +376,6 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
                         <p className="text-sm font-medium">
                           {item.label || <span className="text-muted-foreground italic">No label</span>}
                         </p>
-                        {item.type === 'numeric' && item.unit && (
-                          <p className="text-xs text-muted-foreground mt-0.5">Unit: {item.unit}</p>
-                        )}
                         {item.type === 'dropdown' && item.options.length > 0 && (
                           <p className="text-xs text-muted-foreground mt-0.5">
                             Options: {item.options.join(', ')}
