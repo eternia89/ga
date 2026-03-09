@@ -390,6 +390,18 @@ export function ScheduleViewModal({
               </div>
               {canManage && (
                 <div className="flex items-center gap-2">
+                  {schedule.template?.checklist && schedule.template.checklist.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        router.push(`/maintenance/schedules/${schedule.id}/preview`);
+                        onOpenChange(false);
+                      }}
+                    >
+                      Preview Form
+                    </Button>
+                  )}
                   {schedule.is_active ? (
                     <Button variant="outline" size="sm" onClick={handlePause} disabled={actionPending} className="text-destructive hover:text-destructive">
                       {actionPending ? 'Processing...' : 'Pause'}
