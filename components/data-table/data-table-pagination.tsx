@@ -25,6 +25,11 @@ export function DataTablePagination<TData>({
   const startRow = currentPage * pageSize - pageSize + 1;
   const endRow = Math.min(currentPage * pageSize, totalRows);
 
+  // Hide entire pagination footer when all data fits on one page
+  if (totalPages <= 1) {
+    return null;
+  }
+
   // Generate page numbers to show
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
