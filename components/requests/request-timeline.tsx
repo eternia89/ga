@@ -128,7 +128,7 @@ function EventContent({ event }: { event: TimelineEvent }) {
         <span>
           <span className="font-medium">{event.by}</span> rejected this request
           {reason && (
-            <blockquote className="mt-1 border-l-2 border-red-300 pl-3 text-sm text-muted-foreground italic">
+            <blockquote className="mt-1 border-l-2 border-red-300 pl-3 text-xs text-muted-foreground italic">
               {reason}
             </blockquote>
           )}
@@ -156,7 +156,7 @@ function EventContent({ event }: { event: TimelineEvent }) {
         <span>
           <span className="font-medium">{event.by}</span> rejected the completed work
           {reason && (
-            <blockquote className="mt-1 border-l-2 border-orange-300 pl-3 text-sm text-muted-foreground italic">
+            <blockquote className="mt-1 border-l-2 border-orange-300 pl-3 text-xs text-muted-foreground italic">
               {reason}
             </blockquote>
           )}
@@ -179,7 +179,7 @@ function EventContent({ event }: { event: TimelineEvent }) {
             </div>
           )}
           {comment && (
-            <blockquote className="mt-1 border-l-2 border-amber-300 pl-3 text-sm text-muted-foreground italic">
+            <blockquote className="mt-1 border-l-2 border-amber-300 pl-3 text-xs text-muted-foreground italic">
               {comment}
             </blockquote>
           )}
@@ -207,9 +207,9 @@ export function RequestTimeline({ events }: RequestTimelineProps) {
         {/* Vertical connector line */}
         <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-border" />
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {events.map((event, index) => (
-            <div key={index} className="relative flex gap-4">
+            <div key={index} className="relative flex gap-3">
               {/* Icon circle on the line */}
               <div
                 className={`absolute -left-6 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${EVENT_COLORS[event.type]}`}
@@ -219,7 +219,7 @@ export function RequestTimeline({ events }: RequestTimelineProps) {
 
               {/* Content */}
               <div className="min-w-0 flex-1 space-y-1">
-                <div className="text-sm leading-relaxed">
+                <div className="text-xs leading-relaxed">
                   <EventContent event={event} />
                 </div>
                 <p className="text-xs text-muted-foreground">{formatDateTime(event.at)}</p>

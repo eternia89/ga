@@ -139,7 +139,7 @@ function EventContent({ event }: { event: JobTimelineEvent }) {
         <span>
           <span className="font-medium">{event.by}</span> rejected this job
           {reason && (
-            <blockquote className="mt-1 border-l-2 border-red-300 pl-3 text-sm text-muted-foreground italic">
+            <blockquote className="mt-1 border-l-2 border-red-300 pl-3 text-xs text-muted-foreground italic">
               {reason}
             </blockquote>
           )}
@@ -218,13 +218,13 @@ export function JobTimeline({ events, comments, commentPhotos }: JobTimelineProp
           {/* Vertical connector line */}
           <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-border" />
 
-          <div className="space-y-6">
+          <div className="space-y-4">
             {entries.map((entry, index) => {
               if (entry.kind === 'event') {
                 const { event } = entry;
                 const hasGps = event.latitude != null && event.longitude != null;
                 return (
-                  <div key={`event-${index}`} className="relative flex gap-4">
+                  <div key={`event-${index}`} className="relative flex gap-3">
                     {/* Icon */}
                     <div
                       className={`absolute -left-6 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${EVENT_COLORS[event.type]}`}
@@ -233,7 +233,7 @@ export function JobTimeline({ events, comments, commentPhotos }: JobTimelineProp
                     </div>
                     {/* Content */}
                     <div className="min-w-0 flex-1 space-y-1">
-                      <div className="text-sm leading-relaxed">
+                      <div className="text-xs leading-relaxed">
                         <EventContent event={event} />
                       </div>
                       <p className="text-xs text-muted-foreground">
@@ -260,7 +260,7 @@ export function JobTimeline({ events, comments, commentPhotos }: JobTimelineProp
               const authorName = comment.user?.full_name ?? 'Unknown';
 
               return (
-                <div key={`comment-${comment.id}`} className="relative flex gap-4">
+                <div key={`comment-${comment.id}`} className="relative flex gap-3">
                   {/* Icon */}
                   <div
                     className={`absolute -left-6 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${EVENT_COLORS.comment}`}
@@ -276,7 +276,7 @@ export function JobTimeline({ events, comments, commentPhotos }: JobTimelineProp
                           {formatDateTime(comment.created_at)}
                         </span>
                       </div>
-                      <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                      <p className="text-xs whitespace-pre-wrap leading-relaxed">
                         {comment.content}
                       </p>
                       {photo && (

@@ -217,7 +217,7 @@ function EventContent({ event }: { event: AssetTimelineEvent }) {
         <span>
           <span className="font-medium">{receiverName ?? by}</span> rejected the transfer
           {reason && (
-            <blockquote className="mt-1 border-l-2 border-red-300 pl-3 text-sm text-muted-foreground italic">
+            <blockquote className="mt-1 border-l-2 border-red-300 pl-3 text-xs text-muted-foreground italic">
               {reason}
             </blockquote>
           )}
@@ -404,9 +404,9 @@ export function AssetTimeline({
         {/* Vertical connector line */}
         <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-border" />
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {timelineEvents.map((event, index) => (
-            <div key={index} className="relative flex gap-4">
+            <div key={index} className="relative flex gap-3">
               {/* Icon circle on the line */}
               <div
                 className={`absolute -left-6 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${EVENT_COLORS[event.type]}`}
@@ -416,7 +416,7 @@ export function AssetTimeline({
 
               {/* Content */}
               <div className="min-w-0 flex-1 space-y-1">
-                <div className="text-sm leading-relaxed">
+                <div className="text-xs leading-relaxed">
                   <EventContent event={event} />
                 </div>
                 <p className="text-xs text-muted-foreground">{formatDateTime(event.at)}</p>
