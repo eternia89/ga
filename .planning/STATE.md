@@ -294,7 +294,7 @@ Recent decisions affecting current work:
 | 22 | Move Save button to sticky bottom bar, remove info text | 2026-03-06 | d052605 | Verified | [19-move-save-button-to-sticky-bottom-bar-an](./quick/19-move-save-button-to-sticky-bottom-bar-an/) |
 | 23 | Audit all flows for deadlocks (analysis only) | 2026-03-06 | 92af395 | Verified | [20-test-all-flow-of-request-jobs-approvals-](./quick/20-test-all-flow-of-request-jobs-approvals-/) |
 | 24 | Fix deadlock analysis issues: wire advanceFloatingSchedule, rework Start Work, threshold gates, remove dead statuses | 2026-03-09 | 7584eed | Verified | [21-fix-deadlock-analysis-issues-wire-advanc](./quick/21-fix-deadlock-analysis-issues-wire-advanc/) |
-| 25 | Add permalink support (?action=create) to all 5 create modals | 2026-03-09 | d6258a7 | Complete | [22-add-permalink-support-to-all-5-create-mo](./quick/22-add-permalink-support-to-all-5-create-mo/) |
+| 25 | Add permalink support (?action=create) to all 5 create modals | 2026-03-09 | d6258a7 | Verified | [22-add-permalink-support-to-all-5-create-mo](./quick/22-add-permalink-support-to-all-5-create-mo/) |
 
 ## Session Continuity
 
