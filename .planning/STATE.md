@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-09 - Completed quick task 27: Add location field to user profiles
+Last activity: 2026-03-09 - Completed quick task 28: Asset location tracking & transfer flow
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -297,10 +297,11 @@ Recent decisions affecting current work:
 | 25 | Add permalink support (?action=create) to all 5 create modals | 2026-03-09 | d6258a7 | Verified | [22-add-permalink-support-to-all-5-create-mo](./quick/22-add-permalink-support-to-all-5-create-mo/) |
 | 26 | Remove duplication from detail pages, add sticky save bar | 2026-03-09 | 5374429 | Verified | [23-remove-duplication-of-information-in-det](./quick/23-remove-duplication-of-information-in-det/) |
 | 27 | Add location field to user profiles | 2026-03-09 | ac80bee | Verified | [24-add-location-field-to-user-profiles-indi](./quick/24-add-location-field-to-user-profiles-indi/) |
+| 28 | Asset location tracking & transfer flow refinements | 2026-03-09 | 14b9629 | Complete | [25-asset-location-tracking-transfer-flow-st](./quick/25-asset-location-tracking-transfer-flow-st/) |
 
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Completed quick task 24: Add location field to user profiles
+Stopped at: Completed quick task 25: Asset location tracking & transfer flow
 Resume file: None
 Next: Ready for next task
