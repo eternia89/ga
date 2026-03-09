@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { JobWithRelations, JobComment } from '@/lib/types/database';
 import { JobDetailInfo } from './job-detail-info';
@@ -8,6 +8,7 @@ import { JobDetailActions } from './job-detail-actions';
 import { JobTimeline, JobTimelineEvent } from './job-timeline';
 import { JobCommentForm } from './job-comment-form';
 import { PMChecklist } from '@/components/maintenance/pm-checklist';
+import { Button } from '@/components/ui/button';
 
 interface PhotoItem {
   id: string;
@@ -44,6 +45,13 @@ export function JobDetailClient({
   approvalRejectedByName,
 }: JobDetailClientProps) {
   const router = useRouter();
+  const [isDirty, setIsDirty] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const FORM_ID = 'job-detail-form';
+
+  const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
+  const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job.status);
 
   const handleActionSuccess = () => {
     router.refresh();
@@ -75,6 +83,9 @@ export function JobDetailClient({
           categories={categories}
           locations={locations}
           users={users}
+          formId={FORM_ID}
+          onDirtyChange={setIsDirty}
+          onSubmittingChange={setIsSubmitting}
         />
 
         <JobDetailActions
@@ -123,6 +134,17 @@ export function JobDetailClient({
           </div>
         )}
       </div>
+
+      {canEdit && isDirty && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background shadow-lg">
+          <div className="mx-auto max-w-[1300px] px-6 py-3 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">Unsaved changes</p>
+            <Button type="submit" form={FORM_ID} disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -57,6 +57,10 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const canManage = ['ga_lead', 'admin'].includes(userRole);
+  const [isDirty, setIsDirty] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const FORM_ID = formId ?? 'template-edit-form';
 
   const categoryOptions = categories.map((cat) => ({
     label: cat.name,
@@ -78,10 +82,13 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
   // Track and propagate dirty/submitting state
   const formIsDirty = form.formState.isDirty;
   useEffect(() => {
-    onDirtyChange?.(canManage && formIsDirty);
+    const dirty = canManage && formIsDirty;
+    setIsDirty(dirty);
+    onDirtyChange?.(dirty);
   }, [formIsDirty, canManage, onDirtyChange]);
 
   useEffect(() => {
+    setIsSubmitting(isPending);
     onSubmittingChange?.(isPending);
   }, [isPending, onSubmittingChange]);
 
@@ -198,7 +205,7 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
       {canManage ? (
         /* Directly editable form for users with permission */
         <Form {...form}>
-          <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
             <div className="rounded-lg border border-border p-6 space-y-4">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
@@ -382,6 +389,17 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
                   ))}
               </ol>
             )}
+          </div>
+        </div>
+      )}
+
+      {canManage && isDirty && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background shadow-lg">
+          <div className="mx-auto max-w-[1300px] px-6 py-3 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">Unsaved changes</p>
+            <Button type="submit" form={FORM_ID} disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
           </div>
         </div>
       )}

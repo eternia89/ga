@@ -415,7 +415,7 @@ export default async function JobDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-6 py-6 pb-20">
       <SetBreadcrumbs items={[{ label: 'Jobs', href: '/jobs' }, { label: job.display_id }]} />
 
       {/* Header */}

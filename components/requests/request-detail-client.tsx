@@ -7,6 +7,7 @@ import { RequestDetailInfo } from './request-detail-info';
 import { RequestDetailActions } from './request-detail-actions';
 import { RequestTimeline, TimelineEvent } from './request-timeline';
 import { RequestFeedbackDialog } from './request-feedback-dialog';
+import { Button } from '@/components/ui/button';
 
 interface PhotoItem {
   id: string;
@@ -47,6 +48,10 @@ export function RequestDetailClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const FORM_ID = 'request-detail-form';
 
   // Auto-open feedback dialog when ?feedback=1 is in the URL (survives router.refresh)
   useEffect(() => {
@@ -91,6 +96,9 @@ export function RequestDetailClient({
           onEditSuccess={handleActionSuccess}
           onTriageSuccess={handleActionSuccess}
           linkedJobs={linkedJobs}
+          formId={FORM_ID}
+          onDirtyChange={setIsDirty}
+          onSubmittingChange={setIsSubmitting}
         />
 
         <RequestDetailActions
@@ -112,6 +120,17 @@ export function RequestDetailClient({
         </div>
       </div>
     </div>
+
+    {isDirty && (
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background shadow-lg">
+        <div className="mx-auto max-w-[1300px] px-6 py-3 flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">Unsaved changes</p>
+          <Button type="submit" form={FORM_ID} disabled={isSubmitting}>
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
+      </div>
+    )}
 
     <RequestFeedbackDialog
       open={feedbackOpen}

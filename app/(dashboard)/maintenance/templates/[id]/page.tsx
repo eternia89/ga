@@ -74,7 +74,7 @@ export default async function TemplateDetailPage({ params }: PageProps) {
     .order('name');
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-6 py-6 pb-20">
       <SetBreadcrumbs items={[{ label: 'Maintenance', href: '/maintenance/templates' }, { label: 'Templates', href: '/maintenance/templates' }, { label: template.name }]} />
 
       <div>

@@ -62,7 +62,10 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const FORM_ID = 'schedule-edit-form';
   const canManage = ['ga_lead', 'admin'].includes(userRole);
 
   const isAutoPaused = schedule.is_paused && schedule.paused_reason?.startsWith('auto:');
@@ -245,6 +248,9 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
           assets={[]}
           mode="edit"
           schedule={schedule}
+          formId={FORM_ID}
+          onDirtyChange={setIsDirty}
+          onSubmittingChange={setIsSubmitting}
         />
       ) : (
         <>
@@ -372,6 +378,17 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
             )}
           </div>
         </>
+      )}
+
+      {canManage && isDirty && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background shadow-lg">
+          <div className="mx-auto max-w-[1300px] px-6 py-3 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">Unsaved changes</p>
+            <Button type="submit" form={FORM_ID} disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );
