@@ -296,7 +296,7 @@ Recent decisions affecting current work:
 | 24 | Fix deadlock analysis issues: wire advanceFloatingSchedule, rework Start Work, threshold gates, remove dead statuses | 2026-03-09 | 7584eed | Verified | [21-fix-deadlock-analysis-issues-wire-advanc](./quick/21-fix-deadlock-analysis-issues-wire-advanc/) |
 | 25 | Add permalink support (?action=create) to all 5 create modals | 2026-03-09 | d6258a7 | Verified | [22-add-permalink-support-to-all-5-create-mo](./quick/22-add-permalink-support-to-all-5-create-mo/) |
 | 26 | Replace Start Work with Activate Location two-step flow | 2026-03-09 | 99a9bbc | Verified | [23-replace-start-work-with-activate-locatio](./quick/23-replace-start-work-with-activate-locatio/) |
-| 27 | Make category optional in maintenance templates | 2026-03-09 | 57465be | Complete | [24-make-category-optional-in-maintenance-te](./quick/24-make-category-optional-in-maintenance-te/) |
+| 27 | Make category optional in maintenance templates | 2026-03-09 | 57465be | Verified | [24-make-category-optional-in-maintenance-te](./quick/24-make-category-optional-in-maintenance-te/) |
 
 ## Session Continuity
 
