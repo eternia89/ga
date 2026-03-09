@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-09 - Completed quick task 29: Move PM checklist preview from schedules to templates
+Last activity: 2026-03-09 - Completed quick task 30: Rework job lifecycle budget approval by creator
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -299,10 +299,11 @@ Recent decisions affecting current work:
 | 27 | Make category optional in maintenance templates | 2026-03-09 | 57465be | Verified | [24-make-category-optional-in-maintenance-te](./quick/24-make-category-optional-in-maintenance-te/) |
 | 28 | Fix RLS policy error when deactivating maintenance schedules | 2026-03-09 | 64b2135 | Verified | [25-fix-rls-policy-error-when-deactivating-m](./quick/25-fix-rls-policy-error-when-deactivating-m/) |
 | 29 | Move PM checklist preview from schedules to templates | 2026-03-09 | 84c44d1 | Verified | [26-move-pm-checklist-preview-from-maintenan](./quick/26-move-pm-checklist-preview-from-maintenan/) |
+| 30 | Rework job lifecycle: budget at creation, creator-based approval | 2026-03-09 | 8600294 | Complete | [27-rework-job-lifecycle-budget-approval-by-](./quick/27-rework-job-lifecycle-budget-approval-by-/) |
 
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Completed quick task 29: Move PM checklist preview from schedules to templates
+Stopped at: Completed quick task 30: Rework job lifecycle budget approval by creator
 Resume file: None
 Next: Ready for next task
