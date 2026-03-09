@@ -1,11 +1,11 @@
 {
   "mode": "interactive",
-  "depth": "comprehensive",
   "parallelization": true,
   "gitTracking": true,
   "researchAgents": true,
   "planChecker": true,
   "verifier": true,
   "model_profile": "quality",
-  "createdAt": "2026-02-10"
+  "createdAt": "2026-02-10",
+  "granularity": "fine"
 }

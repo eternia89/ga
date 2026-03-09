@@ -33,6 +33,21 @@ export function formatNumber(amount: number): string {
   }).format(amount);
 }
 
+/** Extract error message from a next-safe-action result */
+export function extractActionError(result: {
+  serverError?: string;
+  validationErrors?: Record<string, { _errors?: string[] } | undefined>;
+  data?: unknown;
+}): string | null {
+  if (result.serverError) return result.serverError;
+  if (result.validationErrors) {
+    const messages = Object.values(result.validationErrors)
+      .flatMap((v) => v?._errors ?? []);
+    if (messages.length) return messages.join(", ");
+  }
+  return null;
+}
+
 /** Parse a formatted IDR string back to a number: "1.500.000" -> 1500000 */
 export function parseIDR(formatted: string): number {
   const digits = formatted.replace(/[^0-9]/g, '');
