@@ -48,7 +48,7 @@ export const locationColumns: ColumnDef<Location>[] = [
           {address}
         </span>
       ) : (
-        "-"
+        <span className="text-muted-foreground">—</span>
       );
     },
   },
@@ -60,7 +60,7 @@ export const locationColumns: ColumnDef<Location>[] = [
     ),
     cell: ({ row }) => {
       const location = row.original;
-      return location.company?.name || "-";
+      return location.company?.name ? <span>{location.company.name}</span> : <span className="text-muted-foreground">—</span>;
     },
   },
   {

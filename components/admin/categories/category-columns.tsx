@@ -48,7 +48,7 @@ export const categoryColumns: ColumnDef<Category>[] = [
           {description}
         </span>
       ) : (
-        "-"
+        <span className="text-muted-foreground">—</span>
       );
     },
   },

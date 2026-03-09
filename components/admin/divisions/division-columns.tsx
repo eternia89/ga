@@ -41,7 +41,10 @@ export const divisionColumns: ColumnDef<Division>[] = [
   {
     accessorKey: "code",
     header: "Code",
-    cell: ({ row }) => row.getValue("code") || "-",
+    cell: ({ row }) => {
+      const value = row.getValue("code") as string | null;
+      return value ? <span>{value}</span> : <span className="text-muted-foreground">—</span>;
+    },
   },
   {
     accessorKey: "company.name",
@@ -51,7 +54,7 @@ export const divisionColumns: ColumnDef<Division>[] = [
     ),
     cell: ({ row }) => {
       const division = row.original;
-      return division.company?.name || "-";
+      return division.company?.name ? <span>{division.company.name}</span> : <span className="text-muted-foreground">—</span>;
     },
   },
   {
@@ -64,7 +67,7 @@ export const divisionColumns: ColumnDef<Division>[] = [
           {description}
         </span>
       ) : (
-        "-"
+        <span className="text-muted-foreground">—</span>
       );
     },
   },

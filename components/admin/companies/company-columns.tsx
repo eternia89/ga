@@ -41,17 +41,26 @@ export const companyColumns: ColumnDef<Company>[] = [
   {
     accessorKey: "code",
     header: "Code",
-    cell: ({ row }) => row.getValue("code") || "-",
+    cell: ({ row }) => {
+      const value = row.getValue("code") as string | null;
+      return value ? <span>{value}</span> : <span className="text-muted-foreground">—</span>;
+    },
   },
   {
     accessorKey: "email",
     header: "Email",
-    cell: ({ row }) => row.getValue("email") || "-",
+    cell: ({ row }) => {
+      const value = row.getValue("email") as string | null;
+      return value ? <span>{value}</span> : <span className="text-muted-foreground">—</span>;
+    },
   },
   {
     accessorKey: "phone",
     header: "Phone",
-    cell: ({ row }) => row.getValue("phone") || "-",
+    cell: ({ row }) => {
+      const value = row.getValue("phone") as string | null;
+      return value ? <span>{value}</span> : <span className="text-muted-foreground">—</span>;
+    },
   },
   {
     accessorKey: "deleted_at",
