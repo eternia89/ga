@@ -29,6 +29,8 @@ import { InlineFeedback } from '@/components/inline-feedback';
 import {
   updateJobStatus,
   cancelJob,
+  assignJob,
+  requestApproval,
 } from '@/app/actions/job-actions';
 import {
   approveJob,
@@ -44,11 +46,15 @@ import {
   ThumbsDown,
   RefreshCw,
 } from 'lucide-react';
+import { Combobox } from '@/components/combobox';
+import { Input } from '@/components/ui/input';
+import { formatNumber } from '@/lib/utils';
 
 interface JobDetailActionsProps {
   job: JobWithRelations;
   currentUserId: string;
   currentUserRole: string;
+  users?: { id: string; full_name: string }[];
   onActionSuccess: () => void;
 }
 
@@ -56,6 +62,7 @@ export function JobDetailActions({
   job,
   currentUserId,
   currentUserRole,
+  users = [],
   onActionSuccess,
 }: JobDetailActionsProps) {
   const router = useRouter();
@@ -75,6 +82,8 @@ export function JobDetailActions({
   // Feedback states
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [assignPicValue, setAssignPicValue] = useState('');
+  const [costValue, setCostValue] = useState('');
 
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
   const isFinanceApproverOrAdmin = ['finance_approver', 'admin'].includes(currentUserRole);
@@ -82,7 +91,9 @@ export function JobDetailActions({
   const isPIC = job.assigned_to === currentUserId;
 
   // Determine available actions per role + status
-  const canStartWork = (isGaLeadOrAdmin || isPIC) && job.status === 'assigned';
+  const canAssignPIC = isGaLeadOrAdmin && job.status === 'created';
+  const canStartWork = isPIC && job.status === 'assigned';
+  const canRequestApproval = isPIC && job.status === 'in_progress' && !job.approved_at;
   const canApproveReject =
     isFinanceApproverOrAdmin && job.status === 'pending_approval';
   const canApproveCompletion =
@@ -97,6 +108,8 @@ export function JobDetailActions({
     !['completed', 'cancelled'].includes(job.status);
 
   const hasAnyAction =
+    canAssignPIC ||
+    canRequestApproval ||
     canStartWork ||
     canApproveReject ||
     canApproveCompletion ||
@@ -104,6 +117,50 @@ export function JobDetailActions({
     canCancel;
 
   if (!hasAnyAction) return null;
+
+  const handleAssignPIC = async () => {
+    if (!assignPicValue) return;
+    setSubmitting(true);
+    setFeedback(null);
+    try {
+      const result = await assignJob({ id: job.id, assigned_to: assignPicValue });
+      if (result?.serverError) {
+        setFeedback({ type: 'error', message: result.serverError });
+        return;
+      }
+      setAssignPicValue('');
+      setFeedback({ type: 'success', message: 'PIC assigned.' });
+      onActionSuccess();
+    } catch (err) {
+      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to assign PIC' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRequestApproval = async () => {
+    setSubmitting(true);
+    setFeedback(null);
+    try {
+      const digits = costValue.replace(/[^0-9]/g, '');
+      const parsedCost = digits === '' ? 0 : parseInt(digits, 10);
+      const result = await requestApproval({ job_id: job.id, estimated_cost: parsedCost });
+      if (result?.serverError) {
+        setFeedback({ type: 'error', message: result.serverError });
+        return;
+      }
+      setCostValue('');
+      const msg = result?.data?.autoApproved
+        ? 'Cost auto-approved (Rp 0).'
+        : 'Approval requested. Awaiting finance review.';
+      setFeedback({ type: 'success', message: msg });
+      onActionSuccess();
+    } catch (err) {
+      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to request approval' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleStartWork = async () => {
     setFeedback(null);
@@ -170,7 +227,7 @@ export function JobDetailActions({
       }
       setRejectOpen(false);
       setRejectReason('');
-      setFeedback({ type: 'success', message: 'Job rejected. Returned to In Progress — budget can be re-edited.' });
+      setFeedback({ type: 'success', message: 'Job rejected. Returned to In Progress — PIC can revise cost and re-request approval.' });
       onActionSuccess();
     } catch (err) {
       setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to reject' });
@@ -276,12 +333,56 @@ export function JobDetailActions({
       <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           {/* Left: Primary CTA */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {canAssignPIC && (
+              <>
+                <div className="w-48">
+                  <Combobox
+                    options={users.map((u) => ({ label: u.full_name, value: u.id }))}
+                    value={assignPicValue}
+                    onValueChange={setAssignPicValue}
+                    placeholder="Select PIC..."
+                    searchPlaceholder="Search users..."
+                    emptyText="No users found."
+                    disabled={submitting}
+                  />
+                </div>
+                <Button onClick={handleAssignPIC} disabled={submitting || !assignPicValue}>
+                  Assign
+                </Button>
+              </>
+            )}
+
             {canStartWork && (
               <Button onClick={handleStartWork} disabled={submitting || capturingGps}>
                 <Play className="mr-2 h-4 w-4" />
                 {capturingGps ? 'Getting location...' : 'Start Work'}
               </Button>
+            )}
+
+            {canRequestApproval && (
+              <>
+                <div className="relative w-40">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
+                    Rp
+                  </span>
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0"
+                    className="pl-10"
+                    disabled={submitting}
+                    value={costValue ? formatNumber(parseInt(costValue.replace(/[^0-9]/g, '') || '0', 10)) : ''}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/[^0-9]/g, '');
+                      setCostValue(digits);
+                    }}
+                  />
+                </div>
+                <Button onClick={handleRequestApproval} disabled={submitting}>
+                  Request Approval
+                </Button>
+              </>
             )}
 
             {canApproveReject && (

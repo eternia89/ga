@@ -81,6 +81,7 @@ export function JobDetailClient({
           job={job}
           currentUserId={currentUserId}
           currentUserRole={currentUserRole}
+          users={users.map((u) => ({ id: u.id, full_name: u.name }))}
           onActionSuccess={handleActionSuccess}
         />
 

@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-06 - Completed quick task 23: Audit all flows for deadlocks
+Last activity: 2026-03-09 - Merged main into refactor (combined quick tasks 17-25)
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -298,7 +298,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-09T02:29:15Z
-Stopped at: Completed quick task 22: Add permalink support to all 5 create modals
+Last session: 2026-03-09
+Stopped at: Merged main into refactor
 Resume file: None
 Next: Ready for next task

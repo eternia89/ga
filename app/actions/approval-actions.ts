@@ -100,7 +100,7 @@ export const submitForApproval = authActionClient
 
 // ============================================================================
 // approveJob — finance_approver or admin only
-// Sets job status to in_progress (approval granted, work can proceed)
+// Sets job status back to in_progress (approval granted, work continues)
 // ============================================================================
 export const approveJob = authActionClient
   .schema(z.object({ job_id: z.string().uuid() }))
@@ -148,7 +148,7 @@ export const approveJob = authActionClient
       recipientIds: approvalRecipients,
       actorId: profile.id,
       title: `Job ${job.display_id} approved`,
-      body: 'Budget approval granted — work can proceed',
+      body: 'Budget approved — work continues',
       type: 'approval',
       entityType: 'job',
       entityId: parsedInput.job_id,
@@ -162,7 +162,7 @@ export const approveJob = authActionClient
 
 // ============================================================================
 // rejectJob — finance_approver or admin only; reason required
-// Sends job back to 'in_progress' so PIC can re-edit budget and resubmit
+// Sends job back to 'in_progress' so PIC can revise cost and resubmit
 // ============================================================================
 export const rejectJob = authActionClient
   .schema(z.object({

@@ -240,7 +240,7 @@ export function ScheduleViewModal({
   return (
     <Dialog open={!!scheduleId} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-[800px] max-h-[90vh] flex flex-col p-0 gap-0 max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0"
+        className="max-w-[1000px] max-h-[90vh] flex flex-col p-0 gap-0 max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0"
         showCloseButton={true}
       >
         {/* Loading state */}
@@ -349,7 +349,7 @@ export function ScheduleViewModal({
             </div>
 
             {/* Split layout: Details left, PM Jobs right */}
-            <div className="flex-1 min-h-0 grid grid-cols-[1fr_350px] max-lg:grid-cols-1">
+            <div className="flex-1 min-h-0 grid grid-cols-[600px_400px] max-lg:grid-cols-1">
               <div className="overflow-y-auto px-6 py-4 max-lg:border-b">
                 <ScheduleDetail
                   schedule={schedule}
@@ -390,6 +390,18 @@ export function ScheduleViewModal({
               </div>
               {canManage && (
                 <div className="flex items-center gap-2">
+                  {schedule.template?.checklist && schedule.template.checklist.length > 0 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        router.push(`/maintenance/schedules/${schedule.id}/preview`);
+                        onOpenChange(false);
+                      }}
+                    >
+                      Preview Form
+                    </Button>
+                  )}
                   {schedule.is_active ? (
                     <Button variant="outline" size="sm" onClick={handlePause} disabled={actionPending} className="text-destructive hover:text-destructive">
                       {actionPending ? 'Processing...' : 'Pause'}
