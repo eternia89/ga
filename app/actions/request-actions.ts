@@ -411,10 +411,9 @@ export const acceptRequest = authActionClient
     }
 
     const isRequester = request.requester_id === profile.id;
-    const isAdmin = profile.role === 'admin';
 
-    if (!isRequester && !isAdmin) {
-      throw new Error('Only the requester or an admin can accept this request');
+    if (!isRequester) {
+      throw new Error('Only the requester can accept this request');
     }
 
     const { error } = await supabase
@@ -454,10 +453,9 @@ export const rejectCompletedWork = authActionClient
     }
 
     const isRequester = request.requester_id === profile.id;
-    const isAdmin = profile.role === 'admin';
 
-    if (!isRequester && !isAdmin) {
-      throw new Error('Only the requester or an admin can reject this work');
+    if (!isRequester) {
+      throw new Error('Only the requester can reject this work');
     }
 
     // Update request: revert to in_progress with rejection reason

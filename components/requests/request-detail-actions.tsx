@@ -35,7 +35,6 @@ export function RequestDetailActions({
 
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
   const isRequester = request.requester_id === currentUserId;
-  const isAdmin = currentUserRole === 'admin';
   const isPic = request.assigned_to === currentUserId;
 
   const canCancel = isRequester && request.status === 'submitted';
@@ -46,9 +45,9 @@ export function RequestDetailActions({
   const canComplete =
     (isPic || isGaLeadOrAdmin) && ['triaged', 'in_progress'].includes(request.status);
 
-  // Acceptance actions: requester or admin on pending_acceptance
+  // Acceptance actions: only the requester on pending_acceptance
   const canAcceptOrReject =
-    (isRequester || isAdmin) && request.status === 'pending_acceptance';
+    isRequester && request.status === 'pending_acceptance';
 
   // Feedback: requester only, accepted status, no feedback yet
   const canGiveFeedback =
