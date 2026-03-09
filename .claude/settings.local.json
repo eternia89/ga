@@ -69,7 +69,8 @@
       "Bash(lsof:*)",
       "Bash(git worktree:*)",
       "Bash(git:*)",
-      "Bash(osascript:*)"
+      "Bash(osascript:*)",
+      "Bash(ls:*)"
     ]
   },
   "outputStyle": "Explanatory"
