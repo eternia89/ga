@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'lucide-react';
-import { createJobSchema } from '@/lib/validations/job-schema';
+import { createJobSchema, updateJobSchema } from '@/lib/validations/job-schema';
 import { createJob, updateJob } from '@/app/actions/job-actions';
 import {
   Form,
@@ -181,16 +181,20 @@ export function JobForm({
     ? initialData.linked_request_ids
     : (prefillRequest ? [prefillRequest.id] : []);
 
-  const form = useForm({
-    resolver: zodResolver(createJobSchema),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const form = useForm<any>({
+    resolver: zodResolver(mode === 'edit' ? updateJobSchema : createJobSchema),
     defaultValues: {
+      ...(mode === 'edit' && jobId ? { id: jobId } : {}),
       title: defaultTitle,
       description: defaultDescription,
       location_id: defaultLocationId,
       category_id: defaultCategoryId,
       priority: defaultPriority as 'low' | 'medium' | 'high' | 'urgent',
-      assigned_to: defaultAssignedTo as string | undefined,
-      estimated_cost: defaultEstimatedCost as number | undefined,
+      ...(mode === 'edit' ? {
+        assigned_to: defaultAssignedTo as string | undefined,
+        estimated_cost: defaultEstimatedCost as number | undefined,
+      } : {}),
       linked_request_ids: defaultLinkedRequestIds as string[],
     },
   });
@@ -223,16 +227,8 @@ export function JobForm({
     setLinkedRequests((prev) => prev.filter((r) => r.id !== requestId));
   };
 
-  const onSubmit = async (data: {
-    title: string;
-    description: string;
-    location_id: string;
-    category_id: string;
-    priority: 'low' | 'medium' | 'high' | 'urgent';
-    assigned_to?: string;
-    estimated_cost?: number;
-    linked_request_ids: string[];
-  }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onSubmit = async (data: any) => {
     setIsSubmitting(true);
     setError(null);
 
@@ -411,67 +407,66 @@ export function JobForm({
           />
         )}
 
-        {/* PIC (Person in Charge) */}
-        <FormField
-          control={form.control}
-          name="assigned_to"
-          render={({ field }) => (
-            <FormItem className="max-w-xs">
-              <FormLabel>PIC (Person in Charge)</FormLabel>
-              <FormControl>
-                <Combobox
-                  options={userOptions}
-                  value={field.value ?? ''}
-                  onValueChange={(val) => field.onChange(val || undefined)}
-                  placeholder="Select PIC (optional)..."
-                  searchPlaceholder="Search users..."
-                  emptyText="No users found."
-                  disabled={disabled || picLocked}
-                />
-              </FormControl>
-              {mode === 'create' && (
-                <p className="text-xs text-muted-foreground">
-                  Assigning a PIC will set the job status to &quot;Assigned&quot;
-                </p>
-              )}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Estimated Cost */}
-        <FormField
-          control={form.control}
-          name="estimated_cost"
-          render={({ field }) => (
-            <FormItem className="max-w-xs">
-              <FormLabel>Estimated Cost</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
-                    Rp
-                  </span>
-                  <Input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="0"
-                    className="pl-10"
-                    disabled={disabled}
-                    value={field.value ? formatNumber(field.value) : ''}
-                    onChange={(e) => {
-                      const digits = e.target.value.replace(/[^0-9]/g, '');
-                      field.onChange(digits === '' ? undefined : parseInt(digits, 10));
-                    }}
+        {/* PIC (Person in Charge) — only shown in edit/view mode */}
+        {mode === 'edit' && (
+          <FormField
+            control={form.control}
+            name="assigned_to"
+            render={({ field }) => (
+              <FormItem className="max-w-xs">
+                <FormLabel>PIC (Person in Charge)</FormLabel>
+                <FormControl>
+                  <Combobox
+                    options={userOptions}
+                    value={field.value ?? ''}
+                    onValueChange={(val) => field.onChange(val || undefined)}
+                    placeholder="Select PIC (optional)..."
+                    searchPlaceholder="Search users..."
+                    emptyText="No users found."
+                    disabled={disabled || picLocked}
                   />
-                </div>
-              </FormControl>
-              <p className="text-xs text-muted-foreground">
-                Optional. Used for budget approval threshold checks.
-              </p>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {/* Estimated Cost — only shown in edit/view mode */}
+        {mode === 'edit' && (
+          <FormField
+            control={form.control}
+            name="estimated_cost"
+            render={({ field }) => (
+              <FormItem className="max-w-xs">
+                <FormLabel>Estimated Cost</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
+                      Rp
+                    </span>
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="0"
+                      className="pl-10"
+                      disabled={disabled}
+                      value={field.value ? formatNumber(field.value) : ''}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/[^0-9]/g, '');
+                        field.onChange(digits === '' ? undefined : parseInt(digits, 10));
+                      }}
+                    />
+                  </div>
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  Read-only. Cost is set via Request Approval workflow.
+                </p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {/* Linked Requests */}
         <div className="space-y-3">

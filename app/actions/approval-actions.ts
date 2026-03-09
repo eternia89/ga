@@ -130,7 +130,7 @@ export const approveJob = authActionClient
     const { error } = await supabase
       .from('jobs')
       .update({
-        status: 'in_progress',
+        status: 'assigned',
         approved_at: new Date().toISOString(),
         approved_by: profile.id,
       })
@@ -147,7 +147,7 @@ export const approveJob = authActionClient
       recipientIds: approvalRecipients,
       actorId: profile.id,
       title: `Job ${job.display_id} approved`,
-      body: 'Budget approval granted — work can proceed',
+      body: 'Budget approved — PIC can now start work',
       type: 'approval',
       entityType: 'job',
       entityId: parsedInput.job_id,
@@ -199,7 +199,7 @@ export const rejectJob = authActionClient
     const { error } = await supabase
       .from('jobs')
       .update({
-        status: 'in_progress',
+        status: 'assigned',
         approval_submitted_at: null,
         approval_rejected_at: now,
         approval_rejected_by: profile.id,

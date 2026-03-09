@@ -57,8 +57,6 @@ export const createJob = authActionClient
         location_id: parsedInput.location_id,
         category_id: parsedInput.category_id,
         priority: computedPriority,
-        assigned_to: parsedInput.assigned_to ?? null,
-        estimated_cost: parsedInput.estimated_cost ?? null,
         created_by: profile.id,
         status: 'created',
       })
@@ -96,14 +94,6 @@ export const createJob = authActionClient
       if (updateReqError) {
         throw new Error(`Failed to update request statuses: ${updateReqError.message}`);
       }
-    }
-
-    // If assigned_to provided, set status to assigned
-    if (parsedInput.assigned_to) {
-      await supabase
-        .from('jobs')
-        .update({ status: 'assigned' })
-        .eq('id', job.id);
     }
 
     revalidatePath('/jobs');
@@ -208,32 +198,6 @@ export const updateJob = authActionClient
     if (updateFields.location_id !== undefined) fieldsToUpdate.location_id = updateFields.location_id;
     if (updateFields.category_id !== undefined) fieldsToUpdate.category_id = updateFields.category_id;
     if (updateFields.priority !== undefined) fieldsToUpdate.priority = updateFields.priority;
-    if (updateFields.assigned_to !== undefined) fieldsToUpdate.assigned_to = updateFields.assigned_to;
-    if (updateFields.estimated_cost !== undefined) fieldsToUpdate.estimated_cost = updateFields.estimated_cost;
-
-    // Auto-transition: if assigning a PIC on a 'created' job, move to 'assigned'
-    if (fieldsToUpdate.assigned_to && existing.status === 'created') {
-      fieldsToUpdate.status = 'assigned';
-    }
-
-    // Auto-transition: if estimated_cost CHANGED on an in_progress job,
-    // route to pending_approval for CEO review (budget approval required)
-    const newCost = fieldsToUpdate.estimated_cost as number | undefined;
-    const oldCost = existing.estimated_cost ?? 0;
-    const costChanged = newCost !== undefined && newCost !== oldCost;
-    if (
-      costChanged &&
-      newCost > 0 &&
-      existing.status === 'in_progress'
-    ) {
-      fieldsToUpdate.status = 'pending_approval';
-      fieldsToUpdate.approval_submitted_at = new Date().toISOString();
-      // Clear any previous rejection data
-      fieldsToUpdate.approval_rejected_at = null;
-      fieldsToUpdate.approval_rejected_by = null;
-      fieldsToUpdate.approval_rejection_reason = null;
-    }
-
     if (Object.keys(fieldsToUpdate).length > 0) {
       const { error } = await supabase
         .from('jobs')
@@ -244,54 +208,6 @@ export const updateJob = authActionClient
         throw new Error(error.message);
       }
 
-      // Notify newly assigned PIC
-      if (fieldsToUpdate.assigned_to) {
-        const { data: jobDisplay } = await supabase
-          .from('jobs')
-          .select('display_id')
-          .eq('id', id)
-          .single();
-
-        createNotifications({
-          companyId: profile.company_id,
-          recipientIds: [fieldsToUpdate.assigned_to as string],
-          actorId: profile.id,
-          title: `Job ${jobDisplay?.display_id ?? id} assigned to you`,
-          body: 'You have been assigned as PIC for this job',
-          type: 'assignment',
-          entityType: 'job',
-          entityId: id,
-        });
-      }
-
-      // Notify finance approvers if budget submitted for approval
-      if (fieldsToUpdate.status === 'pending_approval') {
-        const { data: jobDisplay } = await supabase
-          .from('jobs')
-          .select('display_id')
-          .eq('id', id)
-          .single();
-
-        const { data: approvers } = await supabase
-          .from('user_profiles')
-          .select('id')
-          .eq('company_id', profile.company_id)
-          .in('role', ['finance_approver', 'admin'])
-          .is('deleted_at', null);
-
-        if (approvers && approvers.length > 0) {
-          createNotifications({
-            companyId: profile.company_id,
-            recipientIds: approvers.map((a) => a.id),
-            actorId: profile.id,
-            title: `Budget approval needed: ${jobDisplay?.display_id ?? id}`,
-            body: `Estimated cost: Rp ${(newCost ?? 0).toLocaleString('id-ID')}`,
-            type: 'approval',
-            entityType: 'job',
-            entityId: id,
-          });
-        }
-      }
     }
 
     revalidatePath('/jobs');
@@ -379,7 +295,7 @@ export const updateJobStatus = authActionClient
     // Fetch job
     const { data: job } = await supabase
       .from('jobs')
-      .select('id, status, assigned_to, company_id, created_by, display_id, estimated_cost')
+      .select('id, status, assigned_to, company_id, created_by, display_id, estimated_cost, approved_at')
       .eq('id', parsedInput.id)
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
@@ -417,13 +333,14 @@ export const updateJobStatus = authActionClient
       throw new Error(`Cannot transition from '${job.status}' to '${parsedInput.status}'`);
     }
 
+    // Gate: cannot start work unless budget is approved
+    if (parsedInput.status === 'in_progress' && !job.approved_at) {
+      throw new Error('Cannot start work — budget approval is required first');
+    }
+
     const now = new Date().toISOString();
 
-    // When starting work, if estimated cost is already set, route to budget approval
     let actualStatus: string = parsedInput.status;
-    if (parsedInput.status === 'in_progress' && (job.estimated_cost ?? 0) > 0) {
-      actualStatus = 'pending_approval';
-    }
 
     // When marking complete, check if completion approval is required
     let requiresCompletionApproval = false;
@@ -447,9 +364,7 @@ export const updateJobStatus = authActionClient
 
     const jobUpdate: Record<string, unknown> = { status: actualStatus };
 
-    // Set approval tracking when routing to budget approval
-    if (actualStatus === 'pending_approval' && parsedInput.status === 'in_progress') {
-      jobUpdate.approval_submitted_at = now;
+    if (parsedInput.status === 'in_progress') {
       jobUpdate.started_at = now;
     }
 
@@ -575,6 +490,111 @@ export const updateJobStatus = authActionClient
     revalidatePath('/requests');
     revalidatePath('/approvals');
     return { success: true };
+  });
+
+// ============================================================================
+// requestApproval — PIC only; sets cost and routes to pending_approval (or auto-approves if cost = 0)
+// ============================================================================
+export const requestApproval = authActionClient
+  .schema(z.object({
+    job_id: z.string().uuid(),
+    estimated_cost: z.number().min(0, 'Cost cannot be negative'),
+  }))
+  .action(async ({ parsedInput, ctx }) => {
+    const { supabase, profile } = ctx;
+
+    const { data: job } = await supabase
+      .from('jobs')
+      .select('id, status, assigned_to, company_id, display_id')
+      .eq('id', parsedInput.job_id)
+      .eq('company_id', profile.company_id)
+      .is('deleted_at', null)
+      .single();
+
+    if (!job) {
+      throw new Error('Job not found');
+    }
+
+    if (job.assigned_to !== profile.id) {
+      throw new Error('Only the assigned PIC can request approval');
+    }
+
+    if (job.status !== 'assigned') {
+      throw new Error('Job must be in Assigned status to request approval');
+    }
+
+    const now = new Date().toISOString();
+
+    if (parsedInput.estimated_cost === 0) {
+      // Auto-approve: cost = 0, no need for finance review
+      const { error } = await supabase
+        .from('jobs')
+        .update({
+          estimated_cost: 0,
+          approved_at: now,
+        })
+        .eq('id', parsedInput.job_id);
+
+      if (error) throw new Error(error.message);
+
+      revalidatePath('/jobs');
+      revalidatePath(`/jobs/${parsedInput.job_id}`);
+      revalidatePath('/approvals');
+      return { success: true, autoApproved: true };
+    }
+
+    // Cost > 0: route to pending_approval
+    const { error } = await supabase
+      .from('jobs')
+      .update({
+        estimated_cost: parsedInput.estimated_cost,
+        status: 'pending_approval',
+        approval_submitted_at: now,
+        // Clear any prior rejection data
+        approval_rejected_at: null,
+        approval_rejected_by: null,
+        approval_rejection_reason: null,
+      })
+      .eq('id', parsedInput.job_id);
+
+    if (error) throw new Error(error.message);
+
+    // Record status change
+    await supabase
+      .from('job_status_changes')
+      .insert({
+        job_id: parsedInput.job_id,
+        company_id: job.company_id,
+        from_status: 'assigned',
+        to_status: 'pending_approval',
+        changed_by: profile.id,
+      });
+
+    // Notify finance approvers
+    const { data: financeApprovers } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('company_id', job.company_id)
+      .in('role', ['finance_approver', 'admin'])
+      .is('deleted_at', null);
+
+    if (financeApprovers && financeApprovers.length > 0) {
+      createNotifications({
+        companyId: job.company_id,
+        recipientIds: financeApprovers.map((u) => u.id),
+        actorId: profile.id,
+        title: `Budget approval needed: ${job.display_id}`,
+        body: `Estimated cost: Rp ${parsedInput.estimated_cost.toLocaleString('id-ID')}`,
+        type: 'approval',
+        entityType: 'job',
+        entityId: parsedInput.job_id,
+      });
+    }
+
+    revalidatePath('/jobs');
+    revalidatePath(`/jobs/${parsedInput.job_id}`);
+    revalidatePath('/approvals');
+    return { success: true, autoApproved: false };
   });
 
 // ============================================================================

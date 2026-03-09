@@ -13,8 +13,6 @@ export const createJobSchema = z.object({
   location_id: z.string().uuid({ message: 'Location is required' }),
   category_id: z.string().uuid({ message: 'Category is required' }),
   priority: z.enum(['low', 'medium', 'high', 'urgent'], { message: 'Priority is required' }),
-  assigned_to: z.string().uuid({ message: 'PIC must be a valid user' }).optional(),
-  estimated_cost: z.number().min(0, 'Cost cannot be negative').optional(),
   linked_request_ids: z.array(z.string().uuid()).default([]),
 });
 
