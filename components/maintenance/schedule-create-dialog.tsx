@@ -19,14 +19,16 @@ import type {
 interface ScheduleCreateDialogProps {
   templates: TemplateListItem[];
   assets: AssetListItem[];
+  initialOpen?: boolean;
 }
 
 export function ScheduleCreateDialog({
   templates,
   assets,
+  initialOpen,
 }: ScheduleCreateDialogProps) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initialOpen ?? false);
 
   return (
     <>

@@ -27,6 +27,7 @@ interface JobCreateDialogProps {
     description: string | null;
   }[];
   requestJobLinks: Record<string, string>;
+  initialOpen?: boolean;
 }
 
 export function JobCreateDialog({
@@ -35,9 +36,10 @@ export function JobCreateDialog({
   users,
   eligibleRequests,
   requestJobLinks,
+  initialOpen,
 }: JobCreateDialogProps) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initialOpen ?? false);
 
   return (
     <>

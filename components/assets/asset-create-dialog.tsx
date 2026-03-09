@@ -15,14 +15,16 @@ import { AssetSubmitForm } from "@/components/assets/asset-submit-form";
 interface AssetCreateDialogProps {
   categories: { id: string; name: string }[];
   locations: { id: string; name: string }[];
+  initialOpen?: boolean;
 }
 
 export function AssetCreateDialog({
   categories,
   locations,
+  initialOpen,
 }: AssetCreateDialogProps) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initialOpen ?? false);
 
   return (
     <>

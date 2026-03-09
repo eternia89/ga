@@ -14,13 +14,15 @@ import { TemplateCreateForm } from "@/components/maintenance/template-create-for
 
 interface TemplateCreateDialogProps {
   categories: { id: string; name: string }[];
+  initialOpen?: boolean;
 }
 
 export function TemplateCreateDialog({
   categories,
+  initialOpen,
 }: TemplateCreateDialogProps) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initialOpen ?? false);
 
   return (
     <>

@@ -19,11 +19,12 @@ interface Location {
 
 interface RequestCreateDialogProps {
   locations: Location[];
+  initialOpen?: boolean;
 }
 
-export function RequestCreateDialog({ locations }: RequestCreateDialogProps) {
+export function RequestCreateDialog({ locations, initialOpen }: RequestCreateDialogProps) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initialOpen ?? false);
 
   return (
     <>
