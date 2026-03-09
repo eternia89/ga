@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { createTransfer } from '@/app/actions/asset-actions';
 import type { InventoryItemWithRelations } from '@/lib/types/database';
@@ -16,13 +16,22 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { AlertTriangle } from 'lucide-react';
+
+export interface GAUserWithLocation {
+  id: string;
+  name: string;
+  location_id: string | null;
+}
 
 interface AssetTransferDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   asset: InventoryItemWithRelations;
-  locations: { id: string; name: string }[];
-  gaUsers: { id: string; name: string }[];
+  currentLocationName: string;
+  gaUsers: GAUserWithLocation[];
+  /** Map of location id -> name for resolving receiver's location */
+  locationNames: Record<string, string>;
   onSuccess: () => void;
 }
 
@@ -30,12 +39,12 @@ export function AssetTransferDialog({
   open,
   onOpenChange,
   asset,
-  locations,
+  currentLocationName,
   gaUsers,
+  locationNames,
   onSuccess,
 }: AssetTransferDialogProps) {
   const router = useRouter();
-  const [toLocationId, setToLocationId] = useState('');
   const [receiverId, setReceiverId] = useState('');
   const [notes, setNotes] = useState('');
   const [photos, setPhotos] = useState<File[]>([]);
@@ -45,7 +54,6 @@ export function AssetTransferDialog({
   // Reset when dialog opens
   useEffect(() => {
     if (open) {
-      setToLocationId('');
       setReceiverId('');
       setNotes('');
       setPhotos([]);
@@ -53,13 +61,18 @@ export function AssetTransferDialog({
     }
   }, [open]);
 
-  const locationOptions = locations
-    .filter((l) => l.id !== asset.location_id) // exclude current location
-    .map((l) => ({ label: l.name, value: l.id }));
-
   const userOptions = gaUsers.map((u) => ({ label: u.name, value: u.id }));
 
-  const canSubmit = toLocationId !== '' && receiverId !== '' && photos.length > 0;
+  // Auto-resolve location from selected receiver
+  const selectedUser = useMemo(
+    () => gaUsers.find((u) => u.id === receiverId) ?? null,
+    [gaUsers, receiverId]
+  );
+  const resolvedLocationId = selectedUser?.location_id ?? '';
+  const resolvedLocationName = resolvedLocationId ? (locationNames[resolvedLocationId] ?? 'Unknown location') : '';
+  const receiverHasNoLocation = receiverId !== '' && !resolvedLocationId;
+
+  const canSubmit = receiverId !== '' && resolvedLocationId !== '' && photos.length > 0;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -71,7 +84,7 @@ export function AssetTransferDialog({
       // Step 1: Create transfer movement
       const result = await createTransfer({
         asset_id: asset.id,
-        to_location_id: toLocationId,
+        to_location_id: resolvedLocationId,
         receiver_id: receiverId,
         notes: notes || undefined,
       });
@@ -132,23 +145,7 @@ export function AssetTransferDialog({
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
               Current Location
             </p>
-            <p className="text-sm font-medium">{asset.location?.name ?? '—'}</p>
-          </div>
-
-          {/* Destination location */}
-          <div className="space-y-1.5">
-            <Label htmlFor="to-location">
-              Destination Location <span className="text-destructive">*</span>
-            </Label>
-            <Combobox
-              options={locationOptions}
-              value={toLocationId}
-              onValueChange={setToLocationId}
-              placeholder="Select destination..."
-              searchPlaceholder="Search locations..."
-              emptyText="No locations found."
-              disabled={isSubmitting}
-            />
+            <p className="text-sm font-medium">{currentLocationName || '—'}</p>
           </div>
 
           {/* Receiver */}
@@ -165,6 +162,20 @@ export function AssetTransferDialog({
               emptyText="No users found."
               disabled={isSubmitting}
             />
+            {/* Auto-resolved location display */}
+            {resolvedLocationName && (
+              <p className="text-xs text-muted-foreground">
+                Location: {resolvedLocationName}
+              </p>
+            )}
+            {receiverHasNoLocation && (
+              <div className="flex items-start gap-2 rounded-md border border-yellow-200 bg-yellow-50 p-2.5">
+                <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 shrink-0" />
+                <p className="text-xs text-yellow-700">
+                  Selected receiver has no assigned location. Please assign a location to this user first.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Notes */}

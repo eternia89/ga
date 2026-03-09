@@ -120,10 +120,10 @@ export default async function AssetDetailPage({ params }: PageProps) {
       .is('deleted_at', null)
       .order('name'),
 
-    // GA Staff/Lead users for transfer receiver selection
+    // GA Staff/Lead users for transfer receiver selection (with location_id for auto-derive)
     supabase
       .from('user_profiles')
-      .select('id, name:full_name')
+      .select('id, name:full_name, location_id')
       .eq('company_id', profile.company_id)
       .in('role', ['ga_staff', 'ga_lead', 'admin'])
       .is('deleted_at', null)

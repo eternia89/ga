@@ -85,6 +85,21 @@ export default async function InventoryPage({ searchParams }: PageProps) {
     .is('deleted_at', null)
     .order('name');
 
+  // Fetch GA users with location_id for transfer dialog
+  const { data: gaUsersData } = await supabase
+    .from('user_profiles')
+    .select('id, full_name, location_id')
+    .eq('company_id', profile.company_id)
+    .in('role', ['ga_staff', 'ga_lead', 'admin'])
+    .is('deleted_at', null)
+    .order('full_name');
+
+  const gaUsers = (gaUsersData ?? []).map((u) => ({
+    id: u.id,
+    name: u.full_name,
+    location_id: u.location_id,
+  }));
+
   return (
     <div className="space-y-6 py-6">
       <SetBreadcrumbs items={[{ label: 'Dashboard', href: '/' }, { label: 'Inventory' }]} />
@@ -115,6 +130,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
         pendingTransfers={pendingTransfersMap}
         categories={categories ?? []}
         locations={locations ?? []}
+        gaUsers={gaUsers}
         currentUserId={profile.id}
         currentUserRole={profile.role}
         initialViewId={view}

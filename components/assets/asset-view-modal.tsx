@@ -67,7 +67,7 @@ export function AssetViewModal({
   const [transferPhotos, setTransferPhotos] = useState<TransferPhoto[]>([]);
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
-  const [gaUsers, setGaUsers] = useState<{ id: string; name: string }[]>([]);
+  const [gaUsers, setGaUsers] = useState<{ id: string; name: string; location_id: string | null }[]>([]);
 
   // UI states
   const [loading, setLoading] = useState(false);
@@ -202,10 +202,10 @@ export function AssetViewModal({
           .eq('company_id', companyId)
           .is('deleted_at', null)
           .order('name'),
-        // GA users
+        // GA users (with location_id for transfer auto-derive)
         supabase
           .from('user_profiles')
-          .select('id, name:full_name')
+          .select('id, name:full_name, location_id')
           .eq('company_id', companyId)
           .in('role', ['ga_staff', 'ga_lead', 'admin'])
           .is('deleted_at', null)

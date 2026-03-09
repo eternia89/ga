@@ -12,6 +12,7 @@ import { AssetTimeline } from './asset-timeline';
 import { AssetStatusChangeDialog } from './asset-status-change-dialog';
 import { ASSET_STATUS_TRANSITIONS } from '@/lib/constants/asset-status';
 import type { AssetStatus } from '@/lib/constants/asset-status';
+import type { GAUserWithLocation } from './asset-transfer-dialog';
 
 export interface ConditionPhoto {
   id: string;
@@ -48,7 +49,7 @@ interface AssetDetailClientProps {
   transferPhotos: TransferPhoto[];
   categories: { id: string; name: string }[];
   locations: { id: string; name: string }[];
-  gaUsers: { id: string; name: string }[];
+  gaUsers: GAUserWithLocation[];
   currentUserId: string;
   currentUserRole: string;
 }
@@ -101,19 +102,19 @@ export function AssetDetailClient({
           <h1 className="text-2xl font-bold tracking-tight font-mono">
             {asset.display_id}
           </h1>
-          <button
-            type="button"
-            onClick={isStatusClickable ? () => setShowStatusDialog(true) : undefined}
-            disabled={!isStatusClickable}
-            className={isStatusClickable ? 'cursor-pointer' : 'cursor-default'}
-            aria-label={isStatusClickable ? 'Click to change status' : undefined}
-          >
-            <AssetStatusBadge
-              status={asset.status}
-              clickable={isStatusClickable}
-              showInTransit={!!pendingTransfer}
-            />
-          </button>
+          <AssetStatusBadge
+            status={asset.status}
+            showInTransit={!!pendingTransfer}
+          />
+          {isStatusClickable && (
+            <button
+              type="button"
+              onClick={() => setShowStatusDialog(true)}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Change Status
+            </button>
+          )}
         </div>
 
         {/* In Transit details */}

@@ -9,12 +9,14 @@ import { InlineFeedback } from '@/components/inline-feedback';
 import { assetColumns, PendingTransfer } from './asset-columns';
 import { AssetFilters, filterParsers } from './asset-filters';
 import { AssetViewModal } from './asset-view-modal';
+import { AssetTransferDialog, type GAUserWithLocation } from './asset-transfer-dialog';
 
 interface AssetTableProps {
   data: InventoryItemWithRelations[];
   pendingTransfers: Record<string, PendingTransfer>;
   categories: { id: string; name: string }[];
   locations: { id: string; name: string }[];
+  gaUsers: GAUserWithLocation[];
   currentUserId: string;
   currentUserRole: string;
   initialViewId?: string;
@@ -25,6 +27,7 @@ export function AssetTable({
   pendingTransfers,
   categories,
   locations,
+  gaUsers,
   currentUserId,
   currentUserRole,
   initialViewId,
@@ -34,6 +37,9 @@ export function AssetTable({
 
   // View modal state
   const [viewAssetId, setViewAssetId] = useState<string | null>(initialViewId ?? null);
+
+  // Transfer dialog state (triggered from table row)
+  const [transferAsset, setTransferAsset] = useState<InventoryItemWithRelations | null>(null);
 
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -80,10 +86,19 @@ export function AssetTable({
     setViewAssetId(asset.id);
   };
 
+  const handleTransfer = (asset: InventoryItemWithRelations) => {
+    setTransferAsset(asset);
+  };
+
   const handleModalActionSuccess = () => {
     setFeedback({ type: 'success', message: 'Action completed successfully' });
     router.refresh();
   };
+
+  const locationNames = useMemo(
+    () => Object.fromEntries(locations.map((l) => [l.id, l.name])),
+    [locations]
+  );
 
   return (
     <div className="space-y-4">
@@ -104,6 +119,7 @@ export function AssetTable({
         emptyMessage="No assets found"
         meta={{
           onView: handleView,
+          onTransfer: handleTransfer,
           pendingTransfers,
           currentUserRole,
         }}
@@ -119,6 +135,19 @@ export function AssetTable({
         assetIds={filteredData.map((a) => a.id)}
         onNavigate={setViewAssetId}
       />
+
+      {/* Transfer dialog (from table row action) */}
+      {transferAsset && (
+        <AssetTransferDialog
+          open={!!transferAsset}
+          onOpenChange={(open) => { if (!open) setTransferAsset(null); }}
+          asset={transferAsset}
+          currentLocationName={transferAsset.location?.name ?? ''}
+          gaUsers={gaUsers}
+          locationNames={locationNames}
+          onSuccess={handleModalActionSuccess}
+        />
+      )}
     </div>
   );
 }

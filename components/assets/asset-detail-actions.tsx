@@ -15,7 +15,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import type { InventoryItemWithRelations, InventoryMovementWithRelations } from '@/lib/types/database';
-import { AssetTransferDialog } from './asset-transfer-dialog';
+import { AssetTransferDialog, type GAUserWithLocation } from './asset-transfer-dialog';
 import { AssetTransferRespondDialog } from './asset-transfer-respond-dialog';
 import { cancelTransfer } from '@/app/actions/asset-actions';
 import { InlineFeedback } from '@/components/inline-feedback';
@@ -33,7 +33,7 @@ interface AssetDetailActionsProps {
   onTransferRespondDialogChange: (open: boolean) => void;
   transferRespondMode: 'accept' | 'reject';
   locations: { id: string; name: string }[];
-  gaUsers: { id: string; name: string }[];
+  gaUsers: GAUserWithLocation[];
   onActionSuccess: () => void;
 }
 
@@ -176,8 +176,9 @@ export function AssetDetailActions({
         open={showTransferDialog}
         onOpenChange={onTransferDialogChange}
         asset={asset}
-        locations={locations}
+        currentLocationName={asset.location?.name ?? ''}
         gaUsers={gaUsers}
+        locationNames={Object.fromEntries(locations.map((l) => [l.id, l.name]))}
         onSuccess={onActionSuccess}
       />
 
