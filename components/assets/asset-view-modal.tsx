@@ -340,7 +340,7 @@ export function AssetViewModal({
       >
         {/* Loading state */}
         {loading && (
-          <div className="p-6 space-y-4">
+          <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
             <div className="flex items-center gap-3">
               <Skeleton className="h-6 w-24" />
               <Skeleton className="h-5 w-16" />
