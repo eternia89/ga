@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
+import { type SupabaseClient } from '@supabase/supabase-js';
 import type { PMJobChecklist, ChecklistResponse } from '@/lib/types/maintenance';
 
 // ============================================================================
@@ -243,95 +244,87 @@ export const completePMChecklist = authActionClient
   });
 
 // ============================================================================
-// advanceFloatingSchedule — called after a PM job is marked as completed.
+// advanceFloatingScheduleCore — plain async function for internal use.
+// Called from job-actions.ts updateJobStatus on PM job completion.
 // Advances next_due_at ONLY for floating schedules (fixed schedule next_due_at
 // is advanced by the cron at job generation time, per RESEARCH.md Pitfall 2).
-//
-// INTEGRATION POINT: This function should be called from job-actions.ts
-// `updateJobStatus` when transitioning to 'completed' AND job.job_type is
-// 'preventive_maintenance'. See TODO comment in job-actions.ts.
-//
-// Example integration in updateJobStatus:
-//   if (parsedInput.status === 'completed' && job.job_type === 'preventive_maintenance') {
-//     await advanceFloatingSchedule({ jobId: parsedInput.id });
-//   }
+// ============================================================================
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function advanceFloatingScheduleCore(supabaseClient: SupabaseClient<any>, jobId: string) {
+  // Fetch job with schedule relation
+  const { data: job } = await supabaseClient
+    .from('jobs')
+    .select('id, job_type, maintenance_schedule_id, status')
+    .eq('id', jobId)
+    .is('deleted_at', null)
+    .single();
+
+  if (!job) {
+    return { success: true, advanced: false };
+  }
+
+  if (job.job_type !== 'preventive_maintenance') {
+    return { success: true, advanced: false };
+  }
+
+  if (!job.maintenance_schedule_id) {
+    return { success: true, advanced: false };
+  }
+
+  // Fetch the linked schedule
+  const { data: schedule } = await supabaseClient
+    .from('maintenance_schedules')
+    .select('id, interval_type, interval_days, next_due_at')
+    .eq('id', job.maintenance_schedule_id)
+    .is('deleted_at', null)
+    .single();
+
+  if (!schedule) {
+    return { success: true, advanced: false };
+  }
+
+  const now = new Date();
+
+  if (schedule.interval_type === 'floating') {
+    const nextDueAt = new Date(now.getTime() + schedule.interval_days * 86400000).toISOString();
+
+    const { error } = await supabaseClient
+      .from('maintenance_schedules')
+      .update({
+        next_due_at: nextDueAt,
+        last_completed_at: now.toISOString(),
+      })
+      .eq('id', schedule.id);
+
+    if (error) {
+      throw new Error(`Failed to advance floating schedule: ${error.message}`);
+    }
+
+    return { success: true, advanced: true, nextDueAt };
+  }
+
+  if (schedule.interval_type === 'fixed') {
+    const { error } = await supabaseClient
+      .from('maintenance_schedules')
+      .update({ last_completed_at: now.toISOString() })
+      .eq('id', schedule.id);
+
+    if (error) {
+      throw new Error(`Failed to update fixed schedule last_completed_at: ${error.message}`);
+    }
+
+    return { success: true, advanced: false };
+  }
+
+  return { success: true, advanced: false };
+}
+
+// ============================================================================
+// advanceFloatingSchedule — thin authActionClient wrapper around core function.
+// Kept for standalone use (e.g., manual trigger from UI).
 // ============================================================================
 export const advanceFloatingSchedule = authActionClient
   .schema(z.object({ jobId: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase, profile } = ctx;
-
-    // Fetch job with schedule relation
-    const { data: job } = await supabase
-      .from('jobs')
-      .select('id, job_type, maintenance_schedule_id, status')
-      .eq('id', parsedInput.jobId)
-      .eq('company_id', profile.company_id)
-      .is('deleted_at', null)
-      .single();
-
-    if (!job) {
-      throw new Error('Job not found');
-    }
-
-    if (job.job_type !== 'preventive_maintenance') {
-      // Not a PM job — nothing to advance
-      return { success: true, advanced: false };
-    }
-
-    if (!job.maintenance_schedule_id) {
-      // PM job without a schedule (edge case) — nothing to advance
-      return { success: true, advanced: false };
-    }
-
-    // Fetch the linked schedule
-    const { data: schedule } = await supabase
-      .from('maintenance_schedules')
-      .select('id, interval_type, interval_days, next_due_at')
-      .eq('id', job.maintenance_schedule_id)
-      .is('deleted_at', null)
-      .single();
-
-    if (!schedule) {
-      // Schedule was deleted — nothing to advance
-      return { success: true, advanced: false };
-    }
-
-    const now = new Date();
-
-    if (schedule.interval_type === 'floating') {
-      // Floating: next_due_at = now + interval_days (calculated from completion date)
-      const nextDueAt = new Date(now.getTime() + schedule.interval_days * 86400000).toISOString();
-
-      const { error } = await supabase
-        .from('maintenance_schedules')
-        .update({
-          next_due_at: nextDueAt,
-          last_completed_at: now.toISOString(),
-        })
-        .eq('id', schedule.id);
-
-      if (error) {
-        throw new Error(`Failed to advance floating schedule: ${error.message}`);
-      }
-
-      return { success: true, advanced: true, nextDueAt };
-    }
-
-    if (schedule.interval_type === 'fixed') {
-      // Fixed: cron already advanced next_due_at at job generation time.
-      // Only update last_completed_at here.
-      const { error } = await supabase
-        .from('maintenance_schedules')
-        .update({ last_completed_at: now.toISOString() })
-        .eq('id', schedule.id);
-
-      if (error) {
-        throw new Error(`Failed to update fixed schedule last_completed_at: ${error.message}`);
-      }
-
-      return { success: true, advanced: false };
-    }
-
-    return { success: true, advanced: false };
+    return advanceFloatingScheduleCore(ctx.supabase, parsedInput.jobId);
   });

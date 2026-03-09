@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
 import { highestPriority } from '@/lib/jobs/priority';
 import { formatIDR } from '@/lib/utils';
+import { advanceFloatingScheduleCore } from '@/app/actions/pm-job-actions';
 
 // ============================================================================
 // createJob — ga_lead or admin only
@@ -212,7 +213,7 @@ export const updateJob = authActionClient
     }
 
     // Auto-transition: if estimated_cost CHANGED on an in_progress job,
-    // route to pending_approval for CEO review (budget approval required)
+    // route to pending_approval only if cost >= budget_threshold
     const newCost = fieldsToUpdate.estimated_cost as number | undefined;
     const oldCost = existing.estimated_cost ?? 0;
     const costChanged = newCost !== undefined && newCost !== oldCost;
@@ -221,12 +222,24 @@ export const updateJob = authActionClient
       newCost > 0 &&
       existing.status === 'in_progress'
     ) {
-      fieldsToUpdate.status = 'pending_approval';
-      fieldsToUpdate.approval_submitted_at = new Date().toISOString();
-      // Clear any previous rejection data
-      fieldsToUpdate.approval_rejected_at = null;
-      fieldsToUpdate.approval_rejected_by = null;
-      fieldsToUpdate.approval_rejection_reason = null;
+      // Fetch budget_threshold to determine if approval is needed
+      const { data: thresholdSetting } = await supabase
+        .from('company_settings')
+        .select('value')
+        .eq('company_id', profile.company_id)
+        .eq('key', 'budget_threshold')
+        .single();
+
+      const budgetThreshold = thresholdSetting ? parseInt(thresholdSetting.value, 10) : null;
+
+      if (budgetThreshold !== null && newCost >= budgetThreshold) {
+        fieldsToUpdate.status = 'pending_approval';
+        fieldsToUpdate.approval_submitted_at = new Date().toISOString();
+        // Clear any previous rejection data
+        fieldsToUpdate.approval_rejected_at = null;
+        fieldsToUpdate.approval_rejected_by = null;
+        fieldsToUpdate.approval_rejection_reason = null;
+      }
     }
 
     if (Object.keys(fieldsToUpdate).length > 0) {
@@ -374,7 +387,7 @@ export const updateJobStatus = authActionClient
     // Fetch job
     const { data: job } = await supabase
       .from('jobs')
-      .select('id, status, assigned_to, company_id, created_by, display_id, estimated_cost')
+      .select('id, status, assigned_to, company_id, created_by, display_id, estimated_cost, job_type, maintenance_schedule_id')
       .eq('id', parsedInput.id)
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
@@ -394,7 +407,7 @@ export const updateJobStatus = authActionClient
     // Validate allowed transitions
     const validTransitions: Record<string, string[]> = {
       created: ['assigned'],
-      assigned: ['in_progress', 'pending_approval'],
+      assigned: ['in_progress'],
       in_progress: ['completed', 'pending_approval'],
       pending_approval: ['in_progress'], // after approval (approval action handles the approve path)
       pending_completion_approval: [], // handled by approveCompletion/rejectCompletion
@@ -409,11 +422,7 @@ export const updateJobStatus = authActionClient
 
     const now = new Date().toISOString();
 
-    // When starting work, if estimated cost is already set, route to budget approval
     let actualStatus: string = parsedInput.status;
-    if (parsedInput.status === 'in_progress' && (job.estimated_cost ?? 0) > 0) {
-      actualStatus = 'pending_approval';
-    }
 
     // When marking complete, check if completion approval is required
     let requiresCompletionApproval = false;
@@ -437,9 +446,8 @@ export const updateJobStatus = authActionClient
 
     const jobUpdate: Record<string, unknown> = { status: actualStatus };
 
-    // Set approval tracking when routing to budget approval
-    if (actualStatus === 'pending_approval' && parsedInput.status === 'in_progress') {
-      jobUpdate.approval_submitted_at = now;
+    // Set started_at when transitioning to in_progress
+    if (actualStatus === 'in_progress' && job.status === 'assigned') {
       jobUpdate.started_at = now;
     }
 
@@ -472,16 +480,10 @@ export const updateJobStatus = authActionClient
         gps_accuracy: parsedInput.gpsAccuracy ?? null,
       });
 
-    // TODO(PM-INTEGRATION): When completing a PM job, call advanceFloatingSchedule.
-    // Example integration:
-    //   if (actualStatus === 'completed') {
-    //     const { data: fullJob } = await supabase.from('jobs').select('job_type').eq('id', parsedInput.id).single();
-    //     if (fullJob?.job_type === 'preventive_maintenance') {
-    //       await advanceFloatingSchedule({ jobId: parsedInput.id }); // from pm-job-actions.ts
-    //     }
-    //   }
-    // This advances floating schedule next_due_at from completion date (not generation date).
-    // Fixed schedule next_due_at is already advanced by the cron at job generation time.
+    // Advance floating schedule when completing a PM job
+    if (actualStatus === 'completed' && job.job_type === 'preventive_maintenance') {
+      await advanceFloatingScheduleCore(supabase, parsedInput.id);
+    }
 
     if (requiresCompletionApproval) {
       // Notify finance approvers and admins that completion approval is needed
@@ -610,53 +612,72 @@ export const updateJobBudget = authActionClient
 
     const now = new Date().toISOString();
 
+    // Fetch budget_threshold to determine if approval is needed
+    const { data: setting } = await supabase
+      .from('company_settings')
+      .select('value')
+      .eq('company_id', job.company_id)
+      .eq('key', 'budget_threshold')
+      .single();
+
+    const budgetThreshold = setting ? parseInt(setting.value, 10) : null;
+    const shouldRouteToApproval = budgetThreshold !== null && parsedInput.estimated_cost >= budgetThreshold;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updateData: Record<string, any> = {
+      estimated_cost: parsedInput.estimated_cost,
+      // Clear any previous rejection data
+      approval_rejected_at: null,
+      approval_rejected_by: null,
+      approval_rejection_reason: null,
+    };
+
+    if (shouldRouteToApproval) {
+      updateData.status = 'pending_approval';
+      updateData.approval_submitted_at = now;
+    }
+
     const { error } = await supabase
       .from('jobs')
-      .update({
-        estimated_cost: parsedInput.estimated_cost,
-        status: 'pending_approval',
-        approval_submitted_at: now,
-        // Clear any previous rejection data
-        approval_rejected_at: null,
-        approval_rejected_by: null,
-        approval_rejection_reason: null,
-      })
+      .update(updateData)
       .eq('id', parsedInput.id);
 
     if (error) {
       throw new Error(error.message);
     }
 
-    // Record GPS status change
-    await supabase
-      .from('job_status_changes')
-      .insert({
-        job_id: parsedInput.id,
-        company_id: job.company_id,
-        from_status: job.status,
-        to_status: 'pending_approval',
-        changed_by: profile.id,
-      });
+    if (shouldRouteToApproval) {
+      // Record GPS status change
+      await supabase
+        .from('job_status_changes')
+        .insert({
+          job_id: parsedInput.id,
+          company_id: job.company_id,
+          from_status: job.status,
+          to_status: 'pending_approval',
+          changed_by: profile.id,
+        });
 
-    // Non-blocking notification: notify finance approvers and admins
-    const { data: financeApprovers } = await supabase
-      .from('user_profiles')
-      .select('id')
-      .eq('company_id', job.company_id)
-      .in('role', ['finance_approver', 'admin'])
-      .is('deleted_at', null);
+      // Non-blocking notification: notify finance approvers and admins
+      const { data: financeApprovers } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('company_id', job.company_id)
+        .in('role', ['finance_approver', 'admin'])
+        .is('deleted_at', null);
 
-    if (financeApprovers && financeApprovers.length > 0) {
-      createNotifications({
-        companyId: job.company_id,
-        recipientIds: financeApprovers.map((u) => u.id),
-        actorId: profile.id,
-        title: `Job ${job.display_id} requires budget approval`,
-        body: `Estimated cost: ${formatIDR(parsedInput.estimated_cost)}`,
-        type: 'approval',
-        entityType: 'job',
-        entityId: parsedInput.id,
-      });
+      if (financeApprovers && financeApprovers.length > 0) {
+        createNotifications({
+          companyId: job.company_id,
+          recipientIds: financeApprovers.map((u) => u.id),
+          actorId: profile.id,
+          title: `Job ${job.display_id} requires budget approval`,
+          body: `Estimated cost: ${formatIDR(parsedInput.estimated_cost)}`,
+          type: 'approval',
+          entityType: 'job',
+          entityId: parsedInput.id,
+        });
+      }
     }
 
     revalidatePath('/jobs');
