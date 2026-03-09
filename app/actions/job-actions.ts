@@ -34,6 +34,44 @@ export const createJob = authActionClient
       throw new Error('Failed to generate job ID. Please try again.');
     }
 
+    // ── Validate linked requests (Rules 1-3) ──
+    if (parsedInput.linked_request_ids && parsedInput.linked_request_ids.length > 0) {
+      // Rule 2: Only triaged/in_progress requests can be linked
+      const { data: requestsToLink } = await supabase
+        .from('requests')
+        .select('id, display_id, status, assigned_to')
+        .in('id', parsedInput.linked_request_ids)
+        .is('deleted_at', null);
+
+      if (!requestsToLink || requestsToLink.length !== parsedInput.linked_request_ids.length) {
+        throw new Error('One or more selected requests were not found.');
+      }
+
+      const invalidStatus = requestsToLink.filter((r) => !['triaged', 'in_progress'].includes(r.status));
+      if (invalidStatus.length > 0) {
+        throw new Error("Cannot link requests with status 'New'. Only triaged or in-progress requests can be linked.");
+      }
+
+      // Rule 3: Each request can only be linked to one job
+      const { data: existingLinks } = await supabase
+        .from('job_requests')
+        .select('request_id')
+        .in('request_id', parsedInput.linked_request_ids);
+
+      if (existingLinks && existingLinks.length > 0) {
+        const alreadyLinkedIds = existingLinks.map((l) => l.request_id);
+        const alreadyLinkedRequests = requestsToLink.filter((r) => alreadyLinkedIds.includes(r.id));
+        const displayIds = alreadyLinkedRequests.map((r) => r.display_id).join(', ');
+        throw new Error(`Request ${displayIds} is already linked to another job.`);
+      }
+
+      // Rule 1: Only the PIC assigned to a request can link it
+      const notAssigned = requestsToLink.filter((r) => r.assigned_to !== profile.id);
+      if (notAssigned.length > 0) {
+        throw new Error('You can only link requests assigned to you as PIC.');
+      }
+    }
+
     // Auto-compute priority from linked requests if any
     let computedPriority = parsedInput.priority;
     if (parsedInput.linked_request_ids && parsedInput.linked_request_ids.length > 0) {
@@ -116,12 +154,12 @@ export const createJob = authActionClient
         throw new Error(`Failed to link requests: ${linkError.message}`);
       }
 
-      // Move each linked request to in_progress
+      // Move triaged linked requests to in_progress (skip already in_progress)
       const { error: updateReqError } = await supabase
         .from('requests')
         .update({ status: 'in_progress', updated_at: new Date().toISOString() })
         .in('id', parsedInput.linked_request_ids)
-        .neq('status', 'cancelled');
+        .in('status', ['triaged']);
 
       if (updateReqError) {
         throw new Error(`Failed to update request statuses: ${updateReqError.message}`);
@@ -192,6 +230,43 @@ export const updateJob = authActionClient
       }
 
       if (toAdd.length > 0) {
+        // ── Validate newly linked requests (Rules 1-3) ──
+        // Rule 2: Only triaged/in_progress requests can be linked
+        const { data: requestsToAdd } = await supabase
+          .from('requests')
+          .select('id, display_id, status, assigned_to')
+          .in('id', toAdd)
+          .is('deleted_at', null);
+
+        if (!requestsToAdd || requestsToAdd.length !== toAdd.length) {
+          throw new Error('One or more selected requests were not found.');
+        }
+
+        const invalidStatus = requestsToAdd.filter((r) => !['triaged', 'in_progress'].includes(r.status));
+        if (invalidStatus.length > 0) {
+          throw new Error("Cannot link requests with status 'New'. Only triaged or in-progress requests can be linked.");
+        }
+
+        // Rule 3: Each request can only be linked to one job (exclude current job's own links)
+        const { data: existingLinks } = await supabase
+          .from('job_requests')
+          .select('request_id')
+          .in('request_id', toAdd)
+          .neq('job_id', id);
+
+        if (existingLinks && existingLinks.length > 0) {
+          const alreadyLinkedIds = existingLinks.map((l) => l.request_id);
+          const alreadyLinkedRequests = requestsToAdd.filter((r) => alreadyLinkedIds.includes(r.id));
+          const displayIds = alreadyLinkedRequests.map((r) => r.display_id).join(', ');
+          throw new Error(`Request ${displayIds} is already linked to another job.`);
+        }
+
+        // Rule 1: Only the PIC assigned to a request can link it
+        const notAssigned = requestsToAdd.filter((r) => r.assigned_to !== profile.id);
+        if (notAssigned.length > 0) {
+          throw new Error('You can only link requests assigned to you as PIC.');
+        }
+
         await supabase
           .from('job_requests')
           .insert(toAdd.map((requestId) => ({
@@ -201,12 +276,12 @@ export const updateJob = authActionClient
             linked_by: profile.id,
           })));
 
-        // Move newly linked requests to in_progress
+        // Move triaged newly linked requests to in_progress (skip already in_progress)
         await supabase
           .from('requests')
           .update({ status: 'in_progress', updated_at: new Date().toISOString() })
           .in('id', toAdd)
-          .neq('status', 'cancelled');
+          .in('status', ['triaged']);
       }
 
       // Recalculate priority from all current linked requests
