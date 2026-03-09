@@ -297,7 +297,7 @@ Recent decisions affecting current work:
 | 25 | Add permalink support (?action=create) to all 5 create modals | 2026-03-09 | d6258a7 | Verified | [22-add-permalink-support-to-all-5-create-mo](./quick/22-add-permalink-support-to-all-5-create-mo/) |
 | 26 | Remove duplication from detail pages, add sticky save bar | 2026-03-09 | 5374429 | Verified | [23-remove-duplication-of-information-in-det](./quick/23-remove-duplication-of-information-in-det/) |
 | 27 | Add location field to user profiles | 2026-03-09 | ac80bee | Verified | [24-add-location-field-to-user-profiles-indi](./quick/24-add-location-field-to-user-profiles-indi/) |
-| 28 | Asset location tracking & transfer flow refinements | 2026-03-09 | 14b9629 | Complete | [25-asset-location-tracking-transfer-flow-st](./quick/25-asset-location-tracking-transfer-flow-st/) |
+| 28 | Asset location tracking & transfer flow refinements | 2026-03-09 | 14b9629 | Verified | [25-asset-location-tracking-transfer-flow-st](./quick/25-asset-location-tracking-transfer-flow-st/) |
 
 ## Session Continuity
 
