@@ -276,6 +276,70 @@ export const rejectRequest = authActionClient
   });
 
 // ============================================================================
+// completeRequest — PIC or GA Lead/Admin, from triaged or in_progress
+// Moves request to pending_acceptance so requester can accept/reject
+// ============================================================================
+export const completeRequest = authActionClient
+  .schema(z.object({ id: z.string().uuid() }))
+  .action(async ({ parsedInput, ctx }) => {
+    const { supabase, profile } = ctx;
+
+    // Fetch request
+    const { data: request } = await supabase
+      .from('requests')
+      .select('id, status, assigned_to, requester_id, display_id, company_id')
+      .eq('id', parsedInput.id)
+      .single();
+
+    if (!request) {
+      throw new Error('Request not found');
+    }
+
+    // Permission check: must be PIC or GA Lead/Admin
+    const isPic = request.assigned_to === profile.id;
+    const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(profile.role);
+
+    if (!isPic && !isGaLeadOrAdmin) {
+      throw new Error('Only the assigned PIC or GA Lead can complete this request.');
+    }
+
+    // Status check: must be triaged or in_progress
+    if (!['triaged', 'in_progress'].includes(request.status)) {
+      throw new Error('Request can only be completed when in Triaged or In Progress status');
+    }
+
+    // Update request to pending_acceptance
+    const now = new Date().toISOString();
+    const { error } = await supabase
+      .from('requests')
+      .update({
+        status: 'pending_acceptance',
+        completed_at: now,
+        updated_at: now,
+      })
+      .eq('id', parsedInput.id);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    // Non-blocking notification to requester
+    createNotifications({
+      companyId: request.company_id,
+      recipientIds: [request.requester_id],
+      actorId: profile.id,
+      title: `Request ${request.display_id} completed`,
+      body: `Your request has been completed. Please accept or reject the work.`,
+      type: 'completion',
+      entityType: 'request',
+      entityId: request.id,
+    }).catch(() => {});
+
+    revalidatePath('/requests');
+    return { success: true };
+  });
+
+// ============================================================================
 // deleteMediaAttachment — requester only, while request status = 'submitted'
 // ============================================================================
 export const deleteMediaAttachment = authActionClient
