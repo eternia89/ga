@@ -298,7 +298,7 @@ Recent decisions affecting current work:
 | 26 | Remove duplication from detail pages, add sticky save bar | 2026-03-09 | 5374429 | Verified | [23-remove-duplication-of-information-in-det](./quick/23-remove-duplication-of-information-in-det/) |
 | 27 | Add location field to user profiles | 2026-03-09 | ac80bee | Verified | [24-add-location-field-to-user-profiles-indi](./quick/24-add-location-field-to-user-profiles-indi/) |
 | 28 | Asset location tracking & transfer flow refinements | 2026-03-09 | 14b9629 | Verified | [25-asset-location-tracking-transfer-flow-st](./quick/25-asset-location-tracking-transfer-flow-st/) |
-| 29 | Users table: role beside name, remove Division + Last Login | 2026-03-09 | f5aadbc | Complete | [26-users-table-role-beside-name-remove-divi](./quick/26-users-table-role-beside-name-remove-divi/) |
+| 29 | Users table: role beside name, remove Division + Last Login | 2026-03-09 | f5aadbc | Verified | [26-users-table-role-beside-name-remove-divi](./quick/26-users-table-role-beside-name-remove-divi/) |
 
 ## Session Continuity
 
