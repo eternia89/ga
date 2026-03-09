@@ -276,7 +276,7 @@ Recent decisions affecting current work:
 | 19 | Standardize all modal widths (form 600px, view 1000px) | 2026-03-06 | 1f27e49 | Verified | [16-standardize-all-modal-widths-form-600px-](./quick/16-standardize-all-modal-widths-form-600px-/) |
 | 20 | Restrict Start Work action to PIC only | 2026-03-06 | 9bbd4f0 | Verified | [17-restrict-start-work-action-to-pic-only](./quick/17-restrict-start-work-action-to-pic-only/) |
 | 21 | Lock PIC field once job status moves past assigned | 2026-03-06 | ab78e9b | Verified | [18-lock-pic-field-once-job-status-moves-pas](./quick/18-lock-pic-field-once-job-status-moves-pas/) |
-| 22 | Rework job flow: cost approval before PIC starts work | 2026-03-09 | dee9adc | Complete | [19-rework-job-flow-cost-approval-before-pic](./quick/19-rework-job-flow-cost-approval-before-pic/) |
+| 22 | Rework job flow: cost approval before PIC starts work | 2026-03-09 | dee9adc | Verified | [19-rework-job-flow-cost-approval-before-pic](./quick/19-rework-job-flow-cost-approval-before-pic/) |
 
 ## Session Continuity
 
