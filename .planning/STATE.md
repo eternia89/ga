@@ -278,7 +278,7 @@ Recent decisions affecting current work:
 | 21 | Lock PIC field once job status moves past assigned | 2026-03-06 | ab78e9b | Verified | [18-lock-pic-field-once-job-status-moves-pas](./quick/18-lock-pic-field-once-job-status-moves-pas/) |
 | 22 | Rework job flow: cost approval before PIC starts work | 2026-03-09 | dee9adc | Verified | [19-rework-job-flow-cost-approval-before-pic](./quick/19-rework-job-flow-cost-approval-before-pic/) |
 | 23 | Swap order: start work before cost approval | 2026-03-09 | 707719c | Verified | [20-swap-order-start-work-before-cost-approv](./quick/20-swap-order-start-work-before-cost-approv/) |
-| 24 | Add PM checklist preview page for schedule detail | 2026-03-09 | ae2b673 | Complete | [21-add-a-view-page-to-simulate-how-the-main](./quick/21-add-a-view-page-to-simulate-how-the-main/) |
+| 24 | Add PM checklist preview page for schedule detail | 2026-03-09 | ae2b673 | Verified | [21-add-a-view-page-to-simulate-how-the-main](./quick/21-add-a-view-page-to-simulate-how-the-main/) |
 
 ## Session Continuity
 
