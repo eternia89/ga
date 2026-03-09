@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/select';
 import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
+import { PhotoUpload } from '@/components/media/photo-upload';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { RequestPreviewDialog } from './request-preview-dialog';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
@@ -129,6 +130,7 @@ export function JobForm({
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [previewRequest, setPreviewRequest] = useState<NonNullable<JobFormProps['linkedRequestDetails']>[number] | null>(null);
   const [linkedRequests, setLinkedRequests] = useState<EligibleRequest[]>(() => {
     if (mode === 'edit' && initialData?.linked_request_ids && initialData.linked_request_ids.length > 0) {
@@ -258,6 +260,27 @@ export function JobForm({
           setError('Failed to create job. Please try again.');
           return;
         }
+
+        // Step 2: Upload photos if any were selected
+        if (photoFiles.length > 0) {
+          const formData = new FormData();
+          formData.append('entity_type', 'job');
+          formData.append('entity_id', result.data.jobId);
+          for (const file of photoFiles) {
+            formData.append('photos', file);
+          }
+
+          const uploadResponse = await fetch('/api/uploads/entity-photos', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!uploadResponse.ok) {
+            // Photo upload failed — job is still saved, just without photos
+            console.warn('Photo upload failed:', await uploadResponse.text());
+          }
+        }
+
         if (onSuccess) {
           onSuccess();
         } else {
@@ -564,6 +587,21 @@ export function JobForm({
             )}
           />
         </div>
+
+        {/* Photos — only show in create mode, not readOnly */}
+        {mode === 'create' && !readOnly && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Photos (optional)</p>
+            <div className="flex flex-wrap gap-2">
+              <PhotoUpload
+                onChange={setPhotoFiles}
+                disabled={isSubmitting}
+                maxPhotos={10}
+                showCount
+              />
+            </div>
+          </div>
+        )}
 
         {/* Error feedback */}
         {error && (
