@@ -303,10 +303,11 @@ Recent decisions affecting current work:
 | 31 | Standardize empty cell styling with muted em dash | 2026-03-09 | a60e93c | Verified | [28-inactive-or-empty-state-values-should-ha](./quick/28-inactive-or-empty-state-values-should-ha/) |
 | 32 | Table checkbox columns static width audit (no changes needed) | 2026-03-09 | — | Verified | [29-table-checkbox-columns-should-have-stati](./quick/29-table-checkbox-columns-should-have-stati/) |
 | 33 | Hide pagination footer when data fits on one page | 2026-03-09 | 06c86b8 | Verified | [30-hide-rows-per-page-selector-pagination-p](./quick/30-hide-rows-per-page-selector-pagination-p/) |
+| 34 | Fix skeleton loading state overflow in view modals | 2026-03-09 | de53d61 | Complete | [31-fix-skeleton-loading-state-overflow-from](./quick/31-fix-skeleton-loading-state-overflow-from/) |
 
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Completed quick task 30: Hide pagination footer when data fits on one page
+Stopped at: Completed quick task 31: Fix skeleton loading state overflow in view modals
 Resume file: None
 Next: Ready for next task
