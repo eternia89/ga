@@ -285,7 +285,7 @@ export function JobModal({
           .order('full_name'),
         supabase
           .from('requests')
-          .select('id, display_id, title, priority, status, location_id, category_id, description')
+          .select('id, display_id, title, priority, status, location_id, category_id, description, assigned_to')
           .eq('company_id', companyId)
           .in('status', ['triaged', 'in_progress'])
           .is('deleted_at', null)
@@ -297,30 +297,36 @@ export function JobModal({
       setViewCategories(categoriesResult.data ?? []);
       setViewLocations(locationsResult.data ?? []);
       setViewUsers((usersResult.data ?? []).map((u) => ({ id: u.id, name: u.full_name })));
-      setViewEligibleRequests((eligibleRequestsResult.data ?? []) as EligibleRequest[]);
 
-      // Fetch job links for in_progress requests
-      const inProgressRequestIds = (eligibleRequestsResult.data ?? [])
-        .filter((r) => r.status === 'in_progress')
-        .map((r) => r.id);
+      const rawEligible = (eligibleRequestsResult.data ?? []) as (EligibleRequest & { assigned_to: string | null })[];
 
-      if (inProgressRequestIds.length > 0) {
-        const { data: jobLinks } = await supabase
-          .from('job_requests')
-          .select('request_id, job:jobs(display_id)')
-          .in('request_id', inProgressRequestIds);
+      // Rule 3: Exclude requests already linked to ANY job, BUT include this job's own linked requests
+      const { data: allLinkedData } = await supabase
+        .from('job_requests')
+        .select('request_id');
 
-        if (jobLinks) {
-          const links: Record<string, string> = {};
-          for (const link of jobLinks) {
-            const linkJob = link.job as unknown as { display_id: string } | null;
-            if (linkJob?.display_id) {
-              links[link.request_id] = linkJob.display_id;
-            }
-          }
-          setViewRequestJobLinks(links);
-        }
+      const allLinkedIds = new Set((allLinkedData ?? []).map((r) => r.request_id));
+      const currentJobRequestIds = new Set(
+        (fetchedJob.job_requests ?? []).map((jr: { request: { id: string } }) => jr.request.id)
+      );
+
+      const unlinkedRequests = rawEligible.filter(
+        (r) => !allLinkedIds.has(r.id) || currentJobRequestIds.has(r.id)
+      );
+
+      // Rule 1: Only show requests where current user is PIC
+      const picFiltered = unlinkedRequests.filter(
+        (r) => r.assigned_to === currentUserId || currentJobRequestIds.has(r.id)
+      );
+
+      setViewEligibleRequests(picFiltered as EligibleRequest[]);
+
+      // In edit mode, keep requestJobLinks for current job's linked requests only
+      const viewLinks: Record<string, string> = {};
+      for (const reqId of currentJobRequestIds) {
+        viewLinks[reqId] = fetchedJob.display_id;
       }
+      setViewRequestJobLinks(viewLinks);
 
       // Fetch full details for linked requests (for read-only display)
       const linkedReqIds = (fetchedJob.job_requests ?? []).map((jr: { request: { id: string } }) => jr.request.id);

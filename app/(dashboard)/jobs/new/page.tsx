@@ -60,11 +60,10 @@ export default async function NewJobPage({ searchParams }: NewJobPageProps) {
       .is('deleted_at', null)
       .order('full_name'),
 
-    // Eligible requests (triaged status) — these can be linked to jobs
-    // Also fetch already-linked requests (in_progress) with their job link info
+    // Eligible requests (triaged + in_progress) — include assigned_to for PIC filter
     supabase
       .from('requests')
-      .select('id, display_id, title, priority, status, location_id, category_id, description')
+      .select('id, display_id, title, priority, status, location_id, category_id, description, assigned_to')
       .eq('company_id', profile.company_id)
       .in('status', ['triaged', 'in_progress'])
       .is('deleted_at', null)
@@ -74,30 +73,21 @@ export default async function NewJobPage({ searchParams }: NewJobPageProps) {
   const locations = locationsResult.data ?? [];
   const categories = categoriesResult.data ?? [];
   const users = usersResult.data ?? [];
-  const eligibleRequests = requestsResult.data ?? [];
+  const rawEligibleRequests = requestsResult.data ?? [];
 
-  // Fetch job links for in_progress requests so we can show "(linked to JOB-XX-XXXX)"
-  const inProgressRequestIds = eligibleRequests
-    .filter((r) => r.status === 'in_progress')
-    .map((r) => r.id);
+  // Rule 3: Exclude requests already linked to any job
+  const { data: alreadyLinkedData } = await supabase
+    .from('job_requests')
+    .select('request_id');
 
-  let requestJobLinks: Record<string, string> = {};
+  const alreadyLinkedIds = new Set((alreadyLinkedData ?? []).map((r) => r.request_id));
+  const unlinkedRequests = rawEligibleRequests.filter((r) => !alreadyLinkedIds.has(r.id));
 
-  if (inProgressRequestIds.length > 0) {
-    const { data: jobLinks } = await supabase
-      .from('job_requests')
-      .select('request_id, job:jobs(display_id)')
-      .in('request_id', inProgressRequestIds);
+  // Rule 1: Only show requests where current user is PIC
+  const eligibleRequests = unlinkedRequests.filter((r) => r.assigned_to === profile.id);
 
-    if (jobLinks) {
-      for (const link of jobLinks) {
-        const jobData = link.job as unknown as { display_id: string } | null;
-        if (jobData?.display_id) {
-          requestJobLinks[link.request_id] = jobData.display_id;
-        }
-      }
-    }
-  }
+  // No already-linked requests will appear in create mode, so requestJobLinks is empty
+  const requestJobLinks: Record<string, string> = {};
 
   // Optional prefill from ?request_id= query param
   let prefillRequest: {
