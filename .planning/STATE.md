@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-09 - Completed quick task 23: Swap order — start work before cost approval
+Last activity: 2026-03-09 - Completed quick task 24: Add PM checklist preview page
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -278,10 +278,11 @@ Recent decisions affecting current work:
 | 21 | Lock PIC field once job status moves past assigned | 2026-03-06 | ab78e9b | Verified | [18-lock-pic-field-once-job-status-moves-pas](./quick/18-lock-pic-field-once-job-status-moves-pas/) |
 | 22 | Rework job flow: cost approval before PIC starts work | 2026-03-09 | dee9adc | Verified | [19-rework-job-flow-cost-approval-before-pic](./quick/19-rework-job-flow-cost-approval-before-pic/) |
 | 23 | Swap order: start work before cost approval | 2026-03-09 | 707719c | Verified | [20-swap-order-start-work-before-cost-approv](./quick/20-swap-order-start-work-before-cost-approv/) |
+| 24 | Add PM checklist preview page for schedule detail | 2026-03-09 | ae2b673 | Complete | [21-add-a-view-page-to-simulate-how-the-main](./quick/21-add-a-view-page-to-simulate-how-the-main/) |
 
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Completed quick task 23: Swap order — start work before cost approval
-Resume file: .planning/quick/20-swap-order-start-work-before-cost-approv/20-SUMMARY.md
+Stopped at: Completed quick task 24: Add PM checklist preview page
+Resume file: .planning/quick/21-add-a-view-page-to-simulate-how-the-main/21-SUMMARY.md
 Next: Ready for next task
