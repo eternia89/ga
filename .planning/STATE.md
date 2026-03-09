@@ -301,7 +301,7 @@ Recent decisions affecting current work:
 | 29 | Move PM checklist preview from schedules to templates | 2026-03-09 | 84c44d1 | Verified | [26-move-pm-checklist-preview-from-maintenan](./quick/26-move-pm-checklist-preview-from-maintenan/) |
 | 30 | Rework job lifecycle: budget at creation, creator-based approval | 2026-03-09 | 8600294 | Verified | [27-rework-job-lifecycle-budget-approval-by-](./quick/27-rework-job-lifecycle-budget-approval-by-/) |
 | 31 | Enforce request-job linking rules: PIC-only, status filter, one-to-one | 2026-03-09 | c79afce | Verified | [28-request-job-linking-rules-only-pic-handl](./quick/28-request-job-linking-rules-only-pic-handl/) |
-| 32 | Allow PIC or GA Lead to complete a request directly | 2026-03-09 | d25debc | Complete | [29-allow-pic-or-ga-lead-to-complete-a-reque](./quick/29-allow-pic-or-ga-lead-to-complete-a-reque/) |
+| 32 | Allow PIC or GA Lead to complete a request directly | 2026-03-09 | d25debc | Verified | [29-allow-pic-or-ga-lead-to-complete-a-reque](./quick/29-allow-pic-or-ga-lead-to-complete-a-reque/) |
 
 ## Session Continuity
 
