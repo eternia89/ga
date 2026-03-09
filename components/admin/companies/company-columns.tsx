@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { format } from "date-fns";
+
 import { Company } from "@/lib/types/database";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -63,16 +63,6 @@ export const companyColumns: ColumnDef<Company>[] = [
           {isDeactivated ? "Deactivated" : "Active"}
         </Badge>
       );
-    },
-  },
-  {
-    accessorKey: "created_at",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Created" />
-    ),
-    cell: ({ row }) => {
-      const date = row.getValue("created_at") as string;
-      return format(new Date(date), "dd-MM-yyyy");
     },
   },
   {
