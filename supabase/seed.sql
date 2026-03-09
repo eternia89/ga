@@ -27,10 +27,10 @@ INSERT INTO public.categories (id, company_id, name, type) VALUES
   ('00000000-0000-0000-0003-000000000006', '00000000-0000-0000-0000-000000000001', 'Vehicle', 'asset');
 
 -- 5. Auth users (password: asdf1234 for all)
--- The encrypted password below is bcrypt hash of 'asdf1234'
+-- GoTrue requires email_change, phone, phone_change to be empty strings (not NULL)
 
 -- Admin
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, phone_change, recovery_token, email_change_token_new, email_change_token_current)
 VALUES (
   '00000000-0000-0000-0004-000000000001',
   '00000000-0000-0000-0000-000000000000',
@@ -39,7 +39,7 @@ VALUES (
   now(),
   '{"provider": "email", "providers": ["email"]}',
   '{"full_name": "Admin User"}',
-  'authenticated', 'authenticated', now(), now(), ''
+  'authenticated', 'authenticated', now(), now(), '', '', '', '', '', ''
 );
 INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
 VALUES (
@@ -50,7 +50,7 @@ VALUES (
 );
 
 -- GA Lead
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, phone_change, recovery_token, email_change_token_new, email_change_token_current)
 VALUES (
   '00000000-0000-0000-0004-000000000002',
   '00000000-0000-0000-0000-000000000000',
@@ -59,7 +59,7 @@ VALUES (
   now(),
   '{"provider": "email", "providers": ["email"]}',
   '{"full_name": "GA Lead User"}',
-  'authenticated', 'authenticated', now(), now(), ''
+  'authenticated', 'authenticated', now(), now(), '', '', '', '', '', ''
 );
 INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
 VALUES (
@@ -70,7 +70,7 @@ VALUES (
 );
 
 -- GA Staff
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, phone_change, recovery_token, email_change_token_new, email_change_token_current)
 VALUES (
   '00000000-0000-0000-0004-000000000003',
   '00000000-0000-0000-0000-000000000000',
@@ -79,7 +79,7 @@ VALUES (
   now(),
   '{"provider": "email", "providers": ["email"]}',
   '{"full_name": "GA Staff User"}',
-  'authenticated', 'authenticated', now(), now(), ''
+  'authenticated', 'authenticated', now(), now(), '', '', '', '', '', ''
 );
 INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
 VALUES (
@@ -90,7 +90,7 @@ VALUES (
 );
 
 -- Finance Approver
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, phone_change, recovery_token, email_change_token_new, email_change_token_current)
 VALUES (
   '00000000-0000-0000-0004-000000000004',
   '00000000-0000-0000-0000-000000000000',
@@ -99,7 +99,7 @@ VALUES (
   now(),
   '{"provider": "email", "providers": ["email"]}',
   '{"full_name": "Finance Approver"}',
-  'authenticated', 'authenticated', now(), now(), ''
+  'authenticated', 'authenticated', now(), now(), '', '', '', '', '', ''
 );
 INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
 VALUES (
@@ -110,7 +110,7 @@ VALUES (
 );
 
 -- General User
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, phone_change, recovery_token, email_change_token_new, email_change_token_current)
 VALUES (
   '00000000-0000-0000-0004-000000000005',
   '00000000-0000-0000-0000-000000000000',
@@ -119,7 +119,7 @@ VALUES (
   now(),
   '{"provider": "email", "providers": ["email"]}',
   '{"full_name": "General User"}',
-  'authenticated', 'authenticated', now(), now(), ''
+  'authenticated', 'authenticated', now(), now(), '', '', '', '', '', ''
 );
 INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
 VALUES (
@@ -130,7 +130,7 @@ VALUES (
 );
 
 -- Samuel (Google OAuth user — admin role for testing)
-INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token)
+INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, phone_change, recovery_token, email_change_token_new, email_change_token_current)
 VALUES (
   '00000000-0000-0000-0004-000000000006',
   '00000000-0000-0000-0000-000000000000',
@@ -139,7 +139,7 @@ VALUES (
   now(),
   '{"provider": "email", "providers": ["email", "google"]}',
   '{"full_name": "Samuel Ekanata"}',
-  'authenticated', 'authenticated', now(), now(), ''
+  'authenticated', 'authenticated', now(), now(), '', '', '', '', '', ''
 );
 INSERT INTO auth.identities (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
 VALUES (
