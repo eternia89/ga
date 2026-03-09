@@ -304,10 +304,11 @@ Recent decisions affecting current work:
 | 32 | Table checkbox columns static width audit (no changes needed) | 2026-03-09 | — | Verified | [29-table-checkbox-columns-should-have-stati](./quick/29-table-checkbox-columns-should-have-stati/) |
 | 33 | Hide pagination footer when data fits on one page | 2026-03-09 | 06c86b8 | Verified | [30-hide-rows-per-page-selector-pagination-p](./quick/30-hide-rows-per-page-selector-pagination-p/) |
 | 34 | Fix skeleton loading state overflow in view modals | 2026-03-09 | de53d61 | Verified | [31-fix-skeleton-loading-state-overflow-from](./quick/31-fix-skeleton-loading-state-overflow-from/) |
+| 35 | Timeline UI refinements: compact spacing and text-xs | 2026-03-09 | 2930d34 | Complete | [32-timeline-ui-refinements-add-proper-spaci](./quick/32-timeline-ui-refinements-add-proper-spaci/) |
 
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Completed quick task 31: Fix skeleton loading state overflow in view modals
+Stopped at: Completed quick task 32: Timeline UI refinements compact spacing
 Resume file: None
 Next: Ready for next task
