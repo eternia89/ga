@@ -88,7 +88,7 @@ export function getUserColumns(
       header: ({ column }) => <DataTableColumnHeader column={column} title="Location" />,
       cell: ({ row }) => {
         const location = row.original.location;
-        return <span>{location?.name || '\u2014'}</span>;
+        return location?.name ? <span>{location.name}</span> : <span className="text-muted-foreground">—</span>;
       },
     },
     {
@@ -112,11 +112,11 @@ export function getUserColumns(
     },
     {
       id: 'company_name',
-      accessorFn: (row) => row.company?.name || '—',
+      accessorFn: (row) => row.company?.name || '',
       header: ({ column }) => <DataTableColumnHeader column={column} title="Company" />,
       cell: ({ row }) => {
         const company = row.original.company;
-        return <span>{company?.name || '—'}</span>;
+        return company?.name ? <span>{company.name}</span> : <span className="text-muted-foreground">—</span>;
       },
     },
     {
