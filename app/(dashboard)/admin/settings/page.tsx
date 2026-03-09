@@ -30,7 +30,7 @@ export default async function SettingsPage({
       // Users data
       supabase
         .from("user_profiles")
-        .select("*, division:divisions(name), company:companies(name)")
+        .select("*, division:divisions(name), company:companies(name), location:locations(name)")
         .order("full_name"),
       supabase.auth.admin.listUsers(),
     ]);

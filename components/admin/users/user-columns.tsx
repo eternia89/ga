@@ -14,10 +14,12 @@ export type UserRow = {
   role: string;
   company_id: string;
   division_id: string | null;
+  location_id: string | null;
   deleted_at: string | null;
   created_at: string;
   last_sign_in_at: string | null;
   division: { name: string } | null;
+  location: { name: string } | null;
   company: { name: string } | null;
 };
 
@@ -93,6 +95,14 @@ export function getUserColumns(
       cell: ({ row }) => {
         const division = row.original.division;
         return <span>{division?.name || '—'}</span>;
+      },
+    },
+    {
+      accessorKey: 'location',
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Location" />,
+      cell: ({ row }) => {
+        const location = row.original.location;
+        return <span>{location?.name || '\u2014'}</span>;
       },
     },
     {

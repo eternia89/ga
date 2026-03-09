@@ -87,6 +87,7 @@ export function SettingsContent({
             users={users}
             companies={companies}
             divisions={divisions}
+            locations={locations}
             defaultCompanyId={defaultCompanyId}
             initialUserId={initialUserId}
           />

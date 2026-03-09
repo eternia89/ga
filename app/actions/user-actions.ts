@@ -14,7 +14,7 @@ export const getUsers = adminActionClient
     // Fetch all user profiles with joined division and company names
     const { data: profiles, error: profilesError } = await adminSupabase
       .from('user_profiles')
-      .select('*, division:divisions(name), company:companies(name)')
+      .select('*, division:divisions(name), company:companies(name), location:locations(name)')
       .order('full_name');
 
     if (profilesError) {
@@ -74,6 +74,7 @@ export const createUser = adminActionClient
             role: input.role,
             company_id: input.company_id,
             division_id: input.division_id || null,
+            location_id: input.location_id || null,
             is_active: true,
           });
 
@@ -138,6 +139,7 @@ export const updateUser = adminActionClient
         role: input.role,
         company_id: input.company_id,
         division_id: input.division_id || null,
+        location_id: input.location_id || null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', input.id);

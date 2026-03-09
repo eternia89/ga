@@ -90,6 +90,7 @@ export function ProfileSheet({ open, onOpenChange }: ProfileSheetProps) {
   // Get company and division names from joined data
   const companyName = (profile as any).company?.name || 'Not assigned';
   const divisionName = (profile as any).division?.name || 'Not assigned';
+  const locationName = (profile as any).location?.name || 'Not assigned';
 
   const onSubmitPassword = async (data: PasswordFormData) => {
     setIsSubmittingPassword(true);
@@ -167,6 +168,10 @@ export function ProfileSheet({ open, onOpenChange }: ProfileSheetProps) {
             <div>
               <label className="text-xs font-medium text-muted-foreground">Company</label>
               <p className="text-sm">{companyName}</p>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground">Location</label>
+              <p className="text-sm">{locationName}</p>
             </div>
           </div>
 

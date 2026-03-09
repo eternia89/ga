@@ -33,6 +33,12 @@ type Division = {
   company_id: string;
 };
 
+type Location = {
+  id: string;
+  name: string;
+  company_id: string;
+};
+
 type UserUserFormInput = {
   id?: string;
   email: string;
@@ -40,6 +46,7 @@ type UserUserFormInput = {
   role: Role;
   company_id: string;
   division_id: string | null;
+  location_id: string | null;
 };
 
 // Form type that works for both create and edit
@@ -50,6 +57,7 @@ type UserFormInput = {
   role: Role;
   company_id: string;
   division_id?: string;
+  location_id?: string;
 };
 
 type UserFormDialogProps = {
@@ -58,6 +66,7 @@ type UserFormDialogProps = {
   user?: UserUserFormInput;
   companies: Company[];
   divisions: Division[];
+  locations: Location[];
   defaultCompanyId?: string;
   onSuccess?: () => void;
   onDeactivate?: () => void;
@@ -79,6 +88,7 @@ export function UserFormDialog({
   user,
   companies,
   divisions,
+  locations,
   defaultCompanyId,
   onSuccess,
   onDeactivate,
@@ -102,12 +112,14 @@ export function UserFormDialog({
       role: (user?.role || 'general_user') as Role,
       company_id: user?.company_id || defaultCompanyId || '',
       division_id: user?.division_id || '',
+      location_id: user?.location_id || '',
     }),
     [user, defaultCompanyId]
   );
 
-  // Filter divisions by selected company
+  // Filter divisions and locations by selected company
   const filteredDivisions = divisions.filter(d => d.company_id === selectedCompanyId);
+  const filteredLocations = locations.filter(l => l.company_id === selectedCompanyId);
 
   const handleSubmit = async (data: UserFormInput) => {
     if (isEditMode && user) {
@@ -241,6 +253,16 @@ export function UserFormDialog({
                         form.setValue('division_id', '');
                       }
                     }
+                    // Reset location if it doesn't belong to the new company
+                    const currentLocation = form.getValues('location_id');
+                    if (currentLocation) {
+                      const locationBelongsToCompany = locations.some(
+                        l => l.id === currentLocation && l.company_id === companyId
+                      );
+                      if (!locationBelongsToCompany) {
+                        form.setValue('location_id', '');
+                      }
+                    }
                   }}
                   value={field.value}
                 >
@@ -282,6 +304,35 @@ export function UserFormDialog({
                     {filteredDivisions.map(division => (
                       <SelectItem key={division.id} value={division.id}>
                         {division.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="location_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Location</FormLabel>
+                <Select
+                  onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
+                  value={field.value || "none"}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a location" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {isEditMode && <SelectItem value="none">None</SelectItem>}
+                    {filteredLocations.map(location => (
+                      <SelectItem key={location.id} value={location.id}>
+                        {location.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

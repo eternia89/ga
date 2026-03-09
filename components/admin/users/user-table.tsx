@@ -22,15 +22,22 @@ type Division = {
   company_id: string;
 };
 
+type Location = {
+  id: string;
+  name: string;
+  company_id: string;
+};
+
 type UserTableProps = {
   users: UserRow[];
   companies: Company[];
   divisions: Division[];
+  locations: Location[];
   defaultCompanyId: string;
   initialUserId?: string;
 };
 
-export function UserTable({ users, companies, divisions, defaultCompanyId, initialUserId }: UserTableProps) {
+export function UserTable({ users, companies, divisions, locations, defaultCompanyId, initialUserId }: UserTableProps) {
   const [showDeactivated, setShowDeactivated] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRow | undefined>(undefined);
@@ -172,12 +179,13 @@ export function UserTable({ users, companies, divisions, defaultCompanyId, initi
     const selectedUsers = users.filter(u => ids.includes(u.id));
 
     // Export selected users to CSV
-    const headers = ['Name', 'Email', 'Role', 'Division', 'Company', 'Status', 'Last Login', 'Created'];
+    const headers = ['Name', 'Email', 'Role', 'Division', 'Location', 'Company', 'Status', 'Last Login', 'Created'];
     const rows = selectedUsers.map(u => [
       u.full_name,
       u.email,
       u.role,
       u.division?.name || '',
+      u.location?.name || '',
       u.company?.name || '',
       u.deleted_at ? 'Deactivated' : 'Active',
       u.last_sign_in_at || 'Never',
@@ -233,6 +241,7 @@ export function UserTable({ users, companies, divisions, defaultCompanyId, initi
         user={editingUser as any}
         companies={companies}
         divisions={divisions}
+        locations={locations}
         defaultCompanyId={defaultCompanyId}
         onSuccess={() => setFeedback({ type: 'success', message: 'Changes saved successfully' })}
         onDeactivate={() => {

@@ -31,7 +31,7 @@ export default async function DashboardLayout({
   // Fetch user profile with joined division and company names
   const { data: profile, error: profileError } = await supabase
     .from("user_profiles")
-    .select("*, division:divisions(name), company:companies(name)")
+    .select("*, division:divisions(name), company:companies(name), location:locations(name)")
     .eq("id", user.id)
     .single();
 
