@@ -7,9 +7,6 @@ const STATUS_HEX_COLORS: Record<string, string> = {
   submitted: '#9ca3af',       // gray
   triaged: '#60a5fa',         // blue
   in_progress: '#fbbf24',     // amber
-  pending_approval: '#c084fc', // purple
-  approved: '#2dd4bf',        // teal
-  completed: '#4ade80',       // green
   pending_acceptance: '#a78bfa', // violet
   accepted: '#34d399',        // emerald
   closed: '#94a3b8',          // slate
@@ -183,7 +180,7 @@ export async function getDashboardKpis(
     supabase
       .from('requests')
       .select('id', { count: 'exact', head: true })
-      .in('status', ['accepted', 'completed'])
+      .in('status', ['accepted', 'closed'])
       .is('deleted_at', null)
       .gte('updated_at', currentFrom)
       .lte('updated_at', currentTo),
@@ -192,7 +189,7 @@ export async function getDashboardKpis(
     supabase
       .from('requests')
       .select('id', { count: 'exact', head: true })
-      .in('status', ['accepted', 'completed'])
+      .in('status', ['accepted', 'closed'])
       .is('deleted_at', null)
       .gte('updated_at', prevFrom)
       .lte('updated_at', prevTo),
@@ -247,7 +244,7 @@ export async function getDashboardKpis(
       title: 'Completed',
       value: completed,
       previousValue: completedPrev,
-      href: '/requests?status=accepted,completed',
+      href: '/requests?status=accepted,closed',
       trendIsGood: true, // up is good (more completions = better)
     },
   ];

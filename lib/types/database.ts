@@ -64,7 +64,7 @@ export type Request = {
   title: string;
   description: string | null;
   priority: 'low' | 'medium' | 'high' | 'urgent' | null;
-  status: 'submitted' | 'triaged' | 'in_progress' | 'pending_approval' | 'approved' | 'completed' | 'pending_acceptance' | 'accepted' | 'closed' | 'rejected' | 'cancelled';
+  status: 'submitted' | 'triaged' | 'in_progress' | 'pending_acceptance' | 'accepted' | 'closed' | 'rejected' | 'cancelled';
   estimated_cost: number | null;
   actual_cost: number | null;
   requires_approval: boolean;
