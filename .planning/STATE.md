@@ -299,7 +299,7 @@ Recent decisions affecting current work:
 | 27 | Add location field to user profiles | 2026-03-09 | ac80bee | Verified | [24-add-location-field-to-user-profiles-indi](./quick/24-add-location-field-to-user-profiles-indi/) |
 | 28 | Asset location tracking & transfer flow refinements | 2026-03-09 | 14b9629 | Verified | [25-asset-location-tracking-transfer-flow-st](./quick/25-asset-location-tracking-transfer-flow-st/) |
 | 29 | Users table: role beside name, remove Division + Last Login | 2026-03-09 | f5aadbc | Verified | [26-users-table-role-beside-name-remove-divi](./quick/26-users-table-role-beside-name-remove-divi/) |
-| 30 | Remove Created date column from admin settings tables | 2026-03-09 | 62ff88a | Complete | [27-remove-created-date-column-from-categori](./quick/27-remove-created-date-column-from-categori/) |
+| 30 | Remove Created date column from admin settings tables | 2026-03-09 | 62ff88a | Verified | [27-remove-created-date-column-from-categori](./quick/27-remove-created-date-column-from-categori/) |
 
 ## Session Continuity
 
