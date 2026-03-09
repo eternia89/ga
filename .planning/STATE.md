@@ -302,10 +302,11 @@ Recent decisions affecting current work:
 | 30 | Remove Created date column from admin settings tables | 2026-03-09 | 62ff88a | Verified | [27-remove-created-date-column-from-categori](./quick/27-remove-created-date-column-from-categori/) |
 | 31 | Standardize empty cell styling with muted em dash | 2026-03-09 | a60e93c | Verified | [28-inactive-or-empty-state-values-should-ha](./quick/28-inactive-or-empty-state-values-should-ha/) |
 | 32 | Table checkbox columns static width audit (no changes needed) | 2026-03-09 | — | Verified | [29-table-checkbox-columns-should-have-stati](./quick/29-table-checkbox-columns-should-have-stati/) |
+| 33 | Hide pagination footer when data fits on one page | 2026-03-09 | 06c86b8 | Complete | [30-hide-rows-per-page-selector-pagination-p](./quick/30-hide-rows-per-page-selector-pagination-p/) |
 
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Completed quick task 29: Table checkbox columns static width audit
+Stopped at: Completed quick task 30: Hide pagination footer when data fits on one page
 Resume file: None
 Next: Ready for next task
