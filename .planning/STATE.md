@@ -295,10 +295,11 @@ Recent decisions affecting current work:
 | 23 | Audit all flows for deadlocks (analysis only) | 2026-03-06 | 92af395 | Verified | [20-test-all-flow-of-request-jobs-approvals-](./quick/20-test-all-flow-of-request-jobs-approvals-/) |
 | 24 | Fix deadlock analysis issues: wire advanceFloatingSchedule, rework Start Work, threshold gates, remove dead statuses | 2026-03-09 | 7584eed | Verified | [21-fix-deadlock-analysis-issues-wire-advanc](./quick/21-fix-deadlock-analysis-issues-wire-advanc/) |
 | 25 | Add permalink support (?action=create) to all 5 create modals | 2026-03-09 | d6258a7 | Verified | [22-add-permalink-support-to-all-5-create-mo](./quick/22-add-permalink-support-to-all-5-create-mo/) |
+| 26 | Remove duplication from detail pages, add sticky save bar | 2026-03-09 | 5374429 | Complete | [23-remove-duplication-of-information-in-det](./quick/23-remove-duplication-of-information-in-det/) |
 
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Merged main into refactor
+Stopped at: Completed quick task 23: Remove duplication and add sticky save bar
 Resume file: None
 Next: Ready for next task
