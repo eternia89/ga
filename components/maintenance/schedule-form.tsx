@@ -131,7 +131,7 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
     : assets;
 
   const filteredTemplates = selectedAssetId && selectedAsset?.category_id
-    ? templates.filter((t) => t.category_id === selectedAsset.category_id)
+    ? templates.filter((t) => !t.category_id || t.category_id === selectedAsset.category_id)
     : templates;
 
   const templateOptions = filteredTemplates.map((t) => ({ label: t.name, value: t.id }));
@@ -170,7 +170,7 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
   function handleAssetChange(value: string) {
     setSelectedAssetId(value);
     const asset = assets.find((a) => a.id === value);
-    if (asset?.category_id && selectedTemplate?.category_id !== asset.category_id) {
+    if (asset?.category_id && selectedTemplate?.category_id && selectedTemplate.category_id !== asset.category_id) {
       setSelectedTemplateId('');
       form.setValue('template_id', '');
     }
