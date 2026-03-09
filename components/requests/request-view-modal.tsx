@@ -22,10 +22,12 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { completeRequest } from '@/app/actions/request-actions';
 import {
   XCircle,
   Ban,
   CheckCircle,
+  CheckSquare,
   Star,
   AlertCircle,
   RefreshCw,
@@ -429,15 +431,39 @@ export function RequestViewModal({
     handleActionSuccess();
   }, [handleActionSuccess]);
 
+  // Completing state
+  const [completing, setCompleting] = useState(false);
+
   // Role/permission derivations
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
   const isRequester = request?.requester_id === currentUserId;
   const isAdmin = currentUserRole === 'admin';
+  const isPic = request?.assigned_to === currentUserId;
 
   const canReject = isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request?.status ?? '');
   const canCancel = isRequester && request?.status === 'submitted';
+  const canComplete = (isPic || isGaLeadOrAdmin) && ['triaged', 'in_progress'].includes(request?.status ?? '');
   const canAcceptOrReject = (isRequester || isAdmin) && request?.status === 'pending_acceptance';
   const canGiveFeedback = isRequester && request?.status === 'accepted' && !request?.feedback_rating;
+
+  const handleComplete = async () => {
+    if (!request) return;
+    if (!window.confirm('Complete this request? It will be sent to the requester for acceptance.')) return;
+    setCompleting(true);
+    try {
+      const result = await completeRequest({ id: request.id });
+      if (result?.data?.success) {
+        handleActionSuccess();
+      } else {
+        const errorMsg = (result as { serverError?: string })?.serverError ?? 'Failed to complete request.';
+        alert(errorMsg);
+      }
+    } catch {
+      alert('Failed to complete request.');
+    } finally {
+      setCompleting(false);
+    }
+  };
 
   return (
     <>
@@ -609,6 +635,18 @@ export function RequestViewModal({
                   >
                     {formSubmitting ? 'Updating...' : 'Update Request'}
                   </Button>
+
+                  {canComplete && (
+                    <Button
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      disabled={completing}
+                      onClick={handleComplete}
+                    >
+                      <CheckSquare className="mr-2 h-4 w-4" />
+                      {completing ? 'Completing...' : 'Complete Request'}
+                    </Button>
+                  )}
 
                   {canAcceptOrReject && (
                     <Button
