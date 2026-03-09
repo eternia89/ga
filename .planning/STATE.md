@@ -301,10 +301,11 @@ Recent decisions affecting current work:
 | 29 | Users table: role beside name, remove Division + Last Login | 2026-03-09 | f5aadbc | Verified | [26-users-table-role-beside-name-remove-divi](./quick/26-users-table-role-beside-name-remove-divi/) |
 | 30 | Remove Created date column from admin settings tables | 2026-03-09 | 62ff88a | Verified | [27-remove-created-date-column-from-categori](./quick/27-remove-created-date-column-from-categori/) |
 | 31 | Standardize empty cell styling with muted em dash | 2026-03-09 | a60e93c | Verified | [28-inactive-or-empty-state-values-should-ha](./quick/28-inactive-or-empty-state-values-should-ha/) |
+| 32 | Table checkbox columns static width audit (no changes needed) | 2026-03-09 | — | Verified | [29-table-checkbox-columns-should-have-stati](./quick/29-table-checkbox-columns-should-have-stati/) |
 
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Completed quick task 28: Standardize empty cell styling with muted em dash
+Stopped at: Completed quick task 29: Table checkbox columns static width audit
 Resume file: None
 Next: Ready for next task
