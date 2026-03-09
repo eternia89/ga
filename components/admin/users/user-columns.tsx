@@ -69,32 +69,18 @@ export function getUserColumns(
       cell: ({ row }) => {
         const name = row.getValue('full_name') as string;
         const email = row.original.email;
+        const role = row.original.role;
         return (
           <div>
-            <span className="font-medium">{name}</span>
+            <div className="flex items-center gap-2">
+              <span className="font-medium">{name}</span>
+              <Badge variant="secondary" className={roleColors[role] || roleColors.general_user}>
+                {roleDisplay[role] || role}
+              </Badge>
+            </div>
             <span className="block text-xs text-muted-foreground">{email}</span>
           </div>
         );
-      },
-    },
-    {
-      accessorKey: 'role',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
-      cell: ({ row }) => {
-        const role = row.getValue('role') as string;
-        return (
-          <Badge variant="secondary" className={roleColors[role] || roleColors.general_user}>
-            {roleDisplay[role] || role}
-          </Badge>
-        );
-      },
-    },
-    {
-      accessorKey: 'division',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Division" />,
-      cell: ({ row }) => {
-        const division = row.original.division;
-        return <span>{division?.name || '—'}</span>;
       },
     },
     {
@@ -131,15 +117,6 @@ export function getUserColumns(
       cell: ({ row }) => {
         const company = row.original.company;
         return <span>{company?.name || '—'}</span>;
-      },
-    },
-    {
-      accessorKey: 'last_sign_in_at',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Last Login" />,
-      cell: ({ row }) => {
-        const lastLogin = row.getValue('last_sign_in_at') as string | null;
-        if (!lastLogin) return <span className="text-gray-500">Never</span>;
-        return <span>{format(new Date(lastLogin), 'dd-MM-yyyy')}</span>;
       },
     },
     {
