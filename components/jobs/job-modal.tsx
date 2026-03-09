@@ -16,6 +16,8 @@ import { useGeolocation } from '@/hooks/use-geolocation';
 import {
   updateJobStatus,
   cancelJob,
+  assignJob,
+  requestApproval,
 } from '@/app/actions/job-actions';
 import {
   approveJob,
@@ -44,6 +46,9 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { InlineFeedback } from '@/components/inline-feedback';
+import { Combobox } from '@/components/combobox';
+import { Input } from '@/components/ui/input';
+import { formatNumber } from '@/lib/utils';
 import {
   AlertCircle,
   RefreshCw,
@@ -153,6 +158,8 @@ export function JobModal({
   // Form states
   const [rejectReason, setRejectReason] = useState('');
   const [rejectCompletionReason, setRejectCompletionReason] = useState('');
+  const [assignPicValue, setAssignPicValue] = useState('');
+  const [costValue, setCostValue] = useState('');
 
   // Action states
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -574,7 +581,9 @@ export function JobModal({
 
   const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job?.status ?? '');
   const picLocked = !!job && !['created', 'assigned'].includes(job.status);
-  const canStartWork = isPIC && job?.status === 'assigned';
+  const canAssignPIC = isGaLeadOrAdmin && job?.status === 'created';
+  const canRequestApproval = isPIC && job?.status === 'assigned' && !job?.approved_at;
+  const canStartWork = isPIC && job?.status === 'assigned' && !!job?.approved_at;
   const canApproveReject = isFinanceApproverOrAdmin && job?.status === 'pending_approval';
   const canApproveCompletion = isFinanceApproverOrAdmin && job?.status === 'pending_completion_approval';
   const hasPendingBudget = (job?.estimated_cost ?? 0) > 0 && !job?.approved_at;
@@ -695,6 +704,50 @@ export function JobModal({
       handleActionSuccess();
     } catch (err) {
       setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to reject completion' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleAssignPIC = async () => {
+    if (!assignPicValue) return;
+    setSubmitting(true);
+    setFeedback(null);
+    try {
+      const result = await assignJob({ id: job!.id, assigned_to: assignPicValue });
+      if (result?.serverError) {
+        setFeedback({ type: 'error', message: result.serverError });
+        return;
+      }
+      setAssignPicValue('');
+      setFeedback({ type: 'success', message: 'PIC assigned.' });
+      handleActionSuccess();
+    } catch (err) {
+      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to assign PIC' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRequestApproval = async () => {
+    setSubmitting(true);
+    setFeedback(null);
+    try {
+      const digits = costValue.replace(/[^0-9]/g, '');
+      const parsedCost = digits === '' ? 0 : parseInt(digits, 10);
+      const result = await requestApproval({ job_id: job!.id, estimated_cost: parsedCost });
+      if (result?.serverError) {
+        setFeedback({ type: 'error', message: result.serverError });
+        return;
+      }
+      setCostValue('');
+      const msg = result?.data?.autoApproved
+        ? 'Cost auto-approved (Rp 0). You can now start work.'
+        : 'Approval requested. Awaiting finance review.';
+      setFeedback({ type: 'success', message: msg });
+      handleActionSuccess();
+    } catch (err) {
+      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to request approval' });
     } finally {
       setSubmitting(false);
     }
@@ -1002,83 +1055,129 @@ export function JobModal({
               </div>
 
               {/* Sticky action bar */}
-              <div className="border-t px-6 py-3 flex items-center justify-between gap-2 shrink-0 bg-background">
-                {/* Left: Primary actions */}
-                <div className="flex flex-wrap items-center gap-2">
-                  {feedback && (
-                    <InlineFeedback
-                      type={feedback.type}
-                      message={feedback.message}
-                      onDismiss={() => setFeedback(null)}
-                    />
-                  )}
+              <div className="border-t px-6 py-3 shrink-0 bg-background space-y-2">
+                {feedback && (
+                  <InlineFeedback
+                    type={feedback.type}
+                    message={feedback.message}
+                    onDismiss={() => setFeedback(null)}
+                  />
+                )}
 
-                  {canStartWork && (
-                    <Button size="sm" onClick={handleStartWork} disabled={submitting || capturingGps}>
-                      <Play className="mr-2 h-4 w-4" />
-                      {capturingGps ? 'Getting location...' : 'Start Work'}
-                    </Button>
-                  )}
+                <div className="flex items-center justify-between gap-2">
+                  {/* Left: Primary actions */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {canAssignPIC && (
+                      <>
+                        <div className="w-48">
+                          <Combobox
+                            options={(viewUsers ?? []).map((u) => ({ label: u.name, value: u.id }))}
+                            value={assignPicValue}
+                            onValueChange={setAssignPicValue}
+                            placeholder="Select PIC..."
+                            searchPlaceholder="Search users..."
+                            emptyText="No users found."
+                            disabled={submitting}
+                          />
+                        </div>
+                        <Button size="sm" onClick={handleAssignPIC} disabled={submitting || !assignPicValue}>
+                          Assign
+                        </Button>
+                      </>
+                    )}
 
-                  {canApproveReject && (
-                    <Button size="sm" onClick={handleApprove} disabled={submitting}>
-                      <ThumbsUp className="mr-2 h-4 w-4" />
-                      Approve Budget
-                    </Button>
-                  )}
+                    {canRequestApproval && (
+                      <>
+                        <div className="relative w-40">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
+                            Rp
+                          </span>
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            placeholder="0"
+                            className="pl-10 h-9"
+                            disabled={submitting}
+                            value={costValue ? formatNumber(parseInt(costValue.replace(/[^0-9]/g, '') || '0', 10)) : ''}
+                            onChange={(e) => {
+                              const digits = e.target.value.replace(/[^0-9]/g, '');
+                              setCostValue(digits);
+                            }}
+                          />
+                        </div>
+                        <Button size="sm" onClick={handleRequestApproval} disabled={submitting}>
+                          Request Approval
+                        </Button>
+                      </>
+                    )}
 
-                  {canApproveCompletion && (
-                    <Button size="sm" onClick={handleApproveCompletion} disabled={submitting}>
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      Approve Completion
-                    </Button>
-                  )}
+                    {canStartWork && (
+                      <Button size="sm" onClick={handleStartWork} disabled={submitting || capturingGps}>
+                        <Play className="mr-2 h-4 w-4" />
+                        {capturingGps ? 'Getting location...' : 'Start Work'}
+                      </Button>
+                    )}
 
-                  {canMarkComplete && (
-                    <Button size="sm" onClick={handleMarkComplete} disabled={submitting || capturingGps}>
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      {capturingGps ? 'Getting location...' : 'Mark Complete'}
-                    </Button>
-                  )}
-                </div>
+                    {canApproveReject && (
+                      <Button size="sm" onClick={handleApprove} disabled={submitting}>
+                        <ThumbsUp className="mr-2 h-4 w-4" />
+                        Approve Budget
+                      </Button>
+                    )}
 
-                {/* Right: Secondary/destructive */}
-                <div className="flex flex-wrap items-center gap-2">
-                  {canApproveReject && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => { setRejectReason(''); setRejectOpen(true); }}
-                      disabled={submitting}
-                    >
-                      <ThumbsDown className="mr-2 h-4 w-4 text-destructive" />
-                      <span className="text-destructive">Reject Budget</span>
-                    </Button>
-                  )}
+                    {canApproveCompletion && (
+                      <Button size="sm" onClick={handleApproveCompletion} disabled={submitting}>
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Approve Completion
+                      </Button>
+                    )}
 
-                  {canApproveCompletion && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => { setRejectCompletionReason(''); setRejectCompletionOpen(true); }}
-                      disabled={submitting}
-                    >
-                      <ThumbsDown className="mr-2 h-4 w-4 text-destructive" />
-                      <span className="text-destructive">Reject Completion</span>
-                    </Button>
-                  )}
+                    {canMarkComplete && (
+                      <Button size="sm" onClick={handleMarkComplete} disabled={submitting || capturingGps}>
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        {capturingGps ? 'Getting location...' : 'Mark Complete'}
+                      </Button>
+                    )}
+                  </div>
 
-                  {canCancel && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCancelOpen(true)}
-                      disabled={submitting}
-                    >
-                      <Ban className="mr-2 h-4 w-4 text-destructive" />
-                      <span className="text-destructive">Cancel Job</span>
-                    </Button>
-                  )}
+                  {/* Right: Secondary/destructive */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {canApproveReject && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => { setRejectReason(''); setRejectOpen(true); }}
+                        disabled={submitting}
+                      >
+                        <ThumbsDown className="mr-2 h-4 w-4 text-destructive" />
+                        <span className="text-destructive">Reject Budget</span>
+                      </Button>
+                    )}
+
+                    {canApproveCompletion && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => { setRejectCompletionReason(''); setRejectCompletionOpen(true); }}
+                        disabled={submitting}
+                      >
+                        <ThumbsDown className="mr-2 h-4 w-4 text-destructive" />
+                        <span className="text-destructive">Reject Completion</span>
+                      </Button>
+                    )}
+
+                    {canCancel && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCancelOpen(true)}
+                        disabled={submitting}
+                      >
+                        <Ban className="mr-2 h-4 w-4 text-destructive" />
+                        <span className="text-destructive">Cancel Job</span>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </>
@@ -1096,7 +1195,7 @@ export function JobModal({
                 <div>
                   <h3 className="text-lg font-semibold">Reject Budget</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Provide a reason for rejecting this budget. The job will return to In Progress so the PIC can revise.
+                    Provide a reason for rejecting this budget. The job will return to Assigned so the PIC can revise.
                   </p>
                 </div>
                 <div className="space-y-3">
