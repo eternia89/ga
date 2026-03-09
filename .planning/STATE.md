@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-09 - Completed quick task 27: Make category optional in maintenance templates
+Last activity: 2026-03-09 - Completed quick task 28: Fix RLS policy error when deactivating maintenance schedules
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -297,10 +297,11 @@ Recent decisions affecting current work:
 | 25 | Add permalink support (?action=create) to all 5 create modals | 2026-03-09 | d6258a7 | Verified | [22-add-permalink-support-to-all-5-create-mo](./quick/22-add-permalink-support-to-all-5-create-mo/) |
 | 26 | Replace Start Work with Activate Location two-step flow | 2026-03-09 | 99a9bbc | Verified | [23-replace-start-work-with-activate-locatio](./quick/23-replace-start-work-with-activate-locatio/) |
 | 27 | Make category optional in maintenance templates | 2026-03-09 | 57465be | Verified | [24-make-category-optional-in-maintenance-te](./quick/24-make-category-optional-in-maintenance-te/) |
+| 28 | Fix RLS policy error when deactivating maintenance schedules | 2026-03-09 | 64b2135 | Complete | [25-fix-rls-policy-error-when-deactivating-m](./quick/25-fix-rls-policy-error-when-deactivating-m/) |
 
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Completed quick task 27: Make category optional in maintenance templates
+Stopped at: Completed quick task 28: Fix RLS policy error when deactivating maintenance schedules
 Resume file: None
 Next: Ready for next task
