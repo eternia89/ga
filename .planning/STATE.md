@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-06 - Completed quick task 20: Restrict Start Work action to PIC only
+Last activity: 2026-03-09 - Completed quick task 22: Rework job flow — cost approval before work starts
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -276,10 +276,11 @@ Recent decisions affecting current work:
 | 19 | Standardize all modal widths (form 600px, view 1000px) | 2026-03-06 | 1f27e49 | Verified | [16-standardize-all-modal-widths-form-600px-](./quick/16-standardize-all-modal-widths-form-600px-/) |
 | 20 | Restrict Start Work action to PIC only | 2026-03-06 | 9bbd4f0 | Verified | [17-restrict-start-work-action-to-pic-only](./quick/17-restrict-start-work-action-to-pic-only/) |
 | 21 | Lock PIC field once job status moves past assigned | 2026-03-06 | ab78e9b | Verified | [18-lock-pic-field-once-job-status-moves-pas](./quick/18-lock-pic-field-once-job-status-moves-pas/) |
+| 22 | Rework job flow: cost approval before PIC starts work | 2026-03-09 | dee9adc | Complete | [19-rework-job-flow-cost-approval-before-pic](./quick/19-rework-job-flow-cost-approval-before-pic/) |
 
 ## Session Continuity
 
-Last session: 2026-03-06
-Stopped at: Completed quick task 21: Lock PIC field once job status moves past assigned
-Resume file: .planning/quick/18-lock-pic-field-once-job-status-moves-pas/18-SUMMARY.md
+Last session: 2026-03-09
+Stopped at: Completed quick task 22: Rework job flow — cost approval before work starts
+Resume file: .planning/quick/19-rework-job-flow-cost-approval-before-pic/19-SUMMARY.md
 Next: Ready for next task
