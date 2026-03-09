@@ -55,7 +55,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
     jobsQuery = jobsQuery.eq('assigned_to', profile.id);
   }
 
-  const [jobsResult, usersResult, locationsResult, allCategoriesResult, allUsersResult, eligibleRequestsResult] = await Promise.all([
+  const [jobsResult, usersResult, locationsResult, allCategoriesResult, allUsersResult, eligibleRequestsResult, budgetThresholdResult] = await Promise.all([
     jobsQuery,
 
     // GA Staff/Lead users for PIC filter
@@ -98,6 +98,14 @@ export default async function JobsPage({ searchParams }: PageProps) {
       .in('status', ['triaged', 'in_progress'])
       .is('deleted_at', null)
       .order('created_at', { ascending: false }),
+
+    // Budget threshold for create dialog
+    supabase
+      .from('company_settings')
+      .select('value')
+      .eq('company_id', profile.company_id)
+      .eq('key', 'budget_threshold')
+      .single(),
   ]);
 
   const jobs = (jobsResult.data ?? []) as unknown as import('@/lib/types/database').JobWithRelations[];
@@ -106,6 +114,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const formCategories = allCategoriesResult.data ?? [];
   const formUsers = allUsersResult.data ?? [];
   const eligibleRequests = eligibleRequestsResult.data ?? [];
+  const companyBudgetThreshold = budgetThresholdResult.data ? parseInt(budgetThresholdResult.data.value, 10) : null;
 
   // Fetch job links for in_progress requests (for create dialog)
   const inProgressRequestIds = eligibleRequests
@@ -152,6 +161,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
               users={formUsers}
               eligibleRequests={eligibleRequests}
               requestJobLinks={requestJobLinks}
+              companyBudgetThreshold={companyBudgetThreshold}
               initialOpen={action === 'create'}
             />
           )}

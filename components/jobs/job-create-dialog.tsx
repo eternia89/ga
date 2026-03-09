@@ -13,6 +13,7 @@ interface JobCreateDialogProps {
   users: { id: string; full_name: string }[];
   eligibleRequests: EligibleRequest[];
   requestJobLinks: Record<string, string>;
+  companyBudgetThreshold?: number | null;
   initialOpen?: boolean;
 }
 
@@ -22,6 +23,7 @@ export function JobCreateDialog({
   users,
   eligibleRequests,
   requestJobLinks,
+  companyBudgetThreshold,
   initialOpen,
 }: JobCreateDialogProps) {
   const router = useRouter();
@@ -42,6 +44,7 @@ export function JobCreateDialog({
         users={users}
         eligibleRequests={eligibleRequests}
         requestJobLinks={requestJobLinks}
+        companyBudgetThreshold={companyBudgetThreshold}
       />
     </>
   );

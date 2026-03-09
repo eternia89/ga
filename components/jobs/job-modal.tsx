@@ -17,7 +17,6 @@ import {
   updateJobStatus,
   cancelJob,
   assignJob,
-  requestApproval,
 } from '@/app/actions/job-actions';
 import {
   approveJob,
@@ -47,8 +46,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { Combobox } from '@/components/combobox';
-import { Input } from '@/components/ui/input';
-import { formatNumber } from '@/lib/utils';
 import {
   AlertCircle,
   RefreshCw,
@@ -91,6 +88,7 @@ interface JobModalProps {
   users?: { id: string; full_name: string }[];
   eligibleRequests?: EligibleRequest[];
   requestJobLinks?: Record<string, string>;
+  companyBudgetThreshold?: number | null;
 }
 
 // ============================================================================
@@ -123,6 +121,7 @@ export function JobModal({
   users: createUsers,
   eligibleRequests: createEligibleRequests,
   requestJobLinks: createRequestJobLinks,
+  companyBudgetThreshold,
 }: JobModalProps) {
   const router = useRouter();
 
@@ -160,7 +159,6 @@ export function JobModal({
   const [rejectReason, setRejectReason] = useState('');
   const [rejectCompletionReason, setRejectCompletionReason] = useState('');
   const [assignPicValue, setAssignPicValue] = useState('');
-  const [costValue, setCostValue] = useState('');
 
   // Action states
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -578,19 +576,17 @@ export function JobModal({
   // ========================================================================
 
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
-  const isFinanceApproverOrAdmin = ['finance_approver', 'admin'].includes(currentUserRole);
   const isFinanceApproverOnly = currentUserRole === 'finance_approver';
   const isPIC = job?.assigned_to === currentUserId;
+  const isCreator = job?.created_by === currentUserId;
 
   const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job?.status ?? '');
   const picLocked = !!job && !['created', 'assigned'].includes(job.status);
   const canAssignPIC = isGaLeadOrAdmin && job?.status === 'created';
   const canStartWork = isPIC && job?.status === 'assigned';
-  const canRequestApproval = isPIC && job?.status === 'in_progress' && !job?.approved_at;
-  const canApproveReject = isFinanceApproverOrAdmin && job?.status === 'pending_approval';
-  const canApproveCompletion = isFinanceApproverOrAdmin && job?.status === 'pending_completion_approval';
-  const hasPendingBudget = (job?.estimated_cost ?? 0) > 0 && !job?.approved_at;
-  const canMarkComplete = (isGaLeadOrAdmin || isPIC) && job?.status === 'in_progress' && !hasPendingBudget;
+  const canApproveReject = isCreator && job?.status === 'pending_approval';
+  const canApproveCompletion = isCreator && job?.status === 'pending_completion_approval';
+  const canMarkComplete = (isGaLeadOrAdmin || isPIC) && job?.status === 'in_progress';
   const canCancel = isGaLeadOrAdmin && !isFinanceApproverOnly && !['completed', 'cancelled'].includes(job?.status ?? '');
   const canComment =
     ['ga_lead', 'admin'].includes(currentUserRole) ||
@@ -745,30 +741,6 @@ export function JobModal({
     }
   };
 
-  const handleRequestApproval = async () => {
-    setSubmitting(true);
-    setFeedback(null);
-    try {
-      const digits = costValue.replace(/[^0-9]/g, '');
-      const parsedCost = digits === '' ? 0 : parseInt(digits, 10);
-      const result = await requestApproval({ job_id: job!.id, estimated_cost: parsedCost });
-      if (result?.serverError) {
-        setFeedback({ type: 'error', message: result.serverError });
-        return;
-      }
-      setCostValue('');
-      const msg = result?.data?.autoApproved
-        ? 'Cost auto-approved (Rp 0).'
-        : 'Approval requested. Awaiting finance review.';
-      setFeedback({ type: 'success', message: msg });
-      handleActionSuccess();
-    } catch (err) {
-      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to request approval' });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const handleCancel = async () => {
     setSubmitting(true);
     setFeedback(null);
@@ -857,6 +829,7 @@ export function JobModal({
             requestJobLinks={createRequestJobLinks ?? {}}
             prefillRequest={null}
             mode="create"
+            companyBudgetThreshold={companyBudgetThreshold}
             onSuccess={() => {
               handleDialogOpenChange(false);
               router.refresh();
@@ -1114,31 +1087,6 @@ export function JobModal({
                         <Play className="mr-2 h-4 w-4" />
                         {capturingGps ? 'Getting location...' : 'Start Work'}
                       </Button>
-                    )}
-
-                    {canRequestApproval && (
-                      <>
-                        <div className="relative w-40">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
-                            Rp
-                          </span>
-                          <Input
-                            type="text"
-                            inputMode="numeric"
-                            placeholder="0"
-                            className="pl-10 h-9"
-                            disabled={submitting}
-                            value={costValue ? formatNumber(parseInt(costValue.replace(/[^0-9]/g, '') || '0', 10)) : ''}
-                            onChange={(e) => {
-                              const digits = e.target.value.replace(/[^0-9]/g, '');
-                              setCostValue(digits);
-                            }}
-                          />
-                        </div>
-                        <Button size="sm" onClick={handleRequestApproval} disabled={submitting}>
-                          Request Approval
-                        </Button>
-                      </>
                     )}
 
                     {canApproveReject && (
