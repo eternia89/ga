@@ -92,8 +92,8 @@ export function JobDetailActions({
 
   // Determine available actions per role + status
   const canAssignPIC = isGaLeadOrAdmin && job.status === 'created';
-  const canRequestApproval = isPIC && job.status === 'assigned' && !job.approved_at;
-  const canStartWork = isPIC && job.status === 'assigned' && !!job.approved_at;
+  const canStartWork = isPIC && job.status === 'assigned';
+  const canRequestApproval = isPIC && job.status === 'in_progress' && !job.approved_at;
   const canApproveReject =
     isFinanceApproverOrAdmin && job.status === 'pending_approval';
   const canApproveCompletion =
@@ -151,7 +151,7 @@ export function JobDetailActions({
       }
       setCostValue('');
       const msg = result?.data?.autoApproved
-        ? 'Cost auto-approved (Rp 0). You can now start work.'
+        ? 'Cost auto-approved (Rp 0).'
         : 'Approval requested. Awaiting finance review.';
       setFeedback({ type: 'success', message: msg });
       onActionSuccess();
@@ -227,7 +227,7 @@ export function JobDetailActions({
       }
       setRejectOpen(false);
       setRejectReason('');
-      setFeedback({ type: 'success', message: 'Job rejected. Returned to Assigned — PIC can revise cost and re-request approval.' });
+      setFeedback({ type: 'success', message: 'Job rejected. Returned to In Progress — PIC can revise cost and re-request approval.' });
       onActionSuccess();
     } catch (err) {
       setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to reject' });
@@ -353,6 +353,13 @@ export function JobDetailActions({
               </>
             )}
 
+            {canStartWork && (
+              <Button onClick={handleStartWork} disabled={submitting || capturingGps}>
+                <Play className="mr-2 h-4 w-4" />
+                {capturingGps ? 'Getting location...' : 'Start Work'}
+              </Button>
+            )}
+
             {canRequestApproval && (
               <>
                 <div className="relative w-40">
@@ -376,13 +383,6 @@ export function JobDetailActions({
                   Request Approval
                 </Button>
               </>
-            )}
-
-            {canStartWork && (
-              <Button onClick={handleStartWork} disabled={submitting || capturingGps}>
-                <Play className="mr-2 h-4 w-4" />
-                {capturingGps ? 'Getting location...' : 'Start Work'}
-              </Button>
             )}
 
             {canApproveReject && (
@@ -481,7 +481,7 @@ export function JobDetailActions({
           <DialogHeader>
             <DialogTitle>Reject Budget</DialogTitle>
             <DialogDescription>
-              Provide a reason for rejecting this budget. The job will return to Assigned so the PIC can revise.
+              Provide a reason for rejecting this budget. The job will return to In Progress so the PIC can revise.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2">

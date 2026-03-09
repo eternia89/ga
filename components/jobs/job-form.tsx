@@ -30,7 +30,7 @@ import { InlineFeedback } from '@/components/inline-feedback';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { RequestPreviewDialog } from './request-preview-dialog';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
-import { formatNumber } from '@/lib/utils';
+
 
 const PRIORITY_ORDER = ['low', 'medium', 'high', 'urgent'] as const;
 type Priority = typeof PRIORITY_ORDER[number];
@@ -426,42 +426,6 @@ export function JobForm({
                     disabled={disabled || picLocked}
                   />
                 </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
-
-        {/* Estimated Cost — only shown in edit/view mode */}
-        {mode === 'edit' && (
-          <FormField
-            control={form.control}
-            name="estimated_cost"
-            render={({ field }) => (
-              <FormItem className="max-w-xs">
-                <FormLabel>Estimated Cost</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
-                      Rp
-                    </span>
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="0"
-                      className="pl-10"
-                      disabled={disabled}
-                      value={field.value ? formatNumber(field.value) : ''}
-                      onChange={(e) => {
-                        const digits = e.target.value.replace(/[^0-9]/g, '');
-                        field.onChange(digits === '' ? undefined : parseInt(digits, 10));
-                      }}
-                    />
-                  </div>
-                </FormControl>
-                <p className="text-xs text-muted-foreground">
-                  Read-only. Cost is set via Request Approval workflow.
-                </p>
                 <FormMessage />
               </FormItem>
             )}

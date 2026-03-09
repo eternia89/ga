@@ -582,8 +582,8 @@ export function JobModal({
   const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job?.status ?? '');
   const picLocked = !!job && !['created', 'assigned'].includes(job.status);
   const canAssignPIC = isGaLeadOrAdmin && job?.status === 'created';
-  const canRequestApproval = isPIC && job?.status === 'assigned' && !job?.approved_at;
-  const canStartWork = isPIC && job?.status === 'assigned' && !!job?.approved_at;
+  const canStartWork = isPIC && job?.status === 'assigned';
+  const canRequestApproval = isPIC && job?.status === 'in_progress' && !job?.approved_at;
   const canApproveReject = isFinanceApproverOrAdmin && job?.status === 'pending_approval';
   const canApproveCompletion = isFinanceApproverOrAdmin && job?.status === 'pending_completion_approval';
   const hasPendingBudget = (job?.estimated_cost ?? 0) > 0 && !job?.approved_at;
@@ -742,7 +742,7 @@ export function JobModal({
       }
       setCostValue('');
       const msg = result?.data?.autoApproved
-        ? 'Cost auto-approved (Rp 0). You can now start work.'
+        ? 'Cost auto-approved (Rp 0).'
         : 'Approval requested. Awaiting finance review.';
       setFeedback({ type: 'success', message: msg });
       handleActionSuccess();
@@ -1086,6 +1086,13 @@ export function JobModal({
                       </>
                     )}
 
+                    {canStartWork && (
+                      <Button size="sm" onClick={handleStartWork} disabled={submitting || capturingGps}>
+                        <Play className="mr-2 h-4 w-4" />
+                        {capturingGps ? 'Getting location...' : 'Start Work'}
+                      </Button>
+                    )}
+
                     {canRequestApproval && (
                       <>
                         <div className="relative w-40">
@@ -1109,13 +1116,6 @@ export function JobModal({
                           Request Approval
                         </Button>
                       </>
-                    )}
-
-                    {canStartWork && (
-                      <Button size="sm" onClick={handleStartWork} disabled={submitting || capturingGps}>
-                        <Play className="mr-2 h-4 w-4" />
-                        {capturingGps ? 'Getting location...' : 'Start Work'}
-                      </Button>
                     )}
 
                     {canApproveReject && (
@@ -1195,7 +1195,7 @@ export function JobModal({
                 <div>
                   <h3 className="text-lg font-semibold">Reject Budget</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Provide a reason for rejecting this budget. The job will return to Assigned so the PIC can revise.
+                    Provide a reason for rejecting this budget. The job will return to In Progress so the PIC can revise.
                   </p>
                 </div>
                 <div className="space-y-3">
