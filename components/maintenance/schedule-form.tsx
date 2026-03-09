@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -389,9 +389,15 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
 
 interface EditFormProps {
   schedule: MaintenanceSchedule;
+  /** HTML form id — allows external button to submit via form={formId} */
+  formId?: string;
+  /** Called when form dirty state changes */
+  onDirtyChange?: (isDirty: boolean) => void;
+  /** Called when form submitting state changes */
+  onSubmittingChange?: (isSubmitting: boolean) => void;
 }
 
-function ScheduleEditForm({ schedule }: EditFormProps) {
+function ScheduleEditForm({ schedule, formId, onDirtyChange, onSubmittingChange }: EditFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -405,6 +411,16 @@ function ScheduleEditForm({ schedule }: EditFormProps) {
   });
 
   const intervalType = form.watch('interval_type');
+
+  // Track and propagate dirty/submitting state
+  const formIsDirty = form.formState.isDirty;
+  useEffect(() => {
+    onDirtyChange?.(formIsDirty);
+  }, [formIsDirty, onDirtyChange]);
+
+  useEffect(() => {
+    onSubmittingChange?.(isPending);
+  }, [isPending, onSubmittingChange]);
 
   function onSubmit(data: ScheduleEditFormData) {
     setFeedback(null);
@@ -425,7 +441,7 @@ function ScheduleEditForm({ schedule }: EditFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl">
+      <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl">
 
         <div className="rounded-lg border border-border p-6 space-y-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
@@ -487,19 +503,6 @@ function ScheduleEditForm({ schedule }: EditFormProps) {
           />
         )}
 
-        <div className="flex items-center gap-3">
-          <Button type="submit" disabled={isPending}>
-            {isPending ? 'Saving...' : 'Save Changes'}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            disabled={isPending}
-            onClick={() => router.push('/maintenance')}
-          >
-            Cancel
-          </Button>
-        </div>
       </form>
     </Form>
   );
@@ -517,6 +520,12 @@ interface ScheduleFormProps {
   mode: 'create' | 'edit';
   schedule?: MaintenanceSchedule;
   onSuccess?: () => void;
+  /** HTML form id — passed to edit form for external submit */
+  formId?: string;
+  /** Called when form dirty state changes */
+  onDirtyChange?: (isDirty: boolean) => void;
+  /** Called when form submitting state changes */
+  onSubmittingChange?: (isSubmitting: boolean) => void;
 }
 
 export function ScheduleForm({
@@ -527,9 +536,12 @@ export function ScheduleForm({
   mode,
   schedule,
   onSuccess,
+  formId,
+  onDirtyChange,
+  onSubmittingChange,
 }: ScheduleFormProps) {
   if (mode === 'edit' && schedule) {
-    return <ScheduleEditForm schedule={schedule} />;
+    return <ScheduleEditForm schedule={schedule} formId={formId} onDirtyChange={onDirtyChange} onSubmittingChange={onSubmittingChange} />;
   }
 
   return (

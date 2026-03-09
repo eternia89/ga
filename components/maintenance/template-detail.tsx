@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -43,9 +43,15 @@ interface TemplateDetailProps {
   template: MaintenanceTemplate;
   categories: Category[];
   userRole: string;
+  /** HTML form id — allows external button to submit via form={formId} */
+  formId?: string;
+  /** Called when form dirty state changes */
+  onDirtyChange?: (isDirty: boolean) => void;
+  /** Called when form submitting state changes */
+  onSubmittingChange?: (isSubmitting: boolean) => void;
 }
 
-export function TemplateDetail({ template, categories, userRole }: TemplateDetailProps) {
+export function TemplateDetail({ template, categories, userRole, formId, onDirtyChange, onSubmittingChange }: TemplateDetailProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -68,6 +74,16 @@ export function TemplateDetail({ template, categories, userRole }: TemplateDetai
   });
 
   const checklist = form.watch('checklist') as ChecklistItem[];
+
+  // Track and propagate dirty/submitting state
+  const formIsDirty = form.formState.isDirty;
+  useEffect(() => {
+    onDirtyChange?.(canManage && formIsDirty);
+  }, [formIsDirty, canManage, onDirtyChange]);
+
+  useEffect(() => {
+    onSubmittingChange?.(isPending);
+  }, [isPending, onSubmittingChange]);
 
   function onSubmit(data: TemplateEditFormData) {
     setFeedback(null);
@@ -182,7 +198,7 @@ export function TemplateDetail({ template, categories, userRole }: TemplateDetai
       {canManage ? (
         /* Directly editable form for users with permission */
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
             <div className="rounded-lg border border-border p-6 space-y-4">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
@@ -288,9 +304,6 @@ export function TemplateDetail({ template, categories, userRole }: TemplateDetai
               />
             </div>
 
-            <Button type="submit" disabled={isPending}>
-              {isPending ? 'Saving...' : 'Save Changes'}
-            </Button>
           </form>
         </Form>
       ) : (

@@ -1,12 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { JobWithRelations } from '@/lib/types/database';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { RequestPreviewDialog } from './request-preview-dialog';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
-import { Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -34,6 +32,12 @@ interface JobDetailInfoProps {
   categories: { id: string; name: string }[];
   locations: { id: string; name: string }[];
   users: { id: string; name: string }[];
+  /** HTML form id — allows external button to submit via form={formId} */
+  formId?: string;
+  /** Called when form dirty state changes */
+  onDirtyChange?: (isDirty: boolean) => void;
+  /** Called when form submitting state changes */
+  onSubmittingChange?: (isSubmitting: boolean) => void;
 }
 
 export function JobDetailInfo({
@@ -46,6 +50,9 @@ export function JobDetailInfo({
   categories,
   locations,
   users,
+  formId,
+  onDirtyChange,
+  onSubmittingChange,
 }: JobDetailInfoProps) {
   const linkedRequests = job.job_requests ?? [];
   const [previewRequest, setPreviewRequest] = useState<typeof linkedRequests[number]['request'] | null>(null);
@@ -74,6 +81,24 @@ export function JobDetailInfo({
   const categoryOptions = categories.map((c) => ({ label: c.name, value: c.id }));
   const locationOptions = locations.map((l) => ({ label: l.name, value: l.id }));
   const userOptions = users.map((u) => ({ label: u.name, value: u.id }));
+
+  // Dirty state tracking: compare current edit values against original job values
+  const isDirty =
+    editTitle !== job.title ||
+    editDescription !== (job.description ?? '') ||
+    editLocationId !== (job.location_id ?? '') ||
+    editCategoryId !== (job.category_id ?? '') ||
+    editPriority !== (job.priority ?? 'low') ||
+    editAssignedTo !== (job.assigned_to ?? '') ||
+    editEstimatedCost !== (job.estimated_cost !== null && job.estimated_cost !== undefined ? String(job.estimated_cost) : '');
+
+  useEffect(() => {
+    onDirtyChange?.(canEdit && isDirty);
+  }, [isDirty, canEdit, onDirtyChange]);
+
+  useEffect(() => {
+    onSubmittingChange?.(submitting);
+  }, [submitting, onSubmittingChange]);
 
   const handleEditSave = async () => {
     setSubmitting(true);
@@ -106,7 +131,7 @@ export function JobDetailInfo({
   };
 
   return (
-    <div className="space-y-6">
+    <form id={formId} onSubmit={(e) => { e.preventDefault(); handleEditSave(); }} className="space-y-6">
       {/* Title row */}
       <div className="space-y-2">
         <div>
@@ -274,24 +299,6 @@ export function JobDetailInfo({
           </dd>
         </div>
 
-        <div>
-          <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-            Created By
-          </dt>
-          <dd className="text-sm">
-            {job.created_by_user?.full_name ?? (
-              <span className="text-muted-foreground">—</span>
-            )}
-          </dd>
-        </div>
-
-        <div>
-          <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-            Created At
-          </dt>
-          <dd className="text-sm">{formatDateTime(job.created_at)}</dd>
-        </div>
-
         {job.started_at && (
           <div>
             <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
@@ -382,17 +389,6 @@ export function JobDetailInfo({
         </div>
       )}
 
-      {/* Save button — at the bottom, consistent with other detail pages */}
-      {canEdit && (
-        <Button
-          onClick={handleEditSave}
-          disabled={submitting}
-        >
-          <Check className="mr-1.5 h-3.5 w-3.5" />
-          {submitting ? 'Saving...' : 'Save Changes'}
-        </Button>
-      )}
-
       {/* Inline feedback */}
       {feedback && (
         <InlineFeedback
@@ -442,6 +438,6 @@ export function JobDetailInfo({
         open={!!previewRequest}
         onOpenChange={(open) => { if (!open) setPreviewRequest(null); }}
       />
-    </div>
+    </form>
   );
 }
