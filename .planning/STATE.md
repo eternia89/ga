@@ -309,10 +309,11 @@ Recent decisions affecting current work:
 | 37 | Approval queue: View button opens JobViewModal with permalink support | 2026-03-10 | 79b9a55 | Verified | [34-approval-detail-should-use-modal-with-pe](./quick/34-approval-detail-should-use-modal-with-pe/) |
 | 38 | add proper spacing between icon and text in timeline, so it doesn't look that cramped | 2026-03-10 | a9f1f76 | Needs Review | [35-add-proper-spacing-between-icon-and-text](./quick/35-add-proper-spacing-between-icon-and-text/) |
 | 39 | asset transfer: only the receiver can accept or reject the transfer. admin can still cancel the transfer | 2026-03-10 | 8e7d474 | Verified | [36-asset-transfer-only-the-receiver-can-acc](./quick/36-asset-transfer-only-the-receiver-can-acc/) |
+| 40 | Consolidate asset view modal action buttons to sticky bar only (remove duplicate inline AssetDetailActions) | 2026-03-10 | bd61fcd | Verified | [37-detail-modal-move-all-form-field-action-](./quick/37-detail-modal-move-all-form-field-action-/) |
 
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Completed quick task 34: Approval queue View button opens JobViewModal with permalink support
+Stopped at: Completed quick task 37: Consolidate asset view modal actions to sticky bar only
 Resume file: None
 Next: Ready for next task
