@@ -18,6 +18,8 @@ interface AssetDetailInfoProps {
   currentUserRole: string;
   onEditSuccess: () => void;
   onSubmittingChange?: (submitting: boolean) => void;
+  formId?: string;
+  onDirtyChange?: (isDirty: boolean) => void;
 }
 
 export function AssetDetailInfo({
@@ -30,6 +32,8 @@ export function AssetDetailInfo({
   currentUserRole,
   onEditSuccess,
   onSubmittingChange,
+  formId,
+  onDirtyChange,
 }: AssetDetailInfoProps) {
   const [lightboxPhotos, setLightboxPhotos] = useState<Array<{ id: string; url: string; fileName: string }> | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number>(0);
@@ -66,6 +70,8 @@ export function AssetDetailInfo({
         existingInvoices={editExistingInvoices}
         onSuccess={onEditSuccess}
         onSubmittingChange={onSubmittingChange}
+        formId={formId}
+        onDirtyChange={onDirtyChange}
       />
     );
   }
