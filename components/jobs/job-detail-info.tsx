@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { JobWithRelations } from '@/lib/types/database';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
-import { PhotoGrid } from '@/components/media/photo-grid';
+import { PhotoUpload, ExistingPhoto } from '@/components/media/photo-upload';
 import { RequestPreviewDialog } from './request-preview-dialog';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
 import { Input } from '@/components/ui/input';
@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { updateJob } from '@/app/actions/job-actions';
+import { updateJob, deleteJobAttachment } from '@/app/actions/job-actions';
 import { formatIDR, formatNumber, formatDateTime, formatDate } from '@/lib/utils';
 
 const PRIORITY_ORDER = ['low', 'medium', 'high', 'urgent'] as const;
@@ -27,7 +27,7 @@ interface JobDetailInfoProps {
   job: JobWithRelations;
   currentUserId: string;
   currentUserRole: string;
-  photoUrls: { id: string; url: string; fileName: string }[];
+  photoUrls: ExistingPhoto[];
   approvedByName?: string | null;
   approvalRejectedByName?: string | null;
   onActionSuccess: () => void;
@@ -71,12 +71,16 @@ export function JobDetailInfo({
     job.estimated_cost !== null && job.estimated_cost !== undefined ? String(job.estimated_cost) : ''
   );
 
+  // Photo state
+  const [newPhotos, setNewPhotos] = useState<File[]>([]);
+  const [deletedPhotoIds, setDeletedPhotoIds] = useState<string[]>([]);
+  const [visibleExistingPhotos, setVisibleExistingPhotos] = useState<ExistingPhoto[]>(photoUrls);
+
   // Feedback state
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
-  const isPIC = job.assigned_to === currentUserId;
 
   // canEdit: GA Lead/Admin can edit any non-terminal job
   const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job.status);
@@ -95,13 +99,20 @@ export function JobDetailInfo({
     editAssignedTo !== (job.assigned_to ?? '') ||
     editEstimatedCost !== (job.estimated_cost !== null && job.estimated_cost !== undefined ? String(job.estimated_cost) : '');
 
+  const isPhotoDirty = newPhotos.length > 0 || deletedPhotoIds.length > 0;
+
   useEffect(() => {
-    onDirtyChange?.(canEdit && isDirty);
-  }, [isDirty, canEdit, onDirtyChange]);
+    onDirtyChange?.(canEdit && (isDirty || isPhotoDirty));
+  }, [isDirty, isPhotoDirty, canEdit, onDirtyChange]);
 
   useEffect(() => {
     onSubmittingChange?.(submitting);
   }, [submitting, onSubmittingChange]);
+
+  const handleExistingPhotoRemove = (photoId: string) => {
+    setDeletedPhotoIds((prev) => [...prev, photoId]);
+    setVisibleExistingPhotos((prev) => prev.filter((p) => p.id !== photoId));
+  };
 
   const handleEditSave = async () => {
     setSubmitting(true);
@@ -122,6 +133,33 @@ export function JobDetailInfo({
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
         return;
+      }
+
+      // Delete removed photos
+      if (deletedPhotoIds.length > 0) {
+        for (const attachmentId of deletedPhotoIds) {
+          await deleteJobAttachment({ attachmentId });
+        }
+        setDeletedPhotoIds([]);
+      }
+      // Upload new photos
+      if (newPhotos.length > 0) {
+        const formData = new FormData();
+        formData.append('entity_type', 'job');
+        formData.append('entity_id', job.id);
+        for (const file of newPhotos) {
+          formData.append('photos', file);
+        }
+        const uploadRes = await fetch('/api/uploads/entity-photos', {
+          method: 'POST',
+          body: formData,
+        });
+        if (!uploadRes.ok) {
+          setFeedback({ type: 'error', message: 'Job saved but photo upload failed. Try again.' });
+          onActionSuccess();
+          return;
+        }
+        setNewPhotos([]);
       }
 
       setFeedback({ type: 'success', message: 'Job updated successfully.' });
@@ -373,14 +411,21 @@ export function JobDetailInfo({
       </div>
 
       {/* Job Photos */}
-      {photoUrls.length > 0 && (
-        <div>
-          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-            Photos
-          </h3>
-          <PhotoGrid photos={photoUrls} />
-        </div>
-      )}
+      <div>
+        <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+          Photos
+        </h3>
+        <PhotoUpload
+          onChange={setNewPhotos}
+          existingPhotos={visibleExistingPhotos}
+          onRemoveExisting={canEdit ? handleExistingPhotoRemove : undefined}
+          disabled={!canEdit || submitting}
+          maxPhotos={10}
+          showCount
+          enableAnnotation={false}
+          enableMobileCapture
+        />
+      </div>
 
       {/* Rejection reason callout */}
       {job.approval_rejection_reason && (
