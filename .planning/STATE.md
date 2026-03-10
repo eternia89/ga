@@ -308,10 +308,11 @@ Recent decisions affecting current work:
 | 36 | Stable column widths on all tables (fixed sizes + grow column + actions last) | 2026-03-10 | 72bbd71 | Verified | [32-limit-all-table-width-by-its-own-logical](./quick/32-limit-all-table-width-by-its-own-logical/) |
 | 37 | Inactive settings rows grey background, remove Status column from all settings tables | 2026-03-10 | d989b61 | Verified | [34-in-settings-inactive-rows-should-be-dist](./quick/34-in-settings-inactive-rows-should-be-dist/) |
 | 38 | Move save changes button to sticky bottom bar on asset detail page | 2026-03-10 | ddde5b8 | Verified | [35-move-all-save-changes-buttons-to-the-sti](./quick/35-move-all-save-changes-buttons-to-the-sti/) |
+| 39 | Estimated cost in job timeline displays IDR thousand separator formatting | 2026-03-10 | 74eb908 | Verified | [36-estimated-cost-in-job-timeline-should-di](./quick/36-estimated-cost-in-job-timeline-should-di/) |
 
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Completed quick task 38: Save changes button to sticky bottom bar
+Stopped at: Completed quick task 39: IDR formatting in job timeline
 Resume file: None
 Next: Ready for next task
