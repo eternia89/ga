@@ -87,7 +87,7 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
       const title = row.getValue('title') as string;
       return (
         <span
-          className="max-w-[200px] truncate block"
+          className="truncate block"
           title={title}
         >
           {title}
@@ -95,6 +95,7 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
       );
     },
     size: 200,
+    meta: { grow: true },
   },
   {
     id: 'location_name',

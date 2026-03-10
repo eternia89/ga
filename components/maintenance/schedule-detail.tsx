@@ -4,7 +4,6 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { AlertCircle } from 'lucide-react';
-import Link from 'next/link';
 import { deactivateSchedule, activateSchedule, deleteSchedule } from '@/app/actions/schedule-actions';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -147,13 +146,6 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
 
         {canManage && !showDeleteConfirm && (
           <div className="flex items-center gap-2">
-            {schedule.template?.checklist && schedule.template.checklist.length > 0 && (
-              <Link href={`/maintenance/schedules/${schedule.id}/preview`}>
-                <Button type="button" variant="outline" size="sm">
-                  Preview Form
-                </Button>
-              </Link>
-            )}
             {schedule.is_active ? (
               <Button
                 type="button"

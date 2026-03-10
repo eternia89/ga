@@ -34,6 +34,15 @@ export const authActionClient = actionClient.use(async ({ next }) => {
   });
 });
 
+// GA operations action client — ga_lead or admin, provides adminSupabase (bypasses RLS)
+export const gaLeadActionClient = authActionClient.use(async ({ ctx, next }) => {
+  if (!['ga_lead', 'admin'].includes(ctx.profile.role)) {
+    throw new Error("GA Lead or Admin access required");
+  }
+  const adminSupabase = createAdminClient();
+  return next({ ctx: { ...ctx, adminSupabase } });
+});
+
 // Admin-only action client — provides adminSupabase (service_role) that bypasses RLS
 export const adminActionClient = authActionClient.use(async ({ ctx, next }) => {
   if (ctx.profile.role !== "admin") {

@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { authActionClient } from '@/lib/safe-action';
+import { authActionClient, gaLeadActionClient } from '@/lib/safe-action';
 import { scheduleCreateSchema, scheduleEditSchema } from '@/lib/validations/schedule-schema';
 import { getScheduleDisplayStatus } from '@/lib/constants/schedule-status';
 import type { ChecklistItem } from '@/lib/types/maintenance';
@@ -13,18 +13,13 @@ import { z } from 'zod';
 // Calculates initial next_due_at from start_date or now() + interval_days.
 // ============================================================================
 
-export const createSchedule = authActionClient
+export const createSchedule = gaLeadActionClient
   .schema(scheduleCreateSchema)
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase, profile } = ctx;
-
-    // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
-      throw new Error('Only GA Lead or Admin can create maintenance schedules');
-    }
+    const { adminSupabase, profile } = ctx;
 
     // Fetch template — must be active and belong to company
-    const { data: template } = await supabase
+    const { data: template } = await adminSupabase
       .from('maintenance_templates')
       .select('id, category_id, is_active, company_id')
       .eq('id', parsedInput.template_id)
@@ -38,7 +33,7 @@ export const createSchedule = authActionClient
     }
 
     // Fetch asset — must belong to company and not be sold_disposed
-    const { data: asset } = await supabase
+    const { data: asset } = await adminSupabase
       .from('inventory_items')
       .select('id, category_id, status, company_id')
       .eq('id', parsedInput.item_id)
@@ -55,7 +50,8 @@ export const createSchedule = authActionClient
     }
 
     // Category matching validation (Pitfall 7): template category must match asset category
-    if (template.category_id !== asset.category_id) {
+    // General templates (null category_id) can pair with any asset
+    if (template.category_id && template.category_id !== asset.category_id) {
       throw new Error(
         'Template and asset must have the same category. Select a template that matches the asset category.'
       );
@@ -70,7 +66,7 @@ export const createSchedule = authActionClient
       nextDueAt = new Date(now.getTime() + parsedInput.interval_days * 86400000);
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await adminSupabase
       .from('maintenance_schedules')
       .insert({
         company_id:    profile.company_id,
@@ -100,18 +96,13 @@ export const createSchedule = authActionClient
 // interval changes (fresh calculation: now + new interval_days).
 // ============================================================================
 
-export const updateSchedule = authActionClient
+export const updateSchedule = gaLeadActionClient
   .schema(z.object({ id: z.string().uuid(), data: scheduleEditSchema }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase, profile } = ctx;
-
-    // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
-      throw new Error('Only GA Lead or Admin can update maintenance schedules');
-    }
+    const { adminSupabase, profile } = ctx;
 
     // Verify schedule exists and belongs to company
-    const { data: existing } = await supabase
+    const { data: existing } = await adminSupabase
       .from('maintenance_schedules')
       .select('id, interval_days, interval_type, company_id, item_id')
       .eq('id', parsedInput.id)
@@ -139,7 +130,7 @@ export const updateSchedule = authActionClient
       ).toISOString();
     }
 
-    const { error } = await supabase
+    const { error } = await adminSupabase
       .from('maintenance_schedules')
       .update(updatePayload)
       .eq('id', parsedInput.id);
@@ -159,18 +150,13 @@ export const updateSchedule = authActionClient
 // Per CONTEXT.md: "GA Lead can manually activate/deactivate schedules"
 // ============================================================================
 
-export const deactivateSchedule = authActionClient
+export const deactivateSchedule = gaLeadActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase, profile } = ctx;
-
-    // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
-      throw new Error('Only GA Lead or Admin can deactivate maintenance schedules');
-    }
+    const { adminSupabase, profile } = ctx;
 
     // Verify schedule exists and belongs to company
-    const { data: existing } = await supabase
+    const { data: existing } = await adminSupabase
       .from('maintenance_schedules')
       .select('id, is_active, company_id, item_id')
       .eq('id', parsedInput.id)
@@ -187,7 +173,7 @@ export const deactivateSchedule = authActionClient
     }
 
     // Deactivate the schedule
-    const { error } = await supabase
+    const { error } = await adminSupabase
       .from('maintenance_schedules')
       .update({ is_active: false })
       .eq('id', parsedInput.id);
@@ -197,7 +183,7 @@ export const deactivateSchedule = authActionClient
     }
 
     // Cancel open PM jobs linked to this schedule (created, assigned, in_progress)
-    await supabase
+    await adminSupabase
       .from('jobs')
       .update({ status: 'cancelled' })
       .eq('maintenance_schedule_id', parsedInput.id)
@@ -214,18 +200,13 @@ export const deactivateSchedule = authActionClient
 // Sets is_active = true, recalculates next_due_at = now() + interval_days.
 // ============================================================================
 
-export const activateSchedule = authActionClient
+export const activateSchedule = gaLeadActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase, profile } = ctx;
-
-    // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
-      throw new Error('Only GA Lead or Admin can activate maintenance schedules');
-    }
+    const { adminSupabase, profile } = ctx;
 
     // Verify schedule exists and belongs to company
-    const { data: existing } = await supabase
+    const { data: existing } = await adminSupabase
       .from('maintenance_schedules')
       .select('id, is_active, interval_days, company_id, item_id')
       .eq('id', parsedInput.id)
@@ -241,7 +222,7 @@ export const activateSchedule = authActionClient
       throw new Error('Schedule is already active');
     }
 
-    const { error } = await supabase
+    const { error } = await adminSupabase
       .from('maintenance_schedules')
       .update({
         is_active:   true,
@@ -263,18 +244,13 @@ export const activateSchedule = authActionClient
 // Soft-delete (set deleted_at). Historical PM jobs from this schedule remain.
 // ============================================================================
 
-export const deleteSchedule = authActionClient
+export const deleteSchedule = gaLeadActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase, profile } = ctx;
-
-    // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
-      throw new Error('Only GA Lead or Admin can delete maintenance schedules');
-    }
+    const { adminSupabase, profile } = ctx;
 
     // Verify schedule exists and belongs to company
-    const { data: existing } = await supabase
+    const { data: existing } = await adminSupabase
       .from('maintenance_schedules')
       .select('id, company_id, item_id')
       .eq('id', parsedInput.id)
@@ -286,7 +262,7 @@ export const deleteSchedule = authActionClient
       throw new Error('Schedule not found');
     }
 
-    const { error } = await supabase
+    const { error } = await adminSupabase
       .from('maintenance_schedules')
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', parsedInput.id);

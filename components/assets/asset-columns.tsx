@@ -39,12 +39,13 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
     cell: ({ row }) => {
       const name = row.getValue('name') as string;
       return (
-        <span className="max-w-[200px] truncate block font-medium" title={name}>
+        <span className="truncate block font-medium" title={name}>
           {name}
         </span>
       );
     },
     size: 200,
+    meta: { grow: true },
   },
   {
     id: 'category_name',

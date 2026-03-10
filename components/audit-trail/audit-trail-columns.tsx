@@ -161,5 +161,6 @@ export const auditTrailColumns: ColumnDef<AuditLogRow>[] = [
       );
     },
     size: 120,
+    meta: { grow: true },
   },
 ];

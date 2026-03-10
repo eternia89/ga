@@ -243,6 +243,7 @@ export function ScheduleViewModal({
         className="max-w-[1000px] max-h-[90vh] flex flex-col p-0 gap-0 max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0"
         showCloseButton={true}
       >
+        <DialogTitle className="sr-only">Schedule Details</DialogTitle>
         {/* Loading state */}
         {loading && (
           <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
@@ -291,9 +292,6 @@ export function ScheduleViewModal({
           <>
             {/* Header (non-scrollable) */}
             <div className="px-6 pt-6 pb-4 border-b shrink-0 pr-12">
-              <DialogTitle className="sr-only">
-                Schedule: {schedule.template?.name ?? 'Schedule'}
-              </DialogTitle>
               <div className="flex flex-wrap items-center gap-3">
                 {/* Prev/Next navigation */}
                 {scheduleIds.length > 1 && (
@@ -390,18 +388,6 @@ export function ScheduleViewModal({
               </div>
               {canManage && (
                 <div className="flex items-center gap-2">
-                  {schedule.template?.checklist && schedule.template.checklist.length > 0 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        router.push(`/maintenance/schedules/${schedule.id}/preview`);
-                        onOpenChange(false);
-                      }}
-                    >
-                      Preview Form
-                    </Button>
-                  )}
                   {schedule.is_active ? (
                     <Button variant="outline" size="sm" onClick={handlePause} disabled={actionPending} className="text-destructive hover:text-destructive">
                       {actionPending ? 'Processing...' : 'Pause'}

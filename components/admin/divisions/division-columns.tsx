@@ -37,6 +37,7 @@ export const divisionColumns: ColumnDef<Division>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
+    size: 180,
   },
   {
     accessorKey: "code",
@@ -45,6 +46,7 @@ export const divisionColumns: ColumnDef<Division>[] = [
       const value = row.getValue("code") as string | null;
       return value ? <span>{value}</span> : <span className="text-muted-foreground">—</span>;
     },
+    size: 90,
   },
   {
     accessorKey: "company.name",
@@ -56,6 +58,7 @@ export const divisionColumns: ColumnDef<Division>[] = [
       const division = row.original;
       return division.company?.name ? <span>{division.company.name}</span> : <span className="text-muted-foreground">—</span>;
     },
+    size: 160,
   },
   {
     accessorKey: "description",
@@ -63,13 +66,15 @@ export const divisionColumns: ColumnDef<Division>[] = [
     cell: ({ row }) => {
       const description = row.getValue("description") as string | null;
       return description ? (
-        <span className="max-w-[300px] truncate" title={description}>
+        <span className="truncate block" title={description}>
           {description}
         </span>
       ) : (
         <span className="text-muted-foreground">—</span>
       );
     },
+    size: 220,
+    meta: { grow: true },
   },
   {
     accessorKey: "deleted_at",
@@ -82,6 +87,7 @@ export const divisionColumns: ColumnDef<Division>[] = [
         </Badge>
       );
     },
+    size: 100,
   },
   {
     id: "actions",

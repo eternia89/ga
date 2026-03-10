@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { JobWithRelations } from '@/lib/types/database';
-import { useGeolocation } from '@/hooks/use-geolocation';
+import { useGeolocation, useGeolocationPermission } from '@/hooks/use-geolocation';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -30,7 +30,6 @@ import {
   updateJobStatus,
   cancelJob,
   assignJob,
-  requestApproval,
 } from '@/app/actions/job-actions';
 import {
   approveJob,
@@ -45,10 +44,9 @@ import {
   ThumbsUp,
   ThumbsDown,
   RefreshCw,
+  MapPin,
 } from 'lucide-react';
 import { Combobox } from '@/components/combobox';
-import { Input } from '@/components/ui/input';
-import { formatNumber } from '@/lib/utils';
 
 interface JobDetailActionsProps {
   job: JobWithRelations;
@@ -69,6 +67,8 @@ export function JobDetailActions({
 
   // GPS hook for status changes
   const { capturing: capturingGps, capturePosition } = useGeolocation();
+  const { permissionState } = useGeolocationPermission();
+  const locationActivated = permissionState === 'granted';
 
   // Dialog states
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -83,25 +83,21 @@ export function JobDetailActions({
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [assignPicValue, setAssignPicValue] = useState('');
-  const [costValue, setCostValue] = useState('');
 
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
-  const isFinanceApproverOrAdmin = ['finance_approver', 'admin'].includes(currentUserRole);
   const isFinanceApproverOnly = currentUserRole === 'finance_approver';
   const isPIC = job.assigned_to === currentUserId;
+  const isCreator = job.created_by === currentUserId;
 
   // Determine available actions per role + status
   const canAssignPIC = isGaLeadOrAdmin && job.status === 'created';
   const canStartWork = isPIC && job.status === 'assigned';
-  const canRequestApproval = isPIC && job.status === 'in_progress' && !job.approved_at;
   const canApproveReject =
-    isFinanceApproverOrAdmin && job.status === 'pending_approval';
+    isCreator && job.status === 'pending_approval';
   const canApproveCompletion =
-    isFinanceApproverOrAdmin && job.status === 'pending_completion_approval';
-  // Can only mark complete if in_progress AND budget is approved (or no budget set)
-  const hasPendingBudget = (job.estimated_cost ?? 0) > 0 && !job.approved_at;
+    isCreator && job.status === 'pending_completion_approval';
   const canMarkComplete =
-    (isGaLeadOrAdmin || isPIC) && job.status === 'in_progress' && !hasPendingBudget;
+    (isGaLeadOrAdmin || isPIC) && job.status === 'in_progress';
   const canCancel =
     isGaLeadOrAdmin &&
     !isFinanceApproverOnly &&
@@ -109,7 +105,6 @@ export function JobDetailActions({
 
   const hasAnyAction =
     canAssignPIC ||
-    canRequestApproval ||
     canStartWork ||
     canApproveReject ||
     canApproveCompletion ||
@@ -138,27 +133,16 @@ export function JobDetailActions({
     }
   };
 
-  const handleRequestApproval = async () => {
-    setSubmitting(true);
+  const handleActivateLocation = async () => {
     setFeedback(null);
     try {
-      const digits = costValue.replace(/[^0-9]/g, '');
-      const parsedCost = digits === '' ? 0 : parseInt(digits, 10);
-      const result = await requestApproval({ job_id: job.id, estimated_cost: parsedCost });
-      if (result?.serverError) {
-        setFeedback({ type: 'error', message: result.serverError });
-        return;
-      }
-      setCostValue('');
-      const msg = result?.data?.autoApproved
-        ? 'Cost auto-approved (Rp 0).'
-        : 'Approval requested. Awaiting finance review.';
-      setFeedback({ type: 'success', message: msg });
-      onActionSuccess();
+      await capturePosition();
+      setFeedback({ type: 'success', message: 'Location activated. You can now start work.' });
     } catch (err) {
-      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to request approval' });
-    } finally {
-      setSubmitting(false);
+      setFeedback({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Failed to get location. Please allow location access.',
+      });
     }
   };
 
@@ -353,36 +337,18 @@ export function JobDetailActions({
               </>
             )}
 
-            {canStartWork && (
+            {canStartWork && !locationActivated && (
+              <Button onClick={handleActivateLocation} disabled={submitting || capturingGps}>
+                <MapPin className="mr-2 h-4 w-4" />
+                {capturingGps ? 'Getting location...' : 'Activate Location'}
+              </Button>
+            )}
+
+            {canStartWork && locationActivated && (
               <Button onClick={handleStartWork} disabled={submitting || capturingGps}>
                 <Play className="mr-2 h-4 w-4" />
                 {capturingGps ? 'Getting location...' : 'Start Work'}
               </Button>
-            )}
-
-            {canRequestApproval && (
-              <>
-                <div className="relative w-40">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
-                    Rp
-                  </span>
-                  <Input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="0"
-                    className="pl-10"
-                    disabled={submitting}
-                    value={costValue ? formatNumber(parseInt(costValue.replace(/[^0-9]/g, '') || '0', 10)) : ''}
-                    onChange={(e) => {
-                      const digits = e.target.value.replace(/[^0-9]/g, '');
-                      setCostValue(digits);
-                    }}
-                  />
-                </div>
-                <Button onClick={handleRequestApproval} disabled={submitting}>
-                  Request Approval
-                </Button>
-              </>
             )}
 
             {canApproveReject && (
@@ -450,16 +416,16 @@ export function JobDetailActions({
           </div>
         </div>
 
-        {/* Pending Approval read-only indicator (for non-approvers) */}
-        {job.status === 'pending_approval' && !isFinanceApproverOrAdmin && (
+        {/* Pending Approval read-only indicator (for non-creators) */}
+        {job.status === 'pending_approval' && !isCreator && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground rounded-md border px-3 py-2">
             <RefreshCw className="h-4 w-4 animate-spin" />
             Awaiting Budget Approval
           </div>
         )}
 
-        {/* Pending Completion Approval read-only indicator (for non-approvers) */}
-        {job.status === 'pending_completion_approval' && !isFinanceApproverOrAdmin && (
+        {/* Pending Completion Approval read-only indicator (for non-creators) */}
+        {job.status === 'pending_completion_approval' && !isCreator && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground rounded-md border px-3 py-2">
             <RefreshCw className="h-4 w-4 animate-spin" />
             Awaiting Completion Approval

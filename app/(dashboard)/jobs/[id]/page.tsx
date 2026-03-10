@@ -85,7 +85,7 @@ export default async function JobDetailPage({ params }: PageProps) {
   }
 
   // Fetch all data in parallel
-  const [auditLogsResult, commentsResult, usersResult, statusChangesResult, categoriesResult, locationsResult] = await Promise.all([
+  const [auditLogsResult, commentsResult, usersResult, statusChangesResult, categoriesResult, locationsResult, jobPhotosResult] = await Promise.all([
     // Audit logs for timeline
     supabase
       .from('audit_logs')
@@ -131,6 +131,15 @@ export default async function JobDetailPage({ params }: PageProps) {
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .order('name'),
+
+    // Job photos (entity_type='job')
+    supabase
+      .from('media_attachments')
+      .select('id, file_name, file_path, mime_type, sort_order')
+      .eq('entity_type', 'job')
+      .eq('entity_id', id)
+      .is('deleted_at', null)
+      .order('sort_order', { ascending: true }),
   ]);
 
   const auditLogs = auditLogsResult.data ?? [];
@@ -148,6 +157,25 @@ export default async function JobDetailPage({ params }: PageProps) {
     }
   }
   const users = usersResult.data ?? [];
+
+  // Generate signed URLs for job-level photos
+  const jobAttachments = jobPhotosResult.data ?? [];
+  let jobPhotoUrls: { id: string; url: string; fileName: string }[] = [];
+
+  if (jobAttachments.length > 0) {
+    const { data: signedUrls } = await supabase.storage
+      .from('job-photos')
+      .createSignedUrls(
+        jobAttachments.map((a) => a.file_path),
+        21600 // 6 hours
+      );
+
+    jobPhotoUrls = jobAttachments.map((attachment, index) => ({
+      id: attachment.id,
+      url: signedUrls?.[index]?.signedUrl ?? '',
+      fileName: attachment.file_name,
+    }));
+  }
 
   // Fetch comment photos
   const commentIds = comments.map((c) => c.id);
@@ -449,6 +477,7 @@ export default async function JobDetailPage({ params }: PageProps) {
         users={users}
         categories={categories}
         locations={locations}
+        photoUrls={jobPhotoUrls}
         approvedByName={approvedByName}
         approvalRejectedByName={approvalRejectedByName}
       />

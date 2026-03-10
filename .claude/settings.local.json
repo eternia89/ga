@@ -70,7 +70,11 @@
       "Bash(git worktree:*)",
       "Bash(git:*)",
       "Bash(osascript:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(rm:*)",
+      "Bash(npx eslint:*)",
+      "Bash(grep:*)",
+      "Bash(git rm:*)"
     ]
   },
   "outputStyle": "Explanatory"

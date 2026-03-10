@@ -82,6 +82,8 @@ export function getUserColumns(
           </div>
         );
       },
+      size: 220,
+      meta: { grow: true },
     },
     {
       accessorKey: 'location',
@@ -90,6 +92,7 @@ export function getUserColumns(
         const location = row.original.location;
         return location?.name ? <span>{location.name}</span> : <span className="text-muted-foreground">—</span>;
       },
+      size: 150,
     },
     {
       accessorKey: 'deleted_at',
@@ -102,6 +105,7 @@ export function getUserColumns(
           </Badge>
         );
       },
+      size: 100,
     },
     {
       accessorKey: 'company_id',
@@ -118,14 +122,7 @@ export function getUserColumns(
         const company = row.original.company;
         return company?.name ? <span>{company.name}</span> : <span className="text-muted-foreground">—</span>;
       },
-    },
-    {
-      accessorKey: 'created_at',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Created" />,
-      cell: ({ row }) => {
-        const createdAt = row.getValue('created_at') as string;
-        return <span>{format(new Date(createdAt), 'dd-MM-yyyy')}</span>;
-      },
+      size: 160,
     },
     {
       id: 'actions',
@@ -140,6 +137,7 @@ export function getUserColumns(
           Edit
         </Button>
       ),
+      size: 80,
     },
   ];
 }

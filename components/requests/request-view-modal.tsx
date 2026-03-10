@@ -22,10 +22,12 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { completeRequest } from '@/app/actions/request-actions';
 import {
   XCircle,
   Ban,
   CheckCircle,
+  CheckSquare,
   Star,
   AlertCircle,
   RefreshCw,
@@ -429,15 +431,38 @@ export function RequestViewModal({
     handleActionSuccess();
   }, [handleActionSuccess]);
 
+  // Completing state
+  const [completing, setCompleting] = useState(false);
+
   // Role/permission derivations
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
   const isRequester = request?.requester_id === currentUserId;
-  const isAdmin = currentUserRole === 'admin';
+  const isPic = request?.assigned_to === currentUserId;
 
   const canReject = isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request?.status ?? '');
   const canCancel = isRequester && request?.status === 'submitted';
-  const canAcceptOrReject = (isRequester || isAdmin) && request?.status === 'pending_acceptance';
+  const canComplete = (isPic || isGaLeadOrAdmin) && ['triaged', 'in_progress'].includes(request?.status ?? '');
+  const canAcceptOrReject = isRequester && request?.status === 'pending_acceptance';
   const canGiveFeedback = isRequester && request?.status === 'accepted' && !request?.feedback_rating;
+
+  const handleComplete = async () => {
+    if (!request) return;
+    if (!window.confirm('Complete this request? It will be sent to the requester for acceptance.')) return;
+    setCompleting(true);
+    try {
+      const result = await completeRequest({ id: request.id });
+      if (result?.data?.success) {
+        handleActionSuccess();
+      } else {
+        const errorMsg = (result as { serverError?: string })?.serverError ?? 'Failed to complete request.';
+        alert(errorMsg);
+      }
+    } catch {
+      alert('Failed to complete request.');
+    } finally {
+      setCompleting(false);
+    }
+  };
 
   return (
     <>
@@ -446,6 +471,7 @@ export function RequestViewModal({
           className="max-w-[1000px] max-h-[90vh] flex flex-col p-0 gap-0 max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0"
           showCloseButton={true}
         >
+          <DialogTitle className="sr-only">Request Details</DialogTitle>
           {/* Loading state */}
           {loading && (
             <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
@@ -510,9 +536,6 @@ export function RequestViewModal({
             <>
               {/* Header (non-scrollable) */}
               <div className="px-6 pt-6 pb-4 border-b shrink-0 pr-12">
-                <DialogTitle className="sr-only">
-                  Request {request.display_id}
-                </DialogTitle>
                 <div className="flex flex-wrap items-center gap-3">
                   {/* Prev/Next navigation */}
                   {requestIds.length > 1 && (
@@ -609,6 +632,18 @@ export function RequestViewModal({
                   >
                     {formSubmitting ? 'Updating...' : 'Update Request'}
                   </Button>
+
+                  {canComplete && (
+                    <Button
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      disabled={completing}
+                      onClick={handleComplete}
+                    >
+                      <CheckSquare className="mr-2 h-4 w-4" />
+                      {completing ? 'Completing...' : 'Complete Request'}
+                    </Button>
+                  )}
 
                   {canAcceptOrReject && (
                     <Button

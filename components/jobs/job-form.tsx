@@ -27,9 +27,11 @@ import {
 } from '@/components/ui/select';
 import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
+import { PhotoUpload } from '@/components/media/photo-upload';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { RequestPreviewDialog } from './request-preview-dialog';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
+import { formatNumber } from '@/lib/utils';
 
 
 const PRIORITY_ORDER = ['low', 'medium', 'high', 'urgent'] as const;
@@ -104,6 +106,8 @@ interface JobFormProps {
     requester?: { full_name: string } | null;
     assigned_user?: { full_name: string } | null;
   }[];
+  /** Budget threshold from company_settings (null = no threshold configured) */
+  companyBudgetThreshold?: number | null;
   onSuccess?: () => void;
 }
 
@@ -120,11 +124,13 @@ export function JobForm({
   readOnly = false,
   picLocked = false,
   linkedRequestDetails,
+  companyBudgetThreshold,
   onSuccess,
 }: JobFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [previewRequest, setPreviewRequest] = useState<NonNullable<JobFormProps['linkedRequestDetails']>[number] | null>(null);
   const [linkedRequests, setLinkedRequests] = useState<EligibleRequest[]>(() => {
     if (mode === 'edit' && initialData?.linked_request_ids && initialData.linked_request_ids.length > 0) {
@@ -194,7 +200,9 @@ export function JobForm({
       ...(mode === 'edit' ? {
         assigned_to: defaultAssignedTo as string | undefined,
         estimated_cost: defaultEstimatedCost as number | undefined,
-      } : {}),
+      } : {
+        estimated_cost: undefined as number | undefined,
+      }),
       linked_request_ids: defaultLinkedRequestIds as string[],
     },
   });
@@ -252,6 +260,27 @@ export function JobForm({
           setError('Failed to create job. Please try again.');
           return;
         }
+
+        // Step 2: Upload photos if any were selected
+        if (photoFiles.length > 0) {
+          const formData = new FormData();
+          formData.append('entity_type', 'job');
+          formData.append('entity_id', result.data.jobId);
+          for (const file of photoFiles) {
+            formData.append('photos', file);
+          }
+
+          const uploadResponse = await fetch('/api/uploads/entity-photos', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (!uploadResponse.ok) {
+            // Photo upload failed — job is still saved, just without photos
+            console.warn('Photo upload failed:', await uploadResponse.text());
+          }
+        }
+
         if (onSuccess) {
           onSuccess();
         } else {
@@ -407,6 +436,39 @@ export function JobForm({
           />
         )}
 
+        {/* Budget (estimated cost) */}
+        {!readOnly && (
+          <FormField
+            control={form.control}
+            name="estimated_cost"
+            render={({ field }) => (
+              <FormItem className="max-w-xs">
+                <FormLabel>Budget (optional)</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
+                      Rp
+                    </span>
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="0"
+                      className="pl-10"
+                      disabled={disabled}
+                      value={field.value ? formatNumber(field.value) : ''}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/[^0-9]/g, '');
+                        field.onChange(digits === '' ? undefined : parseInt(digits, 10));
+                      }}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         {/* PIC (Person in Charge) — only shown in edit/view mode */}
         {mode === 'edit' && (
           <FormField
@@ -526,6 +588,21 @@ export function JobForm({
           />
         </div>
 
+        {/* Photos — only show in create mode, not readOnly */}
+        {mode === 'create' && !readOnly && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Photos (optional)</p>
+            <div className="flex flex-wrap gap-2">
+              <PhotoUpload
+                onChange={setPhotoFiles}
+                disabled={isSubmitting}
+                maxPhotos={10}
+                showCount
+              />
+            </div>
+          </div>
+        )}
+
         {/* Error feedback */}
         {error && (
           <InlineFeedback
@@ -544,7 +621,19 @@ export function JobForm({
                   ? 'Creating...'
                   : 'Saving...'
                 : mode === 'create'
-                ? 'Create Job'
+                ? (() => {
+                    const costVal = form.watch('estimated_cost') as number | undefined;
+                    if (
+                      costVal !== undefined &&
+                      costVal > 0 &&
+                      companyBudgetThreshold !== null &&
+                      companyBudgetThreshold !== undefined &&
+                      costVal >= companyBudgetThreshold
+                    ) {
+                      return 'Create Job & Request Budget';
+                    }
+                    return 'Create Job';
+                  })()
                 : 'Save Changes'}
             </Button>
             {!onSuccess && (

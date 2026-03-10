@@ -207,6 +207,7 @@ export function TemplateViewModal({
         className="max-w-[1000px] max-h-[90vh] flex flex-col p-0 gap-0 max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0"
         showCloseButton={true}
       >
+        <DialogTitle className="sr-only">Template Details</DialogTitle>
         {/* Loading state */}
         {loading && (
           <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
@@ -256,9 +257,6 @@ export function TemplateViewModal({
           <>
             {/* Header (non-scrollable) */}
             <div className="px-6 pt-6 pb-4 border-b shrink-0 pr-12">
-              <DialogTitle className="sr-only">
-                Template: {template.name}
-              </DialogTitle>
               <div className="flex flex-wrap items-center gap-3">
                 {/* Prev/Next navigation */}
                 {templateIds.length > 1 && (

@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-09 - Completed quick task 28: Standardize empty cell styling with muted em dash
+Last activity: 2026-03-09 - Completed quick task 33: Add photo attachments to job creation form
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -295,21 +295,21 @@ Recent decisions affecting current work:
 | 23 | Audit all flows for deadlocks (analysis only) | 2026-03-06 | 92af395 | Verified | [20-test-all-flow-of-request-jobs-approvals-](./quick/20-test-all-flow-of-request-jobs-approvals-/) |
 | 24 | Fix deadlock analysis issues: wire advanceFloatingSchedule, rework Start Work, threshold gates, remove dead statuses | 2026-03-09 | 7584eed | Verified | [21-fix-deadlock-analysis-issues-wire-advanc](./quick/21-fix-deadlock-analysis-issues-wire-advanc/) |
 | 25 | Add permalink support (?action=create) to all 5 create modals | 2026-03-09 | d6258a7 | Verified | [22-add-permalink-support-to-all-5-create-mo](./quick/22-add-permalink-support-to-all-5-create-mo/) |
-| 26 | Remove duplication from detail pages, add sticky save bar | 2026-03-09 | 5374429 | Verified | [23-remove-duplication-of-information-in-det](./quick/23-remove-duplication-of-information-in-det/) |
-| 27 | Add location field to user profiles | 2026-03-09 | ac80bee | Verified | [24-add-location-field-to-user-profiles-indi](./quick/24-add-location-field-to-user-profiles-indi/) |
-| 28 | Asset location tracking & transfer flow refinements | 2026-03-09 | 14b9629 | Verified | [25-asset-location-tracking-transfer-flow-st](./quick/25-asset-location-tracking-transfer-flow-st/) |
-| 29 | Users table: role beside name, remove Division + Last Login | 2026-03-09 | f5aadbc | Verified | [26-users-table-role-beside-name-remove-divi](./quick/26-users-table-role-beside-name-remove-divi/) |
-| 30 | Remove Created date column from admin settings tables | 2026-03-09 | 62ff88a | Verified | [27-remove-created-date-column-from-categori](./quick/27-remove-created-date-column-from-categori/) |
-| 31 | Standardize empty cell styling with muted em dash | 2026-03-09 | a60e93c | Verified | [28-inactive-or-empty-state-values-should-ha](./quick/28-inactive-or-empty-state-values-should-ha/) |
-| 32 | Table checkbox columns static width audit (no changes needed) | 2026-03-09 | — | Verified | [29-table-checkbox-columns-should-have-stati](./quick/29-table-checkbox-columns-should-have-stati/) |
-| 33 | Hide pagination footer when data fits on one page | 2026-03-09 | 06c86b8 | Verified | [30-hide-rows-per-page-selector-pagination-p](./quick/30-hide-rows-per-page-selector-pagination-p/) |
-| 34 | Fix skeleton loading state overflow in view modals | 2026-03-09 | de53d61 | Verified | [31-fix-skeleton-loading-state-overflow-from](./quick/31-fix-skeleton-loading-state-overflow-from/) |
-| 35 | Timeline UI refinements: compact spacing and text-xs | 2026-03-09 | 2930d34 | Verified | [32-timeline-ui-refinements-add-proper-spaci](./quick/32-timeline-ui-refinements-add-proper-spaci/) |
-| 36 | Improve Google OAuth error messages with structured logging | 2026-03-10 | badb514 | Verified | [33-improve-google-oauth-error-messages-for-](./quick/33-improve-google-oauth-error-messages-for-/) |
+| 26 | Replace Start Work with Activate Location two-step flow | 2026-03-09 | 99a9bbc | Verified | [23-replace-start-work-with-activate-locatio](./quick/23-replace-start-work-with-activate-locatio/) |
+| 27 | Make category optional in maintenance templates | 2026-03-09 | 57465be | Verified | [24-make-category-optional-in-maintenance-te](./quick/24-make-category-optional-in-maintenance-te/) |
+| 28 | Fix RLS policy error when deactivating maintenance schedules | 2026-03-09 | 64b2135 | Verified | [25-fix-rls-policy-error-when-deactivating-m](./quick/25-fix-rls-policy-error-when-deactivating-m/) |
+| 29 | Move PM checklist preview from schedules to templates | 2026-03-09 | 84c44d1 | Verified | [26-move-pm-checklist-preview-from-maintenan](./quick/26-move-pm-checklist-preview-from-maintenan/) |
+| 30 | Rework job lifecycle: budget at creation, creator-based approval | 2026-03-09 | 8600294 | Verified | [27-rework-job-lifecycle-budget-approval-by-](./quick/27-rework-job-lifecycle-budget-approval-by-/) |
+| 31 | Enforce request-job linking rules: PIC-only, status filter, one-to-one | 2026-03-09 | c79afce | Verified | [28-request-job-linking-rules-only-pic-handl](./quick/28-request-job-linking-rules-only-pic-handl/) |
+| 32 | Allow PIC or GA Lead to complete a request directly | 2026-03-09 | d25debc | Verified | [29-allow-pic-or-ga-lead-to-complete-a-reque](./quick/29-allow-pic-or-ga-lead-to-complete-a-reque/) |
+| 33 | Add photo attachments to job creation form and detail page | 2026-03-09 | 064a282 | Verified | [30-add-photo-attachments-to-job-creation-fo](./quick/30-add-photo-attachments-to-job-creation-fo/) |
+| 34 | Fix DialogTitle accessibility warning in all 5 view modals | 2026-03-09 | af12391 | Verified | [31-fix-dialogtitle-accessibility-warning-in](./quick/31-fix-dialogtitle-accessibility-warning-in/) |
+| 35 | Only request creator can accept/reject completed work | 2026-03-09 | — | Verified | [32-only-the-user-who-created-the-request-ca](./quick/32-only-the-user-who-created-the-request-ca/) |
+| 36 | Stable column widths on all tables (fixed sizes + grow column + actions last) | 2026-03-10 | 72bbd71 | Verified | [32-limit-all-table-width-by-its-own-logical](./quick/32-limit-all-table-width-by-its-own-logical/) |
 
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Completed quick task 33: Improve Google OAuth error messages for structured logging
+Stopped at: Completed quick task 36: Stable column widths on all tables
 Resume file: None
 Next: Ready for next task

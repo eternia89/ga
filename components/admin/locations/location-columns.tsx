@@ -37,6 +37,7 @@ export const locationColumns: ColumnDef<Location>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
+    size: 180,
   },
   {
     accessorKey: "address",
@@ -44,13 +45,15 @@ export const locationColumns: ColumnDef<Location>[] = [
     cell: ({ row }) => {
       const address = row.getValue("address") as string | null;
       return address ? (
-        <span className="max-w-[300px] truncate" title={address}>
+        <span className="truncate block" title={address}>
           {address}
         </span>
       ) : (
         <span className="text-muted-foreground">—</span>
       );
     },
+    size: 240,
+    meta: { grow: true },
   },
   {
     accessorKey: "company.name",
@@ -62,6 +65,7 @@ export const locationColumns: ColumnDef<Location>[] = [
       const location = row.original;
       return location.company?.name ? <span>{location.company.name}</span> : <span className="text-muted-foreground">—</span>;
     },
+    size: 160,
   },
   {
     accessorKey: "deleted_at",
@@ -74,6 +78,7 @@ export const locationColumns: ColumnDef<Location>[] = [
         </Badge>
       );
     },
+    size: 100,
   },
   {
     id: "actions",

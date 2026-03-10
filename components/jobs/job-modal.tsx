@@ -12,12 +12,11 @@ import { JobCommentForm } from './job-comment-form';
 import { PMChecklist } from '@/components/maintenance/pm-checklist';
 import { JobStatusBadge } from './job-status-badge';
 import { PriorityBadge } from '@/components/priority-badge';
-import { useGeolocation } from '@/hooks/use-geolocation';
+import { useGeolocation, useGeolocationPermission } from '@/hooks/use-geolocation';
 import {
   updateJobStatus,
   cancelJob,
   assignJob,
-  requestApproval,
 } from '@/app/actions/job-actions';
 import {
   approveJob,
@@ -47,8 +46,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { Combobox } from '@/components/combobox';
-import { Input } from '@/components/ui/input';
-import { formatNumber } from '@/lib/utils';
 import {
   AlertCircle,
   RefreshCw,
@@ -59,6 +56,7 @@ import {
   Ban,
   ThumbsUp,
   ThumbsDown,
+  MapPin,
 } from 'lucide-react';
 
 // ============================================================================
@@ -90,6 +88,7 @@ interface JobModalProps {
   users?: { id: string; full_name: string }[];
   eligibleRequests?: EligibleRequest[];
   requestJobLinks?: Record<string, string>;
+  companyBudgetThreshold?: number | null;
 }
 
 // ============================================================================
@@ -122,6 +121,7 @@ export function JobModal({
   users: createUsers,
   eligibleRequests: createEligibleRequests,
   requestJobLinks: createRequestJobLinks,
+  companyBudgetThreshold,
 }: JobModalProps) {
   const router = useRouter();
 
@@ -159,7 +159,6 @@ export function JobModal({
   const [rejectReason, setRejectReason] = useState('');
   const [rejectCompletionReason, setRejectCompletionReason] = useState('');
   const [assignPicValue, setAssignPicValue] = useState('');
-  const [costValue, setCostValue] = useState('');
 
   // Action states
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -167,6 +166,8 @@ export function JobModal({
 
   // GPS hook
   const { capturing: capturingGps, capturePosition } = useGeolocation();
+  const { permissionState } = useGeolocationPermission();
+  const locationActivated = permissionState === 'granted';
 
   // Timeline scroll ref
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -284,7 +285,7 @@ export function JobModal({
           .order('full_name'),
         supabase
           .from('requests')
-          .select('id, display_id, title, priority, status, location_id, category_id, description')
+          .select('id, display_id, title, priority, status, location_id, category_id, description, assigned_to')
           .eq('company_id', companyId)
           .in('status', ['triaged', 'in_progress'])
           .is('deleted_at', null)
@@ -296,30 +297,36 @@ export function JobModal({
       setViewCategories(categoriesResult.data ?? []);
       setViewLocations(locationsResult.data ?? []);
       setViewUsers((usersResult.data ?? []).map((u) => ({ id: u.id, name: u.full_name })));
-      setViewEligibleRequests((eligibleRequestsResult.data ?? []) as EligibleRequest[]);
 
-      // Fetch job links for in_progress requests
-      const inProgressRequestIds = (eligibleRequestsResult.data ?? [])
-        .filter((r) => r.status === 'in_progress')
-        .map((r) => r.id);
+      const rawEligible = (eligibleRequestsResult.data ?? []) as (EligibleRequest & { assigned_to: string | null })[];
 
-      if (inProgressRequestIds.length > 0) {
-        const { data: jobLinks } = await supabase
-          .from('job_requests')
-          .select('request_id, job:jobs(display_id)')
-          .in('request_id', inProgressRequestIds);
+      // Rule 3: Exclude requests already linked to ANY job, BUT include this job's own linked requests
+      const { data: allLinkedData } = await supabase
+        .from('job_requests')
+        .select('request_id');
 
-        if (jobLinks) {
-          const links: Record<string, string> = {};
-          for (const link of jobLinks) {
-            const linkJob = link.job as unknown as { display_id: string } | null;
-            if (linkJob?.display_id) {
-              links[link.request_id] = linkJob.display_id;
-            }
-          }
-          setViewRequestJobLinks(links);
-        }
+      const allLinkedIds = new Set((allLinkedData ?? []).map((r) => r.request_id));
+      const currentJobRequestIds = new Set(
+        (fetchedJob.job_requests ?? []).map((jr: { request: { id: string } }) => jr.request.id)
+      );
+
+      const unlinkedRequests = rawEligible.filter(
+        (r) => !allLinkedIds.has(r.id) || currentJobRequestIds.has(r.id)
+      );
+
+      // Rule 1: Only show requests where current user is PIC
+      const picFiltered = unlinkedRequests.filter(
+        (r) => r.assigned_to === currentUserId || currentJobRequestIds.has(r.id)
+      );
+
+      setViewEligibleRequests(picFiltered as EligibleRequest[]);
+
+      // In edit mode, keep requestJobLinks for current job's linked requests only
+      const viewLinks: Record<string, string> = {};
+      for (const reqId of currentJobRequestIds) {
+        viewLinks[reqId] = fetchedJob.display_id;
       }
+      setViewRequestJobLinks(viewLinks);
 
       // Fetch full details for linked requests (for read-only display)
       const linkedReqIds = (fetchedJob.job_requests ?? []).map((jr: { request: { id: string } }) => jr.request.id);
@@ -575,19 +582,17 @@ export function JobModal({
   // ========================================================================
 
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
-  const isFinanceApproverOrAdmin = ['finance_approver', 'admin'].includes(currentUserRole);
   const isFinanceApproverOnly = currentUserRole === 'finance_approver';
   const isPIC = job?.assigned_to === currentUserId;
+  const isCreator = job?.created_by === currentUserId;
 
   const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job?.status ?? '');
   const picLocked = !!job && !['created', 'assigned'].includes(job.status);
   const canAssignPIC = isGaLeadOrAdmin && job?.status === 'created';
   const canStartWork = isPIC && job?.status === 'assigned';
-  const canRequestApproval = isPIC && job?.status === 'in_progress' && !job?.approved_at;
-  const canApproveReject = isFinanceApproverOrAdmin && job?.status === 'pending_approval';
-  const canApproveCompletion = isFinanceApproverOrAdmin && job?.status === 'pending_completion_approval';
-  const hasPendingBudget = (job?.estimated_cost ?? 0) > 0 && !job?.approved_at;
-  const canMarkComplete = (isGaLeadOrAdmin || isPIC) && job?.status === 'in_progress' && !hasPendingBudget;
+  const canApproveReject = isCreator && job?.status === 'pending_approval';
+  const canApproveCompletion = isCreator && job?.status === 'pending_completion_approval';
+  const canMarkComplete = (isGaLeadOrAdmin || isPIC) && job?.status === 'in_progress';
   const canCancel = isGaLeadOrAdmin && !isFinanceApproverOnly && !['completed', 'cancelled'].includes(job?.status ?? '');
   const canComment =
     ['ga_lead', 'admin'].includes(currentUserRole) ||
@@ -596,6 +601,19 @@ export function JobModal({
   // ========================================================================
   // Action handlers (view mode)
   // ========================================================================
+
+  const handleActivateLocation = async () => {
+    setFeedback(null);
+    try {
+      await capturePosition();
+      setFeedback({ type: 'success', message: 'Location activated. You can now start work.' });
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Failed to get location. Please allow location access.',
+      });
+    }
+  };
 
   const handleStartWork = async () => {
     setFeedback(null);
@@ -729,30 +747,6 @@ export function JobModal({
     }
   };
 
-  const handleRequestApproval = async () => {
-    setSubmitting(true);
-    setFeedback(null);
-    try {
-      const digits = costValue.replace(/[^0-9]/g, '');
-      const parsedCost = digits === '' ? 0 : parseInt(digits, 10);
-      const result = await requestApproval({ job_id: job!.id, estimated_cost: parsedCost });
-      if (result?.serverError) {
-        setFeedback({ type: 'error', message: result.serverError });
-        return;
-      }
-      setCostValue('');
-      const msg = result?.data?.autoApproved
-        ? 'Cost auto-approved (Rp 0).'
-        : 'Approval requested. Awaiting finance review.';
-      setFeedback({ type: 'success', message: msg });
-      handleActionSuccess();
-    } catch (err) {
-      setFeedback({ type: 'error', message: err instanceof Error ? err.message : 'Failed to request approval' });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const handleCancel = async () => {
     setSubmitting(true);
     setFeedback(null);
@@ -841,6 +835,7 @@ export function JobModal({
             requestJobLinks={createRequestJobLinks ?? {}}
             prefillRequest={null}
             mode="create"
+            companyBudgetThreshold={companyBudgetThreshold}
             onSuccess={() => {
               handleDialogOpenChange(false);
               router.refresh();
@@ -878,6 +873,7 @@ export function JobModal({
           className="max-w-[1000px] max-h-[90vh] flex flex-col p-0 gap-0 max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0"
           showCloseButton={true}
         >
+          <DialogTitle className="sr-only">Job Details</DialogTitle>
           {/* Loading state */}
           {loading && (
             <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
@@ -942,9 +938,6 @@ export function JobModal({
             <>
               {/* Header (non-scrollable) */}
               <div className="px-6 pt-6 pb-4 border-b shrink-0 pr-12">
-                <DialogTitle className="sr-only">
-                  Job {job.display_id}
-                </DialogTitle>
                 <div className="flex flex-wrap items-center gap-3">
                   {/* Prev/Next navigation */}
                   {jobIds.length > 1 && (
@@ -1086,36 +1079,18 @@ export function JobModal({
                       </>
                     )}
 
-                    {canStartWork && (
+                    {canStartWork && !locationActivated && (
+                      <Button size="sm" onClick={handleActivateLocation} disabled={submitting || capturingGps}>
+                        <MapPin className="mr-2 h-4 w-4" />
+                        {capturingGps ? 'Getting location...' : 'Activate Location'}
+                      </Button>
+                    )}
+
+                    {canStartWork && locationActivated && (
                       <Button size="sm" onClick={handleStartWork} disabled={submitting || capturingGps}>
                         <Play className="mr-2 h-4 w-4" />
                         {capturingGps ? 'Getting location...' : 'Start Work'}
                       </Button>
-                    )}
-
-                    {canRequestApproval && (
-                      <>
-                        <div className="relative w-40">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
-                            Rp
-                          </span>
-                          <Input
-                            type="text"
-                            inputMode="numeric"
-                            placeholder="0"
-                            className="pl-10 h-9"
-                            disabled={submitting}
-                            value={costValue ? formatNumber(parseInt(costValue.replace(/[^0-9]/g, '') || '0', 10)) : ''}
-                            onChange={(e) => {
-                              const digits = e.target.value.replace(/[^0-9]/g, '');
-                              setCostValue(digits);
-                            }}
-                          />
-                        </div>
-                        <Button size="sm" onClick={handleRequestApproval} disabled={submitting}>
-                          Request Approval
-                        </Button>
-                      </>
                     )}
 
                     {canApproveReject && (

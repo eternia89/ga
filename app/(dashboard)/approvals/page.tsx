@@ -26,8 +26,8 @@ export default async function ApprovalsPage() {
     redirect('/login');
   }
 
-  // Only finance_approver and admin can access this page
-  if (!['finance_approver', 'admin'].includes(profile.role)) {
+  // finance_approver, ga_lead, and admin can access this page
+  if (!['finance_approver', 'ga_lead', 'admin'].includes(profile.role)) {
     redirect('/');
   }
 

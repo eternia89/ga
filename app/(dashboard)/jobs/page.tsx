@@ -55,7 +55,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
     jobsQuery = jobsQuery.eq('assigned_to', profile.id);
   }
 
-  const [jobsResult, usersResult, locationsResult, allCategoriesResult, allUsersResult, eligibleRequestsResult] = await Promise.all([
+  const [jobsResult, usersResult, locationsResult, allCategoriesResult, allUsersResult, eligibleRequestsResult, budgetThresholdResult] = await Promise.all([
     jobsQuery,
 
     // GA Staff/Lead users for PIC filter
@@ -90,14 +90,22 @@ export default async function JobsPage({ searchParams }: PageProps) {
       .is('deleted_at', null)
       .order('full_name'),
 
-    // Eligible requests (triaged + in_progress) for create dialog
+    // Eligible requests (triaged + in_progress) for create dialog — include assigned_to for PIC filter
     supabase
       .from('requests')
-      .select('id, display_id, title, priority, status, location_id, category_id, description')
+      .select('id, display_id, title, priority, status, location_id, category_id, description, assigned_to')
       .eq('company_id', profile.company_id)
       .in('status', ['triaged', 'in_progress'])
       .is('deleted_at', null)
       .order('created_at', { ascending: false }),
+
+    // Budget threshold for create dialog
+    supabase
+      .from('company_settings')
+      .select('value')
+      .eq('company_id', profile.company_id)
+      .eq('key', 'budget_threshold')
+      .single(),
   ]);
 
   const jobs = (jobsResult.data ?? []) as unknown as import('@/lib/types/database').JobWithRelations[];
@@ -105,30 +113,22 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const formLocations = locationsResult.data ?? [];
   const formCategories = allCategoriesResult.data ?? [];
   const formUsers = allUsersResult.data ?? [];
-  const eligibleRequests = eligibleRequestsResult.data ?? [];
+  const rawEligibleRequests = eligibleRequestsResult.data ?? [];
+  const companyBudgetThreshold = budgetThresholdResult.data ? parseInt(budgetThresholdResult.data.value, 10) : null;
 
-  // Fetch job links for in_progress requests (for create dialog)
-  const inProgressRequestIds = eligibleRequests
-    .filter((r) => r.status === 'in_progress')
-    .map((r) => r.id);
+  // Rule 3: Exclude requests already linked to any job
+  const { data: alreadyLinkedData } = await supabase
+    .from('job_requests')
+    .select('request_id');
 
-  let requestJobLinks: Record<string, string> = {};
+  const alreadyLinkedIds = new Set((alreadyLinkedData ?? []).map((r) => r.request_id));
+  const unlinkedRequests = rawEligibleRequests.filter((r) => !alreadyLinkedIds.has(r.id));
 
-  if (inProgressRequestIds.length > 0) {
-    const { data: jobLinks } = await supabase
-      .from('job_requests')
-      .select('request_id, job:jobs(display_id)')
-      .in('request_id', inProgressRequestIds);
+  // Rule 1: Only show requests where current user is PIC
+  const eligibleRequests = unlinkedRequests.filter((r) => r.assigned_to === profile.id);
 
-    if (jobLinks) {
-      for (const link of jobLinks) {
-        const jobData = link.job as unknown as { display_id: string } | null;
-        if (jobData?.display_id) {
-          requestJobLinks[link.request_id] = jobData.display_id;
-        }
-      }
-    }
-  }
+  // No already-linked requests will appear in create mode, so requestJobLinks is empty
+  const requestJobLinks: Record<string, string> = {};
 
   return (
     <div className="space-y-6 py-6">
@@ -152,6 +152,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
               users={formUsers}
               eligibleRequests={eligibleRequests}
               requestJobLinks={requestJobLinks}
+              companyBudgetThreshold={companyBudgetThreshold}
               initialOpen={action === 'create'}
             />
           )}

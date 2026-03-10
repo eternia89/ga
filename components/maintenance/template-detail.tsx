@@ -19,6 +19,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { PMChecklistPreview } from './pm-checklist-preview';
 import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { TemplateBuilder } from './template-builder';
@@ -59,6 +66,7 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
   const canManage = ['ga_lead', 'admin'].includes(userRole);
   const [isDirty, setIsDirty] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const FORM_ID = formId ?? 'template-edit-form';
 
@@ -165,32 +173,44 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
         </div>
 
         {/* Action buttons */}
-        {canManage && (
-          <div className="flex items-center gap-2">
-            {template.is_active ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleDeactivate}
-                disabled={isPending}
-                className="text-destructive hover:text-destructive"
-              >
-                Deactivate
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleReactivate}
-                disabled={isPending}
-              >
-                Reactivate
-              </Button>
-            )}
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {(canManage ? checklist.length > 0 : template.checklist.length > 0) && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setPreviewOpen(true)}
+            >
+              Preview Form
+            </Button>
+          )}
+          {canManage && (
+            <>
+              {template.is_active ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDeactivate}
+                  disabled={isPending}
+                  className="text-destructive hover:text-destructive"
+                >
+                  Deactivate
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReactivate}
+                  disabled={isPending}
+                >
+                  Reactivate
+                </Button>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       {/* Feedback */}
@@ -240,12 +260,12 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Category <span className="text-destructive">*</span>
+                      Category
                     </FormLabel>
                     <FormControl>
                       <Combobox
-                        options={categoryOptions}
-                        value={field.value}
+                        options={[{ label: 'None (General)', value: '' }, ...categoryOptions]}
+                        value={field.value ?? ''}
                         onValueChange={field.onChange}
                         placeholder="Select asset category..."
                         searchPlaceholder="Search categories..."
@@ -400,6 +420,23 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
           </div>
         </div>
       )}
+
+      {/* Preview Form Dialog */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Preview Form</DialogTitle>
+          </DialogHeader>
+          <PMChecklistPreview
+            templateName={template.name}
+            checklist={canManage ? checklist : template.checklist}
+            assetName="Asset Name"
+            assetDisplayId="AST-XXXXX"
+            nextDueAt={null}
+            assignedUserName="Assigned User"
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

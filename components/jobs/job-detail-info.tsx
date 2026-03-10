@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { JobWithRelations } from '@/lib/types/database';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
+import { PhotoGrid } from '@/components/media/photo-grid';
 import { RequestPreviewDialog } from './request-preview-dialog';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
 import { Input } from '@/components/ui/input';
@@ -26,6 +27,7 @@ interface JobDetailInfoProps {
   job: JobWithRelations;
   currentUserId: string;
   currentUserRole: string;
+  photoUrls: { id: string; url: string; fileName: string }[];
   approvedByName?: string | null;
   approvalRejectedByName?: string | null;
   onActionSuccess: () => void;
@@ -44,6 +46,7 @@ export function JobDetailInfo({
   job,
   currentUserId,
   currentUserRole,
+  photoUrls,
   approvedByName,
   approvalRejectedByName,
   onActionSuccess,
@@ -368,6 +371,16 @@ export function JobDetailInfo({
           )
         )}
       </div>
+
+      {/* Job Photos */}
+      {photoUrls.length > 0 && (
+        <div>
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+            Photos
+          </h3>
+          <PhotoGrid photos={photoUrls} />
+        </div>
+      )}
 
       {/* Rejection reason callout */}
       {job.approval_rejection_reason && (

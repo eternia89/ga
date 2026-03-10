@@ -39,7 +39,7 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
       const isPM = job.job_type === 'preventive_maintenance';
       const nextDueAt = job.maintenance_schedule?.next_due_at ?? null;
       return (
-        <div className="space-y-0.5 max-w-[220px]">
+        <div className="space-y-0.5">
           <div className="flex items-center gap-1.5 flex-wrap">
             {isPM && (
               <span className="inline-flex items-center rounded-full bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700 shrink-0">
@@ -57,6 +57,7 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
       );
     },
     size: 220,
+    meta: { grow: true },
   },
   {
     id: 'pic_name',

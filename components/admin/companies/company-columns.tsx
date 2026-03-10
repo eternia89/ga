@@ -37,6 +37,8 @@ export const companyColumns: ColumnDef<Company>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
+    size: 200,
+    meta: { grow: true },
   },
   {
     accessorKey: "code",
@@ -45,6 +47,7 @@ export const companyColumns: ColumnDef<Company>[] = [
       const value = row.getValue("code") as string | null;
       return value ? <span>{value}</span> : <span className="text-muted-foreground">—</span>;
     },
+    size: 90,
   },
   {
     accessorKey: "email",
@@ -53,6 +56,7 @@ export const companyColumns: ColumnDef<Company>[] = [
       const value = row.getValue("email") as string | null;
       return value ? <span>{value}</span> : <span className="text-muted-foreground">—</span>;
     },
+    size: 180,
   },
   {
     accessorKey: "phone",
@@ -61,6 +65,7 @@ export const companyColumns: ColumnDef<Company>[] = [
       const value = row.getValue("phone") as string | null;
       return value ? <span>{value}</span> : <span className="text-muted-foreground">—</span>;
     },
+    size: 130,
   },
   {
     accessorKey: "deleted_at",
@@ -73,6 +78,7 @@ export const companyColumns: ColumnDef<Company>[] = [
         </Badge>
       );
     },
+    size: 100,
   },
   {
     id: "actions",

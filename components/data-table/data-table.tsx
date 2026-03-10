@@ -1,6 +1,13 @@
 "use client";
 
 import * as React from "react";
+
+declare module '@tanstack/react-table' {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface ColumnMeta<TData, TValue> {
+    grow?: boolean;
+  }
+}
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -127,7 +134,9 @@ export function DataTable<TData, TValue>({
                       colSpan={header.colSpan}
                       style={
                         header.column.columnDef.size
-                          ? { width: header.column.columnDef.size, minWidth: header.column.columnDef.size, maxWidth: header.column.columnDef.size }
+                          ? header.column.columnDef.meta?.grow
+                            ? { minWidth: header.column.columnDef.size }
+                            : { width: header.column.columnDef.size, minWidth: header.column.columnDef.size, maxWidth: header.column.columnDef.size }
                           : undefined
                       }
                     >
@@ -155,7 +164,9 @@ export function DataTable<TData, TValue>({
                       key={cell.id}
                       style={
                         cell.column.columnDef.size
-                          ? { width: cell.column.columnDef.size, minWidth: cell.column.columnDef.size, maxWidth: cell.column.columnDef.size }
+                          ? cell.column.columnDef.meta?.grow
+                            ? { minWidth: cell.column.columnDef.size }
+                            : { width: cell.column.columnDef.size, minWidth: cell.column.columnDef.size, maxWidth: cell.column.columnDef.size }
                           : undefined
                       }
                     >
