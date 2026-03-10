@@ -193,7 +193,7 @@ export function ApprovalQueue({
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="font-semibold text-base">
+                      <span className="font-semibold">
                         {job.estimated_cost != null ? formatIDR(job.estimated_cost) : '\u2014'}
                       </span>
                     </TableCell>
