@@ -415,7 +415,7 @@ export function AssetTimeline({
               </div>
 
               {/* Content */}
-              <div className="min-w-0 flex-1 space-y-1">
+              <div className="ml-2 min-w-0 flex-1 space-y-1">
                 <div className="text-xs leading-relaxed">
                   <EventContent event={event} />
                 </div>

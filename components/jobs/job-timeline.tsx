@@ -232,7 +232,7 @@ export function JobTimeline({ events, comments, commentPhotos }: JobTimelineProp
                       {EVENT_ICONS[event.type]}
                     </div>
                     {/* Content */}
-                    <div className="min-w-0 flex-1 space-y-1">
+                    <div className="ml-2 min-w-0 flex-1 space-y-1">
                       <div className="text-xs leading-relaxed">
                         <EventContent event={event} />
                       </div>
@@ -268,7 +268,7 @@ export function JobTimeline({ events, comments, commentPhotos }: JobTimelineProp
                     {EVENT_ICONS.comment}
                   </div>
                   {/* Content */}
-                  <div className="min-w-0 flex-1 space-y-2">
+                  <div className="ml-2 min-w-0 flex-1 space-y-2">
                     <div className="rounded-md border bg-muted/30 p-3 space-y-2">
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-xs font-medium">{authorName}</span>
