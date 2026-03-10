@@ -141,6 +141,7 @@ export function UserFormDialog({
 
   return (
     <EntityFormDialog<UserFormInput>
+      key={user?.id || 'create'}
       open={open}
       onOpenChange={(nextOpen) => {
         if (nextOpen) {

@@ -9,6 +9,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run start` — Start production server
 - `npm run lint` — Run ESLint (v9 flat config with core-web-vitals + typescript rules)
 
+## Database / Seed Conventions
+
+- **Hardcoded UUIDs MUST be RFC 4122 compliant.** Zod's `.uuid()` validator enforces version + variant bits. Use version=`4` (pos 13) and variant=`a` (pos 17). Example: `00000000-0000-4000-a000-000000000001`. Never use all-zero UUIDs like `00000000-0000-0000-0000-000000000001` — Postgres accepts them but Zod rejects them.
+- **Seed auth users must include `role`, `company_id`, `division_id` in `raw_app_meta_data`.** The RLS helper functions (`current_user_company_id()`, `current_user_role()`) read from JWT `app_metadata`. Without these fields, all RLS-protected queries return empty results after login.
+
 ## Architecture
 
 This is a **Next.js 16** app using the **App Router** (`app/` directory), **React 19**, **TypeScript** (strict mode), and **Tailwind CSS v4**.

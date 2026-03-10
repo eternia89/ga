@@ -5,7 +5,21 @@
   "researchAgents": true,
   "planChecker": true,
   "verifier": true,
-  "model_profile": "quality",
+  "model_profile": "balanced",
+  "model_overrides": {
+    "planner": "sonnet",
+    "researcher": "sonnet"
+  },
   "createdAt": "2026-02-10",
-  "granularity": "fine"
+  "granularity": "fine",
+  "workflow": {
+    "research": true,
+    "plan_check": true,
+    "verifier": true,
+    "auto_advance": true,
+    "nyquist_validation": true
+  },
+  "git": {
+    "branching_strategy": "none"
+  }
 }
