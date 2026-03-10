@@ -310,10 +310,11 @@ Recent decisions affecting current work:
 | 38 | Move save changes button to sticky bottom bar on asset detail page | 2026-03-10 | ddde5b8 | Verified | [35-move-all-save-changes-buttons-to-the-sti](./quick/35-move-all-save-changes-buttons-to-the-sti/) |
 | 39 | Estimated cost in job timeline displays IDR thousand separator formatting | 2026-03-10 | 74eb908 | Verified | [36-estimated-cost-in-job-timeline-should-di](./quick/36-estimated-cost-in-job-timeline-should-di/) |
 | 40 | Post Comment button uses outline variant instead of CTA | 2026-03-10 | 1e0c68b | Verified | [37-post-comment-button-should-use-outline-v](./quick/37-post-comment-button-should-use-outline-v/) |
+| 41 | Photo attachments displayed and editable in job detail modal | 2026-03-10 | 8e1d745 | Verified | [38-photo-attachments-should-be-displayed-an](./quick/38-photo-attachments-should-be-displayed-an/) |
 
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Completed quick task 40: Post Comment outline button
+Stopped at: Completed quick task 41: Photo attachments in job detail modal
 Resume file: None
 Next: Ready for next task
