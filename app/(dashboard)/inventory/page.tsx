@@ -100,6 +100,50 @@ export default async function InventoryPage({ searchParams }: PageProps) {
     location_id: u.location_id,
   }));
 
+  // Batch-fetch condition photos for all assets
+  let photosByAsset: Record<string, { id: string; url: string; fileName: string }[]> = {};
+
+  if (assetList.length > 0) {
+    const assetIds = assetList.map((a) => a.id);
+
+    const { data: attachments } = await supabase
+      .from('media_attachments')
+      .select('id, entity_id, file_name, file_path')
+      .in('entity_type', ['asset_creation', 'asset_status_change'])
+      .in('entity_id', assetIds)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false });
+
+    if (attachments && attachments.length > 0) {
+      const { data: signedUrls } = await supabase.storage
+        .from('asset-photos')
+        .createSignedUrls(
+          attachments.map((a) => a.file_path),
+          21600
+        );
+
+      const photosWithUrls = attachments.map((a, i) => ({
+        id: a.id,
+        entityId: a.entity_id,
+        url: signedUrls?.[i]?.signedUrl ?? '',
+        fileName: a.file_name,
+      }));
+
+      // Group by asset ID (DESC order preserved — latest first)
+      photosByAsset = {};
+      for (const photo of photosWithUrls) {
+        if (!photosByAsset[photo.entityId]) {
+          photosByAsset[photo.entityId] = [];
+        }
+        photosByAsset[photo.entityId].push({
+          id: photo.id,
+          url: photo.url,
+          fileName: photo.fileName,
+        });
+      }
+    }
+  }
+
   return (
     <div className="space-y-6 py-6">
       <SetBreadcrumbs items={[{ label: 'Dashboard', href: '/' }, { label: 'Inventory' }]} />
@@ -133,6 +177,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
         gaUsers={gaUsers}
         currentUserId={profile.id}
         currentUserRole={profile.role}
+        photosByAsset={photosByAsset}
         initialViewId={view}
       />
     </div>

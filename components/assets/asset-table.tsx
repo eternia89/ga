@@ -10,6 +10,9 @@ import { assetColumns, PendingTransfer } from './asset-columns';
 import { AssetFilters, filterParsers } from './asset-filters';
 import { AssetViewModal } from './asset-view-modal';
 import { AssetTransferDialog, type GAUserWithLocation } from './asset-transfer-dialog';
+import { PhotoLightbox } from '@/components/requests/request-photo-lightbox';
+
+type PhotoItem = { id: string; url: string; fileName: string };
 
 interface AssetTableProps {
   data: InventoryItemWithRelations[];
@@ -19,6 +22,7 @@ interface AssetTableProps {
   gaUsers: GAUserWithLocation[];
   currentUserId: string;
   currentUserRole: string;
+  photosByAsset: Record<string, PhotoItem[]>;
   initialViewId?: string;
 }
 
@@ -30,6 +34,7 @@ export function AssetTable({
   gaUsers,
   currentUserId,
   currentUserRole,
+  photosByAsset,
   initialViewId,
 }: AssetTableProps) {
   const router = useRouter();
@@ -42,6 +47,11 @@ export function AssetTable({
   const [transferAsset, setTransferAsset] = useState<InventoryItemWithRelations | null>(null);
 
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Lightbox state
+  const [lightboxPhotos, setLightboxPhotos] = useState<PhotoItem[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   // Client-side filtering based on URL params
   const filteredData = useMemo(() => {
@@ -90,6 +100,12 @@ export function AssetTable({
     setTransferAsset(asset);
   };
 
+  const handlePhotoClick = (photos: PhotoItem[], index: number) => {
+    setLightboxPhotos(photos);
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
   const handleModalActionSuccess = () => {
     setFeedback({ type: 'success', message: 'Action completed successfully' });
     router.refresh();
@@ -122,6 +138,8 @@ export function AssetTable({
           onTransfer: handleTransfer,
           pendingTransfers,
           currentUserRole,
+          photosByAsset,
+          onPhotoClick: handlePhotoClick,
         }}
       />
 
@@ -146,6 +164,14 @@ export function AssetTable({
           gaUsers={gaUsers}
           locationNames={locationNames}
           onSuccess={handleModalActionSuccess}
+        />
+      )}
+
+      {lightboxOpen && lightboxPhotos.length > 0 && (
+        <PhotoLightbox
+          photos={lightboxPhotos}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
         />
       )}
     </div>
