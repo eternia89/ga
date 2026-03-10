@@ -305,10 +305,11 @@ Recent decisions affecting current work:
 | 33 | Hide pagination footer when data fits on one page | 2026-03-09 | 06c86b8 | Verified | [30-hide-rows-per-page-selector-pagination-p](./quick/30-hide-rows-per-page-selector-pagination-p/) |
 | 34 | Fix skeleton loading state overflow in view modals | 2026-03-09 | de53d61 | Verified | [31-fix-skeleton-loading-state-overflow-from](./quick/31-fix-skeleton-loading-state-overflow-from/) |
 | 35 | Timeline UI refinements: compact spacing and text-xs | 2026-03-09 | 2930d34 | Verified | [32-timeline-ui-refinements-add-proper-spaci](./quick/32-timeline-ui-refinements-add-proper-spaci/) |
+| 36 | Improve Google OAuth error messages with structured logging | 2026-03-10 | badb514 | Verified | [33-improve-google-oauth-error-messages-for-](./quick/33-improve-google-oauth-error-messages-for-/) |
 
 ## Session Continuity
 
-Last session: 2026-03-09
-Stopped at: Completed quick task 32: Timeline UI refinements compact spacing
+Last session: 2026-03-10
+Stopped at: Completed quick task 33: Improve Google OAuth error messages for structured logging
 Resume file: None
 Next: Ready for next task
