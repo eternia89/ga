@@ -307,10 +307,11 @@ Recent decisions affecting current work:
 | 35 | Only request creator can accept/reject completed work | 2026-03-09 | — | Verified | [32-only-the-user-who-created-the-request-ca](./quick/32-only-the-user-who-created-the-request-ca/) |
 | 36 | Stable column widths on all tables (fixed sizes + grow column + actions last) | 2026-03-10 | 72bbd71 | Verified | [32-limit-all-table-width-by-its-own-logical](./quick/32-limit-all-table-width-by-its-own-logical/) |
 | 37 | Inactive settings rows grey background, remove Status column from all settings tables | 2026-03-10 | d989b61 | Verified | [34-in-settings-inactive-rows-should-be-dist](./quick/34-in-settings-inactive-rows-should-be-dist/) |
+| 38 | Move save changes button to sticky bottom bar on asset detail page | 2026-03-10 | ddde5b8 | Verified | [35-move-all-save-changes-buttons-to-the-sti](./quick/35-move-all-save-changes-buttons-to-the-sti/) |
 
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Completed quick task 37: Inactive settings rows grey background
+Stopped at: Completed quick task 38: Save changes button to sticky bottom bar
 Resume file: None
 Next: Ready for next task
