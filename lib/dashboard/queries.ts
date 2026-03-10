@@ -85,7 +85,7 @@ export async function getDashboardKpis(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any>,
   dateRange: DashboardDateRange
-): Promise<KpiItem[]> {
+): Promise<{ data: KpiItem[]; hasError: boolean }> {
   const prevRange = getPreviousRange(dateRange);
 
   // Build ISO timestamps for the date range (inclusive)
@@ -195,6 +195,14 @@ export async function getDashboardKpis(
       .lte('updated_at', prevTo),
   ]);
 
+  const hasError = [
+    openRequestsResult, openRequestsPrevResult,
+    untriagedResult, untriagedPrevResult,
+    overdueJobsResult, overdueJobsPrevResult,
+    openJobsResult, openJobsPrevResult,
+    completedResult, completedPrevResult,
+  ].some((r) => r.error != null);
+
   const openRequests = openRequestsResult.count ?? 0;
   const openRequestsPrev = openRequestsPrevResult.count ?? 0;
   const untriaged = untriagedResult.count ?? 0;
@@ -206,7 +214,7 @@ export async function getDashboardKpis(
   const completed = completedResult.count ?? 0;
   const completedPrev = completedPrevResult.count ?? 0;
 
-  return [
+  return { data: [
     {
       id: 'open-requests',
       title: 'Open Requests',
@@ -247,7 +255,7 @@ export async function getDashboardKpis(
       href: '/requests?status=accepted,closed',
       trendIsGood: true, // up is good (more completions = better)
     },
-  ];
+  ], hasError };
 }
 
 // -------------------------------------------------------------------------
@@ -265,7 +273,7 @@ export async function getRequestStatusDistribution(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any>,
   dateRange: DashboardDateRange
-): Promise<StatusDistributionItem[]> {
+): Promise<{ data: StatusDistributionItem[]; hasError: boolean }> {
   const from = `${dateRange.from}T00:00:00.000Z`;
   const to = `${dateRange.to}T23:59:59.999Z`;
 
@@ -276,7 +284,7 @@ export async function getRequestStatusDistribution(
     .gte('created_at', from)
     .lte('created_at', to);
 
-  if (error || !data) return [];
+  if (error || !data) return { data: [], hasError: !!error };
 
   // Count per status
   const counts: Record<string, number> = {};
@@ -285,21 +293,24 @@ export async function getRequestStatusDistribution(
   }
 
   // Map to display items, filter to statuses with count > 0
-  return REQUEST_STATUSES
-    .map((status) => ({
-      status,
-      label: STATUS_LABELS[status] ?? status,
-      count: counts[status] ?? 0,
-      color: STATUS_HEX_COLORS[status] ?? '#9ca3af',
-    }))
-    .filter((item) => item.count > 0);
+  return {
+    data: REQUEST_STATUSES
+      .map((status) => ({
+        status,
+        label: STATUS_LABELS[status] ?? status,
+        count: counts[status] ?? 0,
+        color: STATUS_HEX_COLORS[status] ?? '#9ca3af',
+      }))
+      .filter((item) => item.count > 0),
+    hasError: false,
+  };
 }
 
 export async function getJobStatusDistribution(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any>,
   dateRange: DashboardDateRange
-): Promise<StatusDistributionItem[]> {
+): Promise<{ data: StatusDistributionItem[]; hasError: boolean }> {
   const from = `${dateRange.from}T00:00:00.000Z`;
   const to = `${dateRange.to}T23:59:59.999Z`;
 
@@ -312,21 +323,24 @@ export async function getJobStatusDistribution(
     .gte('created_at', from)
     .lte('created_at', to);
 
-  if (error || !data) return [];
+  if (error || !data) return { data: [], hasError: !!error };
 
   const counts: Record<string, number> = {};
   for (const row of data) {
     counts[row.status] = (counts[row.status] ?? 0) + 1;
   }
 
-  return jobStatuses
-    .map((status) => ({
-      status,
-      label: JOB_STATUS_LABELS[status] ?? status,
-      count: counts[status] ?? 0,
-      color: JOB_STATUS_HEX_COLORS[status] ?? '#9ca3af',
-    }))
-    .filter((item) => item.count > 0);
+  return {
+    data: jobStatuses
+      .map((status) => ({
+        status,
+        label: JOB_STATUS_LABELS[status] ?? status,
+        count: counts[status] ?? 0,
+        color: JOB_STATUS_HEX_COLORS[status] ?? '#9ca3af',
+      }))
+      .filter((item) => item.count > 0),
+    hasError: false,
+  };
 }
 
 // -------------------------------------------------------------------------
@@ -344,7 +358,7 @@ export interface StaffWorkloadItem {
 export async function getStaffWorkload(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any>
-): Promise<StaffWorkloadItem[]> {
+): Promise<{ data: StaffWorkloadItem[]; hasError: boolean }> {
   // Fetch GA staff/leads
   const { data: staff, error: staffError } = await supabase
     .from('user_profiles')
@@ -352,7 +366,7 @@ export async function getStaffWorkload(
     .in('role', ['ga_staff', 'ga_lead'])
     .is('deleted_at', null);
 
-  if (staffError || !staff || staff.length === 0) return [];
+  if (staffError || !staff || staff.length === 0) return { data: [], hasError: !!staffError };
 
   // Fetch all non-deleted jobs with assigned_to + status + created_at
   const overdueThreshold = subDays(new Date(), 7).toISOString();
@@ -367,7 +381,7 @@ export async function getStaffWorkload(
       staff.map((s: { id: string }) => s.id)
     );
 
-  if (jobsError || !jobs) return [];
+  if (jobsError || !jobs) return { data: [], hasError: !!jobsError };
 
   // Aggregate per staff member
   const staffMap = new Map<string, { full_name: string }>();
@@ -401,11 +415,14 @@ export async function getStaffWorkload(
     }
   }
 
-  return staff.map((s: { id: string; full_name: string }) => ({
-    staffId: s.id,
-    staffName: s.full_name,
-    ...workload.get(s.id)!,
-  }));
+  return {
+    data: staff.map((s: { id: string; full_name: string }) => ({
+      staffId: s.id,
+      staffName: s.full_name,
+      ...workload.get(s.id)!,
+    })),
+    hasError: false,
+  };
 }
 
 // -------------------------------------------------------------------------
@@ -420,7 +437,14 @@ export interface AgingBucket {
 export async function getRequestAging(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any>
-): Promise<AgingBucket[]> {
+): Promise<{ data: AgingBucket[]; hasError: boolean }> {
+  const emptyBuckets: AgingBucket[] = [
+    { bucket: '0-3 days', count: 0 },
+    { bucket: '4-7 days', count: 0 },
+    { bucket: '8-14 days', count: 0 },
+    { bucket: '15+ days', count: 0 },
+  ];
+
   // Open requests only
   const { data, error } = await supabase
     .from('requests')
@@ -429,12 +453,7 @@ export async function getRequestAging(
     .is('deleted_at', null);
 
   if (error || !data) {
-    return [
-      { bucket: '0-3 days', count: 0 },
-      { bucket: '4-7 days', count: 0 },
-      { bucket: '8-14 days', count: 0 },
-      { bucket: '15+ days', count: 0 },
-    ];
+    return { data: emptyBuckets, hasError: !!error };
   }
 
   const now = new Date();
@@ -448,12 +467,15 @@ export async function getRequestAging(
     else buckets['15+'] += 1;
   }
 
-  return [
-    { bucket: '0-3 days', count: buckets['0-3'] },
-    { bucket: '4-7 days', count: buckets['4-7'] },
-    { bucket: '8-14 days', count: buckets['8-14'] },
-    { bucket: '15+ days', count: buckets['15+'] },
-  ];
+  return {
+    data: [
+      { bucket: '0-3 days', count: buckets['0-3'] },
+      { bucket: '4-7 days', count: buckets['4-7'] },
+      { bucket: '8-14 days', count: buckets['8-14'] },
+      { bucket: '15+ days', count: buckets['15+'] },
+    ],
+    hasError: false,
+  };
 }
 
 // -------------------------------------------------------------------------
@@ -471,7 +493,7 @@ export interface MaintenanceItem {
 export async function getMaintenanceSummary(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any>
-): Promise<MaintenanceItem[]> {
+): Promise<{ data: MaintenanceItem[]; hasError: boolean }> {
   const now = new Date();
   const nowIso = now.toISOString();
   const in7Days = subDays(now, -7).toISOString(); // 7 days from now
@@ -484,7 +506,7 @@ export async function getMaintenanceSummary(
     .lte('next_due_at', in30Days)
     .order('next_due_at', { ascending: true });
 
-  if (error || !data) return [];
+  if (error || !data) return { data: [], hasError: !!error };
 
   const items: MaintenanceItem[] = [];
 
@@ -521,7 +543,7 @@ export async function getMaintenanceSummary(
   const urgencyOrder = { overdue: 0, due_this_week: 1, due_this_month: 2 };
   items.sort((a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
 
-  return items;
+  return { data: items, hasError: false };
 }
 
 // -------------------------------------------------------------------------
@@ -553,7 +575,7 @@ const ASSET_STATUS_LABELS: Record<string, string> = {
 export async function getInventoryCounts(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: SupabaseClient<any>
-): Promise<InventoryCounts> {
+): Promise<{ data: InventoryCounts; hasError: boolean }> {
   const [statusResult, categoryResult] = await Promise.all([
     supabase
       .from('inventory_items')
@@ -597,5 +619,6 @@ export async function getInventoryCounts(
     .map(([category, count]) => ({ category, count }))
     .sort((a, b) => b.count - a.count);
 
-  return { byStatus, byCategory };
+  const hasError = !!(statusResult.error || categoryResult.error);
+  return { data: { byStatus, byCategory }, hasError };
 }

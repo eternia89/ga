@@ -11,6 +11,7 @@ import {
   Clock,
   Wrench,
   CheckCircle,
+  WifiOff,
 } from 'lucide-react';
 import { KpiCard } from '@/components/dashboard/kpi-card';
 import { DateRangeFilter } from '@/components/dashboard/date-range-filter';
@@ -102,13 +103,13 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
   // Fetch all dashboard data in parallel for operational roles
   const [
-    kpis,
-    requestStatusData,
-    jobStatusData,
-    staffWorkloadData,
-    agingData,
-    maintenanceData,
-    inventoryData,
+    kpisResult,
+    requestStatusResult,
+    jobStatusResult,
+    staffWorkloadResult,
+    agingResult,
+    maintenanceResult,
+    inventoryResult,
   ] = isOperational
     ? await Promise.all([
         getDashboardKpis(supabase, dateRange),
@@ -119,7 +120,28 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         getMaintenanceSummary(supabase),
         getInventoryCounts(supabase),
       ])
-    : [[], [], [], [], [], [], { byStatus: [], byCategory: [] }];
+    : [
+        { data: [], hasError: false },
+        { data: [], hasError: false },
+        { data: [], hasError: false },
+        { data: [], hasError: false },
+        { data: [], hasError: false },
+        { data: [], hasError: false },
+        { data: { byStatus: [], byCategory: [] }, hasError: false },
+      ];
+
+  const kpis = kpisResult.data;
+  const requestStatusData = requestStatusResult.data;
+  const jobStatusData = jobStatusResult.data;
+  const staffWorkloadData = staffWorkloadResult.data;
+  const agingData = agingResult.data;
+  const maintenanceData = maintenanceResult.data;
+  const inventoryData = inventoryResult.data;
+
+  const dashboardHasDataError = [
+    kpisResult, requestStatusResult, jobStatusResult,
+    staffWorkloadResult, agingResult, maintenanceResult, inventoryResult,
+  ].some((r) => r.hasError);
 
   return (
     <div className="space-y-6 py-6">
@@ -127,7 +149,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
       <div className="flex items-start justify-between gap-4 max-md:flex-col">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-            {greeting}, {profile.full_name.split(' ')[0]}
+            {greeting}, {profile.full_name?.split(' ')[0] ?? 'there'}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             {isOperational
@@ -143,6 +165,17 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           </div>
         )}
       </div>
+
+      {/* DB error banner — shown when any dashboard query failed */}
+      {isOperational && dashboardHasDataError && (
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <WifiOff className="h-4 w-4 mt-0.5 shrink-0 text-amber-500" />
+          <span>
+            Some dashboard data could not be loaded — the database may be temporarily unavailable.
+            The figures shown may be incomplete. Refresh the page to try again.
+          </span>
+        </div>
+      )}
 
       {/* Operational dashboard */}
       {isOperational && (

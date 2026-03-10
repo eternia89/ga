@@ -42,35 +42,41 @@ export function StatusBarChart({ data, entityPath, title }: StatusBarChartProps)
       </CardHeader>
       <CardContent>
         <div className="h-[250px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              layout="vertical"
-              data={data}
-              margin={{ top: 0, right: 16, bottom: 0, left: 0 }}
-            >
-              <XAxis type="number" tick={{ fontSize: 12 }} allowDecimals={false} />
-              <YAxis
-                type="category"
-                dataKey="label"
-                width={110}
-                tick={{ fontSize: 12 }}
-              />
-              <Tooltip
-                formatter={(value) => [value, 'Count']}
-                cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-              />
-              <Bar
-                dataKey="count"
-                radius={[0, 4, 4, 0]}
-                cursor="pointer"
-                onClick={handleBarClick}
+          {data.length === 0 ? (
+            <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
+              No data for the selected period
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                layout="vertical"
+                data={data}
+                margin={{ top: 0, right: 16, bottom: 0, left: 0 }}
               >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+                <XAxis type="number" tick={{ fontSize: 12 }} allowDecimals={false} />
+                <YAxis
+                  type="category"
+                  dataKey="label"
+                  width={110}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip
+                  formatter={(value) => [value, 'Count']}
+                  cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+                />
+                <Bar
+                  dataKey="count"
+                  radius={[0, 4, 4, 0]}
+                  cursor="pointer"
+                  onClick={handleBarClick}
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </CardContent>
     </Card>

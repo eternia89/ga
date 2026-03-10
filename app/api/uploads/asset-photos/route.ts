@@ -185,7 +185,18 @@ export async function POST(request: NextRequest) {
       uploadedCount++;
     }
 
-    return NextResponse.json({ success: true, count: uploadedCount });
+    if (uploadedCount === 0) {
+      return NextResponse.json(
+        { error: 'All file uploads failed. Please try again.' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      count: uploadedCount,
+      partial: uploadedCount < uniqueFiles.length,
+    });
   } catch (error) {
     console.error('Asset photo upload error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
