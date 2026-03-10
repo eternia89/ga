@@ -306,10 +306,11 @@ Recent decisions affecting current work:
 | 34 | Fix DialogTitle accessibility warning in all 5 view modals | 2026-03-09 | af12391 | Verified | [31-fix-dialogtitle-accessibility-warning-in](./quick/31-fix-dialogtitle-accessibility-warning-in/) |
 | 35 | Only request creator can accept/reject completed work | 2026-03-09 | — | Verified | [32-only-the-user-who-created-the-request-ca](./quick/32-only-the-user-who-created-the-request-ca/) |
 | 36 | Stable column widths on all tables (fixed sizes + grow column + actions last) | 2026-03-10 | 72bbd71 | Verified | [32-limit-all-table-width-by-its-own-logical](./quick/32-limit-all-table-width-by-its-own-logical/) |
+| 37 | Approval queue: View button opens JobViewModal with permalink support | 2026-03-10 | 79b9a55 | Verified | [34-approval-detail-should-use-modal-with-pe](./quick/34-approval-detail-should-use-modal-with-pe/) |
 
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Completed quick task 36: Stable column widths on all tables
+Stopped at: Completed quick task 34: Approval queue View button opens JobViewModal with permalink support
 Resume file: None
 Next: Ready for next task
