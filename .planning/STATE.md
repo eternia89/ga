@@ -314,10 +314,11 @@ Recent decisions affecting current work:
 | 42 | Default acquisition_date to today in new asset form | 2026-03-10 | dc06a0e | Verified | [39-asset-default-acquisition-date-to-today-](./quick/39-asset-default-acquisition-date-to-today-/) |
 | 43 | Asset table: photo thumbnail column with lightbox | 2026-03-10 | 2e9485f | Verified | [40-asset-table-list-display-latest-conditio](./quick/40-asset-table-list-display-latest-conditio/) |
 | 44 | Job table: photo thumbnail column with lightbox | 2026-03-10 | 66b0d2c | Verified | [41-job-table-list-display-job-photos-thumbn](./quick/41-job-table-list-display-job-photos-thumbn/) |
+| 45 | Approval queue estimated cost text-base removed, matches table cell size | 2026-03-10 | 783110e | Verified | [42-approval-queue-estimated-costs-should-di](./quick/42-approval-queue-estimated-costs-should-di/) |
 
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Completed quick task 41: Job table photo thumbnail column
+Stopped at: Completed quick task 42: Approval queue estimated cost font size fix
 Resume file: None
 Next: Ready for next task
