@@ -162,6 +162,7 @@ export function AssetTable({
           asset={transferAsset}
           currentLocationName={transferAsset.location?.name ?? ''}
           gaUsers={gaUsers}
+          currentUserId={currentUserId}
           locationNames={locationNames}
           onSuccess={handleModalActionSuccess}
         />

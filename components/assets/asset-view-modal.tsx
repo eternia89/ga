@@ -581,6 +581,7 @@ export function AssetViewModal({
             asset={asset}
             currentLocationName={asset.location?.name ?? ''}
             gaUsers={gaUsers as GAUserWithLocation[]}
+            currentUserId={currentUserId}
             locationNames={Object.fromEntries(locations.map((l) => [l.id, l.name]))}
             onSuccess={handleActionSuccess}
           />

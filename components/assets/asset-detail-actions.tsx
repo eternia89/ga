@@ -174,6 +174,7 @@ export function AssetDetailActions({
         asset={asset}
         currentLocationName={asset.location?.name ?? ''}
         gaUsers={gaUsers}
+        currentUserId={currentUserId}
         locationNames={Object.fromEntries(locations.map((l) => [l.id, l.name]))}
         onSuccess={onActionSuccess}
       />
