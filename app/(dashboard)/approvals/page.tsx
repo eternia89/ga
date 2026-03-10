@@ -4,7 +4,12 @@ import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { ApprovalQueue } from '@/components/approvals/approval-queue';
 import type { ApprovalJob } from '@/components/approvals/approval-queue';
 
-export default async function ApprovalsPage() {
+interface PageProps {
+  searchParams: Promise<{ view?: string }>;
+}
+
+export default async function ApprovalsPage({ searchParams }: PageProps) {
+  const { view } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -192,7 +197,12 @@ export default async function ApprovalsPage() {
         </p>
       </div>
 
-      <ApprovalQueue jobs={jobs} />
+      <ApprovalQueue
+          jobs={jobs}
+          initialViewId={view}
+          currentUserId={profile.id}
+          currentUserRole={profile.role}
+        />
     </div>
   );
 }
