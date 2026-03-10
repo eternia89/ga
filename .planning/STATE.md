@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-10 - Completed quick task 38: inventory transit status display deduplication
+Last activity: 2026-03-10 - Completed quick task 39: asset default acquisition_date to today
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -311,10 +311,11 @@ Recent decisions affecting current work:
 | 39 | asset transfer: only the receiver can accept or reject the transfer. admin can still cancel the transfer | 2026-03-10 | 8e7d474 | Verified | [36-asset-transfer-only-the-receiver-can-acc](./quick/36-asset-transfer-only-the-receiver-can-acc/) |
 | 40 | Consolidate asset view modal action buttons to sticky bar only (remove duplicate inline AssetDetailActions) | 2026-03-10 | bd61fcd | Verified | [37-detail-modal-move-all-form-field-action-](./quick/37-detail-modal-move-all-form-field-action-/) |
 | 41 | inventory transit status should only be displayed once beside the active status badge, not shown in the location field | 2026-03-10 | 558bcae | Verified | [38-inventory-transit-status-should-only-be-](./quick/38-inventory-transit-status-should-only-be-/) |
+| 42 | Default acquisition_date to today in new asset form | 2026-03-10 | dc06a0e | Verified | [39-asset-default-acquisition-date-to-today-](./quick/39-asset-default-acquisition-date-to-today-/) |
 
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Completed quick task 38: inventory transit status display deduplication
+Stopped at: Completed quick task 39: asset default acquisition_date to today
 Resume file: None
 Next: Ready for next task
