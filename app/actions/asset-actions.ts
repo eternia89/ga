@@ -289,12 +289,11 @@ export const acceptTransfer = authActionClient
       throw new Error('Transfer not found or not in pending status');
     }
 
-    // Verify user is the designated receiver OR ga_lead/admin
+    // Verify user is the designated receiver
     const isReceiver = movement.receiver_id === profile.id;
-    const isLeadOrAdmin = ['ga_lead', 'admin'].includes(profile.role);
 
-    if (!isReceiver && !isLeadOrAdmin) {
-      throw new Error('Only the designated receiver or a GA Lead/Admin can accept this transfer');
+    if (!isReceiver) {
+      throw new Error('Only the designated receiver can accept this transfer');
     }
 
     // Update movement to accepted
@@ -347,12 +346,11 @@ export const rejectTransfer = authActionClient
       throw new Error('Transfer not found or not in pending status');
     }
 
-    // Verify user is the designated receiver OR ga_lead/admin
+    // Verify user is the designated receiver
     const isReceiver = movement.receiver_id === profile.id;
-    const isLeadOrAdmin = ['ga_lead', 'admin'].includes(profile.role);
 
-    if (!isReceiver && !isLeadOrAdmin) {
-      throw new Error('Only the designated receiver or a GA Lead/Admin can reject this transfer');
+    if (!isReceiver) {
+      throw new Error('Only the designated receiver can reject this transfer');
     }
 
     const { error } = await supabase
@@ -393,12 +391,12 @@ export const cancelTransfer = authActionClient
       throw new Error('Transfer not found or not in pending status');
     }
 
-    // Verify user is the initiator OR ga_lead/admin
+    // Verify user is the initiator OR admin
     const isInitiator = movement.initiated_by === profile.id;
-    const isLeadOrAdmin = ['ga_lead', 'admin'].includes(profile.role);
+    const isAdmin = profile.role === 'admin';
 
-    if (!isInitiator && !isLeadOrAdmin) {
-      throw new Error('Only the transfer initiator or a GA Lead/Admin can cancel this transfer');
+    if (!isInitiator && !isAdmin) {
+      throw new Error('Only the transfer initiator or an admin can cancel this transfer');
     }
 
     const { error } = await supabase
