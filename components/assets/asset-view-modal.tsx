@@ -520,7 +520,7 @@ export function AssetViewModal({
                     Transfer
                   </Button>
                 )}
-                {pendingTransfer && (currentUserId === pendingTransfer.receiver_id || ['ga_lead', 'admin'].includes(currentUserRole)) && (
+                {pendingTransfer && currentUserId === pendingTransfer.receiver_id && (
                   <>
                     <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => openTransferRespond('accept')}>
                       Accept Transfer

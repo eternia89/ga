@@ -59,23 +59,19 @@ export function AssetDetailActions({
   const [cancelError, setCancelError] = useState<string | null>(null);
 
   const isGaStaffOrHigher = ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole);
-  const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
   const isTerminal = asset.status === 'sold_disposed';
 
   // Transfer: GA Staff or higher on non-terminal assets with no pending transfer
   const canTransfer = isGaStaffOrHigher && !isTerminal && !pendingTransfer;
 
-  // Receiver of pending transfer (or GA Lead/Admin can also respond)
+  // Receiver of pending transfer only can respond
   const isReceiver = pendingTransfer && pendingTransfer.receiver_id === currentUserId;
-  const canRespond =
-    pendingTransfer &&
-    (isReceiver || isGaLeadOrAdmin);
+  const canRespond = pendingTransfer && isReceiver;
 
-  // Cancel: initiator of pending transfer or GA Lead/Admin
+  // Cancel: initiator of pending transfer or admin only
   const isInitiator = pendingTransfer && pendingTransfer.initiated_by === currentUserId;
-  const canCancel =
-    pendingTransfer &&
-    (isInitiator || isGaLeadOrAdmin);
+  const isAdmin = currentUserRole === 'admin';
+  const canCancel = pendingTransfer && (isInitiator || isAdmin);
 
   const hasAnyAction = canTransfer || canRespond || canCancel;
 
