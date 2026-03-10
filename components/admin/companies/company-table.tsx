@@ -172,6 +172,7 @@ export function CompanyTable({ data }: CompanyTableProps) {
         showDeactivated={showDeactivated}
         onBulkDelete={handleBulkDelete}
         onBulkExport={handleBulkExport}
+        getRowClassName={(row) => (row.deleted_at ? "bg-muted/40" : "")}
         meta={{
           onEdit: handleEdit,
         }}
