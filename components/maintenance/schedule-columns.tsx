@@ -26,7 +26,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
       return name ? (
         <button
           type="button"
-          className="font-medium text-blue-600 hover:text-blue-800 hover:underline max-w-[200px] truncate block text-left"
+          className="font-medium text-blue-600 hover:text-blue-800 hover:underline truncate block text-left"
           title={name}
           onClick={() => meta?.onView?.(schedule)}
         >
@@ -37,6 +37,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
       );
     },
     size: 200,
+    meta: { grow: true },
   },
   {
     id: 'asset_name',

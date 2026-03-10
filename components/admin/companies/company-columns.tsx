@@ -37,21 +37,26 @@ export const companyColumns: ColumnDef<Company>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
+    size: 200,
+    meta: { grow: true },
   },
   {
     accessorKey: "code",
     header: "Code",
     cell: ({ row }) => row.getValue("code") || "-",
+    size: 90,
   },
   {
     accessorKey: "email",
     header: "Email",
     cell: ({ row }) => row.getValue("email") || "-",
+    size: 180,
   },
   {
     accessorKey: "phone",
     header: "Phone",
     cell: ({ row }) => row.getValue("phone") || "-",
+    size: 130,
   },
   {
     accessorKey: "deleted_at",
@@ -64,6 +69,7 @@ export const companyColumns: ColumnDef<Company>[] = [
         </Badge>
       );
     },
+    size: 100,
   },
   {
     accessorKey: "created_at",
@@ -74,6 +80,7 @@ export const companyColumns: ColumnDef<Company>[] = [
       const date = row.getValue("created_at") as string;
       return format(new Date(date), "dd-MM-yyyy");
     },
+    size: 110,
   },
   {
     id: "actions",

@@ -37,6 +37,8 @@ export const categoryColumns: ColumnDef<Category>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
+    size: 200,
+    meta: { grow: true },
   },
   {
     accessorKey: "description",
@@ -44,13 +46,14 @@ export const categoryColumns: ColumnDef<Category>[] = [
     cell: ({ row }) => {
       const description = row.getValue("description") as string | null;
       return description ? (
-        <span className="max-w-[300px] truncate" title={description}>
+        <span className="truncate block" title={description}>
           {description}
         </span>
       ) : (
         "-"
       );
     },
+    size: 280,
   },
   {
     accessorKey: "deleted_at",
@@ -63,6 +66,7 @@ export const categoryColumns: ColumnDef<Category>[] = [
         </Badge>
       );
     },
+    size: 100,
   },
   {
     accessorKey: "created_at",
@@ -73,6 +77,7 @@ export const categoryColumns: ColumnDef<Category>[] = [
       const date = row.getValue("created_at") as string;
       return format(new Date(date), "dd-MM-yyyy");
     },
+    size: 110,
   },
   {
     id: "actions",

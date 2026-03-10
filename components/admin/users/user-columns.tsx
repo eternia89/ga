@@ -74,6 +74,8 @@ export function getUserColumns(
           </div>
         );
       },
+      size: 220,
+      meta: { grow: true },
     },
     {
       accessorKey: 'role',
@@ -86,6 +88,7 @@ export function getUserColumns(
           </Badge>
         );
       },
+      size: 150,
     },
     {
       accessorKey: 'division',
@@ -94,6 +97,7 @@ export function getUserColumns(
         const division = row.original.division;
         return <span>{division?.name || '—'}</span>;
       },
+      size: 150,
     },
     {
       accessorKey: 'deleted_at',
@@ -106,6 +110,7 @@ export function getUserColumns(
           </Badge>
         );
       },
+      size: 100,
     },
     {
       accessorKey: 'company_id',
@@ -122,6 +127,7 @@ export function getUserColumns(
         const company = row.original.company;
         return <span>{company?.name || '—'}</span>;
       },
+      size: 160,
     },
     {
       accessorKey: 'last_sign_in_at',
@@ -131,6 +137,7 @@ export function getUserColumns(
         if (!lastLogin) return <span className="text-gray-500">Never</span>;
         return <span>{format(new Date(lastLogin), 'dd-MM-yyyy')}</span>;
       },
+      size: 120,
     },
     {
       accessorKey: 'created_at',
@@ -139,6 +146,7 @@ export function getUserColumns(
         const createdAt = row.getValue('created_at') as string;
         return <span>{format(new Date(createdAt), 'dd-MM-yyyy')}</span>;
       },
+      size: 110,
     },
     {
       id: 'actions',
@@ -153,6 +161,7 @@ export function getUserColumns(
           Edit
         </Button>
       ),
+      size: 80,
     },
   ];
 }
