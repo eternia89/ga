@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { formatDateTime } from '@/lib/utils';
+import { formatDateTime, formatIDR } from '@/lib/utils';
 import {
   Plus,
   ArrowRight,
@@ -76,6 +76,19 @@ const EVENT_COLORS: Record<JobTimelineEventType, string> = {
   field_update: 'bg-gray-100 text-gray-600',
   comment: 'bg-muted text-muted-foreground',
 };
+
+const FIELD_LABELS: Record<string, string> = {
+  estimated_cost: 'Estimated Cost',
+};
+
+function formatFieldValue(field: string | undefined, value: string | undefined): string | undefined {
+  if (value === undefined) return undefined;
+  if (field === 'estimated_cost') {
+    const num = parseFloat(value);
+    return isNaN(num) ? value : formatIDR(num);
+  }
+  return value;
+}
 
 function EventContent({ event }: { event: JobTimelineEvent }) {
   switch (event.type) {
@@ -156,12 +169,15 @@ function EventContent({ event }: { event: JobTimelineEvent }) {
 
     case 'field_update': {
       const field = event.details?.field as string | undefined;
-      const oldValue = event.details?.old_value as string | undefined;
-      const newValue = event.details?.new_value as string | undefined;
+      const rawOldValue = event.details?.old_value as string | undefined;
+      const rawNewValue = event.details?.new_value as string | undefined;
+      const displayLabel = FIELD_LABELS[field ?? ''] ?? field ?? 'a field';
+      const oldValue = formatFieldValue(field, rawOldValue);
+      const newValue = formatFieldValue(field, rawNewValue);
       return (
         <span>
           <span className="font-medium">{event.by}</span> updated{' '}
-          <span className="font-medium">{field ?? 'a field'}</span>
+          <span className="font-medium">{displayLabel}</span>
           {oldValue !== undefined && newValue !== undefined && (
             <span className="text-muted-foreground">
               {' '}from &ldquo;{oldValue}&rdquo; to &ldquo;{newValue}&rdquo;
