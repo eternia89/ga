@@ -5,7 +5,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Location } from "@/lib/types/database";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
 export const locationColumns: ColumnDef<Location>[] = [
@@ -66,19 +65,6 @@ export const locationColumns: ColumnDef<Location>[] = [
       return location.company?.name ? <span>{location.company.name}</span> : <span className="text-muted-foreground">—</span>;
     },
     size: 160,
-  },
-  {
-    accessorKey: "deleted_at",
-    header: "Status",
-    cell: ({ row }) => {
-      const isDeactivated = !!row.getValue("deleted_at");
-      return (
-        <Badge variant={isDeactivated ? "destructive" : "secondary"}>
-          {isDeactivated ? "Deactivated" : "Active"}
-        </Badge>
-      );
-    },
-    size: 100,
   },
   {
     id: "actions",

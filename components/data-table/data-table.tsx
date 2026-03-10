@@ -56,6 +56,7 @@ interface DataTableProps<TData, TValue> {
   pageSize?: number;
   emptyMessage?: string;
   meta?: Record<string, unknown>;
+  getRowClassName?: (row: TData) => string;
 }
 
 export function DataTable<TData, TValue>({
@@ -73,6 +74,7 @@ export function DataTable<TData, TValue>({
   pageSize = 50,
   emptyMessage = "No items found",
   meta,
+  getRowClassName,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(initialColumnVisibility || {});
@@ -158,6 +160,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className={getRowClassName?.(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
