@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-10 - Completed quick task 35: add proper spacing between icon and text in timeline, so it doesn't look that cramped
+Last activity: 2026-03-10 - Completed quick task 36: asset transfer: only the receiver can accept or reject the transfer. admin can still cancel the transfer
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -308,6 +308,7 @@ Recent decisions affecting current work:
 | 36 | Stable column widths on all tables (fixed sizes + grow column + actions last) | 2026-03-10 | 72bbd71 | Verified | [32-limit-all-table-width-by-its-own-logical](./quick/32-limit-all-table-width-by-its-own-logical/) |
 | 37 | Approval queue: View button opens JobViewModal with permalink support | 2026-03-10 | 79b9a55 | Verified | [34-approval-detail-should-use-modal-with-pe](./quick/34-approval-detail-should-use-modal-with-pe/) |
 | 38 | add proper spacing between icon and text in timeline, so it doesn't look that cramped | 2026-03-10 | a9f1f76 | Needs Review | [35-add-proper-spacing-between-icon-and-text](./quick/35-add-proper-spacing-between-icon-and-text/) |
+| 39 | asset transfer: only the receiver can accept or reject the transfer. admin can still cancel the transfer | 2026-03-10 | 8e7d474 | Verified | [36-asset-transfer-only-the-receiver-can-acc](./quick/36-asset-transfer-only-the-receiver-can-acc/) |
 
 ## Session Continuity
 
