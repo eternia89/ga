@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-09 - Completed quick task 33: Add photo attachments to job creation form
+Last activity: 2026-03-10 - Completed quick task 39: photos should be before save changes button
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -311,10 +311,11 @@ Recent decisions affecting current work:
 | 39 | Estimated cost in job timeline displays IDR thousand separator formatting | 2026-03-10 | 74eb908 | Verified | [36-estimated-cost-in-job-timeline-should-di](./quick/36-estimated-cost-in-job-timeline-should-di/) |
 | 40 | Post Comment button uses outline variant instead of CTA | 2026-03-10 | 1e0c68b | Verified | [37-post-comment-button-should-use-outline-v](./quick/37-post-comment-button-should-use-outline-v/) |
 | 41 | Photo attachments displayed and editable in job detail modal | 2026-03-10 | 8e1d745 | Verified | [38-photo-attachments-should-be-displayed-an](./quick/38-photo-attachments-should-be-displayed-an/) |
+| 42 | photos should be before save changes button. remain consistent throughout the app. clicking save changes will save the photos, and other edited fields | 2026-03-10 | 4e450ce | | [39-photos-should-be-before-save-changes-but](./quick/39-photos-should-be-before-save-changes-but/) |
 
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Completed quick task 41: Photo attachments in job detail modal
+Stopped at: Completed quick task 42: photos should be before save changes button
 Resume file: None
 Next: Ready for next task
