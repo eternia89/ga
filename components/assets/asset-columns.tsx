@@ -67,29 +67,15 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
     id: 'location_name',
     accessorFn: (row) => row.location?.name ?? null,
     header: 'Location',
-    cell: ({ row, table }) => {
-      const meta = table.options.meta as AssetTableMeta | undefined;
-      const pendingTransfer = meta?.pendingTransfers?.[row.original.id];
+    cell: ({ row }) => {
       const locationName = row.original.location?.name;
 
-      return (
-        <div className="flex items-center gap-1.5">
-          {locationName ? (
-            <span className="truncate max-w-[120px]" title={locationName}>
-              {locationName}
-            </span>
-          ) : (
-            <span className="text-muted-foreground">—</span>
-          )}
-          {pendingTransfer && (
-            <span
-              className="inline-flex items-center gap-0.5 rounded-full bg-blue-100 px-1.5 py-0.5 text-[10px] font-medium text-blue-700 shrink-0"
-              title={`In Transit to ${pendingTransfer.to_location?.name ?? 'unknown'}`}
-            >
-              Transit
-            </span>
-          )}
-        </div>
+      return locationName ? (
+        <span className="truncate block max-w-[160px]" title={locationName}>
+          {locationName}
+        </span>
+      ) : (
+        <span className="text-muted-foreground">—</span>
       );
     },
     size: 160,
