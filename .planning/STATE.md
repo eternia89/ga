@@ -305,10 +305,11 @@ Recent decisions affecting current work:
 | 33 | Add photo attachments to job creation form and detail page | 2026-03-09 | 064a282 | Verified | [30-add-photo-attachments-to-job-creation-fo](./quick/30-add-photo-attachments-to-job-creation-fo/) |
 | 34 | Fix DialogTitle accessibility warning in all 5 view modals | 2026-03-09 | af12391 | Verified | [31-fix-dialogtitle-accessibility-warning-in](./quick/31-fix-dialogtitle-accessibility-warning-in/) |
 | 35 | Only request creator can accept/reject completed work | 2026-03-09 | — | Verified | [32-only-the-user-who-created-the-request-ca](./quick/32-only-the-user-who-created-the-request-ca/) |
+| 36 | Stable column widths on all tables (fixed sizes + grow column + actions last) | 2026-03-10 | 72bbd71 | Verified | [32-limit-all-table-width-by-its-own-logical](./quick/32-limit-all-table-width-by-its-own-logical/) |
 
 ## Session Continuity
 
-Last session: 2026-03-09
-Stopped at: Completed quick task 33: Add photo attachments to job creation form
+Last session: 2026-03-10
+Stopped at: Completed quick task 36: Stable column widths on all tables
 Resume file: None
 Next: Ready for next task
