@@ -10,6 +10,7 @@ import { assetColumns, PendingTransfer } from './asset-columns';
 import { AssetFilters, filterParsers } from './asset-filters';
 import { AssetViewModal } from './asset-view-modal';
 import { AssetTransferDialog, type GAUserWithLocation } from './asset-transfer-dialog';
+import { AssetStatusChangeDialog } from './asset-status-change-dialog';
 import { PhotoLightbox } from '@/components/requests/request-photo-lightbox';
 
 type PhotoItem = { id: string; url: string; fileName: string };
@@ -45,6 +46,9 @@ export function AssetTable({
 
   // Transfer dialog state (triggered from table row)
   const [transferAsset, setTransferAsset] = useState<InventoryItemWithRelations | null>(null);
+
+  // Change Status dialog state (triggered from table row)
+  const [statusChangeAsset, setStatusChangeAsset] = useState<InventoryItemWithRelations | null>(null);
 
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -100,6 +104,10 @@ export function AssetTable({
     setTransferAsset(asset);
   };
 
+  const handleChangeStatus = (asset: InventoryItemWithRelations) => {
+    setStatusChangeAsset(asset);
+  };
+
   const handlePhotoClick = (photos: PhotoItem[], index: number) => {
     setLightboxPhotos(photos);
     setLightboxIndex(index);
@@ -136,6 +144,7 @@ export function AssetTable({
         meta={{
           onView: handleView,
           onTransfer: handleTransfer,
+          onChangeStatus: handleChangeStatus,
           pendingTransfers,
           currentUserRole,
           photosByAsset,
@@ -164,6 +173,16 @@ export function AssetTable({
           gaUsers={gaUsers}
           currentUserId={currentUserId}
           locationNames={locationNames}
+          onSuccess={handleModalActionSuccess}
+        />
+      )}
+
+      {/* Change Status dialog (from table row action) */}
+      {statusChangeAsset && (
+        <AssetStatusChangeDialog
+          open={!!statusChangeAsset}
+          onOpenChange={(open) => { if (!open) setStatusChangeAsset(null); }}
+          asset={statusChangeAsset}
           onSuccess={handleModalActionSuccess}
         />
       )}

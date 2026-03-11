@@ -23,6 +23,7 @@ interface PhotoItem {
 export type AssetTableMeta = {
   onView?: (asset: InventoryItemWithRelations) => void;
   onTransfer?: (asset: InventoryItemWithRelations) => void;
+  onChangeStatus?: (asset: InventoryItemWithRelations) => void;
   pendingTransfers?: Record<string, PendingTransfer>;
   currentUserRole?: string;
   photosByAsset?: Record<string, PhotoItem[]>;
@@ -167,6 +168,11 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
         ['ga_staff', 'ga_lead', 'admin'].includes(meta.currentUserRole) &&
         asset.status !== 'sold_disposed' &&
         !meta?.pendingTransfers?.[row.original.id];
+      const canChangeStatus =
+        meta?.currentUserRole &&
+        ['ga_staff', 'ga_lead', 'admin'].includes(meta.currentUserRole) &&
+        asset.status !== 'sold_disposed' &&
+        !meta?.pendingTransfers?.[row.original.id];
 
       return (
         <div className="flex items-center gap-1">
@@ -194,10 +200,23 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
               Transfer
             </Button>
           )}
+          {canChangeStatus && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-sm text-blue-600 hover:underline"
+              onClick={(e) => {
+                e.stopPropagation();
+                meta?.onChangeStatus?.(asset);
+              }}
+            >
+              Change Status
+            </Button>
+          )}
         </div>
       );
     },
-    size: 160,
+    size: 220,
     enableSorting: false,
   },
 ];
