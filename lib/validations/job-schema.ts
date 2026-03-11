@@ -15,6 +15,7 @@ export const createJobSchema = z.object({
   priority: z.enum(['low', 'medium', 'high', 'urgent'], { message: 'Priority is required' }),
   estimated_cost: z.number().min(0, 'Cost cannot be negative').optional(),
   linked_request_ids: z.array(z.string().uuid()).default([]),
+  company_id: z.string().uuid().optional(),
 });
 
 export type CreateJobFormData = z.infer<typeof createJobSchema>;

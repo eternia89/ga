@@ -55,7 +55,15 @@ export default async function JobsPage({ searchParams }: PageProps) {
     jobsQuery = jobsQuery.eq('assigned_to', profile.id);
   }
 
-  const [jobsResult, usersResult, locationsResult, allCategoriesResult, allUsersResult, eligibleRequestsResult, budgetThresholdResult] = await Promise.all([
+  // Fetch user's extra company access
+  const { data: companyAccessRows } = await supabase
+    .from('user_company_access')
+    .select('company_id')
+    .eq('user_id', profile.id);
+  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
+  const [jobsResult, usersResult, locationsResult, allCategoriesResult, allUsersResult, eligibleRequestsResult, budgetThresholdResult, extraCompaniesResult, allLocationsResult] = await Promise.all([
     jobsQuery,
 
     // GA Staff/Lead users for PIC filter
@@ -67,7 +75,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
       .is('deleted_at', null)
       .order('full_name'),
 
-    // Locations for create dialog
+    // Locations for create dialog (primary company)
     supabase
       .from('locations')
       .select('id, name')
@@ -106,6 +114,26 @@ export default async function JobsPage({ searchParams }: PageProps) {
       .eq('company_id', profile.company_id)
       .eq('key', 'budget_threshold')
       .single(),
+
+    // Companies for multi-company selector (only if user has extra access)
+    extraCompanyIds.length > 0
+      ? supabase
+          .from('companies')
+          .select('id, name')
+          .in('id', allAccessibleCompanyIds)
+          .is('deleted_at', null)
+          .order('name')
+      : Promise.resolve({ data: null }),
+
+    // All locations across accessible companies (only if user has extra access)
+    extraCompanyIds.length > 0
+      ? supabase
+          .from('locations')
+          .select('id, name, company_id')
+          .in('company_id', allAccessibleCompanyIds)
+          .is('deleted_at', null)
+          .order('name')
+      : Promise.resolve({ data: null }),
   ]);
 
   const jobs = (jobsResult.data ?? []) as unknown as import('@/lib/types/database').JobWithRelations[];
@@ -115,6 +143,8 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const formUsers = allUsersResult.data ?? [];
   const rawEligibleRequests = eligibleRequestsResult.data ?? [];
   const companyBudgetThreshold = budgetThresholdResult.data ? parseInt(budgetThresholdResult.data.value, 10) : null;
+  const extraCompanies = extraCompaniesResult.data ?? [];
+  const allLocations = allLocationsResult.data ?? [];
 
   // Rule 3: Exclude requests already linked to any job
   const { data: alreadyLinkedData } = await supabase
@@ -196,6 +226,8 @@ export default async function JobsPage({ searchParams }: PageProps) {
               requestJobLinks={requestJobLinks}
               companyBudgetThreshold={companyBudgetThreshold}
               initialOpen={action === 'create'}
+              extraCompanies={extraCompanies}
+              allLocations={allLocations}
             />
           )}
         </div>

@@ -91,6 +91,9 @@ interface JobModalProps {
   eligibleRequests?: EligibleRequest[];
   requestJobLinks?: Record<string, string>;
   companyBudgetThreshold?: number | null;
+  // Multi-company access support
+  extraCompanies?: { id: string; name: string }[];
+  allLocations?: { id: string; name: string; company_id: string }[];
 }
 
 // ============================================================================
@@ -124,6 +127,8 @@ export function JobModal({
   eligibleRequests: createEligibleRequests,
   requestJobLinks: createRequestJobLinks,
   companyBudgetThreshold,
+  extraCompanies,
+  allLocations: createAllLocations,
 }: JobModalProps) {
   const router = useRouter();
 
@@ -865,6 +870,8 @@ export function JobModal({
             prefillRequest={null}
             mode="create"
             companyBudgetThreshold={companyBudgetThreshold}
+            extraCompanies={extraCompanies}
+            allLocations={createAllLocations}
             onSuccess={() => {
               handleDialogOpenChange(false);
               router.refresh();

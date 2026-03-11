@@ -92,6 +92,9 @@ interface JobFormProps {
   readOnly?: boolean;
   /** Lock PIC field independently (when job status is past 'assigned') */
   picLocked?: boolean;
+  /** Multi-company access support */
+  extraCompanies?: { id: string; name: string }[];
+  allLocations?: { id: string; name: string; company_id: string }[];
   /** For view mode: linked request objects with status info for read-only display */
   linkedRequestDetails?: {
     id: string;
@@ -123,6 +126,8 @@ export function JobForm({
   initialData,
   readOnly = false,
   picLocked = false,
+  extraCompanies,
+  allLocations,
   linkedRequestDetails,
   companyBudgetThreshold,
   onSuccess,
@@ -131,6 +136,7 @@ export function JobForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   const [previewRequest, setPreviewRequest] = useState<NonNullable<JobFormProps['linkedRequestDetails']>[number] | null>(null);
   const [linkedRequests, setLinkedRequests] = useState<EligibleRequest[]>(() => {
     if (mode === 'edit' && initialData?.linked_request_ids && initialData.linked_request_ids.length > 0) {
@@ -143,7 +149,11 @@ export function JobForm({
     return [];
   });
 
-  const locationOptions = locations.map((loc) => ({
+  // Use all locations filtered by selected company when multi-company mode, else primary locations
+  const locationOptions = (selectedCompanyId && allLocations && allLocations.length > 0
+    ? allLocations.filter(l => l.company_id === selectedCompanyId)
+    : locations
+  ).map((loc) => ({
     label: loc.name,
     value: loc.id,
   }));
@@ -251,7 +261,12 @@ export function JobForm({
           onSuccess();
         }
       } else {
-        const result = await createJob(data);
+        // Include company_id for multi-company access if a different company is selected
+        const effectiveCompanyId =
+          extraCompanies && extraCompanies.length > 1 && selectedCompanyId
+            ? selectedCompanyId
+            : undefined;
+        const result = await createJob({ ...data, company_id: effectiveCompanyId });
         if (result?.serverError) {
           setError(result.serverError);
           return;
@@ -299,6 +314,25 @@ export function JobForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-6 ${onSuccess ? '' : 'max-w-2xl'}`}>
+        {/* Company selector — only shown in create mode when user has extra company access */}
+        {mode === 'create' && extraCompanies && extraCompanies.length > 1 && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Company</label>
+            <Combobox
+              options={extraCompanies.map(c => ({ label: c.name, value: c.id }))}
+              value={selectedCompanyId ?? extraCompanies[0].id}
+              onValueChange={(val) => {
+                setSelectedCompanyId(val);
+                form.setValue('location_id', '');
+              }}
+              placeholder="Select company"
+              searchPlaceholder="Search companies..."
+              emptyText="No companies found"
+              disabled={disabled}
+            />
+          </div>
+        )}
+
         {/* Title */}
         <FormField
           control={form.control}

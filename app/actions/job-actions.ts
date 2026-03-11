@@ -23,9 +23,23 @@ export const createJob = authActionClient
       throw new Error('GA Lead or Admin access required');
     }
 
+    // Determine effective company_id (multi-company access support)
+    const effectiveCompanyId = parsedInput.company_id ?? profile.company_id;
+
+    // Validate extra company access if a different company was selected
+    if (parsedInput.company_id && parsedInput.company_id !== profile.company_id) {
+      const { data: access } = await supabase
+        .from('user_company_access')
+        .select('id')
+        .eq('user_id', profile.id)
+        .eq('company_id', parsedInput.company_id)
+        .single();
+      if (!access) throw new Error('You do not have access to the selected company.');
+    }
+
     // Generate display_id atomically via DB function
     const { data: displayId, error: rpcError } = await supabase
-      .rpc('generate_job_display_id', { p_company_id: profile.company_id });
+      .rpc('generate_job_display_id', { p_company_id: effectiveCompanyId });
 
     if (rpcError || !displayId) {
       const msg = rpcError?.message || '';
@@ -89,7 +103,7 @@ export const createJob = authActionClient
 
     // Insert job
     const insertData: Record<string, unknown> = {
-      company_id: profile.company_id,
+      company_id: effectiveCompanyId,
       display_id: displayId,
       title: parsedInput.title,
       description: parsedInput.description,
@@ -120,7 +134,7 @@ export const createJob = authActionClient
       const { data: thresholdSetting } = await supabase
         .from('company_settings')
         .select('value')
-        .eq('company_id', profile.company_id)
+        .eq('company_id', effectiveCompanyId)
         .eq('key', 'budget_threshold')
         .single();
 
@@ -143,7 +157,7 @@ export const createJob = authActionClient
       const jobRequestRows = parsedInput.linked_request_ids.map((requestId) => ({
         job_id: job.id,
         request_id: requestId,
-        company_id: profile.company_id,
+        company_id: effectiveCompanyId,
         linked_by: profile.id,
       }));
 
