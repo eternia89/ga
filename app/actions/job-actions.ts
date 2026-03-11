@@ -11,7 +11,7 @@ import { advanceFloatingScheduleCore } from '@/app/actions/pm-job-actions';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 // ============================================================================
-// createJob — ga_lead or admin only
+// createJob — ga_lead, admin, or ga_staff
 // ============================================================================
 export const createJob = authActionClient
   .schema(createJobSchema)
@@ -19,7 +19,7 @@ export const createJob = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
+    if (!['ga_lead', 'admin', 'ga_staff'].includes(profile.role)) {
       throw new Error('GA Lead or Admin access required');
     }
 

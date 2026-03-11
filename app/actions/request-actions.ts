@@ -123,7 +123,10 @@ export const triageRequest = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
+    const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(profile.role);
+    const isGaStaff = profile.role === 'ga_staff';
+
+    if (!isGaLeadOrAdmin && !isGaStaff) {
       throw new Error('Triage access required');
     }
 
@@ -136,6 +139,16 @@ export const triageRequest = authActionClient
 
     if (!request || !['submitted', 'triaged'].includes(request.status)) {
       throw new Error('Request can only be triaged when in New or Triaged status');
+    }
+
+    // GA Staff can only triage new (submitted) requests — not already-triaged ones
+    if (isGaStaff && request.status !== 'submitted') {
+      throw new Error('GA Staff can only triage new requests.');
+    }
+
+    // GA Staff can only assign to themselves
+    if (isGaStaff && parsedInput.data.assigned_to !== profile.id) {
+      throw new Error('GA Staff can only assign requests to themselves.');
     }
 
     const updateData: Record<string, string> = {
