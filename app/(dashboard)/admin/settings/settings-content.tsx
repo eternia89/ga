@@ -19,6 +19,7 @@ interface SettingsContentProps {
   defaultCompanyId: string;
   initialTab?: string;
   initialUserId?: string;
+  userCompanyAccessMap: Record<string, string[]>;
 }
 
 const VALID_TABS = ["companies", "divisions", "locations", "request-categories", "asset-categories", "users"];
@@ -32,6 +33,7 @@ export function SettingsContent({
   defaultCompanyId,
   initialTab,
   initialUserId,
+  userCompanyAccessMap,
 }: SettingsContentProps) {
   const defaultTab = initialTab && VALID_TABS.includes(initialTab) ? initialTab : "companies";
   const [tab, setTab] = useQueryState("tab", { defaultValue: defaultTab });
@@ -90,6 +92,7 @@ export function SettingsContent({
             locations={locations}
             defaultCompanyId={defaultCompanyId}
             initialUserId={initialUserId}
+            userCompanyAccessMap={userCompanyAccessMap}
           />
         </TabsContent>
       </Tabs>

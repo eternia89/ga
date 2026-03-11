@@ -14,7 +14,7 @@ export default async function SettingsPage({
   // including soft-deleted items (for the deactivated toggle)
   const supabase = createAdminClient();
 
-  const [companiesResult, divisionsResult, locationsResult, categoriesResult, profilesResult, authUsersResult] =
+  const [companiesResult, divisionsResult, locationsResult, categoriesResult, profilesResult, authUsersResult, accessRowsResult] =
     await Promise.all([
       supabase.from("companies").select("*").order("name"),
       supabase
@@ -33,6 +33,8 @@ export default async function SettingsPage({
         .select("*, division:divisions(name), company:companies(name), location:locations(name)")
         .order("full_name"),
       supabase.auth.admin.listUsers(),
+      // Multi-company access rows
+      supabase.from("user_company_access").select("user_id, company_id"),
     ]);
 
   const companies = (companiesResult.data as Company[]) || [];
@@ -52,6 +54,13 @@ export default async function SettingsPage({
   const adminProfile = profilesResult.data?.find(p => p.role === 'admin');
   const defaultCompanyId = adminProfile?.company_id || companies?.[0]?.id || '';
 
+  // Build userCompanyAccessMap: user_id -> company_id[]
+  const userCompanyAccessMap: Record<string, string[]> = {};
+  for (const row of accessRowsResult.data ?? []) {
+    if (!userCompanyAccessMap[row.user_id]) userCompanyAccessMap[row.user_id] = [];
+    userCompanyAccessMap[row.user_id].push(row.company_id);
+  }
+
   return (
     <div className="space-y-6 py-6">
       <SetBreadcrumbs items={[{ label: 'Dashboard', href: '/' }, { label: 'Settings' }]} />
@@ -65,6 +74,7 @@ export default async function SettingsPage({
         defaultCompanyId={defaultCompanyId}
         initialTab={initialTab}
         initialUserId={initialUserId}
+        userCompanyAccessMap={userCompanyAccessMap}
       />
     </div>
   );

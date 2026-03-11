@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { createUserSchema, updateUserSchema } from '@/lib/validations/user-schema';
 import { createUser, updateUser } from '@/app/actions/user-actions';
+import { updateUserCompanyAccess } from '@/app/actions/user-company-access-actions';
 import { extractActionError } from '@/lib/utils';
 import type { Role } from '@/lib/auth/types';
 import {
@@ -72,6 +73,7 @@ type UserFormDialogProps = {
   onDeactivate?: () => void;
   onReactivate?: () => void;
   isDeactivated?: boolean;
+  userCompanyAccess?: string[]; // company_id[] already granted to this user
 };
 
 const roleOptions = [
@@ -94,11 +96,23 @@ export function UserFormDialog({
   onDeactivate,
   onReactivate,
   isDeactivated,
+  userCompanyAccess,
 }: UserFormDialogProps) {
   const isEditMode = !!user;
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>(
     user?.company_id || defaultCompanyId || ''
   );
+  const [selectedExtraCompanies, setSelectedExtraCompanies] = useState<string[]>(
+    userCompanyAccess ?? []
+  );
+
+  const toggleCompanyAccess = (companyId: string) => {
+    setSelectedExtraCompanies((prev) =>
+      prev.includes(companyId)
+        ? prev.filter((id) => id !== companyId)
+        : [...prev, companyId]
+    );
+  };
 
   const schema = useMemo(
     () => (isEditMode ? updateUserSchema : createUserSchema),
@@ -129,6 +143,15 @@ export function UserFormDialog({
       const error = extractActionError(result);
       if (error) return { error };
       if (!result?.data?.success) return { error: 'Failed to update user' };
+
+      // Save multi-company access changes
+      const accessResult = await updateUserCompanyAccess({
+        userId: user.id!,
+        companyIds: selectedExtraCompanies,
+      });
+      const accessError = extractActionError(accessResult);
+      if (accessError) return { error: `User updated but failed to save company access: ${accessError}` };
+
       return {};
     } else {
       const result = await createUser(data as any);
@@ -146,6 +169,7 @@ export function UserFormDialog({
       onOpenChange={(nextOpen) => {
         if (nextOpen) {
           setSelectedCompanyId(user?.company_id || defaultCompanyId || '');
+          setSelectedExtraCompanies(userCompanyAccess ?? []);
         }
         onOpenChange(nextOpen);
       }}
@@ -342,6 +366,37 @@ export function UserFormDialog({
               </FormItem>
             )}
           />
+
+          {isEditMode && user?.id && (
+            <div className="space-y-3 pt-2 border-t">
+              <div>
+                <p className="text-sm font-medium">Additional Company Access</p>
+                <p className="text-xs text-muted-foreground">
+                  Grant this user access to create requests, jobs, and assets for other companies.
+                  Does not change their role or primary company.
+                </p>
+              </div>
+              <div className="space-y-2">
+                {companies
+                  .filter(c => c.id !== (user.company_id))
+                  .map(company => (
+                    <label key={company.id} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedExtraCompanies.includes(company.id)}
+                        onChange={() => toggleCompanyAccess(company.id)}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <span className="text-sm">{company.name}</span>
+                    </label>
+                  ))
+                }
+                {companies.filter(c => c.id !== user.company_id).length === 0 && (
+                  <p className="text-xs text-muted-foreground">No other companies available.</p>
+                )}
+              </div>
+            </div>
+          )}
         </>
       )}
     </EntityFormDialog>

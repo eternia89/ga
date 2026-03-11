@@ -35,9 +35,10 @@ type UserTableProps = {
   locations: Location[];
   defaultCompanyId: string;
   initialUserId?: string;
+  userCompanyAccessMap: Record<string, string[]>;
 };
 
-export function UserTable({ users, companies, divisions, locations, defaultCompanyId, initialUserId }: UserTableProps) {
+export function UserTable({ users, companies, divisions, locations, defaultCompanyId, initialUserId, userCompanyAccessMap }: UserTableProps) {
   const [showDeactivated, setShowDeactivated] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRow | undefined>(undefined);
@@ -254,6 +255,7 @@ export function UserTable({ users, companies, divisions, locations, defaultCompa
           setReactivateDialogOpen(true);
         }}
         isDeactivated={!!editingUser?.deleted_at}
+        userCompanyAccess={editingUser ? (userCompanyAccessMap[editingUser.id] ?? []) : []}
       />
 
       <UserDeactivateDialog
