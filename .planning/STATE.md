@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: "Completed quick task 48: GA Staff self-assign triage and job create"
 last_updated: "2026-03-11T06:42:55.233Z"
-last_activity: "2026-03-11 - Completed quick task 52: clear icon in photo upload modal is black and invisible against the dark/black background — fix icon color to be visible"
+last_activity: "2026-03-11 - Completed quick task 50: all insertion modals always show Company field (disabled for single-company, Combobox for multi-company)"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -329,10 +329,11 @@ Recent decisions affecting current work:
 | 56 | Add permalink URL sync (?action=create) to New Job and New Asset create modals — bidirectional sync on open and close | 2026-03-11 | dd971dc | Needs Review | [47-add-permalink-support-to-new-job-and-new](./quick/47-add-permalink-support-to-new-job-and-new/) |
 | 57 | GA Staff can self-assign submitted requests and create jobs; status guard prevents overriding GA Lead assignments | 2026-03-11 | c415b94 | Needs Review | [48-ga-staff-should-be-able-to-self-assign-r](./quick/48-ga-staff-should-be-able-to-self-assign-r/) |
 | 58 | Fix company-based data isolation: push migrations, expand RLS SELECT policies for multi-company access, seed test data | 2026-03-11 | 849ffbb | Verified | [49-fix-company-based-data-isolation-user-co](./quick/49-fix-company-based-data-isolation-user-co/) |
+| 59 | All insertion modals always show Company field — disabled Input for single-company, interactive Combobox for multi-company | 2026-03-11 | b4037e3 | Complete | [50-all-insertion-modals-show-company-field-](./quick/50-all-insertion-modals-show-company-field-/) |
 
 ## Session Continuity
 
 Last session: 2026-03-11
-Stopped at: Completed quick task 49: Fix company-based data isolation — multi-company RLS
+Stopped at: Completed quick task 50: All insertion modals show Company field
 Resume file: None
 Next: Ready for next task
