@@ -34,11 +34,14 @@ export function RequestDetailActions({
   const [completeFeedback, setCompleteFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
+  const isGaStaff = currentUserRole === 'ga_staff';
   const isRequester = request.requester_id === currentUserId;
   const isPic = request.assigned_to === currentUserId;
 
   const canCancel = isRequester && request.status === 'submitted';
-  const canTriage = isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request.status);
+  const canTriage =
+    (isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request.status)) ||
+    (isGaStaff && request.status === 'submitted');
   const canReject =
     isGaLeadOrAdmin &&
     (request.status === 'submitted' || request.status === 'triaged');

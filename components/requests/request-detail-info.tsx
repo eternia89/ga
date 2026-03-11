@@ -79,16 +79,19 @@ export function RequestDetailInfo({
   } | null>(null);
 
   const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
+  const isGaStaff = currentUserRole === 'ga_staff';
   const isRequester = request.requester_id === currentUserId;
   const isEditable = isRequester && request.status === 'submitted';
-  const canTriage = isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request.status);
+  const canTriage =
+    (isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request.status)) ||
+    (isGaStaff && request.status === 'submitted');
 
   const triageForm = useForm<TriageFormData>({
     resolver: zodResolver(triageSchema),
     defaultValues: {
       category_id: request.category_id ?? '',
       priority: request.priority ?? undefined,
-      assigned_to: request.assigned_to ?? '',
+      assigned_to: request.assigned_to ?? (isGaStaff ? currentUserId : ''),
     },
   });
 
@@ -140,6 +143,10 @@ export function RequestDetailInfo({
     value,
   }));
   const userOptions = users.map((u) => ({ label: u.name, value: u.id }));
+  // GA Staff can only assign to themselves; GA Lead/Admin see all users
+  const picOptions = isGaStaff
+    ? userOptions.filter((u) => u.value === currentUserId)
+    : userOptions;
 
   // Show edit form directly when requester can edit (submitted status)
   if (isEditable) {
@@ -223,7 +230,7 @@ export function RequestDetailInfo({
                       </FormLabel>
                       <FormControl>
                         <Combobox
-                          options={userOptions}
+                          options={picOptions}
                           value={field.value}
                           onValueChange={field.onChange}
                           placeholder="Select PIC..."

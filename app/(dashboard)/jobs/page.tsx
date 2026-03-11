@@ -217,7 +217,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
           {['ga_lead', 'admin', 'finance_approver'].includes(profile.role) && (
             <ExportButton exportUrl="/api/exports/jobs" />
           )}
-          {['ga_lead', 'admin'].includes(profile.role) && (
+          {['ga_lead', 'admin', 'ga_staff'].includes(profile.role) && (
             <JobCreateDialog
               locations={formLocations}
               categories={formCategories}
