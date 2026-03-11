@@ -9,7 +9,6 @@ import type { ConditionPhoto, InvoiceItem, TransferPhoto } from './asset-detail-
 import { AssetDetailInfo } from './asset-detail-info';
 import { AssetTimeline } from './asset-timeline';
 import { AssetStatusBadge } from './asset-status-badge';
-import { AssetStatusChangeDialog } from './asset-status-change-dialog';
 import { AssetTransferDialog, type GAUserWithLocation } from './asset-transfer-dialog';
 import { AssetTransferRespondDialog } from './asset-transfer-respond-dialog';
 import { cancelTransfer } from '@/app/actions/asset-actions';
@@ -87,8 +86,7 @@ export function AssetViewModal({
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Asset detail client state (status/transfer dialogs)
-  const [showStatusDialog, setShowStatusDialog] = useState(false);
+  // Asset detail client state (transfer dialogs)
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showTransferRespondDialog, setShowTransferRespondDialog] = useState(false);
   const [transferRespondMode, setTransferRespondMode] = useState<'accept' | 'reject'>('accept');
@@ -332,7 +330,6 @@ export function AssetViewModal({
       setLocations([]);
       setGaUsers([]);
       setError(null);
-      setShowStatusDialog(false);
       setShowTransferDialog(false);
       setShowTransferRespondDialog(false);
     }
@@ -531,11 +528,6 @@ export function AssetViewModal({
                   </Button>
                 )}
                 {['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) && asset.status !== 'sold_disposed' && !pendingTransfer && (
-                  <Button variant="outline" size="sm" onClick={() => setShowStatusDialog(true)}>
-                    Change Status
-                  </Button>
-                )}
-                {['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) && asset.status !== 'sold_disposed' && !pendingTransfer && (
                   <Button variant="outline" size="sm" onClick={() => setShowTransferDialog(true)}>
                     Transfer
                   </Button>
@@ -561,15 +553,6 @@ export function AssetViewModal({
           </>
         )}
 
-        {/* Status change dialog */}
-        {asset && (
-          <AssetStatusChangeDialog
-            open={showStatusDialog}
-            onOpenChange={setShowStatusDialog}
-            asset={asset}
-            onSuccess={handleActionSuccess}
-          />
-        )}
       </DialogContent>
 
       {/* Transfer dialogs — rendered outside DialogContent for z-index stacking */}
