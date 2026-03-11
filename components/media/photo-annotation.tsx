@@ -59,7 +59,7 @@ export function PhotoAnnotation({ imageUrl, onSave, onCancel, open }: PhotoAnnot
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onCancel(); }}>
-      <DialogContent className="max-w-5xl w-full h-[90vh] flex flex-col gap-0 p-0">
+      <DialogContent className="max-w-5xl w-full h-[90vh] flex flex-col gap-0 p-0" showCloseButton={false}>
         <DialogHeader className="px-4 py-3 border-b shrink-0">
           <DialogTitle>Annotate Photo</DialogTitle>
         </DialogHeader>
