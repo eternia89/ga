@@ -17,6 +17,7 @@ interface JobCreateDialogProps {
   initialOpen?: boolean;
   extraCompanies?: { id: string; name: string }[];
   allLocations?: { id: string; name: string; company_id: string }[];
+  primaryCompanyName: string;
 }
 
 export function JobCreateDialog({
@@ -29,6 +30,7 @@ export function JobCreateDialog({
   initialOpen,
   extraCompanies,
   allLocations,
+  primaryCompanyName,
 }: JobCreateDialogProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -68,6 +70,7 @@ export function JobCreateDialog({
         companyBudgetThreshold={companyBudgetThreshold}
         extraCompanies={extraCompanies}
         allLocations={allLocations}
+        primaryCompanyName={primaryCompanyName}
       />
     </>
   );

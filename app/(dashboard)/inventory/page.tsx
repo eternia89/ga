@@ -94,7 +94,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
     .order('name');
 
   // Multi-company: fetch companies and all locations for accessible companies
-  const [extraCompaniesResult, allLocationsResult] = extraCompanyIds.length > 0
+  const [extraCompaniesResult, allLocationsResult, primaryCompanyResult] = extraCompanyIds.length > 0
     ? await Promise.all([
         supabase
           .from('companies')
@@ -108,11 +108,25 @@ export default async function InventoryPage({ searchParams }: PageProps) {
           .in('company_id', allAccessibleCompanyIds)
           .is('deleted_at', null)
           .order('name'),
+        supabase
+          .from('companies')
+          .select('name')
+          .eq('id', profile.company_id)
+          .single(),
       ])
-    : [{ data: null }, { data: null }];
+    : await Promise.all([
+        Promise.resolve({ data: null }),
+        Promise.resolve({ data: null }),
+        supabase
+          .from('companies')
+          .select('name')
+          .eq('id', profile.company_id)
+          .single(),
+      ]);
 
   const extraCompanies = extraCompaniesResult.data ?? [];
   const allLocations = allLocationsResult.data ?? [];
+  const primaryCompanyName = primaryCompanyResult.data?.name ?? '';
 
   // Fetch GA users with location_id for transfer dialog
   const { data: gaUsersData } = await supabase
@@ -195,6 +209,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
               initialOpen={action === 'create'}
               extraCompanies={extraCompanies}
               allLocations={allLocations}
+              primaryCompanyName={primaryCompanyName}
             />
           )}
         </div>

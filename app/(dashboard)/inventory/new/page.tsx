@@ -38,13 +38,23 @@ export default async function NewAssetPage() {
     .is('deleted_at', null)
     .order('name');
 
-  // Fetch active locations for this company
-  const { data: locations } = await supabase
-    .from('locations')
-    .select('id, name')
-    .eq('company_id', profile.company_id)
-    .is('deleted_at', null)
-    .order('name');
+  // Fetch active locations and primary company name in parallel
+  const [locationsResult, primaryCompanyResult] = await Promise.all([
+    supabase
+      .from('locations')
+      .select('id, name')
+      .eq('company_id', profile.company_id)
+      .is('deleted_at', null)
+      .order('name'),
+    supabase
+      .from('companies')
+      .select('name')
+      .eq('id', profile.company_id)
+      .single(),
+  ]);
+
+  const locations = locationsResult.data;
+  const primaryCompanyName = primaryCompanyResult.data?.name ?? '';
 
   return (
     <div className="space-y-6 py-6">
@@ -60,6 +70,7 @@ export default async function NewAssetPage() {
       <AssetSubmitForm
         categories={categories ?? []}
         locations={locations ?? []}
+        primaryCompanyName={primaryCompanyName}
       />
     </div>
   );

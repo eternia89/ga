@@ -94,6 +94,7 @@ interface JobModalProps {
   // Multi-company access support
   extraCompanies?: { id: string; name: string }[];
   allLocations?: { id: string; name: string; company_id: string }[];
+  primaryCompanyName?: string;
 }
 
 // ============================================================================
@@ -129,6 +130,7 @@ export function JobModal({
   companyBudgetThreshold,
   extraCompanies,
   allLocations: createAllLocations,
+  primaryCompanyName,
 }: JobModalProps) {
   const router = useRouter();
 
@@ -872,6 +874,7 @@ export function JobModal({
             companyBudgetThreshold={companyBudgetThreshold}
             extraCompanies={extraCompanies}
             allLocations={createAllLocations}
+            primaryCompanyName={primaryCompanyName}
             onSuccess={() => {
               handleDialogOpenChange(false);
               router.refresh();

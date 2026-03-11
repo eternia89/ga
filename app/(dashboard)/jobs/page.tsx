@@ -63,7 +63,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
   const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
 
-  const [jobsResult, usersResult, locationsResult, allCategoriesResult, allUsersResult, eligibleRequestsResult, budgetThresholdResult, extraCompaniesResult, allLocationsResult] = await Promise.all([
+  const [jobsResult, usersResult, locationsResult, allCategoriesResult, allUsersResult, eligibleRequestsResult, budgetThresholdResult, extraCompaniesResult, allLocationsResult, primaryCompanyResult] = await Promise.all([
     jobsQuery,
 
     // GA Staff/Lead users for PIC filter
@@ -134,6 +134,13 @@ export default async function JobsPage({ searchParams }: PageProps) {
           .is('deleted_at', null)
           .order('name')
       : Promise.resolve({ data: null }),
+
+    // Primary company name for the always-visible Company field
+    supabase
+      .from('companies')
+      .select('name')
+      .eq('id', profile.company_id)
+      .single(),
   ]);
 
   const jobs = (jobsResult.data ?? []) as unknown as import('@/lib/types/database').JobWithRelations[];
@@ -145,6 +152,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const companyBudgetThreshold = budgetThresholdResult.data ? parseInt(budgetThresholdResult.data.value, 10) : null;
   const extraCompanies = extraCompaniesResult.data ?? [];
   const allLocations = allLocationsResult.data ?? [];
+  const primaryCompanyName = primaryCompanyResult.data?.name ?? '';
 
   // Rule 3: Exclude requests already linked to any job
   const { data: alreadyLinkedData } = await supabase
@@ -228,6 +236,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
               initialOpen={action === 'create'}
               extraCompanies={extraCompanies}
               allLocations={allLocations}
+              primaryCompanyName={primaryCompanyName}
             />
           )}
         </div>

@@ -56,7 +56,7 @@ export default async function RequestsPage({ searchParams }: PageProps) {
   const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
 
   // Fetch all data in parallel
-  const [requestsResult, categoriesResult, usersResult, locationsResult, extraCompaniesResult, allLocationsResult] = await Promise.all([
+  const [requestsResult, categoriesResult, usersResult, locationsResult, extraCompaniesResult, allLocationsResult, primaryCompanyResult] = await Promise.all([
     requestQuery,
     supabase
       .from('categories')
@@ -95,6 +95,12 @@ export default async function RequestsPage({ searchParams }: PageProps) {
           .is('deleted_at', null)
           .order('name')
       : Promise.resolve({ data: null }),
+    // Primary company name for the always-visible Company field
+    supabase
+      .from('companies')
+      .select('name')
+      .eq('id', profile.company_id)
+      .single(),
   ]);
 
   const requests = requestsResult.data ?? [];
@@ -103,6 +109,7 @@ export default async function RequestsPage({ searchParams }: PageProps) {
   const locations = locationsResult.data ?? [];
   const extraCompanies = extraCompaniesResult.data ?? [];
   const allLocations = allLocationsResult.data ?? [];
+  const primaryCompanyName = primaryCompanyResult.data?.name ?? '';
 
   // Batch-fetch photos for all requests
   const requestIds = requests.map((r) => r.id);
@@ -169,6 +176,7 @@ export default async function RequestsPage({ searchParams }: PageProps) {
             initialOpen={action === 'create'}
             extraCompanies={extraCompanies}
             allLocations={allLocations}
+            primaryCompanyName={primaryCompanyName}
           />
         </div>
       </div>
