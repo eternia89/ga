@@ -322,10 +322,11 @@ Recent decisions affecting current work:
 | 50 | Approval queue estimated cost text-base removed, matches table cell size | 2026-03-10 | 783110e | Verified | [42-approval-queue-estimated-costs-should-di](./quick/42-approval-queue-estimated-costs-should-di/) |
 | 51 | photos should be before save changes button. remain consistent throughout the app. clicking save changes will save the photos, and other edited fields | 2026-03-10 | 4e450ce | | [39-photos-should-be-before-save-changes-but](./quick/39-photos-should-be-before-save-changes-but/) |
 | 52 | clear icon in photo upload modal is black and invisible against the dark/black background — fix icon color to be visible | 2026-03-11 | 4b00700 | Verified | [43-clear-icon-in-photo-upload-modal-is-blac](./quick/43-clear-icon-in-photo-upload-modal-is-blac/) |
+| 53 | Move Change Status action for assets from view modal sticky bar to table row actions | 2026-03-11 | a5a9b78 | Complete | [44-move-change-status-action-for-assets-fro](./quick/44-move-change-status-action-for-assets-fro/) |
 
 ## Session Continuity
 
-Last session: 2026-03-10
-Stopped at: Completed quick task 52: clear icon in photo upload modal fix
+Last session: 2026-03-11
+Stopped at: Completed quick task 53: Move Change Status to asset table row actions
 Resume file: None
 Next: Ready for next task
