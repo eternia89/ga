@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/combobox';
 import { PhotoUpload } from '@/components/media/photo-upload';
@@ -30,9 +31,10 @@ interface RequestSubmitFormProps {
   onSuccess?: () => void;
   extraCompanies?: { id: string; name: string }[];
   allLocations?: { id: string; name: string; company_id: string }[];
+  primaryCompanyName: string;
 }
 
-export function RequestSubmitForm({ locations, onSuccess, extraCompanies, allLocations }: RequestSubmitFormProps) {
+export function RequestSubmitForm({ locations, onSuccess, extraCompanies, allLocations, primaryCompanyName }: RequestSubmitFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -119,10 +121,10 @@ export function RequestSubmitForm({ locations, onSuccess, extraCompanies, allLoc
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-6 ${onSuccess ? '' : 'max-w-2xl'}`}>
-        {/* Company selector — only shown when user has extra company access */}
-        {extraCompanies && extraCompanies.length > 1 && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Company</label>
+        {/* Company field — always visible */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Company</label>
+          {extraCompanies && extraCompanies.length > 1 ? (
             <Combobox
               options={extraCompanies.map(c => ({ label: c.name, value: c.id }))}
               value={selectedCompanyId ?? extraCompanies[0].id}
@@ -135,8 +137,14 @@ export function RequestSubmitForm({ locations, onSuccess, extraCompanies, allLoc
               emptyText="No companies found"
               disabled={isSubmitting}
             />
-          </div>
-        )}
+          ) : (
+            <Input
+              value={primaryCompanyName}
+              disabled
+              className="bg-muted text-muted-foreground cursor-not-allowed"
+            />
+          )}
+        </div>
 
         {/* Description */}
         <FormField

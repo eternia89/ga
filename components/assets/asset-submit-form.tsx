@@ -44,13 +44,14 @@ interface AssetSubmitFormProps {
   onSuccess?: () => void;
   extraCompanies?: { id: string; name: string }[];
   allLocations?: { id: string; name: string; company_id: string }[];
+  primaryCompanyName: string;
 }
 
 const MAX_INVOICE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 const ALLOWED_INVOICE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 const MAX_INVOICES = 5;
 
-export function AssetSubmitForm({ categories, locations, onSuccess, extraCompanies, allLocations }: AssetSubmitFormProps) {
+export function AssetSubmitForm({ categories, locations, onSuccess, extraCompanies, allLocations, primaryCompanyName }: AssetSubmitFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -230,10 +231,10 @@ export function AssetSubmitForm({ categories, locations, onSuccess, extraCompani
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
-        {/* Company selector — only shown when user has extra company access */}
-        {extraCompanies && extraCompanies.length > 1 && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Company</label>
+        {/* Company field — always visible */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Company</label>
+          {extraCompanies && extraCompanies.length > 1 ? (
             <Combobox
               options={extraCompanies.map(c => ({ label: c.name, value: c.id }))}
               value={selectedCompanyId ?? extraCompanies[0].id}
@@ -246,8 +247,14 @@ export function AssetSubmitForm({ categories, locations, onSuccess, extraCompani
               emptyText="No companies found"
               disabled={isSubmitting}
             />
-          </div>
-        )}
+          ) : (
+            <Input
+              value={primaryCompanyName}
+              disabled
+              className="bg-muted text-muted-foreground cursor-not-allowed"
+            />
+          )}
+        </div>
 
         {/* Section 1: Asset Details */}
         <div className="space-y-4">

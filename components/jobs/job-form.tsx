@@ -95,6 +95,8 @@ interface JobFormProps {
   /** Multi-company access support */
   extraCompanies?: { id: string; name: string }[];
   allLocations?: { id: string; name: string; company_id: string }[];
+  /** Primary company name for the always-visible Company field (create mode only) */
+  primaryCompanyName?: string;
   /** For view mode: linked request objects with status info for read-only display */
   linkedRequestDetails?: {
     id: string;
@@ -128,6 +130,7 @@ export function JobForm({
   picLocked = false,
   extraCompanies,
   allLocations,
+  primaryCompanyName,
   linkedRequestDetails,
   companyBudgetThreshold,
   onSuccess,
@@ -314,22 +317,30 @@ export function JobForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-6 ${onSuccess ? '' : 'max-w-2xl'}`}>
-        {/* Company selector — only shown in create mode when user has extra company access */}
-        {mode === 'create' && extraCompanies && extraCompanies.length > 1 && (
+        {/* Company field — always visible in create mode */}
+        {mode === 'create' && (
           <div className="space-y-2">
             <label className="text-sm font-medium">Company</label>
-            <Combobox
-              options={extraCompanies.map(c => ({ label: c.name, value: c.id }))}
-              value={selectedCompanyId ?? extraCompanies[0].id}
-              onValueChange={(val) => {
-                setSelectedCompanyId(val);
-                form.setValue('location_id', '');
-              }}
-              placeholder="Select company"
-              searchPlaceholder="Search companies..."
-              emptyText="No companies found"
-              disabled={disabled}
-            />
+            {extraCompanies && extraCompanies.length > 1 ? (
+              <Combobox
+                options={extraCompanies.map(c => ({ label: c.name, value: c.id }))}
+                value={selectedCompanyId ?? extraCompanies[0].id}
+                onValueChange={(val) => {
+                  setSelectedCompanyId(val);
+                  form.setValue('location_id', '');
+                }}
+                placeholder="Select company"
+                searchPlaceholder="Search companies..."
+                emptyText="No companies found"
+                disabled={disabled}
+              />
+            ) : (
+              <Input
+                value={primaryCompanyName ?? ''}
+                disabled
+                className="bg-muted text-muted-foreground cursor-not-allowed"
+              />
+            )}
           </div>
         )}
 
