@@ -82,7 +82,6 @@ export function AssetViewModal({
   const [gaUsers, setGaUsers] = useState<{ id: string; name: string; location_id: string | null }[]>([]);
 
   // Creator name (fetched separately since InventoryItemWithRelations doesn't include it)
-  const [creatorName, setCreatorName] = useState<string>('');
 
   // UI states
   const [loading, setLoading] = useState(false);
@@ -138,7 +137,7 @@ export function AssetViewModal({
       // Fetch asset with relations
       const { data: assetData, error: assetError } = await supabase
         .from('inventory_items')
-        .select('*, category:categories(name), location:locations(name), company:companies(name), created_by_user:user_profiles!created_by(full_name)')
+        .select('*, category:categories(name), location:locations(name), company:companies(name)')
         .eq('id', id)
         .is('deleted_at', null)
         .single();
@@ -151,7 +150,6 @@ export function AssetViewModal({
 
       const fetchedAsset = assetData as unknown as InventoryItemWithRelations;
       setAsset(fetchedAsset);
-      setCreatorName((assetData as unknown as { created_by_user?: { full_name?: string } | null }).created_by_user?.full_name ?? 'Unknown');
 
       const companyId = fetchedAsset.company_id;
 
@@ -324,7 +322,6 @@ export function AssetViewModal({
     } else {
       // Reset state when modal closes
       setAsset(null);
-      setCreatorName('');
       setPendingTransfer(null);
       setConditionPhotos([]);
       setInvoices([]);
@@ -482,7 +479,7 @@ export function AssetViewModal({
                   showInTransit={!!pendingTransfer}
                 />
                 <span className="text-sm text-muted-foreground">
-                  Created {format(new Date(asset.created_at), 'dd-MM-yyyy')} by {creatorName}
+                  Created {format(new Date(asset.created_at), 'dd-MM-yyyy')}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground mt-0.5">
