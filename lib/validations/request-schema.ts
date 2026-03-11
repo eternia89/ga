@@ -6,6 +6,7 @@ export const requestSubmitSchema = z.object({
     .min(10, 'Description must be at least 10 characters')
     .max(1000, 'Description must be under 1000 characters'),
   location_id: z.string().uuid({ message: 'Location is required' }),
+  company_id: z.string().uuid().optional(),
 });
 
 export type RequestSubmitFormData = z.infer<typeof requestSubmitSchema>;

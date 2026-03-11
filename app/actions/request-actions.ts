@@ -21,9 +21,23 @@ export const createRequest = authActionClient
       throw new Error('Your account has no division assigned. Contact your administrator.');
     }
 
+    // Determine effective company_id (multi-company access support)
+    const effectiveCompanyId = parsedInput.company_id ?? profile.company_id;
+
+    // Validate extra company access if a different company was selected
+    if (parsedInput.company_id && parsedInput.company_id !== profile.company_id) {
+      const { data: access } = await supabase
+        .from('user_company_access')
+        .select('id')
+        .eq('user_id', profile.id)
+        .eq('company_id', parsedInput.company_id)
+        .single();
+      if (!access) throw new Error('You do not have access to the selected company.');
+    }
+
     // Generate display_id atomically via DB function
     const { data: displayId, error: rpcError } = await supabase
-      .rpc('generate_request_display_id', { p_company_id: profile.company_id });
+      .rpc('generate_request_display_id', { p_company_id: effectiveCompanyId });
 
     if (rpcError || !displayId) {
       const msg = rpcError?.message || '';
@@ -39,7 +53,7 @@ export const createRequest = authActionClient
     const { data, error } = await supabase
       .from('requests')
       .insert({
-        company_id: profile.company_id,
+        company_id: effectiveCompanyId,
         division_id: profile.division_id,
         location_id: parsedInput.location_id,
         requester_id: profile.id,

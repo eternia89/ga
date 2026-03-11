@@ -47,8 +47,16 @@ export default async function RequestsPage({ searchParams }: PageProps) {
   }
   // All other roles see all company requests (RLS enforces company isolation)
 
+  // Fetch user's extra company access
+  const { data: companyAccessRows } = await supabase
+    .from('user_company_access')
+    .select('company_id')
+    .eq('user_id', profile.id);
+  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
   // Fetch all data in parallel
-  const [requestsResult, categoriesResult, usersResult, locationsResult] = await Promise.all([
+  const [requestsResult, categoriesResult, usersResult, locationsResult, extraCompaniesResult, allLocationsResult] = await Promise.all([
     requestQuery,
     supabase
       .from('categories')
@@ -62,19 +70,39 @@ export default async function RequestsPage({ searchParams }: PageProps) {
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .order('full_name'),
-    // Locations for the create dialog
+    // Locations for the create dialog (primary company)
     supabase
       .from('locations')
       .select('id, name')
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .order('name'),
+    // Companies for multi-company selector (only if user has extra access)
+    extraCompanyIds.length > 0
+      ? supabase
+          .from('companies')
+          .select('id, name')
+          .in('id', allAccessibleCompanyIds)
+          .is('deleted_at', null)
+          .order('name')
+      : Promise.resolve({ data: null }),
+    // All locations across accessible companies (only if user has extra access)
+    extraCompanyIds.length > 0
+      ? supabase
+          .from('locations')
+          .select('id, name, company_id')
+          .in('company_id', allAccessibleCompanyIds)
+          .is('deleted_at', null)
+          .order('name')
+      : Promise.resolve({ data: null }),
   ]);
 
   const requests = requestsResult.data ?? [];
   const categories = categoriesResult.data ?? [];
   const users = usersResult.data ?? [];
   const locations = locationsResult.data ?? [];
+  const extraCompanies = extraCompaniesResult.data ?? [];
+  const allLocations = allLocationsResult.data ?? [];
 
   // Batch-fetch photos for all requests
   const requestIds = requests.map((r) => r.id);
@@ -136,7 +164,12 @@ export default async function RequestsPage({ searchParams }: PageProps) {
           {['ga_lead', 'admin', 'finance_approver'].includes(profile.role) && (
             <ExportButton exportUrl="/api/exports/requests" />
           )}
-          <RequestCreateDialog locations={locations} initialOpen={action === 'create'} />
+          <RequestCreateDialog
+            locations={locations}
+            initialOpen={action === 'create'}
+            extraCompanies={extraCompanies}
+            allLocations={allLocations}
+          />
         </div>
       </div>
 

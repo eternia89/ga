@@ -20,9 +20,11 @@ interface Location {
 interface RequestCreateDialogProps {
   locations: Location[];
   initialOpen?: boolean;
+  extraCompanies?: { id: string; name: string }[];
+  allLocations?: { id: string; name: string; company_id: string }[];
 }
 
-export function RequestCreateDialog({ locations, initialOpen }: RequestCreateDialogProps) {
+export function RequestCreateDialog({ locations, initialOpen, extraCompanies, allLocations }: RequestCreateDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(initialOpen ?? false);
 
@@ -39,6 +41,8 @@ export function RequestCreateDialog({ locations, initialOpen }: RequestCreateDia
           </DialogHeader>
           <RequestSubmitForm
             locations={locations}
+            extraCompanies={extraCompanies}
+            allLocations={allLocations}
             onSuccess={() => {
               setOpen(false);
               router.refresh();

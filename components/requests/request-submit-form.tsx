@@ -28,15 +28,22 @@ interface Location {
 interface RequestSubmitFormProps {
   locations: Location[];
   onSuccess?: () => void;
+  extraCompanies?: { id: string; name: string }[];
+  allLocations?: { id: string; name: string; company_id: string }[];
 }
 
-export function RequestSubmitForm({ locations, onSuccess }: RequestSubmitFormProps) {
+export function RequestSubmitForm({ locations, onSuccess, extraCompanies, allLocations }: RequestSubmitFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
 
-  const locationOptions = locations.map((loc) => ({
+  // Use all locations filtered by selected company when multi-company mode, else primary locations
+  const locationOptions = (selectedCompanyId && allLocations && allLocations.length > 0
+    ? allLocations.filter(l => l.company_id === selectedCompanyId)
+    : locations
+  ).map((loc) => ({
     label: loc.name,
     value: loc.id,
   }));
@@ -54,8 +61,12 @@ export function RequestSubmitForm({ locations, onSuccess }: RequestSubmitFormPro
     setError(null);
 
     try {
-      // Step 1: Create the request
-      const result = await createRequest(data);
+      // Step 1: Create the request (include selected company if multi-company mode)
+      const effectiveCompanyId =
+        extraCompanies && extraCompanies.length > 1 && selectedCompanyId
+          ? selectedCompanyId
+          : undefined;
+      const result = await createRequest({ ...data, company_id: effectiveCompanyId });
 
       if (result?.serverError) {
         setError(result.serverError);
@@ -90,6 +101,9 @@ export function RequestSubmitForm({ locations, onSuccess }: RequestSubmitFormPro
       }
 
       // Close dialog or redirect to request list
+      // Reset company selection on success
+      setSelectedCompanyId(null);
+
       if (onSuccess) {
         onSuccess();
       } else {
@@ -105,6 +119,25 @@ export function RequestSubmitForm({ locations, onSuccess }: RequestSubmitFormPro
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-6 ${onSuccess ? '' : 'max-w-2xl'}`}>
+        {/* Company selector — only shown when user has extra company access */}
+        {extraCompanies && extraCompanies.length > 1 && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Company</label>
+            <Combobox
+              options={extraCompanies.map(c => ({ label: c.name, value: c.id }))}
+              value={selectedCompanyId ?? extraCompanies[0].id}
+              onValueChange={(val) => {
+                setSelectedCompanyId(val);
+                form.setValue('location_id', '');
+              }}
+              placeholder="Select company"
+              searchPlaceholder="Search companies..."
+              emptyText="No companies found"
+              disabled={isSubmitting}
+            />
+          </div>
+        )}
+
         {/* Description */}
         <FormField
           control={form.control}
