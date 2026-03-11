@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Completed quick task 45: Consistent two-line view modal headers"
+stopped_at: "Completed quick task 46: Multi-company user access in user settings + create modals"
 last_updated: "2026-03-11T00:00:00Z"
-last_activity: "2026-03-11 - Completed quick task 45: Consistent two-line view modal headers across all 5 domain entity view modals"
+last_activity: "2026-03-11 - Completed quick task 46: Multi-company user access — DB table, admin checkboxes in user settings, Company selector in New Request/Job/Asset modals"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -325,10 +325,11 @@ Recent decisions affecting current work:
 | 53 | Move Change Status action for assets from view modal sticky bar to table row actions | 2026-03-11 | a5a9b78 | Complete | [44-move-change-status-action-for-assets-fro](./quick/44-move-change-status-action-for-assets-fro/) |
 
 | 54 | All view modals implement consistent two-line header: identifier on line 1, badges + created by on line 2 | 2026-03-11 | 4dd4341 | Verified | [45-all-view-modals-should-implement-a-consi](./quick/45-all-view-modals-should-implement-a-consi/) |
+| 55 | Multi-company user access: admin grants extra company access in user settings; Company selector in New Request/Job/Asset modals | 2026-03-11 | a866a24 | Complete | [46-multi-company-user-access-in-user-settin](./quick/46-multi-company-user-access-in-user-settin/) |
 
 ## Session Continuity
 
 Last session: 2026-03-11
-Stopped at: Completed quick task 45: Consistent two-line view modal headers
+Stopped at: Completed quick task 46: Multi-company user access in user settings + create modals
 Resume file: None
 Next: Ready for next task
