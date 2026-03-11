@@ -329,7 +329,7 @@ Recent decisions affecting current work:
 | 56 | Add permalink URL sync (?action=create) to New Job and New Asset create modals — bidirectional sync on open and close | 2026-03-11 | dd971dc | Needs Review | [47-add-permalink-support-to-new-job-and-new](./quick/47-add-permalink-support-to-new-job-and-new/) |
 | 57 | GA Staff can self-assign submitted requests and create jobs; status guard prevents overriding GA Lead assignments | 2026-03-11 | c415b94 | Needs Review | [48-ga-staff-should-be-able-to-self-assign-r](./quick/48-ga-staff-should-be-able-to-self-assign-r/) |
 | 58 | Fix company-based data isolation: push migrations, expand RLS SELECT policies for multi-company access, seed test data | 2026-03-11 | 849ffbb | Verified | [49-fix-company-based-data-isolation-user-co](./quick/49-fix-company-based-data-isolation-user-co/) |
-| 59 | All insertion modals always show Company field — disabled Input for single-company, interactive Combobox for multi-company | 2026-03-11 | b4037e3 | Complete | [50-all-insertion-modals-show-company-field-](./quick/50-all-insertion-modals-show-company-field-/) |
+| 59 | All insertion modals always show Company field — disabled Input for single-company, interactive Combobox for multi-company | 2026-03-11 | b4037e3 | Verified | [50-all-insertion-modals-show-company-field-](./quick/50-all-insertion-modals-show-company-field-/) |
 
 ## Session Continuity
 
