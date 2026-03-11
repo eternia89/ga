@@ -324,7 +324,7 @@ Recent decisions affecting current work:
 | 52 | clear icon in photo upload modal is black and invisible against the dark/black background — fix icon color to be visible | 2026-03-11 | 4b00700 | Verified | [43-clear-icon-in-photo-upload-modal-is-blac](./quick/43-clear-icon-in-photo-upload-modal-is-blac/) |
 | 53 | Move Change Status action for assets from view modal sticky bar to table row actions | 2026-03-11 | a5a9b78 | Complete | [44-move-change-status-action-for-assets-fro](./quick/44-move-change-status-action-for-assets-fro/) |
 
-| 54 | All view modals implement consistent two-line header: identifier on line 1, badges + created by on line 2 | 2026-03-11 | 4dd4341 | Complete | [45-all-view-modals-should-implement-a-consi](./quick/45-all-view-modals-should-implement-a-consi/) |
+| 54 | All view modals implement consistent two-line header: identifier on line 1, badges + created by on line 2 | 2026-03-11 | 4dd4341 | Verified | [45-all-view-modals-should-implement-a-consi](./quick/45-all-view-modals-should-implement-a-consi/) |
 
 ## Session Continuity
 
