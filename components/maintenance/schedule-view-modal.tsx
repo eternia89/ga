@@ -71,6 +71,7 @@ export function ScheduleViewModal({
   // Data states
   const [schedule, setSchedule] = useState<MaintenanceSchedule | null>(null);
   const [pmJobs, setPmJobs] = useState<PMJobRef[]>([]);
+  const [creatorName, setCreatorName] = useState<string>('');
 
   // UI states
   const [loading, setLoading] = useState(false);
@@ -121,7 +122,8 @@ export function ScheduleViewModal({
             is_paused, paused_at, paused_reason, is_active,
             deleted_at, created_at, updated_at,
             template:maintenance_templates(name, checklist),
-            asset:inventory_items(name, display_id)
+            asset:inventory_items(name, display_id),
+            created_by_user:user_profiles!created_by(full_name)
           `)
           .eq('id', id)
           .is('deleted_at', null)
@@ -157,6 +159,7 @@ export function ScheduleViewModal({
       };
 
       setSchedule(normalized);
+      setCreatorName((scheduleResult.data as unknown as { created_by_user?: { full_name?: string } | null }).created_by_user?.full_name ?? 'Unknown');
 
       const jobs: PMJobRef[] = (pmJobsResult.data ?? []).map((j) => ({
         id: j.id,
@@ -178,6 +181,7 @@ export function ScheduleViewModal({
     } else {
       setSchedule(null);
       setPmJobs([]);
+      setCreatorName('');
       setError(null);
     }
   }, [scheduleId, refreshKey, fetchData]);
@@ -325,6 +329,8 @@ export function ScheduleViewModal({
                 <h2 className="text-xl font-bold tracking-tight truncate max-w-[400px]">
                   {schedule.template?.name ?? 'Schedule'}
                 </h2>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
                 <ScheduleStatusBadge
                   schedule={{
                     is_active: schedule.is_active,
@@ -332,8 +338,11 @@ export function ScheduleViewModal({
                     paused_reason: schedule.paused_reason,
                   }}
                 />
+                <span className="text-sm text-muted-foreground">
+                  Created {format(new Date(schedule.created_at), 'dd-MM-yyyy')} by {creatorName}
+                </span>
               </div>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {schedule.asset?.name && (
                   <>
                     Asset: {schedule.asset.name}
@@ -342,7 +351,6 @@ export function ScheduleViewModal({
                   </>
                 )}
                 {schedule.interval_days} {schedule.interval_days === 1 ? 'day' : 'days'} ({schedule.interval_type})
-                {' \u00b7 '}Created {format(new Date(schedule.created_at), 'dd-MM-yyyy')}
               </p>
             </div>
 

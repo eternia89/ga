@@ -81,6 +81,9 @@ export function AssetViewModal({
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([]);
   const [gaUsers, setGaUsers] = useState<{ id: string; name: string; location_id: string | null }[]>([]);
 
+  // Creator name (fetched separately since InventoryItemWithRelations doesn't include it)
+  const [creatorName, setCreatorName] = useState<string>('');
+
   // UI states
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -135,7 +138,7 @@ export function AssetViewModal({
       // Fetch asset with relations
       const { data: assetData, error: assetError } = await supabase
         .from('inventory_items')
-        .select('*, category:categories(name), location:locations(name), company:companies(name)')
+        .select('*, category:categories(name), location:locations(name), company:companies(name), created_by_user:user_profiles!created_by(full_name)')
         .eq('id', id)
         .is('deleted_at', null)
         .single();
@@ -148,6 +151,7 @@ export function AssetViewModal({
 
       const fetchedAsset = assetData as unknown as InventoryItemWithRelations;
       setAsset(fetchedAsset);
+      setCreatorName((assetData as unknown as { created_by_user?: { full_name?: string } | null }).created_by_user?.full_name ?? 'Unknown');
 
       const companyId = fetchedAsset.company_id;
 
@@ -320,6 +324,7 @@ export function AssetViewModal({
     } else {
       // Reset state when modal closes
       setAsset(null);
+      setCreatorName('');
       setPendingTransfer(null);
       setConditionPhotos([]);
       setInvoices([]);
@@ -470,16 +475,20 @@ export function AssetViewModal({
                 <h2 className="text-xl font-bold tracking-tight font-mono">
                   {asset.display_id}
                 </h2>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
                 <AssetStatusBadge
                   status={asset.status}
                   showInTransit={!!pendingTransfer}
                 />
+                <span className="text-sm text-muted-foreground">
+                  Created {format(new Date(asset.created_at), 'dd-MM-yyyy')} by {creatorName}
+                </span>
               </div>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {asset.name}
                 {asset.category?.name && ` \u00b7 ${asset.category.name}`}
                 {asset.location?.name && ` \u00b7 ${asset.location.name}`}
-                {' \u00b7 '}Created {format(new Date(asset.created_at), 'dd-MM-yyyy')}
               </p>
             </div>
 

@@ -64,6 +64,7 @@ export function TemplateViewModal({
   // Data states
   const [template, setTemplate] = useState<MaintenanceTemplate | null>(null);
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [creatorName, setCreatorName] = useState<string>('');
 
   // UI states
   const [loading, setLoading] = useState(false);
@@ -111,7 +112,8 @@ export function TemplateViewModal({
           .select(`
             id, company_id, category_id, name, description,
             checklist, is_active, deleted_at, created_at, updated_at,
-            category:categories(name, type)
+            category:categories(name, type),
+            created_by_user:user_profiles!created_by(full_name)
           `)
           .eq('id', id)
           .is('deleted_at', null)
@@ -143,6 +145,7 @@ export function TemplateViewModal({
       };
 
       setTemplate(normalized);
+      setCreatorName((templateResult.data as unknown as { created_by_user?: { full_name?: string } | null }).created_by_user?.full_name ?? 'Unknown');
       setCategories(categoriesResult.data ?? []);
     } catch {
       setError('Failed to load template details');
@@ -157,6 +160,7 @@ export function TemplateViewModal({
     } else {
       setTemplate(null);
       setCategories([]);
+      setCreatorName('');
       setError(null);
     }
   }, [templateId, refreshKey, fetchData]);
@@ -290,6 +294,8 @@ export function TemplateViewModal({
                 <h2 className="text-xl font-bold tracking-tight truncate max-w-[400px]">
                   {template.name}
                 </h2>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
                 {template.is_active ? (
                   <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
                     Active
@@ -299,11 +305,13 @@ export function TemplateViewModal({
                     Inactive
                   </span>
                 )}
+                <span className="text-sm text-muted-foreground">
+                  Created {format(new Date(template.created_at), 'dd-MM-yyyy')} by {creatorName}
+                </span>
               </div>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {template.category?.name && `${template.category.name} \u00b7 `}
                 {template.item_count ?? template.checklist.length} checklist item{(template.item_count ?? template.checklist.length) !== 1 ? 's' : ''}
-                {' \u00b7 '}Created {format(new Date(template.created_at), 'dd-MM-yyyy')}
               </p>
             </div>
 
