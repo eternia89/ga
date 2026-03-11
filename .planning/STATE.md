@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-10 - Completed quick task 51: photos should be before save changes button
+Last activity: 2026-03-11 - Completed quick task 52: clear icon in photo upload modal is black and invisible against the dark/black background — fix icon color to be visible
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -321,10 +321,11 @@ Recent decisions affecting current work:
 | 49 | Job table: photo thumbnail column with lightbox | 2026-03-10 | 66b0d2c | Verified | [41-job-table-list-display-job-photos-thumbn](./quick/41-job-table-list-display-job-photos-thumbn/) |
 | 50 | Approval queue estimated cost text-base removed, matches table cell size | 2026-03-10 | 783110e | Verified | [42-approval-queue-estimated-costs-should-di](./quick/42-approval-queue-estimated-costs-should-di/) |
 | 51 | photos should be before save changes button. remain consistent throughout the app. clicking save changes will save the photos, and other edited fields | 2026-03-10 | 4e450ce | | [39-photos-should-be-before-save-changes-but](./quick/39-photos-should-be-before-save-changes-but/) |
+| 52 | clear icon in photo upload modal is black and invisible against the dark/black background — fix icon color to be visible | 2026-03-11 | 4b00700 | Verified | [43-clear-icon-in-photo-upload-modal-is-blac](./quick/43-clear-icon-in-photo-upload-modal-is-blac/) |
 
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Completed quick task 51: photos should be before save changes button
+Stopped at: Completed quick task 52: clear icon in photo upload modal fix
 Resume file: None
 Next: Ready for next task
