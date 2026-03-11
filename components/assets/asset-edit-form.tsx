@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X, FileText } from 'lucide-react';
@@ -52,6 +52,8 @@ interface AssetEditFormProps {
   existingInvoices?: ExistingInvoice[];
   onSuccess: () => void;
   onSubmittingChange?: (submitting: boolean) => void;
+  formId?: string;
+  onDirtyChange?: (isDirty: boolean) => void;
 }
 
 export function AssetEditForm({
@@ -62,6 +64,8 @@ export function AssetEditForm({
   existingInvoices = [],
   onSuccess,
   onSubmittingChange,
+  formId,
+  onDirtyChange,
 }: AssetEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -94,6 +98,11 @@ export function AssetEditForm({
       warranty_expiry: asset.warranty_expiry ?? '',
     },
   });
+
+  const formIsDirty = form.formState.isDirty;
+  useEffect(() => {
+    onDirtyChange?.(formIsDirty);
+  }, [formIsDirty, onDirtyChange]);
 
   const handleExistingPhotoRemove = (photoId: string) => {
     setDeletedPhotoIds((prev) => [...prev, photoId]);
@@ -237,7 +246,7 @@ export function AssetEditForm({
 
   return (
     <Form {...form}>
-      <form id="asset-edit-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form id={formId ?? 'asset-edit-form'} onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Section 1: Asset Details */}
         <div className="space-y-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">

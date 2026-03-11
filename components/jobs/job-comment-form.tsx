@@ -198,7 +198,7 @@ export function JobCommentForm({ jobId, jobStatus, onSuccess }: JobCommentFormPr
             />
           )}
 
-          <Button type="submit" size="sm" disabled={isSubmitting}>
+          <Button type="submit" size="sm" variant="outline" disabled={isSubmitting}>
             {isSubmitting ? 'Posting...' : 'Post Comment'}
           </Button>
         </form>

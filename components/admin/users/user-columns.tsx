@@ -95,19 +95,6 @@ export function getUserColumns(
       size: 150,
     },
     {
-      accessorKey: 'deleted_at',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
-      cell: ({ row }) => {
-        const deletedAt = row.getValue('deleted_at') as string | null;
-        return (
-          <Badge variant={deletedAt ? 'destructive' : 'default'}>
-            {deletedAt ? 'Deactivated' : 'Active'}
-          </Badge>
-        );
-      },
-      size: 100,
-    },
-    {
       accessorKey: 'company_id',
       header: () => null,
       cell: () => null,

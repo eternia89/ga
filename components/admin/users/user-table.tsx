@@ -224,6 +224,7 @@ export function UserTable({ users, companies, divisions, locations, defaultCompa
         onDeactivatedToggleChange={setShowDeactivated}
         onBulkDelete={handleBulkDeactivate}
         onBulkExport={handleBulkExport}
+        getRowClassName={(row) => (row.deleted_at ? "bg-muted/40" : "")}
         emptyMessage="No users found"
       />
 

@@ -17,7 +17,9 @@ import {
   updateJobStatus,
   cancelJob,
   assignJob,
+  deleteJobAttachment,
 } from '@/app/actions/job-actions';
+import { PhotoUpload, ExistingPhoto } from '@/components/media/photo-upload';
 import {
   approveJob,
   rejectJob,
@@ -133,6 +135,7 @@ export function JobModal({
   const [timelineEvents, setTimelineEvents] = useState<JobTimelineEvent[]>([]);
   const [comments, setComments] = useState<JobComment[]>([]);
   const [commentPhotos, setCommentPhotos] = useState<PhotoItem[]>([]);
+  const [jobPhotoUrls, setJobPhotoUrls] = useState<ExistingPhoto[]>([]);
   const [viewCategories, setViewCategories] = useState<{ id: string; name: string }[]>([]);
   const [viewLocations, setViewLocations] = useState<{ id: string; name: string }[]>([]);
   const [viewUsers, setViewUsers] = useState<{ id: string; name: string }[]>([]);
@@ -380,6 +383,31 @@ export function JobModal({
       }
       setCommentPhotos(fetchedCommentPhotos);
 
+      // Fetch job-level photos (entity_type='job')
+      const { data: jobAttachments } = await supabase
+        .from('media_attachments')
+        .select('id, file_name, file_path')
+        .eq('entity_type', 'job')
+        .eq('entity_id', id)
+        .is('deleted_at', null)
+        .order('sort_order', { ascending: true });
+
+      let fetchedJobPhotos: ExistingPhoto[] = [];
+      if (jobAttachments && jobAttachments.length > 0) {
+        const { data: signedUrls } = await supabase.storage
+          .from('job-photos')
+          .createSignedUrls(
+            jobAttachments.map((a) => a.file_path),
+            21600
+          );
+        fetchedJobPhotos = jobAttachments.map((attachment, index) => ({
+          id: attachment.id,
+          url: signedUrls?.[index]?.signedUrl ?? '',
+          fileName: attachment.file_name,
+        }));
+      }
+      setJobPhotoUrls(fetchedJobPhotos);
+
       // Batch-fetch performer names for audit logs
       const auditLogs = auditLogsResult.data ?? [];
       const performedByIds = [...new Set(auditLogs.map((log) => log.user_id).filter(Boolean))];
@@ -552,6 +580,7 @@ export function JobModal({
       setTimelineEvents([]);
       setComments([]);
       setCommentPhotos([]);
+      setJobPhotoUrls([]);
       setViewCategories([]);
       setViewLocations([]);
       setViewUsers([]);
@@ -1017,6 +1046,33 @@ export function JobModal({
                       }
                     />
                   )}
+
+                  {/* Job Photos */}
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Photos</p>
+                    <PhotoUpload
+                      onChange={async (files) => {
+                        for (const file of files) {
+                          const fd = new FormData();
+                          fd.append('entity_type', 'job');
+                          fd.append('entity_id', job.id);
+                          fd.append('photo', file);
+                          await fetch('/api/uploads/entity-photos', { method: 'POST', body: fd });
+                        }
+                        handleActionSuccess();
+                      }}
+                      existingPhotos={jobPhotoUrls}
+                      onRemoveExisting={canEdit ? async (attachmentId) => {
+                        await deleteJobAttachment({ attachmentId });
+                        handleActionSuccess();
+                      } : undefined}
+                      disabled={!canEdit}
+                      maxPhotos={10}
+                      showCount
+                      enableAnnotation
+                      enableMobileCapture={false}
+                    />
+                  </div>
                 </div>
 
                 {/* Right: Timeline (scrollable) */}

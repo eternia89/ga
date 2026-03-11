@@ -8,6 +8,7 @@ import { createNotifications } from '@/lib/notifications/helpers';
 import { highestPriority } from '@/lib/jobs/priority';
 import { formatIDR } from '@/lib/utils';
 import { advanceFloatingScheduleCore } from '@/app/actions/pm-job-actions';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 // ============================================================================
 // createJob — ga_lead or admin only
@@ -725,4 +726,62 @@ export const addJobComment = authActionClient
 
     revalidatePath(`/jobs/${parsedInput.job_id}`);
     return { success: true, commentId: comment.id };
+  });
+
+// ============================================================================
+// deleteJobAttachment — ga_lead or admin only; soft-deletes media_attachment
+// ============================================================================
+export const deleteJobAttachment = authActionClient
+  .schema(z.object({ attachmentId: z.string().uuid() }))
+  .action(async ({ parsedInput, ctx }) => {
+    const { supabase, profile } = ctx;
+
+    // Role check
+    if (!['ga_lead', 'admin'].includes(profile.role)) {
+      throw new Error('Only GA Lead or Admin can delete job photos');
+    }
+
+    // Fetch the attachment
+    const { data: attachment } = await supabase
+      .from('media_attachments')
+      .select('id, entity_id, entity_type, file_path')
+      .eq('id', parsedInput.attachmentId)
+      .is('deleted_at', null)
+      .single();
+
+    if (!attachment) {
+      throw new Error('Attachment not found');
+    }
+
+    // Verify entity_type is 'job'
+    if (attachment.entity_type !== 'job') {
+      throw new Error('Attachment not found');
+    }
+
+    // Verify the parent job belongs to user's company and is not deleted
+    const { data: job } = await supabase
+      .from('jobs')
+      .select('id')
+      .eq('id', attachment.entity_id)
+      .eq('company_id', profile.company_id)
+      .is('deleted_at', null)
+      .single();
+
+    if (!job) {
+      throw new Error('Job not found or access denied');
+    }
+
+    // Soft-delete the attachment via admin client to bypass RLS WITH CHECK
+    const adminSupabase = createAdminClient();
+    const { error } = await adminSupabase
+      .from('media_attachments')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', parsedInput.attachmentId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    revalidatePath('/jobs');
+    return { success: true };
   });

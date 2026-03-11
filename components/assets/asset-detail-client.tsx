@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { Truck } from 'lucide-react';
 import type { InventoryItemWithRelations, InventoryMovementWithRelations } from '@/lib/types/database';
+import { Button } from '@/components/ui/button';
 import { AssetStatusBadge } from './asset-status-badge';
 import { AssetDetailInfo } from './asset-detail-info';
 import { AssetDetailActions } from './asset-detail-actions';
@@ -73,6 +74,9 @@ export function AssetDetailClient({
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showTransferRespondDialog, setShowTransferRespondDialog] = useState(false);
   const [transferRespondMode, setTransferRespondMode] = useState<'accept' | 'reject'>('accept');
+  const [isDirty, setIsDirty] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const FORM_ID = 'asset-edit-form';
 
   const handleActionSuccess = () => {
     router.refresh();
@@ -150,6 +154,9 @@ export function AssetDetailClient({
             currentUserId={currentUserId}
             currentUserRole={currentUserRole}
             onEditSuccess={handleActionSuccess}
+            onSubmittingChange={setIsSubmitting}
+            formId={FORM_ID}
+            onDirtyChange={setIsDirty}
           />
 
           <AssetDetailActions
@@ -183,6 +190,18 @@ export function AssetDetailClient({
           </div>
         </div>
       </div>
+
+      {/* Sticky save bar */}
+      {isDirty && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background shadow-lg">
+          <div className="mx-auto max-w-[1300px] px-6 py-3 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">Unsaved changes</p>
+            <Button type="submit" form={FORM_ID} disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Status change dialog */}
       <AssetStatusChangeDialog

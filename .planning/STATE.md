@@ -306,19 +306,24 @@ Recent decisions affecting current work:
 | 34 | Fix DialogTitle accessibility warning in all 5 view modals | 2026-03-09 | af12391 | Verified | [31-fix-dialogtitle-accessibility-warning-in](./quick/31-fix-dialogtitle-accessibility-warning-in/) |
 | 35 | Only request creator can accept/reject completed work | 2026-03-09 | — | Verified | [32-only-the-user-who-created-the-request-ca](./quick/32-only-the-user-who-created-the-request-ca/) |
 | 36 | Stable column widths on all tables (fixed sizes + grow column + actions last) | 2026-03-10 | 72bbd71 | Verified | [32-limit-all-table-width-by-its-own-logical](./quick/32-limit-all-table-width-by-its-own-logical/) |
-| 37 | Approval queue: View button opens JobViewModal with permalink support | 2026-03-10 | 79b9a55 | Verified | [34-approval-detail-should-use-modal-with-pe](./quick/34-approval-detail-should-use-modal-with-pe/) |
-| 38 | add proper spacing between icon and text in timeline, so it doesn't look that cramped | 2026-03-10 | a9f1f76 | Needs Review | [35-add-proper-spacing-between-icon-and-text](./quick/35-add-proper-spacing-between-icon-and-text/) |
-| 39 | asset transfer: only the receiver can accept or reject the transfer. admin can still cancel the transfer | 2026-03-10 | 8e7d474 | Verified | [36-asset-transfer-only-the-receiver-can-acc](./quick/36-asset-transfer-only-the-receiver-can-acc/) |
-| 40 | Consolidate asset view modal action buttons to sticky bar only (remove duplicate inline AssetDetailActions) | 2026-03-10 | bd61fcd | Verified | [37-detail-modal-move-all-form-field-action-](./quick/37-detail-modal-move-all-form-field-action-/) |
-| 41 | inventory transit status should only be displayed once beside the active status badge, not shown in the location field | 2026-03-10 | 558bcae | Verified | [38-inventory-transit-status-should-only-be-](./quick/38-inventory-transit-status-should-only-be-/) |
-| 42 | Default acquisition_date to today in new asset form | 2026-03-10 | dc06a0e | Verified | [39-asset-default-acquisition-date-to-today-](./quick/39-asset-default-acquisition-date-to-today-/) |
-| 43 | Asset table: photo thumbnail column with lightbox | 2026-03-10 | 2e9485f | Verified | [40-asset-table-list-display-latest-conditio](./quick/40-asset-table-list-display-latest-conditio/) |
-| 44 | Job table: photo thumbnail column with lightbox | 2026-03-10 | 66b0d2c | Verified | [41-job-table-list-display-job-photos-thumbn](./quick/41-job-table-list-display-job-photos-thumbn/) |
-| 45 | Approval queue estimated cost text-base removed, matches table cell size | 2026-03-10 | 783110e | Verified | [42-approval-queue-estimated-costs-should-di](./quick/42-approval-queue-estimated-costs-should-di/) |
+| 37 | Inactive settings rows grey background, remove Status column from all settings tables | 2026-03-10 | d989b61 | Verified | [34-in-settings-inactive-rows-should-be-dist](./quick/34-in-settings-inactive-rows-should-be-dist/) |
+| 38 | Move save changes button to sticky bottom bar on asset detail page | 2026-03-10 | ddde5b8 | Verified | [35-move-all-save-changes-buttons-to-the-sti](./quick/35-move-all-save-changes-buttons-to-the-sti/) |
+| 39 | Estimated cost in job timeline displays IDR thousand separator formatting | 2026-03-10 | 74eb908 | Verified | [36-estimated-cost-in-job-timeline-should-di](./quick/36-estimated-cost-in-job-timeline-should-di/) |
+| 40 | Post Comment button uses outline variant instead of CTA | 2026-03-10 | 1e0c68b | Verified | [37-post-comment-button-should-use-outline-v](./quick/37-post-comment-button-should-use-outline-v/) |
+| 41 | Photo attachments displayed and editable in job detail modal | 2026-03-10 | 8e1d745 | Verified | [38-photo-attachments-should-be-displayed-an](./quick/38-photo-attachments-should-be-displayed-an/) |
+| 42 | Approval queue: View button opens JobViewModal with permalink support | 2026-03-10 | 79b9a55 | Verified | [34-approval-detail-should-use-modal-with-pe](./quick/34-approval-detail-should-use-modal-with-pe/) |
+| 43 | add proper spacing between icon and text in timeline, so it doesn't look that cramped | 2026-03-10 | a9f1f76 | Needs Review | [35-add-proper-spacing-between-icon-and-text](./quick/35-add-proper-spacing-between-icon-and-text/) |
+| 44 | asset transfer: only the receiver can accept or reject the transfer. admin can still cancel the transfer | 2026-03-10 | 8e7d474 | Verified | [36-asset-transfer-only-the-receiver-can-acc](./quick/36-asset-transfer-only-the-receiver-can-acc/) |
+| 45 | Consolidate asset view modal action buttons to sticky bar only (remove duplicate inline AssetDetailActions) | 2026-03-10 | bd61fcd | Verified | [37-detail-modal-move-all-form-field-action-](./quick/37-detail-modal-move-all-form-field-action-/) |
+| 46 | inventory transit status should only be displayed once beside the active status badge, not shown in the location field | 2026-03-10 | 558bcae | Verified | [38-inventory-transit-status-should-only-be-](./quick/38-inventory-transit-status-should-only-be-/) |
+| 47 | Default acquisition_date to today in new asset form | 2026-03-10 | dc06a0e | Verified | [39-asset-default-acquisition-date-to-today-](./quick/39-asset-default-acquisition-date-to-today-/) |
+| 48 | Asset table: photo thumbnail column with lightbox | 2026-03-10 | 2e9485f | Verified | [40-asset-table-list-display-latest-conditio](./quick/40-asset-table-list-display-latest-conditio/) |
+| 49 | Job table: photo thumbnail column with lightbox | 2026-03-10 | 66b0d2c | Verified | [41-job-table-list-display-job-photos-thumbn](./quick/41-job-table-list-display-job-photos-thumbn/) |
+| 50 | Approval queue estimated cost text-base removed, matches table cell size | 2026-03-10 | 783110e | Verified | [42-approval-queue-estimated-costs-should-di](./quick/42-approval-queue-estimated-costs-should-di/) |
 
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Completed quick task 42: Approval queue estimated cost font size fix
+Stopped at: Completed quick task 50 (refactor): Approval queue estimated cost font size fix
 Resume file: None
 Next: Ready for next task
