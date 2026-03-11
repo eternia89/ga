@@ -326,10 +326,11 @@ Recent decisions affecting current work:
 
 | 54 | All view modals implement consistent two-line header: identifier on line 1, badges + created by on line 2 | 2026-03-11 | 4dd4341 | Verified | [45-all-view-modals-should-implement-a-consi](./quick/45-all-view-modals-should-implement-a-consi/) |
 | 55 | Multi-company user access: admin grants extra company access in user settings; Company selector in New Request/Job/Asset modals | 2026-03-11 | a866a24 | Verified | [46-multi-company-user-access-in-user-settin](./quick/46-multi-company-user-access-in-user-settin/) |
+| 56 | Add permalink URL sync (?action=create) to New Job and New Asset create modals — bidirectional sync on open and close | 2026-03-11 | dd971dc | Verified | [47-add-permalink-support-to-new-job-and-new](./quick/47-add-permalink-support-to-new-job-and-new/) |
 
 ## Session Continuity
 
 Last session: 2026-03-11
-Stopped at: Completed quick task 46: Multi-company user access in user settings + create modals
+Stopped at: Completed quick task 47: Add permalink URL sync to New Job and New Asset create modals
 Resume file: None
 Next: Ready for next task
