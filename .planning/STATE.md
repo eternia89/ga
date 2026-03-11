@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Completed quick task 21: Fix deadlock analysis issues"
-last_updated: "2026-03-09T01:48:59.480Z"
-last_activity: "2026-03-06 - Completed quick task 23: Audit all flows for deadlocks"
+stopped_at: "Completed quick task 41: Job table photo thumbnail column"
+last_updated: "2026-03-10T06:55:34Z"
+last_activity: "2026-03-10 - Completed quick task 41: Job table photo thumbnail column"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-10 - Completed quick task 39: photos should be before save changes button
+Last activity: 2026-03-10 - Completed quick task 51: photos should be before save changes button
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -311,11 +311,20 @@ Recent decisions affecting current work:
 | 39 | Estimated cost in job timeline displays IDR thousand separator formatting | 2026-03-10 | 74eb908 | Verified | [36-estimated-cost-in-job-timeline-should-di](./quick/36-estimated-cost-in-job-timeline-should-di/) |
 | 40 | Post Comment button uses outline variant instead of CTA | 2026-03-10 | 1e0c68b | Verified | [37-post-comment-button-should-use-outline-v](./quick/37-post-comment-button-should-use-outline-v/) |
 | 41 | Photo attachments displayed and editable in job detail modal | 2026-03-10 | 8e1d745 | Verified | [38-photo-attachments-should-be-displayed-an](./quick/38-photo-attachments-should-be-displayed-an/) |
-| 42 | photos should be before save changes button. remain consistent throughout the app. clicking save changes will save the photos, and other edited fields | 2026-03-10 | 4e450ce | | [39-photos-should-be-before-save-changes-but](./quick/39-photos-should-be-before-save-changes-but/) |
+| 42 | Approval queue: View button opens JobViewModal with permalink support | 2026-03-10 | 79b9a55 | Verified | [34-approval-detail-should-use-modal-with-pe](./quick/34-approval-detail-should-use-modal-with-pe/) |
+| 43 | add proper spacing between icon and text in timeline, so it doesn't look that cramped | 2026-03-10 | a9f1f76 | Needs Review | [35-add-proper-spacing-between-icon-and-text](./quick/35-add-proper-spacing-between-icon-and-text/) |
+| 44 | asset transfer: only the receiver can accept or reject the transfer. admin can still cancel the transfer | 2026-03-10 | 8e7d474 | Verified | [36-asset-transfer-only-the-receiver-can-acc](./quick/36-asset-transfer-only-the-receiver-can-acc/) |
+| 45 | Consolidate asset view modal action buttons to sticky bar only (remove duplicate inline AssetDetailActions) | 2026-03-10 | bd61fcd | Verified | [37-detail-modal-move-all-form-field-action-](./quick/37-detail-modal-move-all-form-field-action-/) |
+| 46 | inventory transit status should only be displayed once beside the active status badge, not shown in the location field | 2026-03-10 | 558bcae | Verified | [38-inventory-transit-status-should-only-be-](./quick/38-inventory-transit-status-should-only-be-/) |
+| 47 | Default acquisition_date to today in new asset form | 2026-03-10 | dc06a0e | Verified | [39-asset-default-acquisition-date-to-today-](./quick/39-asset-default-acquisition-date-to-today-/) |
+| 48 | Asset table: photo thumbnail column with lightbox | 2026-03-10 | 2e9485f | Verified | [40-asset-table-list-display-latest-conditio](./quick/40-asset-table-list-display-latest-conditio/) |
+| 49 | Job table: photo thumbnail column with lightbox | 2026-03-10 | 66b0d2c | Verified | [41-job-table-list-display-job-photos-thumbn](./quick/41-job-table-list-display-job-photos-thumbn/) |
+| 50 | Approval queue estimated cost text-base removed, matches table cell size | 2026-03-10 | 783110e | Verified | [42-approval-queue-estimated-costs-should-di](./quick/42-approval-queue-estimated-costs-should-di/) |
+| 51 | photos should be before save changes button. remain consistent throughout the app. clicking save changes will save the photos, and other edited fields | 2026-03-10 | 4e450ce | | [39-photos-should-be-before-save-changes-but](./quick/39-photos-should-be-before-save-changes-but/) |
 
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Completed quick task 42: photos should be before save changes button
+Stopped at: Completed quick task 51: photos should be before save changes button
 Resume file: None
 Next: Ready for next task

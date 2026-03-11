@@ -11,12 +11,16 @@ import { jobColumns } from './job-columns';
 import { JobFilters, jobFilterParsers } from './job-filters';
 import { JobCancelDialog } from './job-cancel-dialog';
 import { JobViewModal } from './job-view-modal';
+import { PhotoLightbox } from '@/components/requests/request-photo-lightbox';
+
+type PhotoItem = { id: string; url: string; fileName: string };
 
 interface JobTableProps {
   data: JobWithRelations[];
   users: { id: string; name: string }[];
   currentUserId: string;
   currentUserRole: string;
+  photosByJob: Record<string, PhotoItem[]>;
   initialViewId?: string;
 }
 
@@ -25,6 +29,7 @@ export function JobTable({
   users,
   currentUserId,
   currentUserRole,
+  photosByJob,
   initialViewId,
 }: JobTableProps) {
   const router = useRouter();
@@ -38,6 +43,11 @@ export function JobTable({
   const [cancellingDisplayId, setCancellingDisplayId] = useState('');
 
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Lightbox state
+  const [lightboxPhotos, setLightboxPhotos] = useState<PhotoItem[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   // Client-side filtering based on URL params
   const filteredData = useMemo(() => {
@@ -80,6 +90,12 @@ export function JobTable({
     setViewJobId(job.id);
   };
 
+  const handlePhotoClick = (photos: PhotoItem[], index: number) => {
+    setLightboxPhotos(photos);
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
   const handleModalActionSuccess = () => {
     setFeedback({ type: 'success', message: 'Action completed successfully' });
     router.refresh();
@@ -114,6 +130,8 @@ export function JobTable({
         emptyMessage="No jobs found"
         meta={{
           onView: handleView,
+          photosByJob,
+          onPhotoClick: handlePhotoClick,
         }}
       />
 
@@ -135,6 +153,14 @@ export function JobTable({
         jobIds={filteredData.map((j) => j.id)}
         onNavigate={setViewJobId}
       />
+
+      {lightboxOpen && lightboxPhotos.length > 0 && (
+        <PhotoLightbox
+          photos={lightboxPhotos}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </div>
   );
 }

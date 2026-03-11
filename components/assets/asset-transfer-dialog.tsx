@@ -30,6 +30,8 @@ interface AssetTransferDialogProps {
   asset: InventoryItemWithRelations;
   currentLocationName: string;
   gaUsers: GAUserWithLocation[];
+  /** The current user's ID — excluded from receiver options to prevent self-transfer */
+  currentUserId: string;
   /** Map of location id -> name for resolving receiver's location */
   locationNames: Record<string, string>;
   onSuccess: () => void;
@@ -41,6 +43,7 @@ export function AssetTransferDialog({
   asset,
   currentLocationName,
   gaUsers,
+  currentUserId,
   locationNames,
   onSuccess,
 }: AssetTransferDialogProps) {
@@ -61,7 +64,9 @@ export function AssetTransferDialog({
     }
   }, [open]);
 
-  const userOptions = gaUsers.map((u) => ({ label: u.name, value: u.id }));
+  const userOptions = gaUsers
+    .filter((u) => u.id !== currentUserId)
+    .map((u) => ({ label: u.name, value: u.id }));
 
   // Auto-resolve location from selected receiver
   const selectedUser = useMemo(

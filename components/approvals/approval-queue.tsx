@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import {
@@ -14,6 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { formatIDR, formatDate } from '@/lib/utils';
+import { JobViewModal } from '@/components/jobs/job-view-modal';
 
 // ============================================================================
 // Types
@@ -50,6 +51,9 @@ export type ApprovalJob = {
 
 interface ApprovalQueueProps {
   jobs: ApprovalJob[];
+  initialViewId?: string;
+  currentUserId: string;
+  currentUserRole: string;
 }
 
 // ============================================================================
@@ -89,9 +93,14 @@ function getRejectionReason(job: ApprovalJob): string | null {
 // ApprovalQueue
 // ============================================================================
 
-export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
-  const router = useRouter();
+export function ApprovalQueue({
+  jobs,
+  initialViewId,
+  currentUserId,
+  currentUserRole,
+}: ApprovalQueueProps) {
   const [pendingOnly, setPendingOnly] = useState(false);
+  const [viewJobId, setViewJobId] = useState<string | null>(initialViewId ?? null);
 
   // Sort by date descending (newest first)
   const sortedJobs = [...jobs].sort((a, b) => {
@@ -105,6 +114,9 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
     : sortedJobs;
 
   const pendingCount = jobs.filter((j) => j.decision === 'pending').length;
+
+  // Deduplicated job IDs for prev/next navigation in modal
+  const jobIds = [...new Set(visibleJobs.map((j) => j.id))];
 
   return (
     <div className="space-y-4">
@@ -144,6 +156,7 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
                 <TableHead className="w-[160px]">PIC</TableHead>
                 <TableHead className="w-[130px]">Status</TableHead>
                 <TableHead className="w-[130px]">Date</TableHead>
+                <TableHead className="w-[80px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -156,11 +169,7 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
                 const rejectionReason = getRejectionReason(job);
 
                 return (
-                  <TableRow
-                    key={`${job.id}-${job.approval_type}`}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => router.push(`/jobs/${job.id}`)}
-                  >
+                  <TableRow key={`${job.id}-${job.approval_type}`}>
                     <TableCell className="font-mono text-sm font-medium">
                       {job.display_id}
                     </TableCell>
@@ -184,7 +193,7 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="font-semibold text-base">
+                      <span className="font-semibold">
                         {job.estimated_cost != null ? formatIDR(job.estimated_cost) : '\u2014'}
                       </span>
                     </TableCell>
@@ -217,6 +226,15 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
                     <TableCell className="text-sm text-muted-foreground">
                       {dateLabel}
                     </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        className="text-blue-600 hover:underline font-normal h-auto p-0"
+                        onClick={() => setViewJobId(job.id)}
+                      >
+                        View
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -232,6 +250,21 @@ export function ApprovalQueue({ jobs }: ApprovalQueueProps) {
           {!pendingOnly && ` out of ${jobs.length} total`}.
         </p>
       )}
+
+      {/* Job view modal */}
+      <JobViewModal
+        jobId={viewJobId}
+        onOpenChange={(open) => {
+          if (!open) setViewJobId(null);
+        }}
+        currentUserId={currentUserId}
+        currentUserRole={currentUserRole}
+        onActionSuccess={() => {
+          // Refresh is handled internally by the modal
+        }}
+        jobIds={jobIds}
+        onNavigate={setViewJobId}
+      />
     </div>
   );
 }

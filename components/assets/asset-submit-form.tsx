@@ -79,7 +79,7 @@ export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmi
       model: '',
       serial_number: '',
       description: '',
-      acquisition_date: '',
+      acquisition_date: new Date().toISOString().split('T')[0],
       warranty_expiry: '',
     },
   });

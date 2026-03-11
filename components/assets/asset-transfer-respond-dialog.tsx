@@ -48,8 +48,8 @@ export function AssetTransferRespondDialog({
 
   const isAccept = mode === 'accept';
   const canSubmit = isAccept
-    ? photos.length > 0
-    : photos.length > 0 && reason.trim().length > 0;
+    ? true
+    : reason.trim().length > 0;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -169,21 +169,20 @@ export function AssetTransferRespondDialog({
             </div>
           )}
 
-          {/* Condition photos (required) */}
+          {/* Condition photos (optional) */}
           <div className="space-y-1.5">
             <Label>
               {isAccept ? 'Received Condition Photos' : 'Evidence Photos'}{' '}
-              <span className="text-destructive">*</span>
+              <span className="text-muted-foreground text-xs">(optional)</span>
             </Label>
             <p className="text-xs text-muted-foreground">
               {isAccept
-                ? 'Document the received asset condition. At least 1 photo required.'
-                : 'Document evidence for rejection. At least 1 photo required.'}
+                ? 'Optionally document the received asset condition.'
+                : 'Optionally attach evidence photos for this rejection.'}
             </p>
             <PhotoUpload
               onChange={setPhotos}
               maxPhotos={5}
-              required
               showCount
               disabled={isSubmitting}
               enableAnnotation={false}

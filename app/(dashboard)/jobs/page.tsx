@@ -130,6 +130,48 @@ export default async function JobsPage({ searchParams }: PageProps) {
   // No already-linked requests will appear in create mode, so requestJobLinks is empty
   const requestJobLinks: Record<string, string> = {};
 
+  // Batch-fetch job photos from media_attachments
+  let photosByJob: Record<string, { id: string; url: string; fileName: string }[]> = {};
+
+  if (jobs.length > 0) {
+    const jobIds = jobs.map((j) => j.id);
+
+    const { data: attachments } = await supabase
+      .from('media_attachments')
+      .select('id, entity_id, file_name, file_path')
+      .eq('entity_type', 'job')
+      .in('entity_id', jobIds)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false });
+
+    if (attachments && attachments.length > 0) {
+      const { data: signedUrls } = await supabase.storage
+        .from('job-photos')
+        .createSignedUrls(
+          attachments.map((a) => a.file_path),
+          21600
+        );
+
+      const photosWithUrls = attachments.map((a, i) => ({
+        id: a.id,
+        entityId: a.entity_id,
+        url: signedUrls?.[i]?.signedUrl ?? '',
+        fileName: a.file_name,
+      }));
+
+      for (const photo of photosWithUrls) {
+        if (!photosByJob[photo.entityId]) {
+          photosByJob[photo.entityId] = [];
+        }
+        photosByJob[photo.entityId].push({
+          id: photo.id,
+          url: photo.url,
+          fileName: photo.fileName,
+        });
+      }
+    }
+  }
+
   return (
     <div className="space-y-6 py-6">
       <SetBreadcrumbs items={[{ label: 'Dashboard', href: '/' }, { label: 'Jobs' }]} />
@@ -164,6 +206,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
         users={users}
         currentUserId={profile.id}
         currentUserRole={profile.role}
+        photosByJob={photosByJob}
         initialViewId={view}
       />
     </div>
