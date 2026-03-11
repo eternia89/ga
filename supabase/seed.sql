@@ -291,3 +291,15 @@ INSERT INTO public.company_settings (company_id, key, value) VALUES
   ('00000000-0000-4000-a000-000000000002', 'budget_approval_threshold', '5000000'),
   ('00000000-0000-4000-a000-000000000003', 'budget_approval_threshold', '5000000'),
   ('00000000-0000-4000-a000-000000000004', 'budget_approval_threshold', '5000000');
+
+-- ============================================================
+-- 8. User company access (multi-company GA Staff test scenario)
+-- ============================================================
+-- Eva (eva@jaknot.com, ga_staff at Jaknot) gets read access to Jakmall.
+-- Test: login as eva@jaknot.com → should see both Jaknot AND Jakmall
+-- requests, jobs, and assets.
+INSERT INTO public.user_company_access (id, user_id, company_id, granted_by) VALUES
+  ('00000000-0000-4000-a005-000000000001',
+   '00000000-0000-4000-a004-000000000004',  -- Eva (ga_staff, Jaknot)
+   '00000000-0000-4000-a000-000000000002',  -- Jakmall
+   '00000000-0000-4000-a004-000000000001'); -- Granted by Samuel (admin, Jakmall)
