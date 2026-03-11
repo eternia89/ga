@@ -1000,6 +1000,8 @@ export function JobModal({
                   <h2 className="text-xl font-bold tracking-tight font-mono">
                     {job.display_id}
                   </h2>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 mt-1">
                   <JobStatusBadge status={job.status} />
                   {job.priority && <PriorityBadge priority={job.priority} />}
                   {job.job_type === 'preventive_maintenance' && (
@@ -1007,11 +1009,10 @@ export function JobModal({
                       PM
                     </span>
                   )}
+                  <span className="text-sm text-muted-foreground">
+                    Created {format(new Date(job.created_at), 'dd-MM-yyyy')} by {job.created_by_user?.full_name ?? 'Unknown'}
+                  </span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {job.created_by_user?.full_name ?? 'Unknown'}
-                  {' \u00b7 '}Created {format(new Date(job.created_at), 'dd-MM-yyyy')}
-                </p>
               </div>
 
               {/* Split layout: Form left, Timeline right */}

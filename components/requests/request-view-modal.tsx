@@ -569,14 +569,15 @@ export function RequestViewModal({
                   <h2 className="text-xl font-bold tracking-tight font-mono">
                     {request.display_id}
                   </h2>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 mt-1">
                   <RequestStatusBadge status={request.status} />
                   {request.priority && <PriorityBadge priority={request.priority} />}
+                  <span className="text-sm text-muted-foreground">
+                    Created {format(new Date(request.created_at), 'dd-MM-yyyy')} by {request.requester?.name ?? 'Unknown'}
+                    {request.division?.name && ` · ${request.division.name}`}
+                  </span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {request.requester?.name ?? 'Unknown'}
-                  {request.division?.name && ` · ${request.division.name}`}
-                  {' · '}Created {format(new Date(request.created_at), 'dd-MM-yyyy')}
-                </p>
 
                 {/* Rejection reason callout */}
                 {request.status === 'rejected' && request.rejection_reason && (
