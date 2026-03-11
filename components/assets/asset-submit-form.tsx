@@ -42,13 +42,15 @@ interface AssetSubmitFormProps {
   categories: Category[];
   locations: Location[];
   onSuccess?: () => void;
+  extraCompanies?: { id: string; name: string }[];
+  allLocations?: { id: string; name: string; company_id: string }[];
 }
 
 const MAX_INVOICE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 const ALLOWED_INVOICE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 const MAX_INVOICES = 5;
 
-export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmitFormProps) {
+export function AssetSubmitForm({ categories, locations, onSuccess, extraCompanies, allLocations }: AssetSubmitFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +59,7 @@ export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmi
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [invoiceFiles, setInvoiceFiles] = useState<InvoiceFile[]>([]);
   const [invoiceError, setInvoiceError] = useState<string | null>(null);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   const invoiceInputRef = useRef<HTMLInputElement>(null);
 
   const categoryOptions = categories.map((cat) => ({
@@ -64,7 +67,11 @@ export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmi
     value: cat.id,
   }));
 
-  const locationOptions = locations.map((loc) => ({
+  // Use all locations filtered by selected company when multi-company mode, else primary locations
+  const locationOptions = (selectedCompanyId && allLocations && allLocations.length > 0
+    ? allLocations.filter(l => l.company_id === selectedCompanyId)
+    : locations
+  ).map((loc) => ({
     label: loc.name,
     value: loc.id,
   }));
@@ -127,8 +134,12 @@ export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmi
     setSuccess(null);
 
     try {
-      // Step 1: Create the asset
-      const result = await createAsset(data);
+      // Step 1: Create the asset (include selected company if multi-company mode)
+      const effectiveCompanyId =
+        extraCompanies && extraCompanies.length > 1 && selectedCompanyId
+          ? selectedCompanyId
+          : undefined;
+      const result = await createAsset({ ...data, company_id: effectiveCompanyId });
 
       if (result?.serverError) {
         setError(result.serverError);
@@ -199,6 +210,9 @@ export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmi
         }
       }
 
+      // Reset company selection on success
+      setSelectedCompanyId(null);
+
       // All done — close dialog or redirect to detail page
       if (onSuccess) {
         onSuccess();
@@ -215,6 +229,25 @@ export function AssetSubmitForm({ categories, locations, onSuccess }: AssetSubmi
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
+        {/* Company selector — only shown when user has extra company access */}
+        {extraCompanies && extraCompanies.length > 1 && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Company</label>
+            <Combobox
+              options={extraCompanies.map(c => ({ label: c.name, value: c.id }))}
+              value={selectedCompanyId ?? extraCompanies[0].id}
+              onValueChange={(val) => {
+                setSelectedCompanyId(val);
+                form.setValue('location_id', '');
+              }}
+              placeholder="Select company"
+              searchPlaceholder="Search companies..."
+              emptyText="No companies found"
+              disabled={isSubmitting}
+            />
+          </div>
+        )}
 
         {/* Section 1: Asset Details */}
         <div className="space-y-4">

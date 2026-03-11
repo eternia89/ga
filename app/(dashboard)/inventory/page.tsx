@@ -69,6 +69,14 @@ export default async function InventoryPage({ searchParams }: PageProps) {
     }
   }
 
+  // Fetch user's extra company access
+  const { data: companyAccessRows } = await supabase
+    .from('user_company_access')
+    .select('company_id')
+    .eq('user_id', profile.id);
+  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
   // Fetch asset-type categories for filter dropdown
   const { data: categories } = await supabase
     .from('categories')
@@ -77,13 +85,34 @@ export default async function InventoryPage({ searchParams }: PageProps) {
     .is('deleted_at', null)
     .order('name');
 
-  // Fetch locations for this company for filter dropdown
+  // Fetch locations for this company for filter dropdown + create dialog
   const { data: locations } = await supabase
     .from('locations')
     .select('id, name')
     .eq('company_id', profile.company_id)
     .is('deleted_at', null)
     .order('name');
+
+  // Multi-company: fetch companies and all locations for accessible companies
+  const [extraCompaniesResult, allLocationsResult] = extraCompanyIds.length > 0
+    ? await Promise.all([
+        supabase
+          .from('companies')
+          .select('id, name')
+          .in('id', allAccessibleCompanyIds)
+          .is('deleted_at', null)
+          .order('name'),
+        supabase
+          .from('locations')
+          .select('id, name, company_id')
+          .in('company_id', allAccessibleCompanyIds)
+          .is('deleted_at', null)
+          .order('name'),
+      ])
+    : [{ data: null }, { data: null }];
+
+  const extraCompanies = extraCompaniesResult.data ?? [];
+  const allLocations = allLocationsResult.data ?? [];
 
   // Fetch GA users with location_id for transfer dialog
   const { data: gaUsersData } = await supabase
@@ -164,6 +193,8 @@ export default async function InventoryPage({ searchParams }: PageProps) {
               categories={categories ?? []}
               locations={locations ?? []}
               initialOpen={action === 'create'}
+              extraCompanies={extraCompanies}
+              allLocations={allLocations}
             />
           )}
         </div>

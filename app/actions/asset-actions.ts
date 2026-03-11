@@ -34,9 +34,23 @@ export const createAsset = authActionClient
       throw new Error('Insufficient permissions to create assets');
     }
 
+    // Determine effective company_id (multi-company access support)
+    const effectiveCompanyId = parsedInput.company_id ?? profile.company_id;
+
+    // Validate extra company access if a different company was selected
+    if (parsedInput.company_id && parsedInput.company_id !== profile.company_id) {
+      const { data: access } = await supabase
+        .from('user_company_access')
+        .select('id')
+        .eq('user_id', profile.id)
+        .eq('company_id', parsedInput.company_id)
+        .single();
+      if (!access) throw new Error('You do not have access to the selected company.');
+    }
+
     // Generate display_id atomically via DB function
     const { data: displayId, error: rpcError } = await supabase
-      .rpc('generate_asset_display_id', { p_company_id: profile.company_id });
+      .rpc('generate_asset_display_id', { p_company_id: effectiveCompanyId });
 
     if (rpcError || !displayId) {
       const msg = rpcError?.message || '';
@@ -49,7 +63,7 @@ export const createAsset = authActionClient
     const { data, error } = await supabase
       .from('inventory_items')
       .insert({
-        company_id: profile.company_id,
+        company_id: effectiveCompanyId,
         location_id: parsedInput.location_id,
         category_id: parsedInput.category_id,
         display_id: displayId,

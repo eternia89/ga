@@ -16,12 +16,16 @@ interface AssetCreateDialogProps {
   categories: { id: string; name: string }[];
   locations: { id: string; name: string }[];
   initialOpen?: boolean;
+  extraCompanies?: { id: string; name: string }[];
+  allLocations?: { id: string; name: string; company_id: string }[];
 }
 
 export function AssetCreateDialog({
   categories,
   locations,
   initialOpen,
+  extraCompanies,
+  allLocations,
 }: AssetCreateDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(initialOpen ?? false);
@@ -40,6 +44,8 @@ export function AssetCreateDialog({
           <AssetSubmitForm
             categories={categories}
             locations={locations}
+            extraCompanies={extraCompanies}
+            allLocations={allLocations}
             onSuccess={() => {
               setOpen(false);
               router.refresh();
