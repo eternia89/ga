@@ -57,7 +57,7 @@ const EVENT_COLORS: Record<TimelineEvent['type'], string> = {
   field_update: 'bg-gray-100 text-gray-600',
   rejection: 'bg-red-100 text-red-700',
   cancellation: 'bg-stone-100 text-stone-600',
-  acceptance: 'bg-emerald-100 text-emerald-700',
+  acceptance: 'bg-green-100 text-green-700',
   acceptance_rejection: 'bg-orange-100 text-orange-700',
   auto_acceptance: 'bg-teal-100 text-teal-700',
   feedback: 'bg-amber-100 text-amber-700',

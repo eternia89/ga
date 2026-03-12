@@ -58,8 +58,8 @@ const EVENT_COLORS: Record<AssetTimelineEventType, string> = {
   created: 'bg-green-100 text-green-700',
   field_update: 'bg-gray-100 text-gray-600',
   status_changed: 'bg-blue-100 text-blue-700',
-  transfer_initiated: 'bg-purple-100 text-purple-700',
-  transfer_accepted: 'bg-emerald-100 text-emerald-700',
+  transfer_initiated: 'bg-blue-100 text-blue-700',
+  transfer_accepted: 'bg-green-100 text-green-700',
   transfer_rejected: 'bg-red-100 text-red-700',
   transfer_cancelled: 'bg-stone-100 text-stone-600',
 };
