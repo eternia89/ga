@@ -574,6 +574,19 @@ const ASSET_TEMPLATES = [
   { name: 'Filter Air FRP 10 inch',            cat: 'frp_water', brand: 'Pentair',    model: 'FRP-1054',       cond: 'good'      },
 ] as const;
 
+// ─── Seed Asset Categories (self-contained upsert for new maintenance categories) ─
+
+async function seedMaintenanceAssetCategories(supabase: SupabaseClient): Promise<void> {
+  const categories = [
+    { id: CAT.apar_jn,     company_id: C.jaknot, name: 'APAR & Fire Safety', type: 'asset' },
+    { id: CAT.ac_split_jn, company_id: C.jaknot, name: 'AC Split',           type: 'asset' },
+    { id: CAT.genset_jn,   company_id: C.jaknot, name: 'Genset',             type: 'asset' },
+    { id: CAT.filter_jn,   company_id: C.jaknot, name: 'Filter Air FRP',     type: 'asset' },
+  ];
+  const { error } = await supabase.from('categories').upsert(categories, { onConflict: 'id' });
+  if (error) throw new Error(`Asset categories upsert: ${error.message}`);
+}
+
 function catIdFor(cat: string): string {
   const map: Record<string, string> = {
     elektronik: CAT.elektronik_jn,
@@ -937,6 +950,10 @@ async function main() {
 
   console.log('🔧 Jakmall jobs (12)...');
   await seedJakmallJobs(supabase);
+  console.log('   ✓ done');
+
+  console.log('🏷️  Maintenance asset categories (upsert 4)...');
+  await seedMaintenanceAssetCategories(supabase);
   console.log('   ✓ done');
 
   console.log('📦 Jaknot inventory items (40)...');
