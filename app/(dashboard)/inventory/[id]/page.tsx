@@ -218,7 +218,7 @@ export default async function AssetDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6 py-6">
-      <SetBreadcrumbs items={[{ label: 'Inventory', href: '/inventory' }, { label: assetWithRelations.display_id }]} />
+      <SetBreadcrumbs items={[{ label: 'Assets', href: '/inventory' }, { label: assetWithRelations.display_id }]} />
 
       {/* Two-column layout via client wrapper */}
       <AssetDetailClient

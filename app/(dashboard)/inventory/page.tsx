@@ -189,13 +189,13 @@ export default async function InventoryPage({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-6 py-6">
-      <SetBreadcrumbs items={[{ label: 'Dashboard', href: '/' }, { label: 'Inventory' }]} />
+      <SetBreadcrumbs items={[{ label: 'Dashboard', href: '/' }, { label: 'Assets' }]} />
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Inventory</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Assets</h1>
           <p className="text-muted-foreground mt-1">
-            View and manage all company assets
+            View and manage all assets
           </p>
         </div>
         <div className="flex items-center gap-2">

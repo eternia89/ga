@@ -54,7 +54,7 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'Inventory',
+    title: 'Assets',
     items: [
       {
         label: 'Assets',

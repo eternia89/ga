@@ -69,21 +69,28 @@ export function getUserColumns(
       cell: ({ row }) => {
         const name = row.getValue('full_name') as string;
         const email = row.original.email;
-        const role = row.original.role;
         return (
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-medium">{name}</span>
-              <Badge variant="secondary" className={roleColors[role] || roleColors.general_user}>
-                {roleDisplay[role] || role}
-              </Badge>
-            </div>
+            <span className="font-medium">{name}</span>
             <span className="block text-xs text-muted-foreground">{email}</span>
           </div>
         );
       },
       size: 220,
       meta: { grow: true },
+    },
+    {
+      accessorKey: 'role',
+      header: 'Role',
+      cell: ({ row }) => {
+        const value = row.getValue('role') as string;
+        return (
+          <Badge variant="secondary" className={roleColors[value] || roleColors.general_user}>
+            {roleDisplay[value] || value}
+          </Badge>
+        );
+      },
+      size: 160,
     },
     {
       accessorKey: 'location',

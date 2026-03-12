@@ -37,7 +37,7 @@ export default function InventoryDetailError({
           Try again
         </Button>
         <Button size="sm" asChild>
-          <Link href="/inventory">Back to Inventory</Link>
+          <Link href="/inventory">Back to Assets</Link>
         </Button>
       </div>
     </div>

@@ -163,11 +163,6 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
     cell: ({ row, table }) => {
       const asset = row.original;
       const meta = table.options.meta as AssetTableMeta | undefined;
-      const canTransfer =
-        meta?.currentUserRole &&
-        ['ga_staff', 'ga_lead', 'admin'].includes(meta.currentUserRole) &&
-        asset.status !== 'sold_disposed' &&
-        !meta?.pendingTransfers?.[row.original.id];
       const canChangeStatus =
         meta?.currentUserRole &&
         ['ga_staff', 'ga_lead', 'admin'].includes(meta.currentUserRole) &&
@@ -187,19 +182,6 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
           >
             View
           </Button>
-          {canTransfer && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-sm text-blue-600 hover:underline"
-              onClick={(e) => {
-                e.stopPropagation();
-                meta?.onTransfer?.(asset);
-              }}
-            >
-              Transfer
-            </Button>
-          )}
           {canChangeStatus && (
             <Button
               variant="ghost"
@@ -216,7 +198,7 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
         </div>
       );
     },
-    size: 220,
+    size: 160,
     enableSorting: false,
   },
 ];
