@@ -144,9 +144,17 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue('created_at') as string;
-      return format(new Date(date), 'dd-MM-yyyy');
+      const creatorName = row.original.requester?.name;
+      return (
+        <div className="flex flex-col gap-0.5">
+          <span>{format(new Date(date), 'dd-MM-yyyy')}</span>
+          {creatorName && (
+            <span className="text-xs text-muted-foreground">by {creatorName}</span>
+          )}
+        </div>
+      );
     },
-    size: 100,
+    size: 130,
   },
   {
     id: 'actions',
