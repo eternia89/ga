@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-12 - Completed quick task 51: Company field on Schedule/Template create modals and all edit/detail pages for all 5 entity types
+Last activity: 2026-03-12 - Completed quick task 53: Show creator name below date in all table Created columns
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
