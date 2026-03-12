@@ -14,12 +14,13 @@ export const createCategory = adminActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { adminSupabase: supabase, profile } = ctx;
 
-    // Check for duplicate name+type among active categories
+    // Check for duplicate name+type among active categories within the same company
     const { data: existing } = await supabase
       .from("categories")
       .select("id")
       .ilike("name", parsedInput.name)
       .eq("type", parsedInput.type)
+      .eq("company_id", profile.company_id)
       .is("deleted_at", null)
       .limit(1);
 
@@ -64,7 +65,7 @@ export const updateCategory = adminActionClient
     if (data.name) {
       const { data: current } = await supabase
         .from("categories")
-        .select("type")
+        .select("type, company_id")
         .eq("id", id)
         .single();
 
@@ -74,6 +75,7 @@ export const updateCategory = adminActionClient
           .select("id")
           .ilike("name", data.name)
           .eq("type", current.type)
+          .eq("company_id", current.company_id)
           .is("deleted_at", null)
           .neq("id", id)
           .limit(1);
@@ -169,7 +171,7 @@ export const restoreCategory = adminActionClient
 
     const { data: category } = await supabase
       .from("categories")
-      .select("name, type")
+      .select("name, type, company_id")
       .eq("id", id)
       .single();
 
@@ -182,6 +184,7 @@ export const restoreCategory = adminActionClient
       .select("id")
       .ilike("name", category.name)
       .eq("type", category.type)
+      .eq("company_id", category.company_id)
       .is("deleted_at", null)
       .neq("id", id)
       .limit(1);
