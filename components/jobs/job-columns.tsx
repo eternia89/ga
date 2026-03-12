@@ -164,9 +164,17 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue('created_at') as string;
-      return <span className="text-sm">{format(new Date(date), 'dd-MM-yyyy')}</span>;
+      const creatorName = row.original.created_by_user?.full_name;
+      return (
+        <div className="flex flex-col gap-0.5">
+          <span className="text-sm">{format(new Date(date), 'dd-MM-yyyy')}</span>
+          {creatorName && (
+            <span className="text-xs text-muted-foreground">by {creatorName}</span>
+          )}
+        </div>
+      );
     },
-    size: 100,
+    size: 130,
   },
   {
     id: 'actions',
