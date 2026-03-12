@@ -10,6 +10,7 @@ import { DataTableColumnHeader } from '@/components/data-table/data-table-column
 import { JobStatusBadge } from './job-status-badge';
 import { PriorityBadge } from '@/components/priority-badge';
 import { OverdueBadge } from '@/components/maintenance/overdue-badge';
+import { PM_BADGE_CLASS } from '@/lib/constants/approval-status';
 
 interface PhotoItem {
   id: string;
@@ -92,7 +93,7 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
         <div className="space-y-0.5">
           <div className="flex items-center gap-1.5 flex-wrap">
             {isPM && (
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700 shrink-0">
+              <span className={`${PM_BADGE_CLASS} shrink-0`}>
                 PM
               </span>
             )}

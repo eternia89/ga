@@ -1,6 +1,7 @@
 import { type SupabaseClient } from '@supabase/supabase-js';
 import { subDays, differenceInDays, startOfMonth } from 'date-fns';
 import { STATUS_LABELS, REQUEST_STATUSES } from '@/lib/constants/request-status';
+import { JOB_STATUS_LABELS } from '@/lib/constants/job-status';
 
 // Hex color palette for status distribution charts (recharts needs hex, not Tailwind classes)
 const STATUS_HEX_COLORS: Record<string, string> = {
@@ -8,8 +9,8 @@ const STATUS_HEX_COLORS: Record<string, string> = {
   triaged: '#60a5fa',         // blue
   in_progress: '#fbbf24',     // amber
   pending_acceptance: '#a78bfa', // violet
-  accepted: '#34d399',        // emerald
-  closed: '#94a3b8',          // slate
+  accepted: '#4ade80',        // green
+  closed: '#a8a29e',          // stone
   rejected: '#f87171',        // red
   cancelled: '#a8a29e',       // stone
 };
@@ -18,21 +19,12 @@ const JOB_STATUS_HEX_COLORS: Record<string, string> = {
   created: '#9ca3af',         // gray
   assigned: '#60a5fa',        // blue
   in_progress: '#fbbf24',     // amber
-  pending_approval: '#c084fc', // purple
-  pending_completion_approval: '#f97316', // orange
+  pending_approval: '#a78bfa', // violet
+  pending_completion_approval: '#a78bfa', // violet
   completed: '#4ade80',       // green
   cancelled: '#a8a29e',       // stone
 };
 
-const JOB_STATUS_LABELS: Record<string, string> = {
-  created: 'Created',
-  assigned: 'Assigned',
-  in_progress: 'In Progress',
-  pending_approval: 'Pending Approval',
-  pending_completion_approval: 'Pending Completion Approval',
-  completed: 'Completed',
-  cancelled: 'Cancelled',
-};
 
 export interface DashboardDateRange {
   from: string; // ISO date string (yyyy-MM-dd)

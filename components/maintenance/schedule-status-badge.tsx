@@ -21,7 +21,7 @@ export function ScheduleStatusBadge({ schedule }: ScheduleStatusBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${colorClass}`}
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${colorClass}`}
     >
       {label}
     </span>

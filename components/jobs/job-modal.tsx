@@ -48,6 +48,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { Combobox } from '@/components/combobox';
+import { PM_BADGE_CLASS } from '@/lib/constants/approval-status';
 import {
   AlertCircle,
   RefreshCw,
@@ -1015,7 +1016,7 @@ export function JobModal({
                   <JobStatusBadge status={job.status} />
                   {job.priority && <PriorityBadge priority={job.priority} />}
                   {job.job_type === 'preventive_maintenance' && (
-                    <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+                    <span className={PM_BADGE_CLASS}>
                       PM
                     </span>
                   )}

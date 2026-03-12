@@ -8,6 +8,7 @@ import { PriorityBadge } from '@/components/priority-badge';
 import type { JobTimelineEvent } from '@/components/jobs/job-timeline';
 import type { JobWithRelations } from '@/lib/types/database';
 import { JOB_STATUS_LABELS } from '@/lib/constants/job-status';
+import { PM_BADGE_CLASS } from '@/lib/constants/approval-status';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -463,7 +464,7 @@ export default async function JobDetailPage({ params }: PageProps) {
           <JobStatusBadge status={job.status} />
           {job.priority && <PriorityBadge priority={job.priority} />}
           {job.job_type === 'preventive_maintenance' && (
-            <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+            <span className={PM_BADGE_CLASS}>
               PM
             </span>
           )}

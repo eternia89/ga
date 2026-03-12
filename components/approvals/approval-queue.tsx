@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/table';
 import { formatIDR, formatDate } from '@/lib/utils';
 import { JobViewModal } from '@/components/jobs/job-view-modal';
+import { APPROVAL_TYPE_COLORS, APPROVAL_TYPE_LABELS, APPROVAL_DECISION_COLORS, APPROVAL_DECISION_LABELS } from '@/lib/constants/approval-status';
 
 // ============================================================================
 // Types
@@ -182,15 +183,9 @@ export function ApprovalQueue({
                       )}
                     </TableCell>
                     <TableCell>
-                      {job.approval_type === 'budget' ? (
-                        <Badge className="bg-purple-100 text-purple-700 border-0 whitespace-nowrap">
-                          Budget
-                        </Badge>
-                      ) : (
-                        <Badge className="bg-orange-100 text-orange-700 border-0 whitespace-nowrap">
-                          Completion
-                        </Badge>
-                      )}
+                      <Badge className={`${APPROVAL_TYPE_COLORS[job.approval_type] ?? 'bg-gray-100 text-gray-700'} border-0 whitespace-nowrap`}>
+                        {APPROVAL_TYPE_LABELS[job.approval_type] ?? job.approval_type}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <span className="font-semibold">
@@ -207,21 +202,9 @@ export function ApprovalQueue({
                       )}
                     </TableCell>
                     <TableCell>
-                      {job.decision === 'pending' && (
-                        <Badge className="bg-yellow-100 text-yellow-700 border-0">
-                          Pending
-                        </Badge>
-                      )}
-                      {job.decision === 'approved' && (
-                        <Badge className="bg-green-100 text-green-700 border-0">
-                          Approved
-                        </Badge>
-                      )}
-                      {job.decision === 'rejected' && (
-                        <Badge className="bg-red-100 text-red-700 border-0">
-                          Rejected
-                        </Badge>
-                      )}
+                      <Badge className={`${APPROVAL_DECISION_COLORS[job.decision] ?? 'bg-gray-100 text-gray-700'} border-0`}>
+                        {APPROVAL_DECISION_LABELS[job.decision] ?? job.decision}
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {dateLabel}
