@@ -2,7 +2,6 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import Link from 'next/link';
 import { ImageIcon } from 'lucide-react';
 import { JobWithRelations } from '@/lib/types/database';
 import { Button } from '@/components/ui/button';
@@ -31,12 +30,18 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
       <DataTableColumnHeader column={column} title="ID" />
     ),
     cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <span className="font-mono text-xs">{row.getValue('display_id')}</span>
-        <JobStatusBadge status={row.original.status} />
-      </div>
+      <span className="font-mono text-xs">{row.getValue('display_id')}</span>
     ),
-    size: 200,
+    size: 160,
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => (
+      <JobStatusBadge status={row.getValue('status') as string} />
+    ),
+    size: 150,
+    enableSorting: false,
   },
   {
     id: 'photo',
@@ -111,6 +116,27 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
     meta: { grow: true },
   },
   {
+    id: 'location_name',
+    accessorFn: (row) => row.location?.name ?? null,
+    header: 'Location',
+    cell: ({ row }) => {
+      const name = row.original.location?.name;
+      return name ? (
+        <span className="truncate block max-w-[130px]" title={name}>{name}</span>
+      ) : (
+        <span className="text-muted-foreground">—</span>
+      );
+    },
+    size: 130,
+    enableSorting: false,
+  },
+  {
+    accessorKey: 'priority',
+    header: 'Priority',
+    cell: ({ row }) => <PriorityBadge priority={row.getValue('priority')} />,
+    size: 90,
+  },
+  {
     id: 'pic_name',
     accessorFn: (row) => row.pic?.full_name ?? null,
     header: 'PIC',
@@ -125,38 +151,6 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
       );
     },
     size: 120,
-  },
-  {
-    accessorKey: 'priority',
-    header: 'Priority',
-    cell: ({ row }) => <PriorityBadge priority={row.getValue('priority')} />,
-    size: 90,
-  },
-  {
-    id: 'linked_request',
-    header: 'Linked Requests',
-    cell: ({ row }) => {
-      const jobRequests = row.original.job_requests;
-      if (!jobRequests?.length) {
-        return <span className="text-muted-foreground">—</span>;
-      }
-      return (
-        <div className="flex flex-col gap-0.5">
-          {jobRequests.map((jr) => (
-            <Link
-              key={jr.request.id}
-              href={`/requests/${jr.request.id}`}
-              className="font-mono text-xs hover:underline text-foreground"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {jr.request.display_id}
-            </Link>
-          ))}
-        </div>
-      );
-    },
-    size: 130,
-    enableSorting: false,
   },
   {
     accessorKey: 'created_at',
