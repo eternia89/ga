@@ -79,52 +79,35 @@ test.beforeAll(async () => {
   }
 
   // 3. Create user B (general_user in Company B) — needed as requester_id for requests
-  // Use listUsers with explicit large page size to avoid pagination issues
+  // Always delete stale user B first (handles orphaned users from interrupted runs),
+  // then create fresh to avoid race conditions with parallel workers.
   const { data: usersPage } = await admin.auth.admin.listUsers({ perPage: 1000 });
   const existingUserB = usersPage?.users?.find((u) => u.email === USER_B_EMAIL);
-
   if (existingUserB) {
-    userBId = existingUserB.id;
-    // Update app_metadata to point to current companyBId (may differ between runs)
-    await admin.auth.admin.updateUserById(userBId, {
-      app_metadata: { company_id: companyBId, role: 'general_user' },
-    });
-    // Ensure user profile exists for Company B
-    await admin.from('user_profiles').upsert(
-      {
-        id: userBId,
-        email: USER_B_EMAIL,
-        full_name: 'RLS Test User B',
-        role: 'general_user',
-        company_id: companyBId,
-        is_active: true,
-        deleted_at: null,
-      },
-      { onConflict: 'id' }
-    );
-  } else {
-    const { data: newUser, error: userError } = await admin.auth.admin.createUser({
-      email: USER_B_EMAIL,
-      password: 'asdf1234',
-      email_confirm: true,
-      app_metadata: {
-        company_id: companyBId,
-        role: 'general_user',
-      },
-    });
-    if (userError) throw new Error(`Failed to create user B: ${userError.message}`);
-    userBId = newUser.user.id;
-
-    // Create user profile
-    await admin.from('user_profiles').insert({
-      id: userBId,
-      email: USER_B_EMAIL,
-      full_name: 'RLS Test User B',
-      role: 'general_user',
-      company_id: companyBId,
-      is_active: true,
-    });
+    await admin.from('user_profiles').delete().eq('id', existingUserB.id);
+    await admin.auth.admin.deleteUser(existingUserB.id);
   }
+
+  const { data: newUser, error: userError } = await admin.auth.admin.createUser({
+    email: USER_B_EMAIL,
+    password: 'asdf1234',
+    email_confirm: true,
+    app_metadata: {
+      company_id: companyBId,
+      role: 'general_user',
+    },
+  });
+  if (userError) throw new Error(`Failed to create user B: ${userError.message}`);
+  userBId = newUser.user.id;
+
+  await admin.from('user_profiles').insert({
+    id: userBId,
+    email: USER_B_EMAIL,
+    full_name: 'RLS Test User B',
+    role: 'general_user',
+    company_id: companyBId,
+    is_active: true,
+  });
 
   // 4. Insert one test row in requests belonging to Company B
   const { data: requestRow, error: requestError } = await admin
@@ -223,6 +206,8 @@ test.afterAll(async () => {
 });
 
 // ─── Tests ─────────────────────────────────────────────────────────────────
+
+test.describe.configure({ mode: 'serial' });
 
 test.describe('quick-54 — Multi-Company RLS Isolation', () => {
   test('Test 1: Company A user cannot SELECT Company B requests', async () => {
