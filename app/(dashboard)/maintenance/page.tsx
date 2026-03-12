@@ -61,8 +61,16 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
+  // Fetch user's extra company access
+  const { data: companyAccessRows } = await supabase
+    .from('user_company_access')
+    .select('company_id')
+    .eq('user_id', profile.id);
+  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
   // Fetch templates and assets for create dialog
-  const [templatesResult, assetsResult] = await Promise.all([
+  const [templatesResult, assetsResult, primaryCompanyResult, extraCompaniesResult] = await Promise.all([
     supabase
       .from('maintenance_templates')
       .select('id, name, category_id')
@@ -77,6 +85,21 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
       .neq('status', 'sold_disposed')
       .is('deleted_at', null)
       .order('name'),
+    // Primary company name for the always-visible Company field
+    supabase
+      .from('companies')
+      .select('name')
+      .eq('id', profile.company_id)
+      .single(),
+    // Companies for multi-company selector (only if user has extra access)
+    extraCompanyIds.length > 0
+      ? supabase
+          .from('companies')
+          .select('id, name')
+          .in('id', allAccessibleCompanyIds)
+          .is('deleted_at', null)
+          .order('name')
+      : Promise.resolve({ data: null }),
   ]);
 
   const templateList: TemplateListItem[] = (templatesResult.data ?? []).map((t) => ({
@@ -91,6 +114,9 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
     display_id: a.display_id,
     category_id: a.category_id ?? null,
   }));
+
+  const primaryCompanyName = primaryCompanyResult.data?.name ?? '';
+  const extraCompanies = extraCompaniesResult.data ?? [];
 
   // Normalize Supabase FK array returns and compute display_status
   const scheduleList: MaintenanceSchedule[] = (schedules ?? []).map((s) => {
@@ -129,7 +155,13 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
             <ExportButton exportUrl="/api/exports/maintenance" />
           )}
           {['ga_lead', 'admin'].includes(profile.role) && (
-            <ScheduleCreateDialog templates={templateList} assets={assetList} initialOpen={action === 'create'} />
+            <ScheduleCreateDialog
+              templates={templateList}
+              assets={assetList}
+              initialOpen={action === 'create'}
+              primaryCompanyName={primaryCompanyName}
+              extraCompanies={extraCompanies}
+            />
           )}
         </div>
       </div>

@@ -31,12 +31,15 @@ interface Category {
 interface TemplateCreateFormProps {
   categories: Category[];
   onSuccess?: () => void;
+  primaryCompanyName?: string;
+  extraCompanies?: { id: string; name: string }[];
 }
 
-export function TemplateCreateForm({ categories, onSuccess }: TemplateCreateFormProps) {
+export function TemplateCreateForm({ categories, onSuccess, primaryCompanyName, extraCompanies }: TemplateCreateFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
 
   const categoryOptions = categories.map((cat) => ({
     label: cat.name,
@@ -89,6 +92,27 @@ export function TemplateCreateForm({ categories, onSuccess }: TemplateCreateForm
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-8 ${onSuccess ? '' : 'max-w-2xl'}`}>
+
+        {/* Company field — always shown at top */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Company</label>
+          {extraCompanies && extraCompanies.length > 1 ? (
+            <Combobox
+              options={extraCompanies.map(c => ({ label: c.name, value: c.id }))}
+              value={selectedCompanyId ?? extraCompanies[0].id}
+              onValueChange={(val) => setSelectedCompanyId(val)}
+              placeholder="Select company"
+              searchPlaceholder="Search companies..."
+              emptyText="No companies found."
+            />
+          ) : (
+            <Input
+              value={primaryCompanyName ?? ''}
+              disabled
+              className="bg-muted text-muted-foreground cursor-not-allowed"
+            />
+          )}
+        </div>
 
         {/* Section 1: Basic Info */}
         <div className="space-y-4">

@@ -20,12 +20,16 @@ interface ScheduleCreateDialogProps {
   templates: TemplateListItem[];
   assets: AssetListItem[];
   initialOpen?: boolean;
+  primaryCompanyName?: string;
+  extraCompanies?: { id: string; name: string }[];
 }
 
 export function ScheduleCreateDialog({
   templates,
   assets,
   initialOpen,
+  primaryCompanyName,
+  extraCompanies,
 }: ScheduleCreateDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(initialOpen ?? false);
@@ -45,6 +49,8 @@ export function ScheduleCreateDialog({
             templates={templates}
             assets={assets}
             mode="create"
+            primaryCompanyName={primaryCompanyName ?? ''}
+            extraCompanies={extraCompanies}
             onSuccess={() => {
               setOpen(false);
               router.refresh();

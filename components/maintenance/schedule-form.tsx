@@ -113,15 +113,18 @@ interface CreateFormProps {
   defaultTemplateId?: string;
   defaultAssetId?: string;
   onSuccess?: () => void;
+  primaryCompanyName?: string;
+  extraCompanies?: { id: string; name: string }[];
 }
 
-function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAssetId, onSuccess }: CreateFormProps) {
+function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAssetId, onSuccess, primaryCompanyName, extraCompanies }: CreateFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const [selectedTemplateId, setSelectedTemplateId] = useState(defaultTemplateId ?? '');
   const [selectedAssetId, setSelectedAssetId] = useState(defaultAssetId ?? '');
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
 
   const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
   const selectedAsset = assets.find((a) => a.id === selectedAssetId);
@@ -200,6 +203,27 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-8 ${onSuccess ? '' : 'max-w-2xl'}`}>
+
+        {/* Company field — always shown at top */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Company</label>
+          {extraCompanies && extraCompanies.length > 1 ? (
+            <Combobox
+              options={extraCompanies.map(c => ({ label: c.name, value: c.id }))}
+              value={selectedCompanyId ?? extraCompanies[0].id}
+              onValueChange={(val) => setSelectedCompanyId(val)}
+              placeholder="Select company"
+              searchPlaceholder="Search companies..."
+              emptyText="No companies found."
+            />
+          ) : (
+            <Input
+              value={primaryCompanyName ?? ''}
+              disabled
+              className="bg-muted text-muted-foreground cursor-not-allowed"
+            />
+          )}
+        </div>
 
         {/* Section 1: Template & Asset */}
         <div className="rounded-lg border border-border p-6 space-y-4">
@@ -526,6 +550,8 @@ interface ScheduleFormProps {
   onDirtyChange?: (isDirty: boolean) => void;
   /** Called when form submitting state changes */
   onSubmittingChange?: (isSubmitting: boolean) => void;
+  primaryCompanyName?: string;
+  extraCompanies?: { id: string; name: string }[];
 }
 
 export function ScheduleForm({
@@ -539,6 +565,8 @@ export function ScheduleForm({
   formId,
   onDirtyChange,
   onSubmittingChange,
+  primaryCompanyName,
+  extraCompanies,
 }: ScheduleFormProps) {
   if (mode === 'edit' && schedule) {
     return <ScheduleEditForm schedule={schedule} formId={formId} onDirtyChange={onDirtyChange} onSubmittingChange={onSubmittingChange} />;
@@ -551,6 +579,8 @@ export function ScheduleForm({
       defaultTemplateId={defaultTemplateId}
       defaultAssetId={defaultAssetId}
       onSuccess={onSuccess}
+      primaryCompanyName={primaryCompanyName}
+      extraCompanies={extraCompanies}
     />
   );
 }
