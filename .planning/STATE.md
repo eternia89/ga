@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Completed quick task 48: GA Staff self-assign triage and job create"
-last_updated: "2026-03-11T06:42:55.233Z"
-last_activity: "2026-03-11 - Completed quick task 50: all insertion modals always show Company field (disabled for single-company, Combobox for multi-company)"
+stopped_at: "Completed quick task 51: Company field on all create and edit surfaces"
+last_updated: "2026-03-12T05:37:09Z"
+last_activity: "2026-03-12 - Completed quick task 51: Company field added to Schedule/Template create modals and all edit/detail pages (Request, Job, Asset, Schedule, Template)"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -330,6 +330,7 @@ Recent decisions affecting current work:
 | 57 | GA Staff can self-assign submitted requests and create jobs; status guard prevents overriding GA Lead assignments | 2026-03-11 | c415b94 | Needs Review | [48-ga-staff-should-be-able-to-self-assign-r](./quick/48-ga-staff-should-be-able-to-self-assign-r/) |
 | 58 | Fix company-based data isolation: push migrations, expand RLS SELECT policies for multi-company access, seed test data | 2026-03-11 | 849ffbb | Verified | [49-fix-company-based-data-isolation-user-co](./quick/49-fix-company-based-data-isolation-user-co/) |
 | 59 | All insertion modals always show Company field — disabled Input for single-company, interactive Combobox for multi-company | 2026-03-11 | b4037e3 | Verified | [50-all-insertion-modals-show-company-field-](./quick/50-all-insertion-modals-show-company-field-/) |
+| 60 | Company field on Schedule/Template create modals and all edit/detail pages for all 5 entity types | 2026-03-12 | 978dd28 | Verified | [51-add-company-field-to-all-creation-and-ed](./quick/51-add-company-field-to-all-creation-and-ed/) |
 
 ## Session Continuity
 
