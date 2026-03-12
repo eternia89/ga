@@ -54,6 +54,7 @@ interface AssetEditFormProps {
   onSubmittingChange?: (submitting: boolean) => void;
   formId?: string;
   onDirtyChange?: (isDirty: boolean) => void;
+  companyName?: string;
 }
 
 export function AssetEditForm({
@@ -66,6 +67,7 @@ export function AssetEditForm({
   onSubmittingChange,
   formId,
   onDirtyChange,
+  companyName,
 }: AssetEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -247,6 +249,16 @@ export function AssetEditForm({
   return (
     <Form {...form}>
       <form id={formId ?? 'asset-edit-form'} onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Company — always shown, always disabled */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Company</label>
+          <Input
+            value={companyName ?? ''}
+            disabled
+            className="bg-muted text-muted-foreground cursor-not-allowed"
+          />
+        </div>
+
         {/* Section 1: Asset Details */}
         <div className="space-y-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">

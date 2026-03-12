@@ -30,6 +30,7 @@ interface JobDetailClientProps {
   locations: { id: string; name: string }[];
   approvedByName?: string | null;
   approvalRejectedByName?: string | null;
+  companyName?: string;
 }
 
 export function JobDetailClient({
@@ -45,6 +46,7 @@ export function JobDetailClient({
   locations,
   approvedByName,
   approvalRejectedByName,
+  companyName,
 }: JobDetailClientProps) {
   const router = useRouter();
   const [isDirty, setIsDirty] = useState(false);
@@ -89,6 +91,7 @@ export function JobDetailClient({
           formId={FORM_ID}
           onDirtyChange={setIsDirty}
           onSubmittingChange={setIsSubmitting}
+          companyName={companyName}
         />
 
         <JobDetailActions

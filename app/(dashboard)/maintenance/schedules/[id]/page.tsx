@@ -78,13 +78,23 @@ export default async function ScheduleDetailPage({ params }: PageProps) {
       : null,
   };
 
-  // Fetch PM jobs generated from this schedule
-  const { data: pmJobsRaw } = await supabase
-    .from('jobs')
-    .select('id, display_id, status, created_at')
-    .eq('maintenance_schedule_id', id)
-    .is('deleted_at', null)
-    .order('created_at', { ascending: false });
+  // Fetch PM jobs and company name in parallel
+  const [pmJobsResult, companyResult] = await Promise.all([
+    supabase
+      .from('jobs')
+      .select('id, display_id, status, created_at')
+      .eq('maintenance_schedule_id', id)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('companies')
+      .select('name')
+      .eq('id', profile.company_id)
+      .single(),
+  ]);
+
+  const pmJobsRaw = pmJobsResult.data;
+  const companyName = companyResult.data?.name ?? '';
 
   const pmJobs: PMJobRef[] = (pmJobsRaw ?? []).map((j) => ({
     id: j.id,
@@ -126,6 +136,7 @@ export default async function ScheduleDetailPage({ params }: PageProps) {
         schedule={schedule}
         pmJobs={pmJobs}
         userRole={profile.role}
+        companyName={companyName}
       />
     </div>
   );

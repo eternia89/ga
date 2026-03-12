@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { ScheduleStatusBadge } from './schedule-status-badge';
 import { ScheduleForm } from './schedule-form';
+import { Input } from '@/components/ui/input';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 
 // ============================================================================
@@ -54,9 +55,10 @@ interface ScheduleDetailProps {
   schedule: MaintenanceSchedule;
   pmJobs: PMJobRef[];
   userRole: string;
+  companyName?: string;
 }
 
-export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailProps) {
+export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: ScheduleDetailProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -128,6 +130,16 @@ export function ScheduleDetail({ schedule, pmJobs, userRole }: ScheduleDetailPro
 
   return (
     <div className="space-y-6">
+
+      {/* Company — always shown, always disabled */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Company</label>
+        <Input
+          value={companyName ?? ''}
+          disabled
+          className="bg-muted text-muted-foreground cursor-not-allowed"
+        />
+      </div>
 
       {/* Status bar + actions */}
       <div className="flex items-center justify-between gap-4 flex-wrap">

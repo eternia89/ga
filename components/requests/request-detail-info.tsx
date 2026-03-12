@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { PRIORITY_LABELS } from '@/lib/constants/request-status';
+import { Input } from '@/components/ui/input';
 
 interface PhotoItem {
   id: string;
@@ -54,6 +55,7 @@ interface RequestDetailInfoProps {
   onDirtyChange?: (isDirty: boolean) => void;
   /** Called when submitting state changes */
   onSubmittingChange?: (isSubmitting: boolean) => void;
+  companyName?: string;
 }
 
 export function RequestDetailInfo({
@@ -70,6 +72,7 @@ export function RequestDetailInfo({
   formId,
   onDirtyChange,
   onSubmittingChange,
+  companyName,
 }: RequestDetailInfoProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [triageSubmitting, setTriageSubmitting] = useState(false);
@@ -152,6 +155,16 @@ export function RequestDetailInfo({
   if (isEditable) {
     return (
       <>
+        {/* Company — always shown, always disabled */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Company</label>
+          <Input
+            value={companyName ?? ''}
+            disabled
+            className="bg-muted text-muted-foreground cursor-not-allowed"
+          />
+        </div>
+
         <RequestEditForm
           request={request}
           locations={locations}
@@ -269,6 +282,16 @@ export function RequestDetailInfo({
   return (
     <>
       <div className="space-y-6">
+        {/* Company — always shown, always disabled */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Company</label>
+          <Input
+            value={companyName ?? ''}
+            disabled
+            className="bg-muted text-muted-foreground cursor-not-allowed"
+          />
+        </div>
+
         {/* Description */}
         <div>
           <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-2">

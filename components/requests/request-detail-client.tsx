@@ -32,6 +32,7 @@ interface RequestDetailClientProps {
   currentUserId: string;
   currentUserRole: string;
   linkedJobs: LinkedJob[];
+  companyName?: string;
 }
 
 export function RequestDetailClient({
@@ -44,6 +45,7 @@ export function RequestDetailClient({
   currentUserId,
   currentUserRole,
   linkedJobs,
+  companyName,
 }: RequestDetailClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -99,6 +101,7 @@ export function RequestDetailClient({
           formId={FORM_ID}
           onDirtyChange={setIsDirty}
           onSubmittingChange={setIsSubmitting}
+          companyName={companyName}
         />
 
         <RequestDetailActions

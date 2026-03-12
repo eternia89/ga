@@ -40,6 +40,7 @@ interface JobDetailInfoProps {
   onDirtyChange?: (isDirty: boolean) => void;
   /** Called when form submitting state changes */
   onSubmittingChange?: (isSubmitting: boolean) => void;
+  companyName?: string;
 }
 
 export function JobDetailInfo({
@@ -56,6 +57,7 @@ export function JobDetailInfo({
   formId,
   onDirtyChange,
   onSubmittingChange,
+  companyName,
 }: JobDetailInfoProps) {
   const linkedRequests = job.job_requests ?? [];
   const [previewRequest, setPreviewRequest] = useState<typeof linkedRequests[number]['request'] | null>(null);
@@ -173,6 +175,16 @@ export function JobDetailInfo({
 
   return (
     <form id={formId} onSubmit={(e) => { e.preventDefault(); handleEditSave(); }} className="space-y-6">
+      {/* Company — always shown, always disabled */}
+      <div className="space-y-2">
+        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Company</Label>
+        <Input
+          value={companyName ?? ''}
+          disabled
+          className="bg-muted text-muted-foreground cursor-not-allowed"
+        />
+      </div>
+
       {/* Title row */}
       <div className="space-y-2">
         <div>

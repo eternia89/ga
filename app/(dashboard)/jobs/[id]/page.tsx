@@ -85,7 +85,7 @@ export default async function JobDetailPage({ params }: PageProps) {
   }
 
   // Fetch all data in parallel
-  const [auditLogsResult, commentsResult, usersResult, statusChangesResult, categoriesResult, locationsResult, jobPhotosResult] = await Promise.all([
+  const [auditLogsResult, commentsResult, usersResult, statusChangesResult, categoriesResult, locationsResult, jobPhotosResult, companyResult] = await Promise.all([
     // Audit logs for timeline
     supabase
       .from('audit_logs')
@@ -140,12 +140,20 @@ export default async function JobDetailPage({ params }: PageProps) {
       .eq('entity_id', id)
       .is('deleted_at', null)
       .order('sort_order', { ascending: true }),
+
+    // Company name for disabled Company field on detail page
+    supabase
+      .from('companies')
+      .select('name')
+      .eq('id', profile.company_id)
+      .single(),
   ]);
 
   const auditLogs = auditLogsResult.data ?? [];
   const comments = commentsResult.data ?? [];
   const categories = categoriesResult.data ?? [];
   const locations = locationsResult.data ?? [];
+  const companyName = companyResult.data?.name ?? '';
   // Build GPS lookup: key = "fromStatus->toStatus" (may have duplicates, use most recent per pair)
   type GpsRecord = { latitude: number | null; longitude: number | null; created_at: string };
   const gpsMap: Record<string, GpsRecord> = {};
@@ -480,6 +488,7 @@ export default async function JobDetailPage({ params }: PageProps) {
         photoUrls={jobPhotoUrls}
         approvedByName={approvedByName}
         approvalRejectedByName={approvalRejectedByName}
+        companyName={companyName}
       />
 
     </div>

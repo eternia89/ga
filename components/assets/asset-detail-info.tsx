@@ -7,6 +7,7 @@ import type { InventoryItemWithRelations } from '@/lib/types/database';
 import { AssetEditForm } from './asset-edit-form';
 import { PhotoLightbox } from '@/components/requests/request-photo-lightbox';
 import type { ConditionPhoto, InvoiceItem } from './asset-detail-client';
+import { Input } from '@/components/ui/input';
 
 interface AssetDetailInfoProps {
   asset: InventoryItemWithRelations;
@@ -72,6 +73,7 @@ export function AssetDetailInfo({
         onSubmittingChange={onSubmittingChange}
         formId={formId}
         onDirtyChange={onDirtyChange}
+        companyName={asset.company?.name ?? ''}
       />
     );
   }
@@ -84,6 +86,16 @@ export function AssetDetailInfo({
   return (
     <>
       <div className="space-y-6">
+        {/* Company — always shown, always disabled */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Company</label>
+          <Input
+            value={asset.company?.name ?? ''}
+            disabled
+            className="bg-muted text-muted-foreground cursor-not-allowed"
+          />
+        </div>
+
         {/* Asset fields */}
         <dl className="space-y-3">
           <div>

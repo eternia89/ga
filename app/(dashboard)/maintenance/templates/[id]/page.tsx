@@ -65,13 +65,23 @@ export default async function TemplateDetailPage({ params }: PageProps) {
       : templateData.category ?? null,
   };
 
-  // Fetch asset-type categories for edit form
-  const { data: categories } = await supabase
-    .from('categories')
-    .select('id, name')
-    .eq('type', 'asset')
-    .is('deleted_at', null)
-    .order('name');
+  // Fetch asset-type categories for edit form and company name in parallel
+  const [categoriesResult, companyResult] = await Promise.all([
+    supabase
+      .from('categories')
+      .select('id, name')
+      .eq('type', 'asset')
+      .is('deleted_at', null)
+      .order('name'),
+    supabase
+      .from('companies')
+      .select('name')
+      .eq('id', profile.company_id)
+      .single(),
+  ]);
+
+  const categories = categoriesResult.data;
+  const companyName = companyResult.data?.name ?? '';
 
   return (
     <div className="space-y-6 py-6 pb-20">
@@ -90,6 +100,7 @@ export default async function TemplateDetailPage({ params }: PageProps) {
         template={template}
         categories={categories ?? []}
         userRole={profile.role}
+        companyName={companyName}
       />
     </div>
   );

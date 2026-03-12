@@ -50,7 +50,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
   }
 
   // Fetch all data in parallel
-  const [photosResult, auditLogsResult, categoriesResult, usersResult, locationsResult, linkedJobsResult] =
+  const [photosResult, auditLogsResult, categoriesResult, usersResult, locationsResult, linkedJobsResult, companyResult] =
     await Promise.all([
       // Photos: media_attachments for this request (non-deleted)
       supabase
@@ -98,6 +98,13 @@ export default async function RequestDetailPage({ params }: PageProps) {
         .from('job_requests')
         .select('job:jobs(id, display_id, title, status)')
         .eq('request_id', id),
+
+      // Company name for disabled Company field on detail page
+      supabase
+        .from('companies')
+        .select('name')
+        .eq('id', profile.company_id)
+        .single(),
     ]);
 
   // Generate signed URLs for photos
@@ -330,6 +337,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
   const categories = categoriesResult.data ?? [];
   const users = usersResult.data ?? [];
   const locations = locationsResult.data ?? [];
+  const companyName = companyResult.data?.name ?? '';
 
   // Extract linked jobs from join table result
   // Supabase returns FK relations as arrays when using select('job:jobs(...)')
@@ -389,6 +397,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
         currentUserId={profile.id}
         currentUserRole={profile.role}
         linkedJobs={linkedJobs}
+        companyName={companyName}
       />
     </div>
   );
