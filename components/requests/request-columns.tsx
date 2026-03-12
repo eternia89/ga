@@ -30,12 +30,18 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
       <DataTableColumnHeader column={column} title="ID" />
     ),
     cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <span className="font-mono text-xs">{row.getValue('display_id')}</span>
-        <RequestStatusBadge status={row.original.status} />
-      </div>
+      <span className="font-mono text-xs">{row.getValue('display_id')}</span>
     ),
-    size: 200,
+    size: 160,
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => (
+      <RequestStatusBadge status={row.original.status} />
+    ),
+    size: 150,
+    enableSorting: false,
   },
   {
     id: 'photo',

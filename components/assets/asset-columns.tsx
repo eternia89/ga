@@ -42,6 +42,21 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
     size: 140,
   },
   {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row, table }) => {
+      const meta = table.options.meta as AssetTableMeta | undefined;
+      const pendingTransfer = meta?.pendingTransfers?.[row.original.id];
+      return (
+        <AssetStatusBadge
+          status={row.getValue('status')}
+          showInTransit={!!pendingTransfer}
+        />
+      );
+    },
+    size: 140,
+  },
+  {
     id: 'photo',
     header: '',
     cell: ({ row, table }) => {
@@ -130,21 +145,6 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
       );
     },
     size: 160,
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row, table }) => {
-      const meta = table.options.meta as AssetTableMeta | undefined;
-      const pendingTransfer = meta?.pendingTransfers?.[row.original.id];
-      return (
-        <AssetStatusBadge
-          status={row.getValue('status')}
-          showInTransit={!!pendingTransfer}
-        />
-      );
-    },
-    size: 140,
   },
   {
     accessorKey: 'warranty_expiry',
