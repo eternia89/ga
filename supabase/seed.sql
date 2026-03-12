@@ -114,6 +114,13 @@ INSERT INTO public.categories (id, company_id, name, type) VALUES
 INSERT INTO public.categories (id, company_id, name, type) VALUES
   ('00000000-0000-4000-a003-000000000020', '00000000-0000-4000-a000-000000000004', 'Kelistrikan',         'request');
 
+-- Jaknot — maintenance equipment asset categories (4)
+INSERT INTO public.categories (id, company_id, name, type) VALUES
+  ('00000000-0000-4000-a003-000000000021', '00000000-0000-4000-a000-000000000001', 'APAR & Fire Safety',    'asset'),
+  ('00000000-0000-4000-a003-000000000022', '00000000-0000-4000-a000-000000000001', 'AC Split',              'asset'),
+  ('00000000-0000-4000-a003-000000000023', '00000000-0000-4000-a000-000000000001', 'Genset',                'asset'),
+  ('00000000-0000-4000-a003-000000000024', '00000000-0000-4000-a000-000000000001', 'Filter Air FRP',        'asset');
+
 -- ============================================================
 -- 5. Auth users (password: asdf1234 for all)
 -- ============================================================
