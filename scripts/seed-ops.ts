@@ -9,8 +9,8 @@
  *   - 60  jobs      (10 per status × 6 statuses)
  *   - 40  inventory items (10 per status × 4 statuses)
  *   - 40  inventory movements (10 per status × 4 statuses)
- *   - 5   maintenance templates
- *   - 12  maintenance schedules
+ *   - 6   maintenance templates
+ *   - 14  maintenance schedules
  *   - 30  job comments
  *
  * Creates for Jakmall (JM):
@@ -80,6 +80,10 @@ const CAT = {
   elektronik_jm: '00000000-0000-4000-a003-000000000015',
   furni_ast_jm:  '00000000-0000-4000-a003-000000000016',
   kendaraan_jm:  '00000000-0000-4000-a003-000000000017',
+  apar_jn:     '00000000-0000-4000-a003-000000000021',
+  ac_split_jn: '00000000-0000-4000-a003-000000000022',
+  genset_jn:   '00000000-0000-4000-a003-000000000023',
+  filter_jn:   '00000000-0000-4000-a003-000000000024',
 };
 
 const U = {
@@ -564,6 +568,10 @@ const ASSET_TEMPLATES = [
   { name: 'Honda Brio 2021',                   cat: 'kendaraan',  brand: 'Honda',      model: 'Brio Satya E',   cond: 'good'      },
   { name: 'Mitsubishi L300 Box 2020',          cat: 'kendaraan',  brand: 'Mitsubishi', model: 'L300 Box',       cond: 'fair'      },
   { name: 'Mesin Fotokopi Ricoh MP 2014',      cat: 'peralatan',  brand: 'Ricoh',      model: 'MP 2014',        cond: 'fair'      },
+  { name: 'APAR Dry Powder 6kg',               cat: 'apar',      brand: 'Protecta',   model: 'DP-6',           cond: 'good'      },
+  { name: 'AC Split Daikin 2PK',               cat: 'ac_split',  brand: 'Daikin',     model: 'FTKC60NVM',      cond: 'good'      },
+  { name: 'Genset Perkins 100kVA',             cat: 'genset',    brand: 'Perkins',    model: '1103A-33G',      cond: 'good'      },
+  { name: 'Filter Air FRP 10 inch',            cat: 'frp_water', brand: 'Pentair',    model: 'FRP-1054',       cond: 'good'      },
 ] as const;
 
 function catIdFor(cat: string): string {
@@ -572,6 +580,10 @@ function catIdFor(cat: string): string {
     furniture:  CAT.furni_ast_jn,
     kendaraan:  CAT.kendaraan_jn,
     peralatan:  CAT.peralatan_jn,
+    apar:      CAT.apar_jn,
+    ac_split:  CAT.ac_split_jn,
+    genset:    CAT.genset_jn,
+    frp_water: CAT.filter_jn,
   };
   return map[cat] ?? CAT.elektronik_jn;
 }
@@ -687,76 +699,92 @@ async function seedMaintenanceTemplates(supabase: SupabaseClient): Promise<strin
   const templates = [
     {
       company_id:  C.jaknot,
-      category_id: CAT.ac_jn,
-      name:        'Servis Rutin AC Split',
-      description: 'Prosedur servis berkala AC split 3 bulanan untuk seluruh unit kantor.',
+      category_id: CAT.apar_jn,
+      name:        'Pemeriksaan Bulanan APAR',
+      description: 'Inspeksi rutin APAR (Alat Pemadam Api Ringan) setiap bulan sesuai standar K3.',
       checklist: JSON.stringify([
-        { id: '1', type: 'checkbox', label: 'Matikan unit dan lepas tutup AC' },
-        { id: '2', type: 'checkbox', label: 'Bersihkan filter udara dengan air dan sabun' },
-        { id: '3', type: 'checkbox', label: 'Semprot evaporator dengan cairan pembersih khusus' },
-        { id: '4', type: 'checkbox', label: 'Cek dan bersihkan saluran pembuangan air' },
-        { id: '5', type: 'checkbox', label: 'Ukur tekanan freon (min. 65-70 PSI)' },
-        { id: '6', type: 'checkbox', label: 'Uji coba pendinginan selama 15 menit' },
-        { id: '7', type: 'checkbox', label: 'Dokumentasikan hasil servis dan kondisi unit' },
+        { id: '1', type: 'checkbox', label: 'Cek segel dan pin pengaman APAR masih utuh' },
+        { id: '2', type: 'checkbox', label: 'Periksa tekanan pressure gauge (jarum di zona hijau)' },
+        { id: '3', type: 'checkbox', label: 'Cek kondisi fisik tabung (tidak berkarat, penyok, atau bocor)' },
+        { id: '4', type: 'checkbox', label: 'Bersihkan dan cek selang/nozzle dari kerusakan' },
+        { id: '5', type: 'checkbox', label: 'Verifikasi label inspeksi dan tanggal kadaluarsa' },
+        { id: '6', type: 'checkbox', label: 'Pastikan APAR mudah dijangkau dan tidak terhalang' },
+        { id: '7', type: 'checkbox', label: 'Catat nomor seri dan kondisi dalam log pemeriksaan' },
       ]),
     },
     {
       company_id:  C.jaknot,
-      category_id: CAT.listrik_jn,
-      name:        'Inspeksi Panel Listrik Bulanan',
-      description: 'Pemeriksaan rutin panel listrik MDP dan SDP setiap bulan.',
+      category_id: CAT.ac_split_jn,
+      name:        'Servis Rutin Bulanan AC Split',
+      description: 'Pembersihan dan pengecekan AC split setiap bulan untuk menjaga performa optimal.',
       checklist: JSON.stringify([
-        { id: '1', type: 'checkbox', label: 'Periksa kondisi fisik busbar dan kabel' },
-        { id: '2', type: 'checkbox', label: 'Cek torque semua baut terminal' },
-        { id: '3', type: 'checkbox', label: 'Uji fungsi MCB (trip test)' },
-        { id: '4', type: 'checkbox', label: 'Ukur suhu busbar dengan thermal camera' },
-        { id: '5', type: 'checkbox', label: 'Cek indikator beban (voltmeter, amperemeter)' },
-        { id: '6', type: 'checkbox', label: 'Bersihkan debu di dalam panel' },
-        { id: '7', type: 'checkbox', label: 'Catat pembacaan meteran dan laporkan anomali' },
+        { id: '1', type: 'checkbox', label: 'Bersihkan filter udara bagian dalam dengan vakum atau air' },
+        { id: '2', type: 'checkbox', label: 'Semprot evaporator dengan cairan pembersih khusus AC' },
+        { id: '3', type: 'checkbox', label: 'Cek dan bersihkan saluran pembuangan air kondensasi' },
+        { id: '4', type: 'checkbox', label: 'Periksa kondisi remote control dan pengaturan suhu' },
+        { id: '5', type: 'checkbox', label: 'Ukur suhu udara keluar (harus 8-12°C di bawah suhu ruangan)' },
+        { id: '6', type: 'checkbox', label: 'Cek unit outdoor: bersihkan kondenser dari debu dan daun' },
+        { id: '7', type: 'checkbox', label: 'Dokumentasikan kondisi unit dan laporkan anomali' },
       ]),
     },
     {
       company_id:  C.jaknot,
-      category_id: CAT.kendaraan_jn,
-      name:        'Servis Kendaraan Operasional',
-      description: 'Servis berkala kendaraan operasional setiap 5.000 km atau 3 bulan.',
+      category_id: CAT.genset_jn,
+      name:        'Perawatan Bulanan Genset',
+      description: 'Servis dan uji coba genset setiap bulan untuk kesiapan saat listrik PLN padam.',
       checklist: JSON.stringify([
-        { id: '1', type: 'checkbox', label: 'Ganti oli mesin dan filter oli' },
-        { id: '2', type: 'checkbox', label: 'Cek dan isi tekanan ban' },
-        { id: '3', type: 'checkbox', label: 'Periksa kondisi rem depan dan belakang' },
-        { id: '4', type: 'checkbox', label: 'Cek level air radiator dan aki' },
-        { id: '5', type: 'checkbox', label: 'Periksa lampu-lampu kendaraan' },
-        { id: '6', type: 'checkbox', label: 'Uji wiper dan cairan washer' },
-        { id: '7', type: 'checkbox', label: 'Test drive dan dokumentasi kondisi' },
+        { id: '1', type: 'checkbox', label: 'Cek level oli mesin dan tambahkan jika kurang' },
+        { id: '2', type: 'checkbox', label: 'Periksa level air radiator dan kondisi selang radiator' },
+        { id: '3', type: 'checkbox', label: 'Cek kondisi aki: tegangan, air aki, dan terminal' },
+        { id: '4', type: 'checkbox', label: 'Bersihkan filter udara dan saringan bahan bakar' },
+        { id: '5', type: 'checkbox', label: 'Lakukan uji coba start dan jalankan beban selama 15 menit' },
+        { id: '6', type: 'checkbox', label: 'Catat jam operasional dan konsumsi bahan bakar' },
+        { id: '7', type: 'checkbox', label: 'Periksa kebocoran oli, air, atau bahan bakar' },
       ]),
     },
     {
       company_id:  C.jaknot,
-      category_id: CAT.elektronik_jn,
-      name:        'Pemeliharaan Perangkat IT Berkala',
-      description: 'Pembersihan dan pengecekan perangkat IT (PC, printer, server) setiap semester.',
+      category_id: CAT.filter_jn,
+      name:        'Perawatan Bulanan Filter Air FRP',
+      description: 'Pemeriksaan dan backwash filter air FRP setiap bulan untuk kualitas air bersih.',
       checklist: JSON.stringify([
-        { id: '1', type: 'checkbox', label: 'Bersihkan debu di dalam casing PC/server' },
-        { id: '2', type: 'checkbox', label: 'Update driver dan firmware perangkat' },
-        { id: '3', type: 'checkbox', label: 'Cek kondisi kipas dan heatsink' },
-        { id: '4', type: 'checkbox', label: 'Uji kapasitas dan kondisi baterai laptop' },
-        { id: '5', type: 'checkbox', label: 'Bersihkan head dan roller printer' },
-        { id: '6', type: 'checkbox', label: 'Verifikasi backup data berjalan normal' },
-        { id: '7', type: 'checkbox', label: 'Catat kondisi dan umur perangkat' },
+        { id: '1', type: 'checkbox', label: 'Cek tekanan inlet dan outlet filter (beda tekanan maks 5 PSI)' },
+        { id: '2', type: 'checkbox', label: 'Lakukan proses backwash selama 10 menit' },
+        { id: '3', type: 'checkbox', label: 'Cek kondisi valve multi-port (tidak bocor atau macet)' },
+        { id: '4', type: 'checkbox', label: 'Periksa kondisi media filter (tidak menggumpal)' },
+        { id: '5', type: 'checkbox', label: 'Cek kualitas air output (TDS, kekeruhan)' },
+        { id: '6', type: 'checkbox', label: 'Bersihkan housing dan area sekitar filter' },
+        { id: '7', type: 'checkbox', label: 'Catat tanggal backwash dan kondisi filter dalam log' },
       ]),
     },
     {
       company_id:  C.jaknot,
-      category_id: CAT.furni_ast_jn,
-      name:        'Inspeksi Furniture Kantor',
-      description: 'Pemeriksaan kondisi furniture kantor (meja, kursi, lemari) setiap 6 bulan.',
+      category_id: null,
+      name:        'Checklist Kebersihan Bulanan',
+      description: 'Checklist pemeriksaan kebersihan umum kantor setiap bulan.',
       checklist: JSON.stringify([
-        { id: '1', type: 'checkbox', label: 'Cek stabilitas dan kekuatan struktur meja' },
-        { id: '2', type: 'checkbox', label: 'Periksa roda dan mekanisme kursi putar' },
-        { id: '3', type: 'checkbox', label: 'Cek kondisi engsel dan kunci lemari' },
-        { id: '4', type: 'checkbox', label: 'Perbarui cat atau finishing yang terkelupas' },
-        { id: '5', type: 'checkbox', label: 'Kencangkan sekrup dan baut yang kendur' },
-        { id: '6', type: 'checkbox', label: 'Dokumentasikan furniture yang perlu penggantian' },
+        { id: '1', type: 'checkbox', label: 'Periksa kondisi lantai semua area (bersih, tidak rusak, tidak licin)' },
+        { id: '2', type: 'checkbox', label: 'Cek kondisi plafon dan dinding (tidak bocor, tidak berjamur)' },
+        { id: '3', type: 'checkbox', label: 'Periksa toilet dan kamar mandi (saluran lancar, tidak bocor)' },
+        { id: '4', type: 'checkbox', label: 'Cek kondisi kaca jendela dan pintu (bersih, tidak retak)' },
+        { id: '5', type: 'checkbox', label: 'Periksa area dapur/pantry (bersih, peralatan berfungsi)' },
+        { id: '6', type: 'checkbox', label: 'Cek area parkir dan loading dock (bebas sampah dan hambatan)' },
+        { id: '7', type: 'checkbox', label: 'Verifikasi tempat sampah tersedia di semua titik dan berfungsi' },
+        { id: '8', type: 'checkbox', label: 'Dokumentasikan temuan dan tindak lanjut yang diperlukan' },
+      ]),
+    },
+    {
+      company_id:  C.jaknot,
+      category_id: null,
+      name:        'Audit Inventaris Karyawan 10 Pcs',
+      description: 'Audit mingguan 10 aset karyawan secara acak untuk memverifikasi kondisi dan keberadaan.',
+      checklist: JSON.stringify([
+        { id: '1', type: 'checkbox', label: 'Pilih 10 aset secara acak dari daftar inventaris aktif' },
+        { id: '2', type: 'checkbox', label: 'Verifikasi keberadaan fisik aset sesuai lokasi tercatat' },
+        { id: '3', type: 'checkbox', label: 'Cek kondisi aset (bandingkan dengan kondisi terakhir di sistem)' },
+        { id: '4', type: 'checkbox', label: 'Scan atau catat nomor seri / kode aset' },
+        { id: '5', type: 'checkbox', label: 'Perbarui kondisi aset di sistem jika ada perubahan' },
+        { id: '6', type: 'checkbox', label: 'Laporkan aset yang tidak ditemukan atau kondisinya menurun' },
       ]),
     },
   ];
@@ -771,10 +799,15 @@ async function seedMaintenanceTemplates(supabase: SupabaseClient): Promise<strin
 async function seedMaintenanceSchedules(supabase: SupabaseClient, templateIds: string[], activeItemIds: string[]): Promise<string[]> {
   const schedules = templateIds.flatMap((templateId, tIdx) => {
     // Assign 2-3 schedules per template using different active items
+    // count: 3+3+2+2+2+2 = 14 schedules total across 6 templates
     const count = tIdx < 2 ? 3 : 2;
     return Array.from({ length: count }, (_, i) => {
-      const itemId  = activeItemIds[(tIdx * 3 + i) % activeItemIds.length];
-      const interval = [7, 14, 30, 90, 180][tIdx % 5];
+      // Templates 4-5 (general checklists, no category) use offset picks for variety
+      const itemId = tIdx >= 4
+        ? activeItemIds[(tIdx * 3 + i + 20) % activeItemIds.length]
+        : activeItemIds[(tIdx * 3 + i) % activeItemIds.length];
+      // Template index 5 = weekly audit; all others = monthly
+      const interval = tIdx === 5 ? 7 : 30;
       const lastDone = daysAgo(interval + (i + 1) * 3);
       const nextDue  = new Date(new Date(lastDone).getTime() + interval * 86_400_000).toISOString();
       const isPaused = tIdx === 3 && i === 0; // one paused schedule for variety
@@ -918,11 +951,11 @@ async function main() {
   await seedJakmallInventory(supabase);
   console.log('   ✓ done');
 
-  console.log('🗓️  Maintenance templates (5)...');
+  console.log('🗓️  Maintenance templates (6)...');
   const templateIds = await seedMaintenanceTemplates(supabase);
   console.log(`   ✓ ${templateIds.length} templates created`);
 
-  console.log('📅 Maintenance schedules (12)...');
+  console.log('📅 Maintenance schedules (14)...');
   const scheduleIds = await seedMaintenanceSchedules(supabase, templateIds, activeItemIds);
   console.log(`   ✓ ${scheduleIds.length} schedules created`);
 
@@ -936,7 +969,7 @@ async function main() {
 
   console.log('\n✅ Seed complete!\n');
   console.log('Summary:');
-  console.log('  Jaknot  : 110 requests | 60 jobs | 40 assets | 40 movements | 5 templates | 12 schedules');
+  console.log('  Jaknot  : 110 requests | 60 jobs | 40 assets | 40 movements | 6 templates | 14 schedules');
   console.log('  Jakmall :  22 requests | 12 jobs | 10 assets');
   console.log('');
   console.log('All users login with password: asdf1234');
