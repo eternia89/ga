@@ -24,6 +24,8 @@ export interface GAUserWithLocation {
   location_id: string | null;
 }
 
+type TransferMode = 'user' | 'location';
+
 interface AssetTransferDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -48,7 +50,9 @@ export function AssetTransferDialog({
   onSuccess,
 }: AssetTransferDialogProps) {
   const router = useRouter();
+  const [mode, setMode] = useState<TransferMode>('user');
   const [receiverId, setReceiverId] = useState('');
+  const [toLocationId, setToLocationId] = useState('');
   const [notes, setNotes] = useState('');
   const [photos, setPhotos] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,7 +61,9 @@ export function AssetTransferDialog({
   // Reset when dialog opens
   useEffect(() => {
     if (open) {
+      setMode('user');
       setReceiverId('');
+      setToLocationId('');
       setNotes('');
       setPhotos([]);
       setFeedback(null);
@@ -68,16 +74,36 @@ export function AssetTransferDialog({
     .filter((u) => u.id !== currentUserId)
     .map((u) => ({ label: u.name, value: u.id }));
 
-  // Auto-resolve location from selected receiver
+  const locationOptions = Object.entries(locationNames).map(([value, label]) => ({
+    value,
+    label,
+  }));
+
+  // Auto-resolve location from selected receiver (user mode)
   const selectedUser = useMemo(
     () => gaUsers.find((u) => u.id === receiverId) ?? null,
     [gaUsers, receiverId]
   );
   const resolvedLocationId = selectedUser?.location_id ?? '';
-  const resolvedLocationName = resolvedLocationId ? (locationNames[resolvedLocationId] ?? 'Unknown location') : '';
+  const resolvedLocationName = resolvedLocationId
+    ? (locationNames[resolvedLocationId] ?? 'Unknown location')
+    : '';
   const receiverHasNoLocation = receiverId !== '' && !resolvedLocationId;
 
-  const canSubmit = receiverId !== '' && resolvedLocationId !== '' && photos.length > 0;
+  const canSubmit =
+    mode === 'user'
+      ? receiverId !== '' && resolvedLocationId !== '' && photos.length > 0
+      : toLocationId !== '' && photos.length > 0;
+
+  const handleModeSwitch = (newMode: TransferMode) => {
+    setMode(newMode);
+    if (newMode === 'location') {
+      setReceiverId('');
+    } else {
+      setToLocationId('');
+    }
+    setFeedback(null);
+  };
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -86,11 +112,14 @@ export function AssetTransferDialog({
     setFeedback(null);
 
     try {
+      const finalLocationId = mode === 'user' ? resolvedLocationId : toLocationId;
+      const finalReceiverId = mode === 'user' ? receiverId : undefined;
+
       // Step 1: Create transfer movement
       const result = await createTransfer({
         asset_id: asset.id,
-        to_location_id: resolvedLocationId,
-        receiver_id: receiverId,
+        to_location_id: finalLocationId,
+        receiver_id: finalReceiverId,
         notes: notes || undefined,
       });
 
@@ -116,7 +145,7 @@ export function AssetTransferDialog({
         });
 
         if (!uploadRes.ok) {
-          // Transfer created but photo upload failed
+          // Transfer created but photo upload failed — still close and refresh
           onOpenChange(false);
           onSuccess();
           router.refresh();
@@ -142,46 +171,94 @@ export function AssetTransferDialog({
       <DialogContent className="max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Transfer Asset</DialogTitle>
+          <p className="text-sm text-muted-foreground">
+            Current location: <span className="font-medium text-foreground">{currentLocationName || '—'}</span>
+          </p>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Current location (read-only) */}
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-              Current Location
-            </p>
-            <p className="text-sm font-medium">{currentLocationName || '—'}</p>
+          {/* Mode toggle */}
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={mode === 'user' ? 'default' : 'outline'}
+              size="sm"
+              className="flex-1"
+              onClick={() => handleModeSwitch('user')}
+              disabled={isSubmitting}
+            >
+              Transfer to User
+            </Button>
+            <Button
+              type="button"
+              variant={mode === 'location' ? 'default' : 'outline'}
+              size="sm"
+              className="flex-1"
+              onClick={() => handleModeSwitch('location')}
+              disabled={isSubmitting}
+            >
+              Move to Location
+            </Button>
           </div>
 
-          {/* Receiver */}
-          <div className="space-y-1.5">
-            <Label htmlFor="receiver">
-              Receiver <span className="text-destructive">*</span>
-            </Label>
-            <Combobox
-              options={userOptions}
-              value={receiverId}
-              onValueChange={setReceiverId}
-              placeholder="Select receiver..."
-              searchPlaceholder="Search users..."
-              emptyText="No users found."
-              disabled={isSubmitting}
-            />
-            {/* Auto-resolved location display */}
-            {resolvedLocationName && (
-              <p className="text-xs text-muted-foreground">
-                Location: {resolvedLocationName}
-              </p>
-            )}
-            {receiverHasNoLocation && (
-              <div className="flex items-start gap-2 rounded-md border border-yellow-200 bg-yellow-50 p-2.5">
-                <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 shrink-0" />
-                <p className="text-xs text-yellow-700">
-                  Selected receiver has no assigned location. Please assign a location to this user first.
-                </p>
-              </div>
-            )}
-          </div>
+          {/* User Transfer mode */}
+          {mode === 'user' && (
+            <div className="space-y-1.5">
+              <Label htmlFor="receiver">
+                Receiver <span className="text-destructive">*</span>
+              </Label>
+              {userOptions.length === 0 ? (
+                <InlineFeedback
+                  type="error"
+                  message="No eligible users found in this company. Use 'Move to Location' instead."
+                />
+              ) : (
+                <>
+                  <Combobox
+                    options={userOptions}
+                    value={receiverId}
+                    onValueChange={setReceiverId}
+                    placeholder="Select receiver..."
+                    searchPlaceholder="Search users..."
+                    emptyText="No users found."
+                    disabled={isSubmitting}
+                  />
+                  {/* Auto-resolved location display */}
+                  {resolvedLocationName && (
+                    <p className="text-xs text-muted-foreground">
+                      Location: {resolvedLocationName}
+                    </p>
+                  )}
+                  {receiverHasNoLocation && (
+                    <div className="flex items-start gap-2 rounded-md border border-yellow-200 bg-yellow-50 p-2.5">
+                      <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 shrink-0" />
+                      <p className="text-xs text-yellow-700">
+                        Selected receiver has no assigned location. Please assign a location to this user first.
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Location Transfer mode */}
+          {mode === 'location' && (
+            <div className="space-y-1.5">
+              <Label htmlFor="to-location">
+                Destination Location <span className="text-destructive">*</span>
+              </Label>
+              <Combobox
+                options={locationOptions}
+                value={toLocationId}
+                onValueChange={setToLocationId}
+                placeholder="Select location..."
+                searchPlaceholder="Search locations..."
+                emptyText="No locations found."
+                disabled={isSubmitting}
+              />
+            </div>
+          )}
 
           {/* Notes */}
           <div className="space-y-1.5">
@@ -238,7 +315,9 @@ export function AssetTransferDialog({
               onClick={handleSubmit}
               disabled={!canSubmit || isSubmitting}
             >
-              {isSubmitting ? 'Initiating...' : 'Initiate Transfer'}
+              {isSubmitting
+                ? mode === 'user' ? 'Initiating...' : 'Moving...'
+                : mode === 'user' ? 'Initiate Transfer' : 'Move Asset'}
             </Button>
           </div>
         </div>

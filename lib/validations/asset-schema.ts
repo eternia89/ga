@@ -32,11 +32,11 @@ export const assetStatusChangeSchema = z.object({
 
 export type AssetStatusChangeFormData = z.infer<typeof assetStatusChangeSchema>;
 
-// Transfer initiation schema
+// Transfer initiation schema — receiver_id optional to support location-only transfers
 export const assetTransferSchema = z.object({
   asset_id: z.string().uuid({ message: 'Asset ID is required' }),
   to_location_id: z.string().uuid({ message: 'Destination location is required' }),
-  receiver_id: z.string().uuid({ message: 'Receiver is required' }),
+  receiver_id: z.string().uuid().optional(),
   notes: z.string().max(200, 'Notes must be under 200 characters').optional(),
 });
 
