@@ -93,7 +93,7 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
       const title = row.getValue('title') as string;
       return (
         <span
-          className="truncate block"
+          className="whitespace-normal break-words block"
           title={title}
         >
           {title}
@@ -110,7 +110,7 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
     cell: ({ row }) => {
       const name = row.original.location?.name;
       return name ? (
-        <span className="truncate block max-w-[130px]" title={name}>
+        <span className="whitespace-normal break-words" title={name}>
           {name}
         </span>
       ) : (
@@ -134,7 +134,7 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
     cell: ({ row }) => {
       const name = row.original.assigned_user?.name;
       return name ? (
-        <span className="truncate block max-w-[120px]" title={name}>
+        <span className="whitespace-normal break-words" title={name}>
           {name}
         </span>
       ) : (

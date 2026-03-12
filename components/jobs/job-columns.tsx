@@ -106,7 +106,7 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
               <OverdueBadge nextDueAt={nextDueAt} jobStatus={job.status} />
             )}
           </div>
-          <span className="truncate block text-sm" title={title}>
+          <span className="whitespace-normal break-words text-sm" title={title}>
             {title}
           </span>
         </div>
@@ -122,7 +122,7 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
     cell: ({ row }) => {
       const name = row.original.location?.name;
       return name ? (
-        <span className="truncate block max-w-[130px]" title={name}>{name}</span>
+        <span className="whitespace-normal break-words" title={name}>{name}</span>
       ) : (
         <span className="text-muted-foreground">—</span>
       );
@@ -143,7 +143,7 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
     cell: ({ row }) => {
       const name = row.original.pic?.full_name;
       return name ? (
-        <span className="truncate block max-w-[120px]" title={name}>
+        <span className="whitespace-normal break-words" title={name}>
           {name}
         </span>
       ) : (
