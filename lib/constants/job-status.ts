@@ -14,8 +14,8 @@ export const JOB_STATUS_COLORS: Record<string, string> = {
   created: 'bg-gray-100 text-gray-700',
   assigned: 'bg-blue-100 text-blue-700',
   in_progress: 'bg-amber-100 text-amber-700',
-  pending_approval: 'bg-purple-100 text-purple-700',
-  pending_completion_approval: 'bg-orange-100 text-orange-700',
+  pending_approval: 'bg-violet-100 text-violet-700',
+  pending_completion_approval: 'bg-violet-100 text-violet-700',
   completed: 'bg-green-100 text-green-700',
   cancelled: 'bg-stone-100 text-stone-600',
 };
