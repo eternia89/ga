@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Completed quick task 54: Multi-company RLS E2E test and unit test"
-last_updated: "2026-03-12T06:52:48Z"
-last_activity: "2026-03-12 - Completed quick task 54: Vitest schema validation (7 cases) + Playwright API-level RLS isolation tests (5 cases) for multi-company access"
+stopped_at: "Completed quick task 55: Fix inconsistent status badge colors across ACR"
+last_updated: "2026-03-12T07:51:00Z"
+last_activity: "2026-03-12 - Completed quick task 55: Canonical color palette enforced — emerald/slate/purple retired from status badges, APPROVAL_TYPE_COLORS/APPROVAL_DECISION_COLORS/PM_BADGE_CLASS constants created, dashboard hex colors aligned"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -333,6 +333,7 @@ Recent decisions affecting current work:
 | 60 | Company field on Schedule/Template create modals and all edit/detail pages for all 5 entity types | 2026-03-12 | 978dd28 | Verified | [51-add-company-field-to-all-creation-and-ed](./quick/51-add-company-field-to-all-creation-and-ed/) |
 | 61 | Add ?action=create permalink URL sync to New Request modal — bidirectional sync on open and close | 2026-03-12 | ad826f3 | Verified | [52-add-action-create-permalink-support-to-n](./quick/52-add-action-create-permalink-support-to-n/) |
 | 62 | Multi-company RLS E2E test (5 Playwright API cases) + updateUserCompanyAccess unit test (7 Vitest cases) | 2026-03-12 | c63fe2c | Verified | [54-add-multi-company-rls-e2e-test-and-updat](./quick/54-add-multi-company-rls-e2e-test-and-updat/) |
+| 63 | Fix inconsistent status badge colors: canonical palette (green/stone/violet), approval constants, PM badge constant, dashboard hex colors | 2026-03-12 | 5ddd0ba | Complete | [55-fix-inconsistent-status-badge-colors-acr](./quick/55-fix-inconsistent-status-badge-colors-acr/) |
 
 ## Session Continuity
 
