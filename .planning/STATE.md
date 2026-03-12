@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Completed quick task 51: Company field on all create and edit surfaces"
-last_updated: "2026-03-12T05:37:09Z"
-last_activity: "2026-03-12 - Completed quick task 51: Company field added to Schedule/Template create modals and all edit/detail pages (Request, Job, Asset, Schedule, Template)"
+stopped_at: "Completed quick task 52: ?action=create permalink URL sync for New Request modal"
+last_updated: "2026-03-12T06:30:10Z"
+last_activity: "2026-03-12 - Completed quick task 52: Added bidirectional ?action=create URL sync to RequestCreateDialog matching pattern from JobCreateDialog and AssetCreateDialog"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -331,10 +331,11 @@ Recent decisions affecting current work:
 | 58 | Fix company-based data isolation: push migrations, expand RLS SELECT policies for multi-company access, seed test data | 2026-03-11 | 849ffbb | Verified | [49-fix-company-based-data-isolation-user-co](./quick/49-fix-company-based-data-isolation-user-co/) |
 | 59 | All insertion modals always show Company field — disabled Input for single-company, interactive Combobox for multi-company | 2026-03-11 | b4037e3 | Verified | [50-all-insertion-modals-show-company-field-](./quick/50-all-insertion-modals-show-company-field-/) |
 | 60 | Company field on Schedule/Template create modals and all edit/detail pages for all 5 entity types | 2026-03-12 | 978dd28 | Verified | [51-add-company-field-to-all-creation-and-ed](./quick/51-add-company-field-to-all-creation-and-ed/) |
+| 61 | Add ?action=create permalink URL sync to New Request modal — bidirectional sync on open and close | 2026-03-12 | ad826f3 | Verified | [52-add-action-create-permalink-support-to-n](./quick/52-add-action-create-permalink-support-to-n/) |
 
 ## Session Continuity
 
-Last session: 2026-03-11
-Stopped at: Completed quick task 50: All insertion modals show Company field
+Last session: 2026-03-12
+Stopped at: Completed quick task 52: ?action=create permalink URL sync for New Request modal
 Resume file: None
 Next: Ready for next task
