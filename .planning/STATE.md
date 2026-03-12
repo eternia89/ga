@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Completed quick task 52: ?action=create permalink URL sync for New Request modal"
-last_updated: "2026-03-12T06:30:10Z"
-last_activity: "2026-03-12 - Completed quick task 52: Added bidirectional ?action=create URL sync to RequestCreateDialog matching pattern from JobCreateDialog and AssetCreateDialog"
+stopped_at: "Completed quick task 53: Show creator name below date in all tables"
+last_updated: "2026-03-12T07:00:00Z"
+last_activity: "2026-03-12 - Completed quick task 53: Two-line Created cells in Requests and Jobs tables showing date + by {creator name}"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -336,6 +336,6 @@ Recent decisions affecting current work:
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed quick task 52: ?action=create permalink URL sync for New Request modal
+Stopped at: Completed quick task 53: Show creator name below date in all tables
 Resume file: None
 Next: Ready for next task
