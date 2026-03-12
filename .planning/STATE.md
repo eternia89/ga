@@ -337,10 +337,11 @@ Recent decisions affecting current work:
 | 64 | Jobs table: split ID/Status into separate columns, add Location column, remove Linked Requests, fix column order | 2026-03-12 | 15a7208 | Complete | [56-jobs-table-add-location-column-and-fix-c](./quick/56-jobs-table-add-location-column-and-fix-c/) |
 | 65 | Requests and assets tables: separate ID (font-mono only) and Status (badge only) into first two columns | 2026-03-12 | cc22879 | Complete | [57-separate-id-and-status-into-first-two-co](./quick/57-separate-id-and-status-into-first-two-co/) |
 | 66 | Seed ops data: 4 asset categories (APAR, AC Split, Genset, Filter Air FRP), 4 equipment assets, 6 maintenance templates, 14 schedules | 2026-03-12 | 3c2c139 | Complete | [59-seed-ops-data-asset-categories-assets-ma](./quick/59-seed-ops-data-asset-categories-assets-ma/) |
+| 67 | Enforce company-scoped uniqueness for category names (create, update, restore) | 2026-03-12 | 991fcb6 | Complete | [60-enforce-uniqueness-for-categories-and-co](./quick/60-enforce-uniqueness-for-categories-and-co/) |
 
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed quick task 59: Seed ops data — 4 asset categories, 6 maintenance templates, 14 schedules
+Stopped at: Completed quick task 60: Enforce company-scoped category name uniqueness
 Resume file: None
 Next: Ready for next task
