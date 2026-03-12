@@ -334,10 +334,11 @@ Recent decisions affecting current work:
 | 61 | Add ?action=create permalink URL sync to New Request modal — bidirectional sync on open and close | 2026-03-12 | ad826f3 | Verified | [52-add-action-create-permalink-support-to-n](./quick/52-add-action-create-permalink-support-to-n/) |
 | 62 | Multi-company RLS E2E test (5 Playwright API cases) + updateUserCompanyAccess unit test (7 Vitest cases) | 2026-03-12 | c63fe2c | Verified | [54-add-multi-company-rls-e2e-test-and-updat](./quick/54-add-multi-company-rls-e2e-test-and-updat/) |
 | 63 | Fix inconsistent status badge colors: canonical palette (green/stone/violet), approval constants, PM badge constant, dashboard hex colors | 2026-03-12 | 5ddd0ba | Complete | [55-fix-inconsistent-status-badge-colors-acr](./quick/55-fix-inconsistent-status-badge-colors-acr/) |
+| 64 | Jobs table: split ID/Status into separate columns, add Location column, remove Linked Requests, fix column order | 2026-03-12 | 15a7208 | Complete | [56-jobs-table-add-location-column-and-fix-c](./quick/56-jobs-table-add-location-column-and-fix-c/) |
 
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed quick task 54: Multi-company RLS E2E test and unit test
+Stopped at: Completed quick task 56: Jobs table column restructure — split ID/Status, add Location
 Resume file: None
 Next: Ready for next task
