@@ -105,7 +105,7 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
     cell: ({ row }) => {
       const name = row.getValue('name') as string;
       return (
-        <span className="truncate block font-medium" title={name}>
+        <span className="whitespace-normal break-words font-medium" title={name}>
           {name}
         </span>
       );
@@ -120,7 +120,7 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
     cell: ({ row }) => {
       const name = row.original.category?.name;
       return name ? (
-        <span className="truncate block max-w-[140px]" title={name}>
+        <span className="whitespace-normal break-words" title={name}>
           {name}
         </span>
       ) : (
@@ -137,7 +137,7 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
       const locationName = row.original.location?.name;
 
       return locationName ? (
-        <span className="truncate block max-w-[160px]" title={locationName}>
+        <span className="whitespace-normal break-words" title={locationName}>
           {locationName}
         </span>
       ) : (
