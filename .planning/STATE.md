@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-12 - Completed quick task 53: Show creator name below date in all table Created columns
+Last activity: 2026-03-12 - Completed quick task 61: users table role column, remove transfer button, rename inventory to asset, fix asset transfer no users found, and the two-mode transfer modal
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -338,7 +338,7 @@ Recent decisions affecting current work:
 | 65 | Requests and assets tables: separate ID (font-mono only) and Status (badge only) into first two columns | 2026-03-12 | cc22879 | Complete | [57-separate-id-and-status-into-first-two-co](./quick/57-separate-id-and-status-into-first-two-co/) |
 | 66 | Seed ops data: 4 asset categories (APAR, AC Split, Genset, Filter Air FRP), 4 equipment assets, 6 maintenance templates, 14 schedules | 2026-03-12 | 3c2c139 | Complete | [59-seed-ops-data-asset-categories-assets-ma](./quick/59-seed-ops-data-asset-categories-assets-ma/) |
 | 67 | Enforce company-scoped uniqueness for category names (create, update, restore) | 2026-03-12 | 991fcb6 | Complete | [60-enforce-uniqueness-for-categories-and-co](./quick/60-enforce-uniqueness-for-categories-and-co/) |
-| 68 | Users table role column, remove Transfer row button, rename Inventory to Assets, two-mode transfer dialog | 2026-03-12 | 78d05c0 | Complete | [61-users-table-role-column-remove-transfer-](./quick/61-users-table-role-column-remove-transfer-/) |
+| 68 | Users table role column, remove Transfer row button, rename Inventory to Assets, two-mode transfer dialog | 2026-03-12 | 78d05c0 | Verified | [61-users-table-role-column-remove-transfer-](./quick/61-users-table-role-column-remove-transfer-/) |
 
 ## Session Continuity
 
