@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Completed quick task 55: Fix inconsistent status badge colors across ACR"
-last_updated: "2026-03-12T07:51:00Z"
-last_activity: "2026-03-12 - Completed quick task 55: Canonical color palette enforced — emerald/slate/purple retired from status badges, APPROVAL_TYPE_COLORS/APPROVAL_DECISION_COLORS/PM_BADGE_CLASS constants created, dashboard hex colors aligned"
+stopped_at: "Completed quick task 59: Seed ops data — 4 asset categories, 4 equipment assets, 6 maintenance templates, 14 schedules"
+last_updated: "2026-03-12T08:30:00Z"
+last_activity: "2026-03-12 - Completed quick task 59: Added 4 maintenance equipment asset categories to seed.sql (IDs 021-024), extended seed-ops.ts with equipment assets and 6 maintenance templates (4 equipment-specific monthly PM + cleaning checklist + weekly inventory audit), 14 schedules total"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -336,10 +336,11 @@ Recent decisions affecting current work:
 | 63 | Fix inconsistent status badge colors: canonical palette (green/stone/violet), approval constants, PM badge constant, dashboard hex colors | 2026-03-12 | 5ddd0ba | Complete | [55-fix-inconsistent-status-badge-colors-acr](./quick/55-fix-inconsistent-status-badge-colors-acr/) |
 | 64 | Jobs table: split ID/Status into separate columns, add Location column, remove Linked Requests, fix column order | 2026-03-12 | 15a7208 | Complete | [56-jobs-table-add-location-column-and-fix-c](./quick/56-jobs-table-add-location-column-and-fix-c/) |
 | 65 | Requests and assets tables: separate ID (font-mono only) and Status (badge only) into first two columns | 2026-03-12 | cc22879 | Complete | [57-separate-id-and-status-into-first-two-co](./quick/57-separate-id-and-status-into-first-two-co/) |
+| 66 | Seed ops data: 4 asset categories (APAR, AC Split, Genset, Filter Air FRP), 4 equipment assets, 6 maintenance templates, 14 schedules | 2026-03-12 | 3c2c139 | Complete | [59-seed-ops-data-asset-categories-assets-ma](./quick/59-seed-ops-data-asset-categories-assets-ma/) |
 
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Completed quick task 57: Requests and assets tables — ID col 1 (mono only), Status col 2 (badge only)
+Stopped at: Completed quick task 59: Seed ops data — 4 asset categories, 6 maintenance templates, 14 schedules
 Resume file: None
 Next: Ready for next task
