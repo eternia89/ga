@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Completed quick task 59: Seed ops data — 4 asset categories, 4 equipment assets, 6 maintenance templates, 14 schedules"
-last_updated: "2026-03-12T08:30:00Z"
-last_activity: "2026-03-12 - Completed quick task 59: Added 4 maintenance equipment asset categories to seed.sql (IDs 021-024), extended seed-ops.ts with equipment assets and 6 maintenance templates (4 equipment-specific monthly PM + cleaning checklist + weekly inventory audit), 14 schedules total"
+stopped_at: "Completed quick task 61: Users role column, remove Transfer row button, rename Inventory to Assets, two-mode transfer dialog"
+last_updated: "2026-03-12T09:00:00Z"
+last_activity: "2026-03-12 - Completed quick task 61: Extracted role badge into standalone Role column in users table, removed Transfer button from asset table rows, renamed all Inventory UI labels to Assets (sidebar, page h1, breadcrumbs, error page), redesigned transfer dialog with two-mode toggle (user vs location), fixed no-users-found state with InlineFeedback, made receiver_id optional in assetTransferSchema"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -338,6 +338,7 @@ Recent decisions affecting current work:
 | 65 | Requests and assets tables: separate ID (font-mono only) and Status (badge only) into first two columns | 2026-03-12 | cc22879 | Complete | [57-separate-id-and-status-into-first-two-co](./quick/57-separate-id-and-status-into-first-two-co/) |
 | 66 | Seed ops data: 4 asset categories (APAR, AC Split, Genset, Filter Air FRP), 4 equipment assets, 6 maintenance templates, 14 schedules | 2026-03-12 | 3c2c139 | Complete | [59-seed-ops-data-asset-categories-assets-ma](./quick/59-seed-ops-data-asset-categories-assets-ma/) |
 | 67 | Enforce company-scoped uniqueness for category names (create, update, restore) | 2026-03-12 | 991fcb6 | Complete | [60-enforce-uniqueness-for-categories-and-co](./quick/60-enforce-uniqueness-for-categories-and-co/) |
+| 68 | Users table role column, remove Transfer row button, rename Inventory to Assets, two-mode transfer dialog | 2026-03-12 | 78d05c0 | Complete | [61-users-table-role-column-remove-transfer-](./quick/61-users-table-role-column-remove-transfer-/) |
 
 ## Session Continuity
 
