@@ -341,10 +341,11 @@ Recent decisions affecting current work:
 | 68 | Users table role column, remove Transfer row button, rename Inventory to Assets, two-mode transfer dialog | 2026-03-12 | 78d05c0 | Verified | [61-users-table-role-column-remove-transfer-](./quick/61-users-table-role-column-remove-transfer-/) |
 | 69 | Location-only asset transfers auto-accept (no pending state, no photo requirement) | 2026-03-13 | 88690b2 | Verified | [62-location-only-asset-transfers-are-auto-a](./quick/62-location-only-asset-transfers-are-auto-a/) |
 | 70 | Show persistent InlineFeedback error on photo upload failure in AssetTransferDialog | 2026-03-13 | 511de7c | Verified | [63-show-persistent-error-when-photo-upload-](./quick/63-show-persistent-error-when-photo-upload-/) |
+| 71 | Add case-insensitive partial unique index on categories (company_id, lower(name), type) WHERE deleted_at IS NULL | 2026-03-13 | d8ec77e | Complete | [64-add-partial-unique-index-on-categories-c](./quick/64-add-partial-unique-index-on-categories-c/) |
 
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed quick task 63: Persistent error on photo upload failure in AssetTransferDialog
+Stopped at: Completed quick task 64: Case-insensitive partial unique index on categories closes TOCTOU race
 Resume file: None
 Next: Ready for next task
