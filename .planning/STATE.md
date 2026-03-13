@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Completed quick task 70: Add auto_create_days_before field to maintenance schedules"
-last_updated: "2026-03-13T10:19:39.920Z"
-last_activity: "2026-03-12 - Completed quick task 61: users table role column, remove transfer button, rename inventory to asset, fix asset transfer no users found, and the two-mode transfer modal"
+stopped_at: "Completed quick task 71: Fix schedule write actions for multi-company access"
+last_updated: "2026-03-13T11:03:03.465Z"
+last_activity: "2026-03-13 - Completed quick task 70: Add auto_create_days_before field to maintenance schedules"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -252,6 +252,7 @@ Recent decisions affecting current work:
 - [Phase 09.1-04]: ExportButton as standalone reusable client component; admin tab headers use h2+Create button pattern above DataTable; toolbar simplified to search/filters/bulk-actions only
 - [Phase quick-68]: Templates made global: nullable company_id + global SELECT RLS + role-only INSERT/UPDATE; company_id kept in type as nullable for backward compatibility
 - [Phase quick-69]: Schedules not asset-locked: item_id nullable, generate_pm_jobs uses LEFT JOIN; asset field hidden in form for general templates (no category); company_id derived from form/profile when no asset
+- [Phase quick-71]: Multi-company write action pattern: fetch by ID, then verify access via primary company_id OR user_company_access row; same error message for unauthorized
 
 ### Roadmap Evolution
 
@@ -350,10 +351,11 @@ Recent decisions affecting current work:
 | 75 | Make maintenance templates shared across companies (global resource) | 2026-03-13 | f0cdff4 | Verified | [68-make-maintenance-templates-shared-across](./quick/68-make-maintenance-templates-shared-across/) |
 | 76 | Make schedules not asset-locked (item_id optional for general templates) | 2026-03-13 | 44fe0b6 | Verified | [69-make-schedules-not-asset-locked-item-id-](./quick/69-make-schedules-not-asset-locked-item-id-/) |
 | 77 | Add auto_create_days_before field to maintenance schedules (0-30 days advance job creation) | 2026-03-13 | 712df5d | Verified | [70-add-auto-create-jobs-days-before-due-fie](./quick/70-add-auto-create-jobs-days-before-due-fie/) |
+| 78 | Fix schedule write actions for multi-company access (deactivate/activate/update/delete) | 2026-03-13 | b38238f | Complete | [71-fix-deactivating-schedule-returns-schedu](./quick/71-fix-deactivating-schedule-returns-schedu/) |
 
 ## Session Continuity
 
-Last session: 2026-03-13T10:54:00Z
-Stopped at: Completed quick task 70: Add auto_create_days_before field to maintenance schedules
+Last session: 2026-03-13T11:03:01.413Z
+Stopped at: Completed quick task 71: Fix schedule write actions for multi-company access
 Resume file: None
 Next: Ready for next task
