@@ -84,7 +84,7 @@ export type MaintenanceTemplate = {
 export type MaintenanceSchedule = {
   id: string;
   company_id: string;
-  item_id: string;
+  item_id: string | null;
   template_id: string;
   assigned_to: string | null;
   interval_days: number;

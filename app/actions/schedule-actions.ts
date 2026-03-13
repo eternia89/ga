@@ -31,29 +31,38 @@ export const createSchedule = gaLeadActionClient
       throw new Error('Template not found or inactive');
     }
 
-    // Fetch asset — must belong to company and not be sold_disposed
-    const { data: asset } = await adminSupabase
-      .from('inventory_items')
-      .select('id, category_id, status, company_id')
-      .eq('id', parsedInput.item_id)
-      .eq('company_id', profile.company_id)
-      .is('deleted_at', null)
-      .single();
+    // Determine company_id and validate asset (if provided)
+    let companyId: string;
 
-    if (!asset) {
-      throw new Error('Asset not found');
-    }
+    if (parsedInput.item_id) {
+      // Asset-linked schedule: fetch asset, validate status + category match
+      const { data: asset } = await adminSupabase
+        .from('inventory_items')
+        .select('id, category_id, status, company_id')
+        .eq('id', parsedInput.item_id)
+        .is('deleted_at', null)
+        .single();
 
-    if (asset.status === 'sold_disposed') {
-      throw new Error('Cannot create a schedule for a sold/disposed asset');
-    }
+      if (!asset) {
+        throw new Error('Asset not found');
+      }
 
-    // Category matching validation (Pitfall 7): template category must match asset category
-    // General templates (null category_id) can pair with any asset
-    if (template.category_id && template.category_id !== asset.category_id) {
-      throw new Error(
-        'Template and asset must have the same category. Select a template that matches the asset category.'
-      );
+      if (asset.status === 'sold_disposed') {
+        throw new Error('Cannot create a schedule for a sold/disposed asset');
+      }
+
+      // Category matching validation (Pitfall 7): template category must match asset category
+      // General templates (null category_id) can pair with any asset
+      if (template.category_id && template.category_id !== asset.category_id) {
+        throw new Error(
+          'Template and asset must have the same category. Select a template that matches the asset category.'
+        );
+      }
+
+      companyId = asset.company_id;
+    } else {
+      // No asset: use company_id from form (multi-company user) or fall back to profile
+      companyId = parsedInput.company_id ?? profile.company_id;
     }
 
     // Calculate initial next_due_at
@@ -68,8 +77,8 @@ export const createSchedule = gaLeadActionClient
     const { data, error } = await adminSupabase
       .from('maintenance_schedules')
       .insert({
-        company_id:    profile.company_id,
-        item_id:       parsedInput.item_id,
+        company_id:    companyId,
+        item_id:       parsedInput.item_id ?? null,
         template_id:   parsedInput.template_id,
         interval_days: parsedInput.interval_days,
         interval_type: parsedInput.interval_type,
@@ -85,7 +94,9 @@ export const createSchedule = gaLeadActionClient
     }
 
     revalidatePath('/maintenance');
-    revalidatePath(`/inventory/${parsedInput.item_id}`);
+    if (parsedInput.item_id) {
+      revalidatePath(`/inventory/${parsedInput.item_id}`);
+    }
     return { success: true, scheduleId: data.id };
   });
 
@@ -139,7 +150,9 @@ export const updateSchedule = gaLeadActionClient
     }
 
     revalidatePath('/maintenance');
-    revalidatePath(`/inventory/${existing.item_id}`);
+    if (existing.item_id) {
+      revalidatePath(`/inventory/${existing.item_id}`);
+    }
     return { success: true };
   });
 
@@ -190,7 +203,9 @@ export const deactivateSchedule = gaLeadActionClient
       .is('deleted_at', null);
 
     revalidatePath('/maintenance');
-    revalidatePath(`/inventory/${existing.item_id}`);
+    if (existing.item_id) {
+      revalidatePath(`/inventory/${existing.item_id}`);
+    }
     return { success: true };
   });
 
@@ -234,7 +249,9 @@ export const activateSchedule = gaLeadActionClient
     }
 
     revalidatePath('/maintenance');
-    revalidatePath(`/inventory/${existing.item_id}`);
+    if (existing.item_id) {
+      revalidatePath(`/inventory/${existing.item_id}`);
+    }
     return { success: true };
   });
 
@@ -271,7 +288,9 @@ export const deleteSchedule = gaLeadActionClient
     }
 
     revalidatePath('/maintenance');
-    revalidatePath(`/inventory/${existing.item_id}`);
+    if (existing.item_id) {
+      revalidatePath(`/inventory/${existing.item_id}`);
+    }
     return { success: true };
   });
 

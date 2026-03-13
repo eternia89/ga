@@ -6,7 +6,8 @@ import { z } from 'zod';
 
 export const scheduleCreateSchema = z.object({
   template_id:   z.string().uuid({ message: 'Template is required' }),
-  item_id:       z.string().uuid({ message: 'Asset is required' }),
+  item_id:       z.string().uuid().nullable().optional(),
+  company_id:    z.string().uuid().optional(),
   interval_days: z.number().int().min(1, 'Minimum 1 day').max(365, 'Maximum 365 days'),
   interval_type: z.enum(['fixed', 'floating']).default('floating'),
   // ISO date string; if omitted defaults to now() + interval_days

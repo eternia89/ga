@@ -10,7 +10,7 @@
  *   - 40  inventory items (10 per status × 4 statuses)
  *   - 40  inventory movements (10 per status × 4 statuses)
  *   - 6   maintenance templates
- *   - 14  maintenance schedules
+ *   - 16  maintenance schedules (14 asset-linked + 2 asset-free)
  *   - 30  job comments
  *
  * Creates for Jakmall (JM):
@@ -810,9 +810,22 @@ async function seedMaintenanceTemplates(supabase: SupabaseClient): Promise<strin
 // ─── Seed Maintenance Schedules ───────────────────────────────────────────────
 
 async function seedMaintenanceSchedules(supabase: SupabaseClient, templateIds: string[], activeItemIds: string[]): Promise<string[]> {
-  const schedules = templateIds.flatMap((templateId, tIdx) => {
+  const schedules: Array<{
+    company_id: string;
+    item_id: string | null;
+    template_id: string;
+    assigned_to: string;
+    interval_days: number;
+    interval_type: string;
+    last_completed_at: string;
+    next_due_at: string;
+    is_paused: boolean;
+    is_active: boolean;
+    paused_reason: string | null;
+    paused_at: string | null;
+  }> = templateIds.flatMap((templateId, tIdx) => {
     // Assign 2-3 schedules per template using different active items
-    // count: 3+3+2+2+2+2 = 14 schedules total across 6 templates
+    // count: 3+3+2+2+2+2 = 14 schedules total across 6 templates (asset-linked)
     const count = tIdx < 2 ? 3 : 2;
     return Array.from({ length: count }, (_, i) => {
       // Templates 4-5 (general checklists, no category) use offset picks for variety
@@ -841,6 +854,42 @@ async function seedMaintenanceSchedules(supabase: SupabaseClient, templateIds: s
       };
     });
   });
+
+  // Add 2 asset-free (general) schedules using general templates (index 4 and 5)
+  // These demonstrate the non-asset schedule feature (item_id = null)
+  if (templateIds.length >= 6) {
+    const generalSchedules = [
+      {
+        company_id:         C.jaknot,
+        item_id:            null,
+        template_id:        templateIds[4], // Checklist Kebersihan Bulanan
+        assigned_to:        pick(JN_GA_STAFF, 0),
+        interval_days:      30,
+        interval_type:      'fixed' as const,
+        last_completed_at:  daysAgo(25),
+        next_due_at:        new Date(new Date(daysAgo(25)).getTime() + 30 * 86_400_000).toISOString(),
+        is_paused:          false,
+        is_active:          true,
+        paused_reason:      null,
+        paused_at:          null,
+      },
+      {
+        company_id:         C.jaknot,
+        item_id:            null,
+        template_id:        templateIds[5], // Audit Inventaris Karyawan 10 Pcs
+        assigned_to:        pick(JN_GA_STAFF, 1),
+        interval_days:      7,
+        interval_type:      'floating' as const,
+        last_completed_at:  daysAgo(5),
+        next_due_at:        new Date(new Date(daysAgo(5)).getTime() + 7 * 86_400_000).toISOString(),
+        is_paused:          false,
+        is_active:          true,
+        paused_reason:      null,
+        paused_at:          null,
+      },
+    ];
+    schedules.push(...generalSchedules);
+  }
 
   const { data, error } = await supabase.from('maintenance_schedules').insert(schedules).select('id');
   if (error) throw new Error(`Maintenance schedules: ${error.message}`);
@@ -972,9 +1021,9 @@ async function main() {
   const templateIds = await seedMaintenanceTemplates(supabase);
   console.log(`   ✓ ${templateIds.length} templates created`);
 
-  console.log('📅 Maintenance schedules (14)...');
+  console.log('📅 Maintenance schedules (16)...');
   const scheduleIds = await seedMaintenanceSchedules(supabase, templateIds, activeItemIds);
-  console.log(`   ✓ ${scheduleIds.length} schedules created`);
+  console.log(`   ✓ ${scheduleIds.length} schedules created (incl. 2 asset-free)`);
 
   console.log('💬 Job comments (30)...');
   await seedJobComments(supabase, jnJobIds);
@@ -986,7 +1035,7 @@ async function main() {
 
   console.log('\n✅ Seed complete!\n');
   console.log('Summary:');
-  console.log('  Jaknot  : 110 requests | 60 jobs | 40 assets | 40 movements | 6 templates | 14 schedules');
+  console.log('  Jaknot  : 110 requests | 60 jobs | 40 assets | 40 movements | 6 templates | 16 schedules (2 asset-free)');
   console.log('  Jakmall :  22 requests | 12 jobs | 10 assets');
   console.log('');
   console.log('All users login with password: asdf1234');
