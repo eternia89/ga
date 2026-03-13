@@ -106,7 +106,7 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
               <OverdueBadge nextDueAt={nextDueAt} jobStatus={job.status} />
             )}
           </div>
-          <span className="whitespace-normal break-words text-sm" title={title}>
+          <span className="whitespace-normal break-words" title={title}>
             {title}
           </span>
         </div>

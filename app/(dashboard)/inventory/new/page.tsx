@@ -58,7 +58,7 @@ export default async function NewAssetPage() {
 
   return (
     <div className="space-y-6 py-6">
-      <SetBreadcrumbs items={[{ label: 'Inventory', href: '/inventory' }, { label: 'New Asset' }]} />
+      <SetBreadcrumbs items={[{ label: 'Assets', href: '/inventory' }, { label: 'New Asset' }]} />
 
       <div>
         <h1 className="text-2xl font-bold tracking-tight">New Asset</h1>
