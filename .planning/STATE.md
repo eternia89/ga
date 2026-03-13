@@ -340,7 +340,7 @@ Recent decisions affecting current work:
 | 67 | Enforce company-scoped uniqueness for category names (create, update, restore) | 2026-03-12 | 991fcb6 | Complete | [60-enforce-uniqueness-for-categories-and-co](./quick/60-enforce-uniqueness-for-categories-and-co/) |
 | 68 | Users table role column, remove Transfer row button, rename Inventory to Assets, two-mode transfer dialog | 2026-03-12 | 78d05c0 | Verified | [61-users-table-role-column-remove-transfer-](./quick/61-users-table-role-column-remove-transfer-/) |
 | 69 | Location-only asset transfers auto-accept (no pending state, no photo requirement) | 2026-03-13 | 88690b2 | Verified | [62-location-only-asset-transfers-are-auto-a](./quick/62-location-only-asset-transfers-are-auto-a/) |
-| 70 | Show persistent InlineFeedback error on photo upload failure in AssetTransferDialog | 2026-03-13 | 511de7c | Complete | [63-show-persistent-error-when-photo-upload-](./quick/63-show-persistent-error-when-photo-upload-/) |
+| 70 | Show persistent InlineFeedback error on photo upload failure in AssetTransferDialog | 2026-03-13 | 511de7c | Verified | [63-show-persistent-error-when-photo-upload-](./quick/63-show-persistent-error-when-photo-upload-/) |
 
 ## Session Continuity
 
