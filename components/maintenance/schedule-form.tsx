@@ -129,6 +129,9 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
   const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
   const selectedAsset = assets.find((a) => a.id === selectedAssetId);
 
+  // Track whether the selected template has a category (requires asset)
+  const templateHasCategory = selectedTemplate?.category_id != null;
+
   const filteredAssets = selectedTemplateId && selectedTemplate?.category_id
     ? assets.filter((a) => a.category_id === selectedTemplate.category_id)
     : assets;
@@ -163,9 +166,14 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
   function handleTemplateChange(value: string) {
     setSelectedTemplateId(value);
     const template = templates.find((t) => t.id === value);
-    if (template?.category_id && selectedAsset?.category_id !== template.category_id) {
+    if (!template?.category_id) {
+      // General template (no category): clear asset selection, set item_id to null
       setSelectedAssetId('');
-      form.setValue('item_id', '');
+      form.setValue('item_id', null);
+    } else if (template.category_id && selectedAsset?.category_id !== template.category_id) {
+      // Category mismatch: clear asset selection
+      setSelectedAssetId('');
+      form.setValue('item_id', null);
     }
     form.setValue('template_id', value);
   }
@@ -183,7 +191,14 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
   function onSubmit(data: ScheduleCreateOutput) {
     setFeedback(null);
     startTransition(async () => {
-      const result = await createSchedule(data);
+      // Attach company_id for asset-free schedules
+      const submitData = {
+        ...data,
+        company_id: !data.item_id
+          ? (selectedCompanyId ?? extraCompanies?.[0]?.id)
+          : undefined,
+      };
+      const result = await createSchedule(submitData);
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
         return;
@@ -264,41 +279,49 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="item_id"
-            render={({ field }) => (
-              <FormItem className="max-w-xs">
-                <FormLabel>
-                  Asset <span className="text-destructive">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Combobox
-                    options={assetOptions}
-                    value={field.value}
-                    onValueChange={(val) => {
-                      field.onChange(val);
-                      handleAssetChange(val);
-                    }}
-                    placeholder="Select asset..."
-                    searchPlaceholder="Search assets..."
-                    emptyText={
-                      selectedTemplateId
-                        ? "No assets found matching this template's category."
-                        : 'No assets found.'
-                    }
-                    disabled={isPending || assetLocked}
-                  />
-                </FormControl>
-                {selectedAsset?.category_id && !selectedTemplateId && (
-                  <p className="text-xs text-muted-foreground">
-                    Template list is filtered to match this asset&apos;s category.
-                  </p>
-                )}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {/* Asset field: shown only when template has a category (requires asset) */}
+          {(templateHasCategory || !selectedTemplateId) && (
+            <FormField
+              control={form.control}
+              name="item_id"
+              render={({ field }) => (
+                <FormItem className="max-w-xs">
+                  <FormLabel>
+                    Asset {templateHasCategory && <span className="text-destructive">*</span>}
+                  </FormLabel>
+                  <FormControl>
+                    <Combobox
+                      options={assetOptions}
+                      value={field.value ?? ''}
+                      onValueChange={(val) => {
+                        field.onChange(val);
+                        handleAssetChange(val);
+                      }}
+                      placeholder="Select asset..."
+                      searchPlaceholder="Search assets..."
+                      emptyText={
+                        selectedTemplateId
+                          ? "No assets found matching this template's category."
+                          : 'No assets found.'
+                      }
+                      disabled={isPending || assetLocked}
+                    />
+                  </FormControl>
+                  {selectedAsset?.category_id && !selectedTemplateId && (
+                    <p className="text-xs text-muted-foreground">
+                      Template list is filtered to match this asset&apos;s category.
+                    </p>
+                  )}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+          {selectedTemplateId && !templateHasCategory && (
+            <p className="text-xs text-muted-foreground">
+              This is a general template (no asset category). No asset required.
+            </p>
+          )}
         </div>
 
         {/* Section 2: Schedule Configuration */}

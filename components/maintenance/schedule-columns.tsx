@@ -48,7 +48,10 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
     cell: ({ row }) => {
       const asset = row.original.asset;
       const assetId = row.original.item_id;
-      return asset ? (
+      if (!assetId || !asset) {
+        return <span className="text-muted-foreground">—</span>;
+      }
+      return (
         <Link
           href={`/inventory/${assetId}`}
           className="whitespace-normal break-words hover:underline"
@@ -59,8 +62,6 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
             <span className="text-xs text-muted-foreground ml-1">({asset.display_id})</span>
           )}
         </Link>
-      ) : (
-        <span className="text-muted-foreground">—</span>
       );
     },
     size: 200,

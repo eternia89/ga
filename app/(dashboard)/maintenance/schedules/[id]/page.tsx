@@ -124,7 +124,7 @@ export default async function ScheduleDetailPage({ params }: PageProps) {
 
       <div>
         <h1 className="text-2xl font-bold tracking-tight">{templateName}</h1>
-        {assetName && (
+        {schedule.item_id && assetName ? (
           <p className="text-muted-foreground mt-1">
             Asset:{' '}
             <Link
@@ -137,7 +137,9 @@ export default async function ScheduleDetailPage({ params }: PageProps) {
               )}
             </Link>
           </p>
-        )}
+        ) : !schedule.item_id ? (
+          <p className="text-muted-foreground mt-1">General schedule (no asset)</p>
+        ) : null}
       </div>
 
       <ScheduleDetail

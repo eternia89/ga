@@ -226,8 +226,8 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
         </div>
       )}
 
-      {/* Auto-pause notice */}
-      {isAutoPaused && (
+      {/* Auto-pause notice — only relevant for asset-linked schedules */}
+      {isAutoPaused && schedule.item_id && (
         <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
           <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
           <p className="text-sm text-amber-700">
@@ -282,7 +282,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Asset</p>
                 <p className="text-sm font-medium">
-                  {schedule.asset?.name ? (
+                  {schedule.item_id && schedule.asset?.name ? (
                     <a
                       href={`/inventory/${schedule.item_id}`}
                       className="text-blue-600 hover:underline"
@@ -294,7 +294,9 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
                         </span>
                       )}
                     </a>
-                  ) : '—'}
+                  ) : (
+                    <span className="text-muted-foreground font-normal">No asset (general schedule)</span>
+                  )}
                 </p>
               </div>
               <div>
