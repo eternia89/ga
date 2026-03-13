@@ -19,6 +19,7 @@ interface AssetCreateDialogProps {
   extraCompanies?: { id: string; name: string }[];
   allLocations?: { id: string; name: string; company_id: string }[];
   primaryCompanyName: string;
+  primaryCompanyId: string;
 }
 
 export function AssetCreateDialog({
@@ -28,6 +29,7 @@ export function AssetCreateDialog({
   extraCompanies,
   allLocations,
   primaryCompanyName,
+  primaryCompanyId,
 }: AssetCreateDialogProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -66,6 +68,7 @@ export function AssetCreateDialog({
             extraCompanies={extraCompanies}
             allLocations={allLocations}
             primaryCompanyName={primaryCompanyName}
+            primaryCompanyId={primaryCompanyId}
             onSuccess={() => {
               handleOpenChange(false);
               router.refresh();

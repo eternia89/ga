@@ -14,7 +14,7 @@ export const assetCreateSchema = z.object({
   description: z.string().max(200, 'Description must be under 200 characters').optional(),
   acquisition_date: z.string().min(1, 'Acquisition date is required'),
   warranty_expiry: z.string().optional(),
-  company_id: z.string().uuid().optional(),
+  company_id: z.string().uuid({ message: 'Company is required' }),
 });
 
 export type AssetCreateFormData = z.infer<typeof assetCreateSchema>;

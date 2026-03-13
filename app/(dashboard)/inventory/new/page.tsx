@@ -71,6 +71,7 @@ export default async function NewAssetPage() {
         categories={categories ?? []}
         locations={locations ?? []}
         primaryCompanyName={primaryCompanyName}
+        primaryCompanyId={profile.company_id ?? ''}
       />
     </div>
   );

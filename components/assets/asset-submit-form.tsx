@@ -45,13 +45,14 @@ interface AssetSubmitFormProps {
   extraCompanies?: { id: string; name: string }[];
   allLocations?: { id: string; name: string; company_id: string }[];
   primaryCompanyName: string;
+  primaryCompanyId: string;
 }
 
 const MAX_INVOICE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 const ALLOWED_INVOICE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 const MAX_INVOICES = 5;
 
-export function AssetSubmitForm({ categories, locations, onSuccess, extraCompanies, allLocations, primaryCompanyName }: AssetSubmitFormProps) {
+export function AssetSubmitForm({ categories, locations, onSuccess, extraCompanies, allLocations, primaryCompanyName, primaryCompanyId }: AssetSubmitFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -89,6 +90,7 @@ export function AssetSubmitForm({ categories, locations, onSuccess, extraCompani
       description: '',
       acquisition_date: new Date().toISOString().split('T')[0],
       warranty_expiry: '',
+      company_id: primaryCompanyId,
     },
   });
 
@@ -139,7 +141,7 @@ export function AssetSubmitForm({ categories, locations, onSuccess, extraCompani
       const effectiveCompanyId =
         extraCompanies && extraCompanies.length > 1 && selectedCompanyId
           ? selectedCompanyId
-          : undefined;
+          : primaryCompanyId;
       const result = await createAsset({ ...data, company_id: effectiveCompanyId });
 
       if (result?.serverError) {
@@ -240,6 +242,7 @@ export function AssetSubmitForm({ categories, locations, onSuccess, extraCompani
               value={selectedCompanyId ?? extraCompanies[0].id}
               onValueChange={(val) => {
                 setSelectedCompanyId(val);
+                form.setValue('company_id', val);
                 form.setValue('location_id', '');
               }}
               placeholder="Select company"

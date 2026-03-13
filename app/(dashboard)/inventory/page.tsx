@@ -210,6 +210,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
               extraCompanies={extraCompanies}
               allLocations={allLocations}
               primaryCompanyName={primaryCompanyName}
+              primaryCompanyId={profile.company_id ?? ''}
             />
           )}
         </div>
