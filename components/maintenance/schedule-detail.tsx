@@ -259,7 +259,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
       ) : (
         <>
           {/* Schedule info */}
-          <div className="rounded-lg border border-border p-6 space-y-4">
+          <div className="space-y-4">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               Schedule Details
             </h2>
@@ -352,7 +352,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
           </div>
 
           {/* Linked PM Jobs */}
-          <div className="rounded-lg border border-border p-6 space-y-4">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
                 PM Jobs ({pmJobs.length})

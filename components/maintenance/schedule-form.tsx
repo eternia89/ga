@@ -242,7 +242,7 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
         </div>
 
         {/* Section 1: Template & Asset */}
-        <div className="rounded-lg border border-border p-6 space-y-4">
+        <div className="space-y-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
             Template &amp; Asset
           </h2>
@@ -326,7 +326,7 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
         </div>
 
         {/* Section 2: Schedule Configuration */}
-        <div className="rounded-lg border border-border p-6 space-y-4">
+        <div className="space-y-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
             Schedule Configuration
           </h2>
@@ -517,7 +517,7 @@ function ScheduleEditForm({ schedule, formId, onDirtyChange, onSubmittingChange 
     <Form {...form}>
       <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl">
 
-        <div className="rounded-lg border border-border p-6 space-y-4">
+        <div className="space-y-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
             Schedule Configuration
           </h2>
