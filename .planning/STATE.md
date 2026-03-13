@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-12 - Completed quick task 61: users table role column, remove transfer button, rename inventory to asset, fix asset transfer no users found, and the two-mode transfer modal
+Last activity: 2026-03-13 - Completed quick task 68: Make maintenance templates shared across all companies
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -346,7 +346,7 @@ Recent decisions affecting current work:
 | 72 | Make company_id required in asset create schema; wire primaryCompanyId to form defaultValues; fix AssetEditForm | 2026-03-13 | c8884b3 | Verified | [65-make-company-id-required-in-asset-create](./quick/65-make-company-id-required-in-asset-create/) |
 | 73 | Fix UI/UX table inconsistencies: template name truncation, job title text-sm, breadcrumb label, Created columns on assets/schedules, INVENTORY_VIEW_ALL rename | 2026-03-13 | 74c414a | Verified | [66-fix-ui-ux-table-inconsistencies-template](./quick/66-fix-ui-ux-table-inconsistencies-template/) |
 | 74 | E2E regression tests for quick-62 through quick-66 (location transfer, company field, Created columns, breadcrumb, sidebar, template name) | 2026-03-13 | ba1261d | Verified | [67-e2e-tests-for-quick-62-to-quick-66-locat](./quick/67-e2e-tests-for-quick-62-to-quick-66-locat/) |
-| 75 | Make maintenance templates shared across companies (global resource) | 2026-03-13 | f0cdff4 | Complete | [68-make-maintenance-templates-shared-across](./quick/68-make-maintenance-templates-shared-across/) |
+| 75 | Make maintenance templates shared across companies (global resource) | 2026-03-13 | f0cdff4 | Verified | [68-make-maintenance-templates-shared-across](./quick/68-make-maintenance-templates-shared-across/) |
 
 ## Session Continuity
 
