@@ -122,8 +122,7 @@ export function ScheduleViewModal({
             is_paused, paused_at, paused_reason, is_active,
             deleted_at, created_at, updated_at,
             template:maintenance_templates(name, checklist),
-            asset:inventory_items(name, display_id),
-            created_by_user:user_profiles!created_by(full_name)
+            asset:inventory_items(name, display_id)
           `)
           .eq('id', id)
           .is('deleted_at', null)
@@ -159,7 +158,7 @@ export function ScheduleViewModal({
       };
 
       setSchedule(normalized);
-      setCreatorName((scheduleResult.data as unknown as { created_by_user?: { full_name?: string } | null }).created_by_user?.full_name ?? 'Unknown');
+      setCreatorName('System');
 
       const jobs: PMJobRef[] = (pmJobsResult.data ?? []).map((j) => ({
         id: j.id,

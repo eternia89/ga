@@ -112,8 +112,7 @@ export function TemplateViewModal({
           .select(`
             id, company_id, category_id, name, description,
             checklist, is_active, deleted_at, created_at, updated_at,
-            category:categories(name, type),
-            created_by_user:user_profiles!created_by(full_name)
+            category:categories(name, type)
           `)
           .eq('id', id)
           .is('deleted_at', null)
@@ -145,7 +144,7 @@ export function TemplateViewModal({
       };
 
       setTemplate(normalized);
-      setCreatorName((templateResult.data as unknown as { created_by_user?: { full_name?: string } | null }).created_by_user?.full_name ?? 'Unknown');
+      setCreatorName('System');
       setCategories(categoriesResult.data ?? []);
     } catch {
       setError('Failed to load template details');
