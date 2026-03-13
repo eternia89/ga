@@ -157,6 +157,7 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
       item_id: defaultAssetId ?? '',
       interval_days: 30,
       interval_type: 'floating',
+      auto_create_days_before: 0,
       start_date: undefined,
     },
   });
@@ -400,6 +401,31 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="auto_create_days_before"
+            render={({ field }) => (
+              <FormItem className="max-w-xs">
+                <FormLabel>Auto-create job (days before due)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={30}
+                    placeholder="0"
+                    disabled={isPending}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  Create PM job this many days before due date. 0 = create on due date.
+                </p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         {feedback && (
@@ -454,6 +480,7 @@ function ScheduleEditForm({ schedule, formId, onDirtyChange, onSubmittingChange 
     defaultValues: {
       interval_days: schedule.interval_days,
       interval_type: schedule.interval_type,
+      auto_create_days_before: schedule.auto_create_days_before,
     },
   });
 
@@ -536,6 +563,31 @@ function ScheduleEditForm({ schedule, formId, onDirtyChange, onSubmittingChange 
                     disabled={isPending}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="auto_create_days_before"
+            render={({ field }) => (
+              <FormItem className="max-w-xs">
+                <FormLabel>Auto-create job (days before due)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={30}
+                    placeholder="0"
+                    disabled={isPending}
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                  />
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  Create PM job this many days before due date. 0 = create on due date.
+                </p>
                 <FormMessage />
               </FormItem>
             )}

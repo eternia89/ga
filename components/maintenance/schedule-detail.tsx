@@ -320,6 +320,14 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
                 </p>
               </div>
               <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Auto-create Before Due</p>
+                <p className="text-sm">
+                  {schedule.auto_create_days_before > 0
+                    ? `${schedule.auto_create_days_before} ${schedule.auto_create_days_before === 1 ? 'day' : 'days'} before`
+                    : 'On due date'}
+                </p>
+              </div>
+              <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Next Due</p>
                 <p className={`text-sm font-medium ${isOverdue ? 'text-red-600' : ''}`}>
                   {!schedule.is_active || schedule.is_paused

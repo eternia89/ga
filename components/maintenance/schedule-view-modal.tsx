@@ -118,7 +118,8 @@ export function ScheduleViewModal({
           .from('maintenance_schedules')
           .select(`
             id, company_id, item_id, template_id, assigned_to,
-            interval_days, interval_type, last_completed_at, next_due_at,
+            interval_days, interval_type, auto_create_days_before,
+            last_completed_at, next_due_at,
             is_paused, paused_at, paused_reason, is_active,
             deleted_at, created_at, updated_at,
             template:maintenance_templates(name, checklist),
@@ -350,6 +351,9 @@ export function ScheduleViewModal({
                   </>
                 )}
                 {schedule.interval_days} {schedule.interval_days === 1 ? 'day' : 'days'} ({schedule.interval_type})
+                {schedule.auto_create_days_before > 0 && (
+                  <>{' \u00b7 '}Auto-create {schedule.auto_create_days_before}d before due</>
+                )}
               </p>
             </div>
 
