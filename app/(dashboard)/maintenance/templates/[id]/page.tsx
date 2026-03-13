@@ -30,15 +30,7 @@ export default async function TemplateDetailPage({ params }: PageProps) {
     redirect('/login');
   }
 
-  // Fetch user's extra company access
-  const { data: companyAccessRows } = await supabase
-    .from('user_company_access')
-    .select('company_id')
-    .eq('user_id', profile.id);
-  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
-
-  // Fetch template with category join (accessible across all companies)
+  // Fetch template with category join (templates are global)
   const { data: templateData } = await supabase
     .from('maintenance_templates')
     .select(`
@@ -55,7 +47,6 @@ export default async function TemplateDetailPage({ params }: PageProps) {
       category:categories(name, type)
     `)
     .eq('id', id)
-    .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
     .single();
 
@@ -73,23 +64,15 @@ export default async function TemplateDetailPage({ params }: PageProps) {
       : templateData.category ?? null,
   };
 
-  // Fetch asset-type categories for edit form and company name in parallel
-  const [categoriesResult, companyResult] = await Promise.all([
-    supabase
-      .from('categories')
-      .select('id, name')
-      .eq('type', 'asset')
-      .is('deleted_at', null)
-      .order('name'),
-    supabase
-      .from('companies')
-      .select('name')
-      .eq('id', templateData.company_id)
-      .single(),
-  ]);
+  // Fetch asset-type categories for edit form
+  const categoriesResult = await supabase
+    .from('categories')
+    .select('id, name')
+    .eq('type', 'asset')
+    .is('deleted_at', null)
+    .order('name');
 
   const categories = categoriesResult.data;
-  const companyName = companyResult.data?.name ?? '';
 
   return (
     <div className="space-y-6 py-6 pb-20">
@@ -108,7 +91,6 @@ export default async function TemplateDetailPage({ params }: PageProps) {
         template={template}
         categories={categories ?? []}
         userRole={profile.role}
-        companyName={companyName}
       />
     </div>
   );

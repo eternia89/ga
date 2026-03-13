@@ -56,10 +56,9 @@ interface TemplateDetailProps {
   onDirtyChange?: (isDirty: boolean) => void;
   /** Called when form submitting state changes */
   onSubmittingChange?: (isSubmitting: boolean) => void;
-  companyName?: string;
 }
 
-export function TemplateDetail({ template, categories, userRole, formId, onDirtyChange, onSubmittingChange, companyName }: TemplateDetailProps) {
+export function TemplateDetail({ template, categories, userRole, formId, onDirtyChange, onSubmittingChange }: TemplateDetailProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -222,16 +221,6 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
           onDismiss={() => setFeedback(null)}
         />
       )}
-
-      {/* Company — always shown, always disabled */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Company</label>
-        <Input
-          value={companyName ?? ''}
-          disabled
-          className="bg-muted text-muted-foreground cursor-not-allowed"
-        />
-      </div>
 
       {canManage ? (
         /* Directly editable form for users with permission */

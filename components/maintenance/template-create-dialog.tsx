@@ -15,15 +15,11 @@ import { TemplateCreateForm } from "@/components/maintenance/template-create-for
 interface TemplateCreateDialogProps {
   categories: { id: string; name: string }[];
   initialOpen?: boolean;
-  primaryCompanyName?: string;
-  extraCompanies?: { id: string; name: string }[];
 }
 
 export function TemplateCreateDialog({
   categories,
   initialOpen,
-  primaryCompanyName,
-  extraCompanies,
 }: TemplateCreateDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(initialOpen ?? false);
@@ -41,8 +37,6 @@ export function TemplateCreateDialog({
           </DialogHeader>
           <TemplateCreateForm
             categories={categories}
-            primaryCompanyName={primaryCompanyName ?? ''}
-            extraCompanies={extraCompanies}
             onSuccess={() => {
               setOpen(false);
               router.refresh();

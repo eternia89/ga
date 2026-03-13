@@ -74,7 +74,6 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
     supabase
       .from('maintenance_templates')
       .select('id, name, category_id')
-      .in('company_id', allAccessibleCompanyIds)
       .eq('is_active', true)
       .is('deleted_at', null)
       .order('name'),

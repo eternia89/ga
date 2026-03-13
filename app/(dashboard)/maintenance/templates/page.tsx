@@ -31,44 +31,17 @@ export default async function MaintenanceTemplatesPage({ searchParams }: PagePro
     redirect('/login');
   }
 
-  // Fetch user's extra company access
-  const { data: companyAccessRows } = await supabase
-    .from('user_company_access')
-    .select('company_id')
-    .eq('user_id', profile.id);
-  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
-
-  // Fetch asset-type categories for create dialog, primary company name, and extra companies
-  const [categoriesResult, primaryCompanyResult, extraCompaniesResult] = await Promise.all([
-    supabase
-      .from('categories')
-      .select('id, name')
-      .eq('type', 'asset')
-      .is('deleted_at', null)
-      .order('name'),
-    // Primary company name for the always-visible Company field
-    supabase
-      .from('companies')
-      .select('name')
-      .eq('id', profile.company_id)
-      .single(),
-    // Companies for multi-company selector (only if user has extra access)
-    extraCompanyIds.length > 0
-      ? supabase
-          .from('companies')
-          .select('id, name')
-          .in('id', allAccessibleCompanyIds)
-          .is('deleted_at', null)
-          .order('name')
-      : Promise.resolve({ data: null }),
-  ]);
+  // Fetch asset-type categories for create dialog
+  const categoriesResult = await supabase
+    .from('categories')
+    .select('id, name')
+    .eq('type', 'asset')
+    .is('deleted_at', null)
+    .order('name');
 
   const assetCategories = categoriesResult.data;
-  const primaryCompanyName = primaryCompanyResult.data?.name ?? '';
-  const extraCompanies = extraCompaniesResult.data ?? [];
 
-  // Fetch all templates for this company with category join
+  // Fetch all templates globally (templates are shared across companies)
   const { data: templates } = await supabase
     .from('maintenance_templates')
     .select(`
@@ -84,7 +57,6 @@ export default async function MaintenanceTemplatesPage({ searchParams }: PagePro
       updated_at,
       category:categories(name, type)
     `)
-    .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
     .order('name', { ascending: true });
 
@@ -111,8 +83,6 @@ export default async function MaintenanceTemplatesPage({ searchParams }: PagePro
           <TemplateCreateDialog
             categories={assetCategories ?? []}
             initialOpen={action === 'create'}
-            primaryCompanyName={primaryCompanyName}
-            extraCompanies={extraCompanies}
           />
         )}
       </div>

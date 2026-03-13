@@ -245,6 +245,7 @@ export const getTemplates = authActionClient
       .from('maintenance_templates')
       .select(`
         id,
+        company_id,
         category_id,
         name,
         description,
@@ -286,6 +287,7 @@ export const getTemplateById = authActionClient
       .from('maintenance_templates')
       .select(`
         id,
+        company_id,
         category_id,
         name,
         description,
