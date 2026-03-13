@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Completed quick task 67: E2E regression tests for quick-62 through quick-66 (location transfer, company field, Created columns, breadcrumb, sidebar, template name)"
-last_updated: "2026-03-13T07:30:49.087Z"
+stopped_at: "Completed quick task 68: Make maintenance templates shared across companies (global resource)"
+last_updated: "2026-03-13T10:19:39.920Z"
 last_activity: "2026-03-12 - Completed quick task 61: users table role column, remove transfer button, rename inventory to asset, fix asset transfer no users found, and the two-mode transfer modal"
 progress:
   total_phases: 10
@@ -250,6 +250,7 @@ Recent decisions affecting current work:
 - [Phase 09.1-02]: react-day-picker v9 Calendar with Popover for date range picking; applied to both job and request filters; ISO params in URL, dd-MM-yyyy display
 - [Phase 09.1-05]: Text labels replace icons entirely (no icon+text combo) for table row action buttons -- cleaner, more compact, no guessing
 - [Phase 09.1-04]: ExportButton as standalone reusable client component; admin tab headers use h2+Create button pattern above DataTable; toolbar simplified to search/filters/bulk-actions only
+- [Phase quick-68]: Templates made global: nullable company_id + global SELECT RLS + role-only INSERT/UPDATE; company_id kept in type as nullable for backward compatibility
 
 ### Roadmap Evolution
 
@@ -345,10 +346,11 @@ Recent decisions affecting current work:
 | 72 | Make company_id required in asset create schema; wire primaryCompanyId to form defaultValues; fix AssetEditForm | 2026-03-13 | c8884b3 | Verified | [65-make-company-id-required-in-asset-create](./quick/65-make-company-id-required-in-asset-create/) |
 | 73 | Fix UI/UX table inconsistencies: template name truncation, job title text-sm, breadcrumb label, Created columns on assets/schedules, INVENTORY_VIEW_ALL rename | 2026-03-13 | 74c414a | Verified | [66-fix-ui-ux-table-inconsistencies-template](./quick/66-fix-ui-ux-table-inconsistencies-template/) |
 | 74 | E2E regression tests for quick-62 through quick-66 (location transfer, company field, Created columns, breadcrumb, sidebar, template name) | 2026-03-13 | ba1261d | Verified | [67-e2e-tests-for-quick-62-to-quick-66-locat](./quick/67-e2e-tests-for-quick-62-to-quick-66-locat/) |
+| 75 | Make maintenance templates shared across companies (global resource) | 2026-03-13 | f0cdff4 | Complete | [68-make-maintenance-templates-shared-across](./quick/68-make-maintenance-templates-shared-across/) |
 
 ## Session Continuity
 
-Last session: 2026-03-13T07:30:49.083Z
-Stopped at: Completed quick task 67: E2E regression tests for quick-62 through quick-66 (location transfer, company field, Created columns, breadcrumb, sidebar, template name)
+Last session: 2026-03-13T10:19:33.866Z
+Stopped at: Completed quick task 68: Make maintenance templates shared across companies (global resource)
 Resume file: None
 Next: Ready for next task
