@@ -159,6 +159,17 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
     size: 130,
   },
   {
+    accessorKey: 'created_at',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Created" />
+    ),
+    cell: ({ row }) => {
+      const date = row.getValue('created_at') as string;
+      return <span>{format(new Date(date), 'dd-MM-yyyy')}</span>;
+    },
+    size: 120,
+  },
+  {
     id: 'actions',
     cell: ({ row, table }) => {
       const asset = row.original;
