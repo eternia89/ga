@@ -76,7 +76,11 @@
       "Bash(grep:*)",
       "Bash(git rm:*)",
       "Bash(cat:*)",
-      "Bash(grep PhotoUpload:*)"
+      "Bash(grep PhotoUpload:*)",
+      "Skill(gsd:update)",
+      "Skill(gsd:quick)",
+      "Bash(ls /Users/samuel/code/ga/supabase/migrations/00020_rls_multi_company_access.sql 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls /Users/samuel/code/ga/supabase/migrations/00003_rls_policies.sql 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls /Users/samuel/code/ga/app/\\\\\\(dashboard\\\\\\)/maintenance/page.tsx 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls /Users/samuel/code/ga/app/\\\\\\(dashboard\\\\\\)/maintenance/templates/page.tsx 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls \"/Users/samuel/code/ga/app/\\(dashboard\\)/maintenance/templates/[id]/page.tsx\" 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls \"/Users/samuel/code/ga/app/\\(dashboard\\)/maintenance/schedules/[id]/page.tsx\" 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls /Users/samuel/code/ga/app/actions/template-actions.ts 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls /Users/samuel/code/ga/app/actions/schedule-actions.ts 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\")",
+      "Bash(git add:*)"
     ]
   },
   "outputStyle": "Explanatory"
