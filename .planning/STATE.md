@@ -343,10 +343,11 @@ Recent decisions affecting current work:
 | 70 | Show persistent InlineFeedback error on photo upload failure in AssetTransferDialog | 2026-03-13 | 511de7c | Verified | [63-show-persistent-error-when-photo-upload-](./quick/63-show-persistent-error-when-photo-upload-/) |
 | 71 | Add case-insensitive partial unique index on categories (company_id, lower(name), type) WHERE deleted_at IS NULL | 2026-03-13 | d8ec77e | Verified | [64-add-partial-unique-index-on-categories-c](./quick/64-add-partial-unique-index-on-categories-c/) |
 | 72 | Make company_id required in asset create schema; wire primaryCompanyId to form defaultValues; fix AssetEditForm | 2026-03-13 | c8884b3 | Verified | [65-make-company-id-required-in-asset-create](./quick/65-make-company-id-required-in-asset-create/) |
+| 73 | Fix UI/UX table inconsistencies: template name truncation, job title text-sm, breadcrumb label, Created columns on assets/schedules, INVENTORY_VIEW_ALL rename | 2026-03-13 | 74c414a | Complete | [66-fix-ui-ux-table-inconsistencies-template](./quick/66-fix-ui-ux-table-inconsistencies-template/) |
 
 ## Session Continuity
 
 Last session: 2026-03-13
-Stopped at: Completed quick task 65: company_id required in assetCreateSchema; primaryCompanyId threaded through dialog to form; AssetEditForm defaultValues fixed
+Stopped at: Completed quick task 66: template name wrapping, job title font, Assets breadcrumb, Created columns on assets/schedules tables, ASSETS_VIEW_ALL permission rename
 Resume file: None
 Next: Ready for next task
