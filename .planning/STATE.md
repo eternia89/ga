@@ -344,6 +344,7 @@ Recent decisions affecting current work:
 | 71 | Add case-insensitive partial unique index on categories (company_id, lower(name), type) WHERE deleted_at IS NULL | 2026-03-13 | d8ec77e | Verified | [64-add-partial-unique-index-on-categories-c](./quick/64-add-partial-unique-index-on-categories-c/) |
 | 72 | Make company_id required in asset create schema; wire primaryCompanyId to form defaultValues; fix AssetEditForm | 2026-03-13 | c8884b3 | Verified | [65-make-company-id-required-in-asset-create](./quick/65-make-company-id-required-in-asset-create/) |
 | 73 | Fix UI/UX table inconsistencies: template name truncation, job title text-sm, breadcrumb label, Created columns on assets/schedules, INVENTORY_VIEW_ALL rename | 2026-03-13 | 74c414a | Verified | [66-fix-ui-ux-table-inconsistencies-template](./quick/66-fix-ui-ux-table-inconsistencies-template/) |
+| 74 | E2E regression tests for quick-62 through quick-66 (location transfer, company field, Created columns, breadcrumb, sidebar, template name) | 2026-03-13 | ba1261d | Verified | [67-e2e-tests-for-quick-62-to-quick-66-locat](./quick/67-e2e-tests-for-quick-62-to-quick-66-locat/) |
 
 ## Session Continuity
 
