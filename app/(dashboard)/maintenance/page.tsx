@@ -34,7 +34,15 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
     redirect('/login');
   }
 
-  // Fetch all schedules for this company with template and asset joins
+  // Fetch user's extra company access (must be before main queries)
+  const { data: companyAccessRows } = await supabase
+    .from('user_company_access')
+    .select('company_id')
+    .eq('user_id', profile.id);
+  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
+  // Fetch all schedules for all accessible companies with template and asset joins
   const { data: schedules } = await supabase
     .from('maintenance_schedules')
     .select(`
@@ -57,31 +65,23 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
       template:maintenance_templates(name),
       asset:inventory_items(name, display_id)
     `)
-    .eq('company_id', profile.company_id)
+    .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
-
-  // Fetch user's extra company access
-  const { data: companyAccessRows } = await supabase
-    .from('user_company_access')
-    .select('company_id')
-    .eq('user_id', profile.id);
-  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
 
   // Fetch templates and assets for create dialog
   const [templatesResult, assetsResult, primaryCompanyResult, extraCompaniesResult] = await Promise.all([
     supabase
       .from('maintenance_templates')
       .select('id, name, category_id')
-      .eq('company_id', profile.company_id)
+      .in('company_id', allAccessibleCompanyIds)
       .eq('is_active', true)
       .is('deleted_at', null)
       .order('name'),
     supabase
       .from('inventory_items')
       .select('id, name, display_id, category_id')
-      .eq('company_id', profile.company_id)
+      .in('company_id', allAccessibleCompanyIds)
       .neq('status', 'sold_disposed')
       .is('deleted_at', null)
       .order('name'),

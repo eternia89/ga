@@ -32,7 +32,15 @@ export default async function ScheduleDetailPage({ params }: PageProps) {
     redirect('/login');
   }
 
-  // Fetch schedule with template and asset joins
+  // Fetch user's extra company access
+  const { data: companyAccessRows } = await supabase
+    .from('user_company_access')
+    .select('company_id')
+    .eq('user_id', profile.id);
+  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
+  // Fetch schedule with template and asset joins (accessible across all companies)
   const { data: scheduleRaw } = await supabase
     .from('maintenance_schedules')
     .select(`
@@ -56,7 +64,7 @@ export default async function ScheduleDetailPage({ params }: PageProps) {
       asset:inventory_items(name, display_id)
     `)
     .eq('id', id)
-    .eq('company_id', profile.company_id)
+    .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
     .single();
 
@@ -89,7 +97,7 @@ export default async function ScheduleDetailPage({ params }: PageProps) {
     supabase
       .from('companies')
       .select('name')
-      .eq('id', profile.company_id)
+      .eq('id', scheduleRaw.company_id)
       .single(),
   ]);
 

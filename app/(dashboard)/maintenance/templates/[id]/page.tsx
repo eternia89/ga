@@ -30,7 +30,15 @@ export default async function TemplateDetailPage({ params }: PageProps) {
     redirect('/login');
   }
 
-  // Fetch template with category join
+  // Fetch user's extra company access
+  const { data: companyAccessRows } = await supabase
+    .from('user_company_access')
+    .select('company_id')
+    .eq('user_id', profile.id);
+  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
+  // Fetch template with category join (accessible across all companies)
   const { data: templateData } = await supabase
     .from('maintenance_templates')
     .select(`
@@ -47,7 +55,7 @@ export default async function TemplateDetailPage({ params }: PageProps) {
       category:categories(name, type)
     `)
     .eq('id', id)
-    .eq('company_id', profile.company_id)
+    .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
     .single();
 
@@ -76,7 +84,7 @@ export default async function TemplateDetailPage({ params }: PageProps) {
     supabase
       .from('companies')
       .select('name')
-      .eq('id', profile.company_id)
+      .eq('id', templateData.company_id)
       .single(),
   ]);
 

@@ -245,6 +245,14 @@ export const getTemplates = authActionClient
   .action(async ({ ctx }) => {
     const { supabase, profile } = ctx;
 
+    // Fetch user's extra company access
+    const { data: companyAccessRows } = await supabase
+      .from('user_company_access')
+      .select('company_id')
+      .eq('user_id', profile.id);
+    const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+    const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
     const { data, error } = await supabase
       .from('maintenance_templates')
       .select(`
@@ -260,7 +268,7 @@ export const getTemplates = authActionClient
         updated_at,
         category:categories(name, type)
       `)
-      .eq('company_id', profile.company_id)
+      .in('company_id', allAccessibleCompanyIds)
       .is('deleted_at', null)
       .order('name', { ascending: true });
 
@@ -288,6 +296,14 @@ export const getTemplateById = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { supabase, profile } = ctx;
 
+    // Fetch user's extra company access
+    const { data: companyAccessRows } = await supabase
+      .from('user_company_access')
+      .select('company_id')
+      .eq('user_id', profile.id);
+    const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+    const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
     const { data, error } = await supabase
       .from('maintenance_templates')
       .select(`
@@ -304,7 +320,7 @@ export const getTemplateById = authActionClient
         category:categories(name, type)
       `)
       .eq('id', parsedInput.id)
-      .eq('company_id', profile.company_id)
+      .in('company_id', allAccessibleCompanyIds)
       .is('deleted_at', null)
       .single();
 

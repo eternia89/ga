@@ -84,7 +84,7 @@ export default async function MaintenanceTemplatesPage({ searchParams }: PagePro
       updated_at,
       category:categories(name, type)
     `)
-    .eq('company_id', profile.company_id)
+    .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
     .order('name', { ascending: true });
 
