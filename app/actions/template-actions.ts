@@ -43,7 +43,6 @@ export const createTemplate = authActionClient
     const { data, error } = await supabase
       .from('maintenance_templates')
       .insert({
-        company_id:  profile.company_id,
         category_id: parsedInput.category_id ?? null,
         name:        parsedInput.name,
         description: parsedInput.description ?? null,
@@ -78,12 +77,11 @@ export const updateTemplate = authActionClient
       throw new Error('Only GA Lead or Admin can update maintenance templates');
     }
 
-    // Verify template exists and belongs to company
+    // Verify template exists
     const { data: existing } = await supabase
       .from('maintenance_templates')
-      .select('id, company_id')
+      .select('id')
       .eq('id', parsedInput.id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -146,12 +144,11 @@ export const deactivateTemplate = authActionClient
       throw new Error('Only GA Lead or Admin can deactivate maintenance templates');
     }
 
-    // Verify template exists and belongs to company
+    // Verify template exists
     const { data: existing } = await supabase
       .from('maintenance_templates')
-      .select('id, is_active, company_id')
+      .select('id, is_active')
       .eq('id', parsedInput.id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -205,12 +202,11 @@ export const reactivateTemplate = authActionClient
       throw new Error('Only GA Lead or Admin can reactivate maintenance templates');
     }
 
-    // Verify template exists and belongs to company
+    // Verify template exists
     const { data: existing } = await supabase
       .from('maintenance_templates')
-      .select('id, is_active, company_id')
+      .select('id, is_active')
       .eq('id', parsedInput.id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -236,28 +232,19 @@ export const reactivateTemplate = authActionClient
   });
 
 // ============================================================================
-// getTemplates — all templates for user's company
+// getTemplates — all global templates (shared across companies)
 // Sorted by name. Includes category name and computed item_count.
 // ============================================================================
 
 export const getTemplates = authActionClient
   .schema(z.object({}))
   .action(async ({ ctx }) => {
-    const { supabase, profile } = ctx;
-
-    // Fetch user's extra company access
-    const { data: companyAccessRows } = await supabase
-      .from('user_company_access')
-      .select('company_id')
-      .eq('user_id', profile.id);
-    const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-    const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+    const { supabase } = ctx;
 
     const { data, error } = await supabase
       .from('maintenance_templates')
       .select(`
         id,
-        company_id,
         category_id,
         name,
         description,
@@ -268,7 +255,6 @@ export const getTemplates = authActionClient
         updated_at,
         category:categories(name, type)
       `)
-      .in('company_id', allAccessibleCompanyIds)
       .is('deleted_at', null)
       .order('name', { ascending: true });
 
@@ -294,21 +280,12 @@ export const getTemplates = authActionClient
 export const getTemplateById = authActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
-    const { supabase, profile } = ctx;
-
-    // Fetch user's extra company access
-    const { data: companyAccessRows } = await supabase
-      .from('user_company_access')
-      .select('company_id')
-      .eq('user_id', profile.id);
-    const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-    const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+    const { supabase } = ctx;
 
     const { data, error } = await supabase
       .from('maintenance_templates')
       .select(`
         id,
-        company_id,
         category_id,
         name,
         description,
@@ -320,7 +297,6 @@ export const getTemplateById = authActionClient
         category:categories(name, type)
       `)
       .eq('id', parsedInput.id)
-      .in('company_id', allAccessibleCompanyIds)
       .is('deleted_at', null)
       .single();
 

@@ -18,12 +18,11 @@ export const createSchedule = gaLeadActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { adminSupabase, profile } = ctx;
 
-    // Fetch template — must be active and belong to company
+    // Fetch template — must be active (templates are global)
     const { data: template } = await adminSupabase
       .from('maintenance_templates')
-      .select('id, category_id, is_active, company_id')
+      .select('id, category_id, is_active')
       .eq('id', parsedInput.template_id)
-      .eq('company_id', profile.company_id)
       .eq('is_active', true)
       .is('deleted_at', null)
       .single();
