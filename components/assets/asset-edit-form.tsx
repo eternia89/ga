@@ -98,6 +98,7 @@ export function AssetEditForm({
       description: asset.description ?? '',
       acquisition_date: asset.acquisition_date ?? '',
       warranty_expiry: asset.warranty_expiry ?? '',
+      company_id: asset.company_id ?? '',
     },
   });
 
