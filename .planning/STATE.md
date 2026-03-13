@@ -342,7 +342,7 @@ Recent decisions affecting current work:
 | 69 | Location-only asset transfers auto-accept (no pending state, no photo requirement) | 2026-03-13 | 88690b2 | Verified | [62-location-only-asset-transfers-are-auto-a](./quick/62-location-only-asset-transfers-are-auto-a/) |
 | 70 | Show persistent InlineFeedback error on photo upload failure in AssetTransferDialog | 2026-03-13 | 511de7c | Verified | [63-show-persistent-error-when-photo-upload-](./quick/63-show-persistent-error-when-photo-upload-/) |
 | 71 | Add case-insensitive partial unique index on categories (company_id, lower(name), type) WHERE deleted_at IS NULL | 2026-03-13 | d8ec77e | Verified | [64-add-partial-unique-index-on-categories-c](./quick/64-add-partial-unique-index-on-categories-c/) |
-| 72 | Make company_id required in asset create schema; wire primaryCompanyId to form defaultValues; fix AssetEditForm | 2026-03-13 | c8884b3 | Complete | [65-make-company-id-required-in-asset-create](./quick/65-make-company-id-required-in-asset-create/) |
+| 72 | Make company_id required in asset create schema; wire primaryCompanyId to form defaultValues; fix AssetEditForm | 2026-03-13 | c8884b3 | Verified | [65-make-company-id-required-in-asset-create](./quick/65-make-company-id-required-in-asset-create/) |
 
 ## Session Continuity
 
