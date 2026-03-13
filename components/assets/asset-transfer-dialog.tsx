@@ -145,11 +145,16 @@ export function AssetTransferDialog({
         });
 
         if (!uploadRes.ok) {
-          // Transfer created but photo upload failed — still close and refresh
-          onOpenChange(false);
-          onSuccess();
-          router.refresh();
+          let errorMessage = 'Upload failed. Transfer was created but condition photos could not be saved. Please try again or contact support.';
+          try {
+            const errorBody = await uploadRes.json();
+            if (errorBody?.error) errorMessage = `Upload failed: ${errorBody.error}`;
+          } catch {
+            // ignore parse errors, keep default message
+          }
+          setFeedback({ type: 'error', message: errorMessage });
           return;
+          // Do NOT call onOpenChange(false) or onSuccess() — dialog stays open so user can retry
         }
       }
 
