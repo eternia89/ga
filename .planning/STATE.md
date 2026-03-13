@@ -351,7 +351,7 @@ Recent decisions affecting current work:
 | 75 | Make maintenance templates shared across companies (global resource) | 2026-03-13 | f0cdff4 | Verified | [68-make-maintenance-templates-shared-across](./quick/68-make-maintenance-templates-shared-across/) |
 | 76 | Make schedules not asset-locked (item_id optional for general templates) | 2026-03-13 | 44fe0b6 | Verified | [69-make-schedules-not-asset-locked-item-id-](./quick/69-make-schedules-not-asset-locked-item-id-/) |
 | 77 | Add auto_create_days_before field to maintenance schedules (0-30 days advance job creation) | 2026-03-13 | 712df5d | Verified | [70-add-auto-create-jobs-days-before-due-fie](./quick/70-add-auto-create-jobs-days-before-due-fie/) |
-| 78 | Fix schedule write actions for multi-company access (deactivate/activate/update/delete) | 2026-03-13 | b38238f | Complete | [71-fix-deactivating-schedule-returns-schedu](./quick/71-fix-deactivating-schedule-returns-schedu/) |
+| 78 | Fix schedule write actions for multi-company access (deactivate/activate/update/delete) | 2026-03-13 | b38238f | Verified | [71-fix-deactivating-schedule-returns-schedu](./quick/71-fix-deactivating-schedule-returns-schedu/) |
 
 ## Session Continuity
 
