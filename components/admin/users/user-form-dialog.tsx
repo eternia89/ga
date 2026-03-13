@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { createUserSchema, updateUserSchema } from '@/lib/validations/user-schema';
 import { createUser, updateUser } from '@/app/actions/user-actions';
 import { updateUserCompanyAccess } from '@/app/actions/user-company-access-actions';
@@ -105,6 +105,12 @@ export function UserFormDialog({
   const [selectedExtraCompanies, setSelectedExtraCompanies] = useState<string[]>(
     userCompanyAccess ?? []
   );
+
+  // Sync prop → state when the selected user changes (dialog mounts with editingUser=null,
+  // so useState initial value is []; useEffect re-syncs when a real user is opened for edit)
+  useEffect(() => {
+    setSelectedExtraCompanies(userCompanyAccess ?? []);
+  }, [userCompanyAccess]);
 
   const toggleCompanyAccess = (companyId: string) => {
     setSelectedExtraCompanies((prev) =>
