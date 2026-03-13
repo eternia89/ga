@@ -93,7 +93,7 @@ export function AssetTransferDialog({
   const canSubmit =
     mode === 'user'
       ? receiverId !== '' && resolvedLocationId !== '' && photos.length > 0
-      : toLocationId !== '' && photos.length > 0;
+      : toLocationId !== '';
 
   const handleModeSwitch = (newMode: TransferMode) => {
     setMode(newMode);
@@ -257,6 +257,11 @@ export function AssetTransferDialog({
                 emptyText="No locations found."
                 disabled={isSubmitting}
               />
+              {toLocationId && (
+                <p className="text-xs text-muted-foreground">
+                  Asset will be moved to this location immediately.
+                </p>
+              )}
             </div>
           )}
 
@@ -275,23 +280,25 @@ export function AssetTransferDialog({
             <p className="text-xs text-muted-foreground">{notes.length}/200</p>
           </div>
 
-          {/* Sender condition photos (required) */}
-          <div className="space-y-1.5">
-            <Label>
-              Condition Photos <span className="text-destructive">*</span>
-            </Label>
-            <p className="text-xs text-muted-foreground">
-              Document the asset condition before transfer. At least 1 photo required.
-            </p>
-            <PhotoUpload
-              onChange={setPhotos}
-              maxPhotos={5}
-              required
-              showCount
-              disabled={isSubmitting}
-              enableAnnotation={false}
-            />
-          </div>
+          {/* Sender condition photos (required in user mode only) */}
+          {mode === 'user' && (
+            <div className="space-y-1.5">
+              <Label>
+                Condition Photos <span className="text-destructive">*</span>
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Document the asset condition before transfer. At least 1 photo required.
+              </p>
+              <PhotoUpload
+                onChange={setPhotos}
+                maxPhotos={5}
+                required
+                showCount
+                disabled={isSubmitting}
+                enableAnnotation={false}
+              />
+            </div>
+          )}
 
           {feedback && (
             <InlineFeedback
