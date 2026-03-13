@@ -258,6 +258,8 @@ export const createTransfer = authActionClient
       throw new Error('Asset has a pending transfer. Complete or cancel it first.');
     }
 
+    const isLocationOnly = !parsedInput.receiver_id;
+
     const { data, error } = await supabase
       .from('inventory_movements')
       .insert({
@@ -266,8 +268,10 @@ export const createTransfer = authActionClient
         from_location_id: asset.location_id,
         to_location_id: parsedInput.to_location_id,
         initiated_by: profile.id,
-        receiver_id: parsedInput.receiver_id,
-        status: 'pending',
+        receiver_id: parsedInput.receiver_id ?? null,
+        status: isLocationOnly ? 'accepted' : 'pending',
+        received_by: isLocationOnly ? profile.id : null,
+        received_at: isLocationOnly ? new Date().toISOString() : null,
         notes: parsedInput.notes ?? null,
       })
       .select('id')
@@ -275,6 +279,14 @@ export const createTransfer = authActionClient
 
     if (error) {
       throw new Error(error.message);
+    }
+
+    if (isLocationOnly) {
+      const { error: itemError } = await supabase
+        .from('inventory_items')
+        .update({ location_id: parsedInput.to_location_id })
+        .eq('id', parsedInput.asset_id);
+      if (itemError) throw new Error(itemError.message);
     }
 
     revalidatePath('/inventory');
