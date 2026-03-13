@@ -348,7 +348,7 @@ Recent decisions affecting current work:
 | 73 | Fix UI/UX table inconsistencies: template name truncation, job title text-sm, breadcrumb label, Created columns on assets/schedules, INVENTORY_VIEW_ALL rename | 2026-03-13 | 74c414a | Verified | [66-fix-ui-ux-table-inconsistencies-template](./quick/66-fix-ui-ux-table-inconsistencies-template/) |
 | 74 | E2E regression tests for quick-62 through quick-66 (location transfer, company field, Created columns, breadcrumb, sidebar, template name) | 2026-03-13 | ba1261d | Verified | [67-e2e-tests-for-quick-62-to-quick-66-locat](./quick/67-e2e-tests-for-quick-62-to-quick-66-locat/) |
 | 75 | Make maintenance templates shared across companies (global resource) | 2026-03-13 | f0cdff4 | Verified | [68-make-maintenance-templates-shared-across](./quick/68-make-maintenance-templates-shared-across/) |
-| 76 | Make schedules not asset-locked (item_id optional for general templates) | 2026-03-13 | 44fe0b6 | Complete | [69-make-schedules-not-asset-locked-item-id-](./quick/69-make-schedules-not-asset-locked-item-id-/) |
+| 76 | Make schedules not asset-locked (item_id optional for general templates) | 2026-03-13 | 44fe0b6 | Verified | [69-make-schedules-not-asset-locked-item-id-](./quick/69-make-schedules-not-asset-locked-item-id-/) |
 
 ## Session Continuity
 
