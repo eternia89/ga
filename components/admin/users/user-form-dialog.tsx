@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createUserSchema, updateUserSchema } from '@/lib/validations/user-schema';
 import { createUser, updateUser } from '@/app/actions/user-actions';
 import { updateUserCompanyAccess } from '@/app/actions/user-company-access-actions';
@@ -106,11 +106,12 @@ export function UserFormDialog({
     userCompanyAccess ?? []
   );
 
-  // Sync prop → state when the selected user changes (dialog mounts with editingUser=null,
-  // so useState initial value is []; useEffect re-syncs when a real user is opened for edit)
   useEffect(() => {
-    setSelectedExtraCompanies(userCompanyAccess ?? []);
-  }, [userCompanyAccess]);
+    if (open) {
+      setSelectedCompanyId(user?.company_id || defaultCompanyId || '');
+      setSelectedExtraCompanies(userCompanyAccess ?? []);
+    }
+  }, [open, user?.id, user?.company_id, defaultCompanyId, userCompanyAccess]);
 
   const toggleCompanyAccess = (companyId: string) => {
     setSelectedExtraCompanies((prev) =>
@@ -172,13 +173,7 @@ export function UserFormDialog({
     <EntityFormDialog<UserFormInput>
       key={user?.id || 'create'}
       open={open}
-      onOpenChange={(nextOpen) => {
-        if (nextOpen) {
-          setSelectedCompanyId(user?.company_id || defaultCompanyId || '');
-          setSelectedExtraCompanies(userCompanyAccess ?? []);
-        }
-        onOpenChange(nextOpen);
-      }}
+      onOpenChange={onOpenChange}
       schema={schema as any}
       defaultValues={defaultValues}
       onSubmit={handleSubmit}
