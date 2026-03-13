@@ -89,6 +89,7 @@ export type MaintenanceSchedule = {
   assigned_to: string | null;
   interval_days: number;
   interval_type: 'fixed' | 'floating';
+  auto_create_days_before: number;
   last_completed_at: string | null;
   next_due_at: string | null;
   is_paused: boolean;

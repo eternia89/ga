@@ -82,6 +82,7 @@ export const createSchedule = gaLeadActionClient
         template_id:   parsedInput.template_id,
         interval_days: parsedInput.interval_days,
         interval_type: parsedInput.interval_type,
+        auto_create_days_before: parsedInput.auto_create_days_before ?? 0,
         next_due_at:   nextDueAt.toISOString(),
         is_active:     true,
         is_paused:     false,
@@ -114,7 +115,7 @@ export const updateSchedule = gaLeadActionClient
     // Verify schedule exists and belongs to company
     const { data: existing } = await adminSupabase
       .from('maintenance_schedules')
-      .select('id, interval_days, interval_type, company_id, item_id')
+      .select('id, interval_days, interval_type, auto_create_days_before, company_id, item_id')
       .eq('id', parsedInput.id)
       .eq('company_id', profile.company_id)
       .is('deleted_at', null)
@@ -132,6 +133,7 @@ export const updateSchedule = gaLeadActionClient
     const updatePayload: Record<string, unknown> = {
       interval_days: parsedInput.data.interval_days,
       interval_type: parsedInput.data.interval_type,
+      auto_create_days_before: parsedInput.data.auto_create_days_before,
     };
 
     if (intervalChanged) {
@@ -321,6 +323,7 @@ export const getSchedules = authActionClient
         assigned_to,
         interval_days,
         interval_type,
+        auto_create_days_before,
         last_completed_at,
         next_due_at,
         is_paused,
@@ -391,6 +394,7 @@ export const getSchedulesByAssetId = authActionClient
         assigned_to,
         interval_days,
         interval_type,
+        auto_create_days_before,
         last_completed_at,
         next_due_at,
         is_paused,

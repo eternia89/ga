@@ -53,6 +53,7 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
       assigned_to,
       interval_days,
       interval_type,
+      auto_create_days_before,
       last_completed_at,
       next_due_at,
       is_paused,
