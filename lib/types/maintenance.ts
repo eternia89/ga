@@ -59,7 +59,7 @@ export type PMJobChecklist = {
 
 export type MaintenanceTemplate = {
   id: string;
-  company_id: string;
+  company_id: string | null;
   category_id: string | null;
   name: string;
   description: string | null;
