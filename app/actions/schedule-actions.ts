@@ -112,17 +112,30 @@ export const updateSchedule = gaLeadActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { adminSupabase, profile } = ctx;
 
-    // Verify schedule exists and belongs to company
+    // Verify schedule exists
     const { data: existing } = await adminSupabase
       .from('maintenance_schedules')
       .select('id, interval_days, interval_type, auto_create_days_before, company_id, item_id')
       .eq('id', parsedInput.id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
     if (!existing) {
       throw new Error('Schedule not found');
+    }
+
+    // Verify user has access to this schedule's company
+    const hasUpdateAccess = existing.company_id === profile.company_id;
+    if (!hasUpdateAccess) {
+      const { data: accessRow } = await adminSupabase
+        .from('user_company_access')
+        .select('id')
+        .eq('user_id', profile.id)
+        .eq('company_id', existing.company_id)
+        .maybeSingle();
+      if (!accessRow) {
+        throw new Error('Schedule not found');
+      }
     }
 
     // Recalculate next_due_at if interval changes
@@ -169,17 +182,30 @@ export const deactivateSchedule = gaLeadActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { adminSupabase, profile } = ctx;
 
-    // Verify schedule exists and belongs to company
+    // Verify schedule exists
     const { data: existing } = await adminSupabase
       .from('maintenance_schedules')
       .select('id, is_active, company_id, item_id')
       .eq('id', parsedInput.id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
     if (!existing) {
       throw new Error('Schedule not found');
+    }
+
+    // Verify user has access to this schedule's company
+    const hasDeactivateAccess = existing.company_id === profile.company_id;
+    if (!hasDeactivateAccess) {
+      const { data: accessRow } = await adminSupabase
+        .from('user_company_access')
+        .select('id')
+        .eq('user_id', profile.id)
+        .eq('company_id', existing.company_id)
+        .maybeSingle();
+      if (!accessRow) {
+        throw new Error('Schedule not found');
+      }
     }
 
     if (!existing.is_active) {
@@ -221,17 +247,30 @@ export const activateSchedule = gaLeadActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { adminSupabase, profile } = ctx;
 
-    // Verify schedule exists and belongs to company
+    // Verify schedule exists
     const { data: existing } = await adminSupabase
       .from('maintenance_schedules')
       .select('id, is_active, interval_days, company_id, item_id')
       .eq('id', parsedInput.id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
     if (!existing) {
       throw new Error('Schedule not found');
+    }
+
+    // Verify user has access to this schedule's company
+    const hasActivateAccess = existing.company_id === profile.company_id;
+    if (!hasActivateAccess) {
+      const { data: accessRow } = await adminSupabase
+        .from('user_company_access')
+        .select('id')
+        .eq('user_id', profile.id)
+        .eq('company_id', existing.company_id)
+        .maybeSingle();
+      if (!accessRow) {
+        throw new Error('Schedule not found');
+      }
     }
 
     if (existing.is_active) {
@@ -267,17 +306,30 @@ export const deleteSchedule = gaLeadActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { adminSupabase, profile } = ctx;
 
-    // Verify schedule exists and belongs to company
+    // Verify schedule exists
     const { data: existing } = await adminSupabase
       .from('maintenance_schedules')
       .select('id, company_id, item_id')
       .eq('id', parsedInput.id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
     if (!existing) {
       throw new Error('Schedule not found');
+    }
+
+    // Verify user has access to this schedule's company
+    const hasDeleteAccess = existing.company_id === profile.company_id;
+    if (!hasDeleteAccess) {
+      const { data: accessRow } = await adminSupabase
+        .from('user_company_access')
+        .select('id')
+        .eq('user_id', profile.id)
+        .eq('company_id', existing.company_id)
+        .maybeSingle();
+      if (!accessRow) {
+        throw new Error('Schedule not found');
+      }
     }
 
     const { error } = await adminSupabase
