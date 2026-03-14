@@ -357,10 +357,11 @@ Recent decisions affecting current work:
 | 81 | Add Company column to maintenance schedules table for multi-company visibility | 2026-03-14 | 55c2f04 | Verified | [74-fix-schedule-company-scoping-duplication](./quick/74-fix-schedule-company-scoping-duplication/) |
 | 82 | Add company access validation to createSchedule non-asset branch | 2026-03-14 | 575736b | Verified | [75-add-company-access-validation-to-creates](./quick/75-add-company-access-validation-to-creates/) |
 | 83 | Add .max(10) to unbounded start_date string in scheduleCreateSchema | 2026-03-14 | 2b9510e | Verified | [76-add-max-10-to-unbounded-start-date-strin](./quick/76-add-max-10-to-unbounded-start-date-strin/) |
+| 84 | E2E tests for schedule non-asset path, auto_create_days_before, and RLS cross-company INSERT | 2026-03-14 | 6f40606 | Complete | [77-extend-schedule-e2e-tests-no-asset-path-](./quick/77-extend-schedule-e2e-tests-no-asset-path-/) |
 
 ## Session Continuity
 
-Last session: 2026-03-14T16:10:13Z
-Stopped at: Completed quick task 76: Add .max(10) to unbounded start_date string in scheduleCreateSchema
+Last session: 2026-03-14T16:36:00Z
+Stopped at: Completed quick task 77: E2E tests for schedule non-asset path, auto_create_days_before, and RLS
 Resume file: None
 Next: Ready for next task
