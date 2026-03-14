@@ -356,7 +356,7 @@ Recent decisions affecting current work:
 | 80 | Move asset name from schedule detail header to body section | 2026-03-14 | 98257dd | Verified | [73-move-asset-name-from-schedule-detail-hea](./quick/73-move-asset-name-from-schedule-detail-hea/) |
 | 81 | Add Company column to maintenance schedules table for multi-company visibility | 2026-03-14 | 55c2f04 | Verified | [74-fix-schedule-company-scoping-duplication](./quick/74-fix-schedule-company-scoping-duplication/) |
 | 82 | Add company access validation to createSchedule non-asset branch | 2026-03-14 | 575736b | Verified | [75-add-company-access-validation-to-creates](./quick/75-add-company-access-validation-to-creates/) |
-| 83 | Add .max(10) to unbounded start_date string in scheduleCreateSchema | 2026-03-14 | 2b9510e | Complete | [76-add-max-10-to-unbounded-start-date-strin](./quick/76-add-max-10-to-unbounded-start-date-strin/) |
+| 83 | Add .max(10) to unbounded start_date string in scheduleCreateSchema | 2026-03-14 | 2b9510e | Verified | [76-add-max-10-to-unbounded-start-date-strin](./quick/76-add-max-10-to-unbounded-start-date-strin/) |
 
 ## Session Continuity
 
