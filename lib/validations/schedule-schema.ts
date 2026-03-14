@@ -12,7 +12,7 @@ export const scheduleCreateSchema = z.object({
   interval_type: z.enum(['fixed', 'floating']).default('floating'),
   auto_create_days_before: z.number().int().min(0, 'Minimum 0').max(30, 'Maximum 30 days').default(0),
   // ISO date string; if omitted defaults to now() + interval_days
-  start_date:    z.string().optional(),
+  start_date:    z.string().max(10).optional(),
 });
 
 // ============================================================================

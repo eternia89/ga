@@ -388,6 +388,7 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
                 <FormControl>
                   <Input
                     type="date"
+                    maxLength={10}
                     disabled={isPending}
                     {...field}
                     value={field.value ?? ''}
