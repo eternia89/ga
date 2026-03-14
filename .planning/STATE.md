@@ -354,10 +354,11 @@ Recent decisions affecting current work:
 | 78 | Fix schedule write actions for multi-company access (deactivate/activate/update/delete) | 2026-03-13 | b38238f | Verified | [71-fix-deactivating-schedule-returns-schedu](./quick/71-fix-deactivating-schedule-returns-schedu/) |
 | 79 | Remove rounded border section separators from maintenance schedule components | 2026-03-13 | 9611087 | Verified | [72-remove-rounded-border-separators-from-ma](./quick/72-remove-rounded-border-separators-from-ma/) |
 | 80 | Move asset name from schedule detail header to body section | 2026-03-14 | 98257dd | Verified | [73-move-asset-name-from-schedule-detail-hea](./quick/73-move-asset-name-from-schedule-detail-hea/) |
+| 81 | Add Company column to maintenance schedules table for multi-company visibility | 2026-03-14 | 55c2f04 | Complete | [74-fix-schedule-company-scoping-duplication](./quick/74-fix-schedule-company-scoping-duplication/) |
 
 ## Session Continuity
 
-Last session: 2026-03-14T04:44:21Z
-Stopped at: Completed quick task 73: Move asset name from schedule detail header to body section
+Last session: 2026-03-14T05:11:33Z
+Stopped at: Completed quick task 74: Add Company column to maintenance schedules table
 Resume file: None
 Next: Ready for next task
