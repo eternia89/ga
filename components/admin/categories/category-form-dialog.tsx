@@ -108,7 +108,7 @@ export function CategoryFormDialog({
                   Name <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Maintenance" maxLength={100} {...field} />
+                  <Input placeholder="Maintenance" maxLength={60} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

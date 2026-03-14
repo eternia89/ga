@@ -98,7 +98,7 @@ export function CompanyFormDialog({
                   Name <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Acme Corporation" maxLength={100} {...field} />
+                  <Input placeholder="Acme Corporation" maxLength={60} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -131,7 +131,7 @@ export function CompanyFormDialog({
                   <Input
                     type="email"
                     placeholder="contact@acme.com"
-                    maxLength={255}
+                    maxLength={60}
                     {...field}
                   />
                 </FormControl>

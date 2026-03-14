@@ -34,7 +34,7 @@ export function DeactivateConfirmDialog({
   dependencyLabel,
 }: DeactivateConfirmDialogProps) {
   const [confirmText, setConfirmText] = React.useState("");
-  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [isDeactivating, setIsDeactivating] = React.useState(false);
 
   const hasDependencies = dependencyCount !== undefined && dependencyCount > 0;
   const isConfirmValid = confirmText === entityName;
@@ -42,15 +42,15 @@ export function DeactivateConfirmDialog({
   const handleConfirm = async () => {
     if (!isConfirmValid || hasDependencies) return;
 
-    setIsDeleting(true);
+    setIsDeactivating(true);
     try {
       await onConfirm();
       setConfirmText("");
       onOpenChange(false);
     } catch (error) {
-      console.error("Delete failed:", error);
+      console.error("Deactivation failed:", error);
     } finally {
-      setIsDeleting(false);
+      setIsDeactivating(false);
     }
   };
 
@@ -58,7 +58,7 @@ export function DeactivateConfirmDialog({
   React.useEffect(() => {
     if (!open) {
       setConfirmText("");
-      setIsDeleting(false);
+      setIsDeactivating(false);
     }
   }, [open]);
 
@@ -102,13 +102,13 @@ export function DeactivateConfirmDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeactivating}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
-            disabled={hasDependencies || !isConfirmValid || isDeleting}
+            disabled={hasDependencies || !isConfirmValid || isDeactivating}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isDeleting ? "Deactivating..." : "Deactivate"}
+            {isDeactivating ? "Deactivating..." : "Deactivate"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

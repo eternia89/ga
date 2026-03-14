@@ -204,7 +204,7 @@ export function UserFormDialog({
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="user@example.com" maxLength={255} {...field} />
+                    <Input type="email" placeholder="user@example.com" maxLength={60} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -227,7 +227,7 @@ export function UserFormDialog({
               <FormItem>
                 <FormLabel>Full Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="John Doe" maxLength={100} {...field} />
+                  <Input placeholder="John Doe" maxLength={60} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

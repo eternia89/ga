@@ -141,7 +141,7 @@ export function LocationFormDialog({
                   Name <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Main Office" maxLength={100} {...field} />
+                  <Input placeholder="Main Office" maxLength={60} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

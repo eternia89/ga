@@ -1,10 +1,10 @@
-"use server";
+'use server';
 
-import { revalidatePath } from "next/cache";
-import { adminActionClient } from "@/lib/safe-action";
-import { locationSchema } from "@/lib/validations/location-schema";
-import { emptyToNull } from "@/lib/utils";
-import { z } from "zod";
+import { revalidatePath } from 'next/cache';
+import { adminActionClient } from '@/lib/safe-action';
+import { locationSchema } from '@/lib/validations/location-schema';
+import { emptyToNull } from '@/lib/utils';
+import { z } from 'zod';
 
 // Create location
 export const createLocation = adminActionClient
@@ -13,20 +13,19 @@ export const createLocation = adminActionClient
     const { adminSupabase: supabase } = ctx;
 
     // Check for duplicate name within the same company
-    const { data: existing } = await supabase
-      .from("locations")
-      .select("id")
-      .ilike("name", parsedInput.name)
-      .eq("company_id", parsedInput.company_id)
-      .is("deleted_at", null)
-      .limit(1);
+    const { count } = await supabase
+      .from('locations')
+      .select('id', { count: 'exact', head: true })
+      .ilike('name', parsedInput.name)
+      .eq('company_id', parsedInput.company_id)
+      .is('deleted_at', null);
 
-    if (existing && existing.length > 0) {
+    if (count && count > 0) {
       throw new Error(`A location named "${parsedInput.name}" already exists in this company`);
     }
 
     const { data, error } = await supabase
-      .from("locations")
+      .from('locations')
       .insert([emptyToNull(parsedInput)])
       .select()
       .single();
@@ -35,7 +34,7 @@ export const createLocation = adminActionClient
       throw new Error(error.message);
     }
 
-    revalidatePath("/admin/settings");
+    revalidatePath('/admin/settings');
     return { success: true, data };
   });
 
@@ -53,24 +52,23 @@ export const updateLocation = adminActionClient
 
     // Check for duplicate name within the same company (excluding self)
     if (data.name) {
-      const { data: existing } = await supabase
-        .from("locations")
-        .select("id")
-        .ilike("name", data.name)
-        .eq("company_id", data.company_id)
-        .is("deleted_at", null)
-        .neq("id", id)
-        .limit(1);
+      const { count } = await supabase
+        .from('locations')
+        .select('id', { count: 'exact', head: true })
+        .ilike('name', data.name)
+        .eq('company_id', data.company_id)
+        .is('deleted_at', null)
+        .neq('id', id);
 
-      if (existing && existing.length > 0) {
+      if (count && count > 0) {
         throw new Error(`A location named "${data.name}" already exists in this company`);
       }
     }
 
     const { data: updated, error } = await supabase
-      .from("locations")
+      .from('locations')
       .update(emptyToNull(data))
-      .eq("id", id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -78,26 +76,25 @@ export const updateLocation = adminActionClient
       throw new Error(error.message);
     }
 
-    revalidatePath("/admin/settings");
+    revalidatePath('/admin/settings');
     return { success: true, data: updated };
   });
 
-// Delete location (soft-delete with dependency check)
-export const deleteLocation = adminActionClient
+// Deactivate location (soft-delete with dependency check)
+export const deactivateLocation = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
     const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
-    // Check for active dependencies (requests, inventory_items)
-    // Note: Requests table may not exist yet, but we'll check when it does
+    // Check for active dependencies (inventory_items)
     const { count: inventoryCount, error: inventoryError } = await supabase
-      .from("inventory_items")
-      .select("id", { count: "exact", head: true })
-      .eq("location_id", id)
-      .is("deleted_at", null);
+      .from('inventory_items')
+      .select('id', { count: 'exact', head: true })
+      .eq('location_id', id)
+      .is('deleted_at', null);
 
-    if (inventoryError && inventoryError.code !== "42P01") {
+    if (inventoryError && inventoryError.code !== '42P01') {
       // Ignore "relation does not exist" error for tables not yet created
       throw new Error(inventoryError.message);
     }
@@ -108,86 +105,85 @@ export const deleteLocation = adminActionClient
       const deps: string[] = [];
       if (inventoryCount && inventoryCount > 0)
         deps.push(
-          `${inventoryCount} inventory item${inventoryCount > 1 ? "s" : ""}`
+          `${inventoryCount} inventory item${inventoryCount > 1 ? 's' : ''}`
         );
 
-      throw new Error(`Cannot deactivate -- ${deps.join(", ")} assigned`);
+      throw new Error(`Cannot deactivate -- ${deps.join(', ')} assigned`);
     }
 
     // Soft delete
     const { error } = await supabase
-      .from("locations")
+      .from('locations')
       .update({ deleted_at: new Date().toISOString() })
-      .eq("id", id);
+      .eq('id', id);
 
     if (error) {
       throw new Error(error.message);
     }
 
-    revalidatePath("/admin/settings");
+    revalidatePath('/admin/settings');
     return { success: true };
   });
 
-// Restore location
-export const restoreLocation = adminActionClient
+// Reactivate location
+export const reactivateLocation = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
     const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
     const { data: location } = await supabase
-      .from("locations")
-      .select("name, company_id")
-      .eq("id", id)
+      .from('locations')
+      .select('name, company_id')
+      .eq('id', id)
       .single();
 
     if (!location) {
-      throw new Error("Location not found");
+      throw new Error('Location not found');
     }
 
-    const { data: existing } = await supabase
-      .from("locations")
-      .select("id")
-      .ilike("name", location.name)
-      .eq("company_id", location.company_id)
-      .is("deleted_at", null)
-      .neq("id", id)
-      .limit(1);
+    const { count } = await supabase
+      .from('locations')
+      .select('id', { count: 'exact', head: true })
+      .ilike('name', location.name)
+      .eq('company_id', location.company_id)
+      .is('deleted_at', null)
+      .neq('id', id);
 
-    if (existing && existing.length > 0) {
+    if (count && count > 0) {
       throw new Error(`Cannot reactivate -- an active location named "${location.name}" already exists in this company`);
     }
 
     const { error } = await supabase
-      .from("locations")
+      .from('locations')
       .update({ deleted_at: null })
-      .eq("id", id);
+      .eq('id', id);
 
     if (error) {
       throw new Error(error.message);
     }
 
-    revalidatePath("/admin/settings");
+    revalidatePath('/admin/settings');
     return { success: true };
   });
 
-// Bulk delete locations
-export const bulkDeleteLocations = adminActionClient
+// Bulk deactivate locations
+export const bulkDeactivateLocations = adminActionClient
   .schema(z.object({ ids: z.array(z.string().uuid()) }))
   .action(async ({ parsedInput, ctx }) => {
     const { adminSupabase: supabase } = ctx;
     const { ids } = parsedInput;
 
     const blocked: string[] = [];
-    const deleted: string[] = [];
+    const deactivated: string[] = [];
 
     for (const id of ids) {
       // Check for dependencies
       const { count: inventoryCount } = await supabase
-        .from("inventory_items")
-        .select("id", { count: "exact", head: true })
-        .eq("location_id", id)
-        .is("deleted_at", null);
+        .from('inventory_items')
+        .select('id', { count: 'exact', head: true })
+        .eq('location_id', id)
+        .is('deleted_at', null);
 
       const totalDeps = inventoryCount || 0;
 
@@ -196,16 +192,16 @@ export const bulkDeleteLocations = adminActionClient
       } else {
         // Soft delete
         const { error } = await supabase
-          .from("locations")
+          .from('locations')
           .update({ deleted_at: new Date().toISOString() })
-          .eq("id", id);
+          .eq('id', id);
 
         if (!error) {
-          deleted.push(id);
+          deactivated.push(id);
         }
       }
     }
 
-    revalidatePath("/admin/settings");
-    return { success: true, deleted: deleted.length, blocked: blocked.length };
+    revalidatePath('/admin/settings');
+    return { success: true, deleted: deactivated.length, blocked: blocked.length };
   });

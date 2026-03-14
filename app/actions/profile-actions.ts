@@ -7,16 +7,16 @@ import { z } from 'zod';
 // Update profile (name only)
 export const updateProfile = authActionClient
   .schema(z.object({
-    full_name: z.string().min(1, "Name is required").max(100),
+    full_name: z.string().min(1, "Name is required").max(60),
   }))
-  .action(async ({ parsedInput: input, ctx }) => {
+  .action(async ({ parsedInput, ctx }) => {
     const { supabase, user } = ctx;
 
     // Update user_profiles where id = current user
     const { error } = await supabase
       .from('user_profiles')
       .update({
-        full_name: input.full_name,
+        full_name: parsedInput.full_name,
         updated_at: new Date().toISOString(),
       })
       .eq('id', user.id);
@@ -37,13 +37,13 @@ export const changePassword = authActionClient
     currentPassword: z.string().min(1, "Current password is required"),
     newPassword: z.string().min(8, "Password must be at least 8 characters"),
   }))
-  .action(async ({ parsedInput: input, ctx }) => {
+  .action(async ({ parsedInput, ctx }) => {
     const { supabase, profile } = ctx;
 
     // Verify current password by attempting to sign in
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: profile.email,
-      password: input.currentPassword,
+      password: parsedInput.currentPassword,
     });
 
     if (signInError) {
@@ -52,7 +52,7 @@ export const changePassword = authActionClient
 
     // Update password
     const { error: updateError } = await supabase.auth.updateUser({
-      password: input.newPassword,
+      password: parsedInput.newPassword,
     });
 
     if (updateError) {

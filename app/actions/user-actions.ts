@@ -45,13 +45,13 @@ export const getUsers = adminActionClient
 // Create user
 export const createUser = adminActionClient
   .schema(createUserSchema)
-  .action(async ({ parsedInput: input }) => {
+  .action(async ({ parsedInput }) => {
     const adminSupabase = createAdminClient();
 
     try {
       // 1. Create auth user with Supabase Admin API
       const { data: authUser, error: authError } = await adminSupabase.auth.admin.createUser({
-        email: input.email,
+        email: parsedInput.email,
         email_confirm: true,
       });
 
@@ -69,12 +69,12 @@ export const createUser = adminActionClient
           .from('user_profiles')
           .insert({
             id: authUser.user.id,
-            email: input.email,
-            full_name: input.full_name,
-            role: input.role,
-            company_id: input.company_id,
-            division_id: input.division_id || null,
-            location_id: input.location_id || null,
+            email: parsedInput.email,
+            full_name: parsedInput.full_name,
+            role: parsedInput.role,
+            company_id: parsedInput.company_id,
+            division_id: parsedInput.division_id || null,
+            location_id: parsedInput.location_id || null,
             is_active: true,
           });
 
@@ -89,9 +89,9 @@ export const createUser = adminActionClient
           authUser.user.id,
           {
             app_metadata: {
-              role: input.role,
-              company_id: input.company_id,
-              division_id: input.division_id || null,
+              role: parsedInput.role,
+              company_id: parsedInput.company_id,
+              division_id: parsedInput.division_id || null,
             },
           }
         );
@@ -107,9 +107,9 @@ export const createUser = adminActionClient
           success: true,
           user: {
             id: authUser.user.id,
-            email: input.email,
-            full_name: input.full_name,
-            role: input.role,
+            email: parsedInput.email,
+            full_name: parsedInput.full_name,
+            role: parsedInput.role,
           },
         };
       } catch (error) {
@@ -128,21 +128,21 @@ export const createUser = adminActionClient
 // Update user
 export const updateUser = adminActionClient
   .schema(z.object({ id: z.string().uuid() }).merge(updateUserSchema))
-  .action(async ({ parsedInput: input }) => {
+  .action(async ({ parsedInput }) => {
     const adminSupabase = createAdminClient();
 
     // 1. Update user_profiles row
     const { error: profileError } = await adminSupabase
       .from('user_profiles')
       .update({
-        full_name: input.full_name,
-        role: input.role,
-        company_id: input.company_id,
-        division_id: input.division_id || null,
-        location_id: input.location_id || null,
+        full_name: parsedInput.full_name,
+        role: parsedInput.role,
+        company_id: parsedInput.company_id,
+        division_id: parsedInput.division_id || null,
+        location_id: parsedInput.location_id || null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', input.id);
+      .eq('id', parsedInput.id);
 
     if (profileError) {
       throw new Error(`Failed to update user profile: ${profileError.message}`);
@@ -150,12 +150,12 @@ export const updateUser = adminActionClient
 
     // 2. Update auth user app_metadata
     const { error: metadataError } = await adminSupabase.auth.admin.updateUserById(
-      input.id,
+      parsedInput.id,
       {
         app_metadata: {
-          role: input.role,
-          company_id: input.company_id,
-          division_id: input.division_id || null,
+          role: parsedInput.role,
+          company_id: parsedInput.company_id,
+          division_id: parsedInput.division_id || null,
         },
       }
     );
@@ -176,7 +176,7 @@ export const deactivateUser = adminActionClient
     id: z.string().uuid(),
     reason: z.string().optional(),
   }))
-  .action(async ({ parsedInput: input }) => {
+  .action(async ({ parsedInput }) => {
     const adminSupabase = createAdminClient();
 
     // Set deleted_at to deactivate the user
@@ -186,7 +186,7 @@ export const deactivateUser = adminActionClient
         deleted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .eq('id', input.id);
+      .eq('id', parsedInput.id);
 
     if (error) {
       throw new Error(`Failed to deactivate user: ${error.message}`);
@@ -200,7 +200,7 @@ export const deactivateUser = adminActionClient
 // Reactivate user
 export const reactivateUser = adminActionClient
   .schema(z.object({ id: z.string().uuid(), reason: z.string().max(200).optional() }))
-  .action(async ({ parsedInput: input }) => {
+  .action(async ({ parsedInput }) => {
     const adminSupabase = createAdminClient();
 
     // Clear deleted_at and ensure is_active is true
@@ -211,7 +211,7 @@ export const reactivateUser = adminActionClient
         is_active: true,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', input.id);
+      .eq('id', parsedInput.id);
 
     if (error) {
       throw new Error(`Failed to reactivate user: ${error.message}`);
