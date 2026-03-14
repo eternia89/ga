@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
-import Link from 'next/link';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { ScheduleDetail } from '@/components/maintenance/schedule-detail';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
@@ -125,22 +124,6 @@ export default async function ScheduleDetailPage({ params }: PageProps) {
 
       <div>
         <h1 className="text-2xl font-bold tracking-tight">{templateName}</h1>
-        {schedule.item_id && assetName ? (
-          <p className="text-muted-foreground mt-1">
-            Asset:{' '}
-            <Link
-              href={`/inventory/${schedule.item_id}`}
-              className="text-blue-600 hover:underline"
-            >
-              {assetName}
-              {schedule.asset?.display_id && (
-                <span className="text-muted-foreground ml-1">({schedule.asset.display_id})</span>
-              )}
-            </Link>
-          </p>
-        ) : !schedule.item_id ? (
-          <p className="text-muted-foreground mt-1">General schedule (no asset)</p>
-        ) : null}
       </div>
 
       <ScheduleDetail

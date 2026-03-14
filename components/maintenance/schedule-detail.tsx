@@ -141,6 +141,27 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
         />
       </div>
 
+      {/* Asset — always shown, always disabled */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Asset</label>
+        {schedule.item_id && schedule.asset?.name ? (
+          <div className="flex items-center gap-2">
+            <Input
+              value={`${schedule.asset.name}${schedule.asset.display_id ? ` (${schedule.asset.display_id})` : ''}`}
+              disabled
+              className="bg-muted text-muted-foreground cursor-not-allowed"
+            />
+            <a href={`/inventory/${schedule.item_id}`} className="text-blue-600 hover:underline text-sm whitespace-nowrap shrink-0">View Asset</a>
+          </div>
+        ) : (
+          <Input
+            value="No asset (general schedule)"
+            disabled
+            className="bg-muted text-muted-foreground cursor-not-allowed"
+          />
+        )}
+      </div>
+
       {/* Status bar + actions */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
@@ -277,26 +298,6 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
                       {schedule.template.name}
                     </a>
                   ) : '—'}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Asset</p>
-                <p className="text-sm font-medium">
-                  {schedule.item_id && schedule.asset?.name ? (
-                    <a
-                      href={`/inventory/${schedule.item_id}`}
-                      className="text-blue-600 hover:underline"
-                    >
-                      {schedule.asset.name}
-                      {schedule.asset.display_id && (
-                        <span className="text-muted-foreground font-normal ml-1">
-                          ({schedule.asset.display_id})
-                        </span>
-                      )}
-                    </a>
-                  ) : (
-                    <span className="text-muted-foreground font-normal">No asset (general schedule)</span>
-                  )}
                 </p>
               </div>
               <div>
