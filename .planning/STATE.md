@@ -358,10 +358,11 @@ Recent decisions affecting current work:
 | 82 | Add company access validation to createSchedule non-asset branch | 2026-03-14 | 575736b | Verified | [75-add-company-access-validation-to-creates](./quick/75-add-company-access-validation-to-creates/) |
 | 83 | Add .max(10) to unbounded start_date string in scheduleCreateSchema | 2026-03-14 | 2b9510e | Verified | [76-add-max-10-to-unbounded-start-date-strin](./quick/76-add-max-10-to-unbounded-start-date-strin/) |
 | 84 | E2E tests for schedule non-asset path, auto_create_days_before, and RLS cross-company INSERT | 2026-03-14 | 6f40606 | Verified | [77-extend-schedule-e2e-tests-no-asset-path-](./quick/77-extend-schedule-e2e-tests-no-asset-path-/) |
+| 85 | Standardize text-sm on Created column date spans in asset and schedule tables | 2026-03-14 | fba2a18 | Complete | [78-standardize-text-sm-on-created-column-da](./quick/78-standardize-text-sm-on-created-column-da/) |
 
 ## Session Continuity
 
-Last session: 2026-03-14T16:36:00Z
-Stopped at: Completed quick task 77: E2E tests for schedule non-asset path, auto_create_days_before, and RLS
+Last session: 2026-03-14T16:44:51Z
+Stopped at: Completed quick task 78: Standardize text-sm on Created column date spans
 Resume file: None
 Next: Ready for next task
