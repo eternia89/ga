@@ -67,6 +67,22 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
     size: 200,
   },
   {
+    accessorKey: 'company.name',
+    id: 'company_name',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Company" />
+    ),
+    cell: ({ row }) => {
+      const schedule = row.original;
+      return schedule.company?.name ? (
+        <span>{schedule.company.name}</span>
+      ) : (
+        <span className="text-muted-foreground">—</span>
+      );
+    },
+    size: 160,
+  },
+  {
     accessorKey: 'interval_days',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Interval" />
