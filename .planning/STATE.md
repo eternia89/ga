@@ -355,7 +355,7 @@ Recent decisions affecting current work:
 | 79 | Remove rounded border section separators from maintenance schedule components | 2026-03-13 | 9611087 | Verified | [72-remove-rounded-border-separators-from-ma](./quick/72-remove-rounded-border-separators-from-ma/) |
 | 80 | Move asset name from schedule detail header to body section | 2026-03-14 | 98257dd | Verified | [73-move-asset-name-from-schedule-detail-hea](./quick/73-move-asset-name-from-schedule-detail-hea/) |
 | 81 | Add Company column to maintenance schedules table for multi-company visibility | 2026-03-14 | 55c2f04 | Verified | [74-fix-schedule-company-scoping-duplication](./quick/74-fix-schedule-company-scoping-duplication/) |
-| 82 | Add company access validation to createSchedule non-asset branch | 2026-03-14 | 575736b | Complete | [75-add-company-access-validation-to-creates](./quick/75-add-company-access-validation-to-creates/) |
+| 82 | Add company access validation to createSchedule non-asset branch | 2026-03-14 | 575736b | Verified | [75-add-company-access-validation-to-creates](./quick/75-add-company-access-validation-to-creates/) |
 
 ## Session Continuity
 
