@@ -123,7 +123,8 @@ export function ScheduleViewModal({
             is_paused, paused_at, paused_reason, is_active,
             deleted_at, created_at, updated_at,
             template:maintenance_templates(name, checklist),
-            asset:inventory_items(name, display_id)
+            asset:inventory_items(name, display_id),
+            company:companies(name)
           `)
           .eq('id', id)
           .is('deleted_at', null)
@@ -147,6 +148,7 @@ export function ScheduleViewModal({
       // Normalize FK arrays
       const templateRaw = Array.isArray(raw.template) ? raw.template[0] : raw.template;
       const assetRaw = Array.isArray(raw.asset) ? raw.asset[0] : raw.asset;
+      const companyRaw = Array.isArray(raw.company) ? raw.company[0] : raw.company;
 
       const normalized: MaintenanceSchedule = {
         ...raw,
@@ -156,6 +158,7 @@ export function ScheduleViewModal({
         asset: assetRaw
           ? { name: assetRaw.name, display_id: assetRaw.display_id }
           : null,
+        company: companyRaw ? { name: companyRaw.name } : null,
       };
 
       setSchedule(normalized);

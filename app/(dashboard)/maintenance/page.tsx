@@ -64,7 +64,8 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
       created_at,
       updated_at,
       template:maintenance_templates(name),
-      asset:inventory_items(name, display_id)
+      asset:inventory_items(name, display_id),
+      company:companies(name)
     `)
     .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
@@ -122,6 +123,7 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
   const scheduleList: MaintenanceSchedule[] = (schedules ?? []).map((s) => {
     const templateRaw = Array.isArray(s.template) ? s.template[0] : s.template;
     const assetRaw = Array.isArray(s.asset) ? s.asset[0] : s.asset;
+    const companyRaw = Array.isArray(s.company) ? s.company[0] : s.company;
 
     return {
       ...s,
@@ -131,6 +133,7 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
       asset: assetRaw
         ? { name: assetRaw.name, display_id: assetRaw.display_id }
         : null,
+      company: companyRaw ? { name: companyRaw.name } : null,
       display_status: getScheduleDisplayStatus({
         is_active: s.is_active ?? true,
         is_paused: s.is_paused ?? false,

@@ -111,6 +111,9 @@ export type MaintenanceSchedule = {
   category?: {
     name: string;
   } | null;
+  company?: {
+    name: string;
+  } | null;
 };
 
 // ============================================================================
