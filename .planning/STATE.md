@@ -353,7 +353,7 @@ Recent decisions affecting current work:
 | 77 | Add auto_create_days_before field to maintenance schedules (0-30 days advance job creation) | 2026-03-13 | 712df5d | Verified | [70-add-auto-create-jobs-days-before-due-fie](./quick/70-add-auto-create-jobs-days-before-due-fie/) |
 | 78 | Fix schedule write actions for multi-company access (deactivate/activate/update/delete) | 2026-03-13 | b38238f | Verified | [71-fix-deactivating-schedule-returns-schedu](./quick/71-fix-deactivating-schedule-returns-schedu/) |
 | 79 | Remove rounded border section separators from maintenance schedule components | 2026-03-13 | 9611087 | Verified | [72-remove-rounded-border-separators-from-ma](./quick/72-remove-rounded-border-separators-from-ma/) |
-| 80 | Move asset name from schedule detail header to body section | 2026-03-14 | 98257dd | Complete | [73-move-asset-name-from-schedule-detail-hea](./quick/73-move-asset-name-from-schedule-detail-hea/) |
+| 80 | Move asset name from schedule detail header to body section | 2026-03-14 | 98257dd | Verified | [73-move-asset-name-from-schedule-detail-hea](./quick/73-move-asset-name-from-schedule-detail-hea/) |
 
 ## Session Continuity
 
