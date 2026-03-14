@@ -8,9 +8,9 @@ import { CompanyFormDialog } from "./company-form-dialog";
 import { DeactivateConfirmDialog } from "@/components/delete-confirm-dialog";
 import { InlineFeedback } from "@/components/inline-feedback";
 import {
-  deleteCompany,
-  restoreCompany,
-  bulkDeleteCompanies,
+  deactivateCompany,
+  reactivateCompany,
+  bulkDeactivateCompanies,
 } from "@/app/actions/company-actions";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -45,7 +45,7 @@ export function CompanyTable({ data }: CompanyTableProps) {
   const handleRestore = async () => {
     if (!editingCompany) return;
     try {
-      const result = await restoreCompany({ id: editingCompany.id });
+      const result = await reactivateCompany({ id: editingCompany.id });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else {
@@ -67,7 +67,7 @@ export function CompanyTable({ data }: CompanyTableProps) {
     if (!deletingCompany) return;
 
     try {
-      const result = await deleteCompany({ id: deletingCompany.id });
+      const result = await deactivateCompany({ id: deletingCompany.id });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else {
@@ -88,7 +88,7 @@ export function CompanyTable({ data }: CompanyTableProps) {
 
   const handleBulkDelete = async (selectedIds: string[]) => {
     try {
-      const result = await bulkDeleteCompanies({ ids: selectedIds });
+      const result = await bulkDeactivateCompanies({ ids: selectedIds });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else if (result?.data) {

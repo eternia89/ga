@@ -52,7 +52,7 @@ export interface Category {
   updated_at: string;
 }
 
-export type Request = {
+export interface Request {
   id: string;
   company_id: string;
   division_id: string;
@@ -82,18 +82,18 @@ export type Request = {
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
-};
+}
 
 // Request with joined relations (for list and detail views)
-export type RequestWithRelations = Request & {
+export interface RequestWithRelations extends Request {
   location: { name: string } | null;
   category: { name: string } | null;
   requester: { name: string; email: string } | null;
   assigned_user: { name: string; email: string } | null;
   division: { name: string } | null;
-};
+}
 
-export type MediaAttachment = {
+export interface MediaAttachment {
   id: string;
   company_id: string;
   entity_type: string;
@@ -108,7 +108,7 @@ export type MediaAttachment = {
   uploaded_by: string | null;
   deleted_at: string | null;
   created_at: string;
-};
+}
 
 export interface Job {
   id: string;

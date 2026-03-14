@@ -8,9 +8,9 @@ import { DivisionFormDialog } from "./division-form-dialog";
 import { DeactivateConfirmDialog } from "@/components/delete-confirm-dialog";
 import { InlineFeedback } from "@/components/inline-feedback";
 import {
-  deleteDivision,
-  restoreDivision,
-  bulkDeleteDivisions,
+  deactivateDivision,
+  reactivateDivision,
+  bulkDeactivateDivisions,
 } from "@/app/actions/division-actions";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -50,7 +50,7 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
   const handleRestore = async () => {
     if (!editingDivision) return;
     try {
-      const result = await restoreDivision({ id: editingDivision.id });
+      const result = await reactivateDivision({ id: editingDivision.id });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else {
@@ -72,7 +72,7 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
     if (!deletingDivision) return;
 
     try {
-      const result = await deleteDivision({ id: deletingDivision.id });
+      const result = await deactivateDivision({ id: deletingDivision.id });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else {
@@ -93,7 +93,7 @@ export function DivisionTable({ data, companies }: DivisionTableProps) {
 
   const handleBulkDelete = async (selectedIds: string[]) => {
     try {
-      const result = await bulkDeleteDivisions({ ids: selectedIds });
+      const result = await bulkDeactivateDivisions({ ids: selectedIds });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else if (result?.data) {

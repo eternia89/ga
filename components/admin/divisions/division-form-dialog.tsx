@@ -143,7 +143,7 @@ export function DivisionFormDialog({
                   Name <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Engineering" maxLength={100} {...field} />
+                  <Input placeholder="Engineering" maxLength={60} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

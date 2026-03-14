@@ -8,9 +8,9 @@ import { LocationFormDialog } from "./location-form-dialog";
 import { DeactivateConfirmDialog } from "@/components/delete-confirm-dialog";
 import { InlineFeedback } from "@/components/inline-feedback";
 import {
-  deleteLocation,
-  restoreLocation,
-  bulkDeleteLocations,
+  deactivateLocation,
+  reactivateLocation,
+  bulkDeactivateLocations,
 } from "@/app/actions/location-actions";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -48,7 +48,7 @@ export function LocationTable({ data, companies }: LocationTableProps) {
   const handleRestore = async () => {
     if (!editingLocation) return;
     try {
-      const result = await restoreLocation({ id: editingLocation.id });
+      const result = await reactivateLocation({ id: editingLocation.id });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else {
@@ -70,7 +70,7 @@ export function LocationTable({ data, companies }: LocationTableProps) {
     if (!deletingLocation) return;
 
     try {
-      const result = await deleteLocation({ id: deletingLocation.id });
+      const result = await deactivateLocation({ id: deletingLocation.id });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else {
@@ -91,7 +91,7 @@ export function LocationTable({ data, companies }: LocationTableProps) {
 
   const handleBulkDelete = async (selectedIds: string[]) => {
     try {
-      const result = await bulkDeleteLocations({ ids: selectedIds });
+      const result = await bulkDeactivateLocations({ ids: selectedIds });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else if (result?.data) {

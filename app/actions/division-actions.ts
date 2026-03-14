@@ -1,10 +1,10 @@
-"use server";
+'use server';
 
-import { revalidatePath } from "next/cache";
-import { adminActionClient } from "@/lib/safe-action";
-import { divisionSchema } from "@/lib/validations/division-schema";
-import { emptyToNull } from "@/lib/utils";
-import { z } from "zod";
+import { revalidatePath } from 'next/cache';
+import { adminActionClient } from '@/lib/safe-action';
+import { divisionSchema } from '@/lib/validations/division-schema';
+import { emptyToNull } from '@/lib/utils';
+import { z } from 'zod';
 
 // Get companies for dropdown
 export const getCompanies = adminActionClient
@@ -13,10 +13,10 @@ export const getCompanies = adminActionClient
     const { adminSupabase: supabase } = ctx;
 
     const { data, error } = await supabase
-      .from("companies")
-      .select("id, name")
-      .is("deleted_at", null)
-      .order("name");
+      .from('companies')
+      .select('id, name')
+      .is('deleted_at', null)
+      .order('name');
 
     if (error) {
       throw new Error(error.message);
@@ -32,20 +32,19 @@ export const createDivision = adminActionClient
     const { adminSupabase: supabase } = ctx;
 
     // Check for duplicate name within the same company
-    const { data: existing } = await supabase
-      .from("divisions")
-      .select("id")
-      .ilike("name", parsedInput.name)
-      .eq("company_id", parsedInput.company_id)
-      .is("deleted_at", null)
-      .limit(1);
+    const { count } = await supabase
+      .from('divisions')
+      .select('id', { count: 'exact', head: true })
+      .ilike('name', parsedInput.name)
+      .eq('company_id', parsedInput.company_id)
+      .is('deleted_at', null);
 
-    if (existing && existing.length > 0) {
+    if (count && count > 0) {
       throw new Error(`A division named "${parsedInput.name}" already exists in this company`);
     }
 
     const { data, error } = await supabase
-      .from("divisions")
+      .from('divisions')
       .insert([emptyToNull(parsedInput)])
       .select()
       .single();
@@ -54,7 +53,7 @@ export const createDivision = adminActionClient
       throw new Error(error.message);
     }
 
-    revalidatePath("/admin/settings");
+    revalidatePath('/admin/settings');
     return { success: true, data };
   });
 
@@ -72,24 +71,23 @@ export const updateDivision = adminActionClient
 
     // Check for duplicate name within the same company (excluding self)
     if (data.name) {
-      const { data: existing } = await supabase
-        .from("divisions")
-        .select("id")
-        .ilike("name", data.name)
-        .eq("company_id", data.company_id)
-        .is("deleted_at", null)
-        .neq("id", id)
-        .limit(1);
+      const { count } = await supabase
+        .from('divisions')
+        .select('id', { count: 'exact', head: true })
+        .ilike('name', data.name)
+        .eq('company_id', data.company_id)
+        .is('deleted_at', null)
+        .neq('id', id);
 
-      if (existing && existing.length > 0) {
+      if (count && count > 0) {
         throw new Error(`A division named "${data.name}" already exists in this company`);
       }
     }
 
     const { data: updated, error } = await supabase
-      .from("divisions")
+      .from('divisions')
       .update(emptyToNull(data))
-      .eq("id", id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -97,12 +95,12 @@ export const updateDivision = adminActionClient
       throw new Error(error.message);
     }
 
-    revalidatePath("/admin/settings");
+    revalidatePath('/admin/settings');
     return { success: true, data: updated };
   });
 
-// Delete division (soft-delete with dependency check)
-export const deleteDivision = adminActionClient
+// Deactivate division (soft-delete with dependency check)
+export const deactivateDivision = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
     const { adminSupabase: supabase } = ctx;
@@ -110,109 +108,108 @@ export const deleteDivision = adminActionClient
 
     // Check for active users in this division
     const { count, error: countError } = await supabase
-      .from("user_profiles")
-      .select("id", { count: "exact", head: true })
-      .eq("division_id", id)
-      .is("deleted_at", null);
+      .from('user_profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('division_id', id)
+      .is('deleted_at', null);
 
     if (countError) {
       throw new Error(countError.message);
     }
 
     if (count && count > 0) {
-      throw new Error(`Cannot deactivate -- ${count} user${count > 1 ? "s" : ""} assigned`);
+      throw new Error(`Cannot deactivate -- ${count} user${count > 1 ? 's' : ''} assigned`);
     }
 
     // Soft delete
     const { error } = await supabase
-      .from("divisions")
+      .from('divisions')
       .update({ deleted_at: new Date().toISOString() })
-      .eq("id", id);
+      .eq('id', id);
 
     if (error) {
       throw new Error(error.message);
     }
 
-    revalidatePath("/admin/settings");
+    revalidatePath('/admin/settings');
     return { success: true };
   });
 
-// Restore division
-export const restoreDivision = adminActionClient
+// Reactivate division
+export const reactivateDivision = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
   .action(async ({ parsedInput, ctx }) => {
     const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
     const { data: division } = await supabase
-      .from("divisions")
-      .select("name, company_id")
-      .eq("id", id)
+      .from('divisions')
+      .select('name, company_id')
+      .eq('id', id)
       .single();
 
     if (!division) {
-      throw new Error("Division not found");
+      throw new Error('Division not found');
     }
 
-    const { data: existing } = await supabase
-      .from("divisions")
-      .select("id")
-      .ilike("name", division.name)
-      .eq("company_id", division.company_id)
-      .is("deleted_at", null)
-      .neq("id", id)
-      .limit(1);
+    const { count } = await supabase
+      .from('divisions')
+      .select('id', { count: 'exact', head: true })
+      .ilike('name', division.name)
+      .eq('company_id', division.company_id)
+      .is('deleted_at', null)
+      .neq('id', id);
 
-    if (existing && existing.length > 0) {
+    if (count && count > 0) {
       throw new Error(`Cannot reactivate -- an active division named "${division.name}" already exists in this company`);
     }
 
     const { error } = await supabase
-      .from("divisions")
+      .from('divisions')
       .update({ deleted_at: null })
-      .eq("id", id);
+      .eq('id', id);
 
     if (error) {
       throw new Error(error.message);
     }
 
-    revalidatePath("/admin/settings");
+    revalidatePath('/admin/settings');
     return { success: true };
   });
 
-// Bulk delete divisions
-export const bulkDeleteDivisions = adminActionClient
+// Bulk deactivate divisions
+export const bulkDeactivateDivisions = adminActionClient
   .schema(z.object({ ids: z.array(z.string().uuid()) }))
   .action(async ({ parsedInput, ctx }) => {
     const { adminSupabase: supabase } = ctx;
     const { ids } = parsedInput;
 
     const blocked: string[] = [];
-    const deleted: string[] = [];
+    const deactivated: string[] = [];
 
     for (const id of ids) {
       // Check for active users
       const { count } = await supabase
-        .from("user_profiles")
-        .select("id", { count: "exact", head: true })
-        .eq("division_id", id)
-        .is("deleted_at", null);
+        .from('user_profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('division_id', id)
+        .is('deleted_at', null);
 
       if (count && count > 0) {
         blocked.push(id);
       } else {
         // Soft delete
         const { error } = await supabase
-          .from("divisions")
+          .from('divisions')
           .update({ deleted_at: new Date().toISOString() })
-          .eq("id", id);
+          .eq('id', id);
 
         if (!error) {
-          deleted.push(id);
+          deactivated.push(id);
         }
       }
     }
 
-    revalidatePath("/admin/settings");
-    return { success: true, deleted: deleted.length, blocked: blocked.length };
+    revalidatePath('/admin/settings');
+    return { success: true, deleted: deactivated.length, blocked: blocked.length };
   });

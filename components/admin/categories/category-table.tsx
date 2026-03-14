@@ -8,9 +8,9 @@ import { CategoryFormDialog } from "./category-form-dialog";
 import { DeactivateConfirmDialog } from "@/components/delete-confirm-dialog";
 import { InlineFeedback } from "@/components/inline-feedback";
 import {
-  deleteCategory,
-  restoreCategory,
-  bulkDeleteCategories,
+  deactivateCategory,
+  reactivateCategory,
+  bulkDeactivateCategories,
 } from "@/app/actions/category-actions";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -45,7 +45,7 @@ export function CategoryTable({ data, categoryType }: CategoryTableProps) {
   const handleRestore = async () => {
     if (!editingCategory) return;
     try {
-      const result = await restoreCategory({ id: editingCategory.id });
+      const result = await reactivateCategory({ id: editingCategory.id });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else {
@@ -67,7 +67,7 @@ export function CategoryTable({ data, categoryType }: CategoryTableProps) {
     if (!deletingCategory) return;
 
     try {
-      const result = await deleteCategory({ id: deletingCategory.id });
+      const result = await deactivateCategory({ id: deletingCategory.id });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else {
@@ -88,7 +88,7 @@ export function CategoryTable({ data, categoryType }: CategoryTableProps) {
 
   const handleBulkDelete = async (selectedIds: string[]) => {
     try {
-      const result = await bulkDeleteCategories({ ids: selectedIds });
+      const result = await bulkDeactivateCategories({ ids: selectedIds });
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else if (result?.data) {
