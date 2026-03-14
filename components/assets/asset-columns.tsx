@@ -165,7 +165,7 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue('created_at') as string;
-      return <span>{format(new Date(date), 'dd-MM-yyyy')}</span>;
+      return <span className="text-sm">{format(new Date(date), 'dd-MM-yyyy')}</span>;
     },
     size: 120,
   },
