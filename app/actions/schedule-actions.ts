@@ -63,6 +63,19 @@ export const createSchedule = gaLeadActionClient
     } else {
       // No asset: use company_id from form (multi-company user) or fall back to profile
       companyId = parsedInput.company_id ?? profile.company_id;
+
+      // Validate company access when a different company was selected
+      if (parsedInput.company_id && parsedInput.company_id !== profile.company_id) {
+        const { data: access } = await adminSupabase
+          .from('user_company_access')
+          .select('id')
+          .eq('user_id', profile.id)
+          .eq('company_id', parsedInput.company_id)
+          .maybeSingle();
+        if (!access) {
+          throw new Error('You do not have access to the selected company.');
+        }
+      }
     }
 
     // Calculate initial next_due_at
