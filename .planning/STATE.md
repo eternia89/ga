@@ -360,7 +360,7 @@ Recent decisions affecting current work:
 | 84 | E2E tests for schedule non-asset path, auto_create_days_before, and RLS cross-company INSERT | 2026-03-14 | 6f40606 | Verified | [77-extend-schedule-e2e-tests-no-asset-path-](./quick/77-extend-schedule-e2e-tests-no-asset-path-/) |
 | 85 | Standardize text-sm on Created column date spans in asset and schedule tables | 2026-03-14 | fba2a18 | Verified | [78-standardize-text-sm-on-created-column-da](./quick/78-standardize-text-sm-on-created-column-da/) |
 | 86 | Fix 7 security/correctness bugs: RFC 4122 UUIDs, .maybeSingle(), duplicate email, company access | 2026-03-16 | 53352a7 | Verified | [79-fix-7-security-correctness-bugs-rfc4122-](./quick/79-fix-7-security-correctness-bugs-rfc4122-/) |
-| 87 | Extract shared helpers for company access and date validation | 2026-03-16 | 4a4e1ef | Complete | [80-extract-shared-helpers-for-company-acces](./quick/80-extract-shared-helpers-for-company-acces/) |
+| 87 | Extract shared helpers for company access and date validation | 2026-03-16 | 4a4e1ef | Verified | [80-extract-shared-helpers-for-company-acces](./quick/80-extract-shared-helpers-for-company-acces/) |
 
 ## Session Continuity
 

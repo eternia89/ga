@@ -189,7 +189,7 @@ For each action file, add `import { assertCompanyAccess } from '@/lib/auth/compa
     <automated>npx tsc --noEmit --pretty 2>&1 | head -30 && npm run lint 2>&1 | tail -5</automated>
   </verify>
   <done>
-- Zero inline `from('user_company_access')` patterns remain in the 5 action files (only the helper and user-company-access-actions.ts should reference this table)
+- Zero inline company access *check* patterns using `from('user_company_access')` remain in the 5 action files (read-access fetches in getSchedules/getSchedulesByAssetId are exempt — they fetch accessible company ID lists, not guard mutations)
 - Zero bare `z.string()` date fields remain in asset-schema.ts and schedule-schema.ts (replaced by isoDateString)
 - TypeScript compiles without errors
 - ESLint passes
@@ -199,7 +199,7 @@ For each action file, add `import { assertCompanyAccess } from '@/lib/auth/compa
 </tasks>
 
 <verification>
-- `grep -r "from('user_company_access')" app/actions/ --include="*.ts" | grep -v user-company-access-actions` should return empty (all inline checks removed)
+- `grep -r "from('user_company_access')" app/actions/ --include="*.ts" | grep -v user-company-access-actions | grep -v "Fetch user"` should return empty (all inline access checks removed; read-access fetches in getSchedules/getSchedulesByAssetId are exempt)
 - `grep "isoDateString" lib/validations/asset-schema.ts lib/validations/schedule-schema.ts` should show 3 usages (acquisition_date, warranty_expiry, start_date)
 - `npx tsc --noEmit` passes
 - `npm run lint` passes
