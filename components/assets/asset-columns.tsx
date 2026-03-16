@@ -194,10 +194,23 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
               Change Status
             </Button>
           )}
+          {canChangeStatus && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-sm text-blue-600 hover:underline"
+              onClick={(e) => {
+                e.stopPropagation();
+                meta?.onTransfer?.(asset);
+              }}
+            >
+              Transfer
+            </Button>
+          )}
         </div>
       );
     },
-    size: 160,
+    size: 240,
     enableSorting: false,
   },
 ];

@@ -533,11 +533,6 @@ export function AssetViewModal({
                     {isEditSubmitting ? 'Saving...' : 'Save Changes'}
                   </Button>
                 )}
-                {['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) && asset.status !== 'sold_disposed' && !pendingTransfer && (
-                  <Button variant="outline" size="sm" onClick={() => setShowTransferDialog(true)}>
-                    Transfer
-                  </Button>
-                )}
                 {pendingTransfer && currentUserId === pendingTransfer.receiver_id && (
                   <>
                     <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => openTransferRespond('accept')}>
@@ -548,7 +543,7 @@ export function AssetViewModal({
                     </Button>
                   </>
                 )}
-                {pendingTransfer && (pendingTransfer.initiated_by === currentUserId || currentUserRole === 'admin') && (
+                {pendingTransfer && (pendingTransfer.initiated_by === currentUserId || ['ga_lead', 'admin'].includes(currentUserRole)) && (
                   <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setShowCancelTransferDialog(true)}>
                     <Ban className="mr-2 h-4 w-4" />
                     Cancel Transfer
@@ -597,7 +592,10 @@ export function AssetViewModal({
               <AlertDialogFooter>
                 <AlertDialogCancel disabled={cancelTransferLoading}>Keep Transfer</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={handleCancelTransfer}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleCancelTransfer();
+                  }}
                   disabled={cancelTransferLoading}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
