@@ -65,7 +65,7 @@ INSERT INTO public.categories (id, company_id, name, type) VALUES
 INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token)
 VALUES (
   'b0000000-0000-4000-8000-000000000001',
-  '00000000-0000-0000-0000-000000000000',
+  '00000000-0000-4000-a000-000000000000',
   'admin@jaknot.com',
   crypt('Password123!', gen_salt('bf')),
   now(),
@@ -85,7 +85,7 @@ VALUES (
 INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token)
 VALUES (
   'b0000000-0000-4000-8000-000000000002',
-  '00000000-0000-0000-0000-000000000000',
+  '00000000-0000-4000-a000-000000000000',
   'galead@jaknot.com',
   crypt('Password123!', gen_salt('bf')),
   now(),
@@ -105,7 +105,7 @@ VALUES (
 INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token)
 VALUES (
   'b0000000-0000-4000-8000-000000000003',
-  '00000000-0000-0000-0000-000000000000',
+  '00000000-0000-4000-a000-000000000000',
   'gastaff@jaknot.com',
   crypt('Password123!', gen_salt('bf')),
   now(),
@@ -125,7 +125,7 @@ VALUES (
 INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token)
 VALUES (
   'b0000000-0000-4000-8000-000000000004',
-  '00000000-0000-0000-0000-000000000000',
+  '00000000-0000-4000-a000-000000000000',
   'finance@jaknot.com',
   crypt('Password123!', gen_salt('bf')),
   now(),
@@ -145,7 +145,7 @@ VALUES (
 INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, aud, role, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token)
 VALUES (
   'b0000000-0000-4000-8000-000000000005',
-  '00000000-0000-0000-0000-000000000000',
+  '00000000-0000-4000-a000-000000000000',
   'user@jaknot.com',
   crypt('Password123!', gen_salt('bf')),
   now(),

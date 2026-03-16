@@ -18,7 +18,7 @@ SET search_path = public
 AS $$
   SELECT COALESCE(
     (auth.jwt() -> 'app_metadata' ->> 'company_id')::uuid,
-    '00000000-0000-0000-0000-000000000000'::uuid
+    '00000000-0000-4000-a000-000000000000'::uuid
   );
 $$;
 
