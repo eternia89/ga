@@ -378,21 +378,23 @@ export function UserFormDialog({
                 </p>
               </div>
               <div className="space-y-2">
-                {companies
-                  .filter(c => c.id !== (user.company_id))
-                  .map(company => (
-                    <label key={company.id} className="flex items-center gap-2 cursor-pointer">
+                {companies.map(company => {
+                  const isPrimary = company.id === user.company_id;
+                  return (
+                    <label key={company.id} className={`flex items-center gap-2 ${isPrimary ? 'opacity-60' : 'cursor-pointer'}`}>
                       <input
                         type="checkbox"
-                        checked={selectedExtraCompanies.includes(company.id)}
-                        onChange={() => toggleCompanyAccess(company.id)}
+                        checked={isPrimary || selectedExtraCompanies.includes(company.id)}
+                        onChange={() => !isPrimary && toggleCompanyAccess(company.id)}
+                        disabled={isPrimary}
                         className="h-4 w-4 rounded border-gray-300"
                       />
                       <span className="text-sm">{company.name}</span>
+                      {isPrimary && <span className="text-xs text-muted-foreground">(primary)</span>}
                     </label>
-                  ))
-                }
-                {companies.filter(c => c.id !== user.company_id).length === 0 && (
+                  );
+                })}
+                {companies.length <= 1 && (
                   <p className="text-xs text-muted-foreground">No other companies available.</p>
                 )}
               </div>
