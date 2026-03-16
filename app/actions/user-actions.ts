@@ -45,8 +45,22 @@ export const getUsers = adminActionClient
 // Create user
 export const createUser = adminActionClient
   .schema(createUserSchema)
-  .action(async ({ parsedInput }) => {
+  .action(async ({ parsedInput, ctx }) => {
     const adminSupabase = createAdminClient();
+
+    // Validate admin has access to the target company
+    const { profile } = ctx;
+    if (parsedInput.company_id !== profile.company_id) {
+      const { data: access } = await adminSupabase
+        .from('user_company_access')
+        .select('id')
+        .eq('user_id', profile.id)
+        .eq('company_id', parsedInput.company_id)
+        .maybeSingle();
+      if (!access) {
+        throw new Error('You do not have access to the selected company.');
+      }
+    }
 
     try {
       // 1. Create auth user with Supabase Admin API
@@ -202,6 +216,30 @@ export const reactivateUser = adminActionClient
   .schema(z.object({ id: z.string().uuid(), reason: z.string().max(200).optional() }))
   .action(async ({ parsedInput }) => {
     const adminSupabase = createAdminClient();
+
+    // Fetch the user being reactivated to get their email
+    const { data: userToReactivate, error: fetchError } = await adminSupabase
+      .from('user_profiles')
+      .select('id, email')
+      .eq('id', parsedInput.id)
+      .single();
+
+    if (fetchError || !userToReactivate) {
+      throw new Error('User not found');
+    }
+
+    // Check for duplicate email among active users
+    const { data: duplicateEmail } = await adminSupabase
+      .from('user_profiles')
+      .select('id')
+      .eq('email', userToReactivate.email)
+      .is('deleted_at', null)
+      .neq('id', parsedInput.id)
+      .maybeSingle();
+
+    if (duplicateEmail) {
+      throw new Error('Cannot reactivate: another active user already has this email address.');
+    }
 
     // Clear deleted_at and ensure is_active is true
     const { error } = await adminSupabase
