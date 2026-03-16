@@ -297,12 +297,11 @@ export const acceptTransfer = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { supabase, profile } = ctx;
 
-    // Fetch movement — must be pending
+    // Fetch movement — must be pending (RLS handles company scoping)
     const { data: movement } = await supabase
       .from('inventory_movements')
       .select('id, status, receiver_id, to_location_id, item_id, company_id')
       .eq('id', parsedInput.movement_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -354,12 +353,11 @@ export const rejectTransfer = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { supabase, profile } = ctx;
 
-    // Fetch movement — must be pending
+    // Fetch movement — must be pending (RLS handles company scoping)
     const { data: movement } = await supabase
       .from('inventory_movements')
       .select('id, status, receiver_id, company_id')
       .eq('id', parsedInput.movement_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -399,12 +397,11 @@ export const cancelTransfer = authActionClient
   .action(async ({ parsedInput, ctx }) => {
     const { supabase, profile } = ctx;
 
-    // Fetch movement — must be pending
+    // Fetch movement — must be pending (RLS handles company scoping)
     const { data: movement } = await supabase
       .from('inventory_movements')
       .select('id, status, initiated_by, company_id')
       .eq('id', parsedInput.movement_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
