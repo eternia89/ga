@@ -83,38 +83,6 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
     size: 160,
   },
   {
-    accessorKey: 'interval_days',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Interval" />
-    ),
-    cell: ({ row }) => {
-      const days = row.getValue('interval_days') as number;
-      return (
-        <span className="tabular-nums">
-          {days} {days === 1 ? 'day' : 'days'}
-        </span>
-      );
-    },
-    size: 100,
-  },
-  {
-    accessorKey: 'interval_type',
-    header: 'Type',
-    cell: ({ row }) => {
-      const type = row.getValue('interval_type') as 'fixed' | 'floating';
-      return type === 'fixed' ? (
-        <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-          Fixed
-        </span>
-      ) : (
-        <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-700">
-          Floating
-        </span>
-      );
-    },
-    size: 100,
-  },
-  {
     id: 'status',
     header: 'Status',
     cell: ({ row }) => {
