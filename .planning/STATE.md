@@ -4,8 +4,8 @@ milestone: v1.0
 milestone_name: milestone
 status: completed
 stopped_at: "Completed quick task 82: Remove warranty_expiry column from asset table"
-last_updated: "2026-03-16T07:16:03.000Z"
-last_activity: "2026-03-16 - Completed quick task 89: Remove warranty_expiry column from asset table"
+last_updated: "2026-03-16T07:28:00.000Z"
+last_activity: "2026-03-16 - Completed quick task 90: Move Transfer button from modal to table row actions"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -363,10 +363,11 @@ Recent decisions affecting current work:
 | 87 | Extract shared helpers for company access and date validation | 2026-03-16 | 4a4e1ef | Verified | [80-extract-shared-helpers-for-company-acces](./quick/80-extract-shared-helpers-for-company-acces/) |
 | 88 | Multi-company comprehensive fix: RLS expansion, exports, actions, dropdowns | 2026-03-16 | 93a26f4 | Verified | [81-multi-company-comprehensive-fix-rls-expa](./quick/81-multi-company-comprehensive-fix-rls-expa/) |
 | 89 | Remove warranty_expiry column from asset table | 2026-03-16 | 0a94e11 | Verified | [82-remove-warranty-expiry-from-asset-table-](./quick/82-remove-warranty-expiry-from-asset-table-/) |
+| 90 | Move Transfer button from modal sticky bar to table row actions | 2026-03-16 | 9290332 | Complete | [83-move-transfer-button-out-from-modal-stic](./quick/83-move-transfer-button-out-from-modal-stic/) |
 
 ## Session Continuity
 
-Last session: 2026-03-16T07:16:03.000Z
-Stopped at: Completed quick task 82: Remove warranty_expiry column from asset table
+Last session: 2026-03-16T07:28:00.000Z
+Stopped at: Completed quick task 83: Move Transfer button from modal to table row actions
 Resume file: None
 Next: Ready for next task
