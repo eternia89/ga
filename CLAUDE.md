@@ -37,6 +37,17 @@ This is a **Next.js 16** app using the **App Router** (`app/` directory), **Reac
 - **Never use mobile-first breakpoints** (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`). Always use `max-sm:`, `max-md:`, `max-lg:`, `max-xl:`, `max-2xl:`.
 - **Tailwind arbitrary values use underscores for spaces** (e.g., `grid-cols-[1fr_380px]` not `grid-cols-[1fr,380px]`).
 
+## Task Pre-Check (MANDATORY)
+
+Before executing any batch of tasks or multi-step instructions, **always perform a contradiction check first**:
+1. Compare each instruction against existing CLAUDE.md rules — flag conflicts
+2. Compare instructions against each other — flag contradictions between tasks
+3. Compare against recent decisions in STATE.md — flag reversals without explicit intent
+4. Surface any ambiguous instructions that could be interpreted multiple ways
+5. Present findings to the user and resolve before starting execution
+
+This prevents silent misimplementation of conflicting requirements.
+
 ## UI Conventions
 
 - **Dropdowns with many options:** Use shadcn **Combobox** (basic) instead of plain Select for any dropdown where the list may grow large (e.g., Company, Division, Location, Category, User selectors). The combobox turns the trigger into a search box on click, allowing type-to-filter. Only use plain Select for short, fixed lists (e.g., Role with 5 options, Type with 2 options).

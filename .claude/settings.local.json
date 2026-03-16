@@ -80,7 +80,14 @@
       "Skill(gsd:update)",
       "Skill(gsd:quick)",
       "Bash(ls /Users/samuel/code/ga/supabase/migrations/00020_rls_multi_company_access.sql 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls /Users/samuel/code/ga/supabase/migrations/00003_rls_policies.sql 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls /Users/samuel/code/ga/app/\\\\\\(dashboard\\\\\\)/maintenance/page.tsx 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls /Users/samuel/code/ga/app/\\\\\\(dashboard\\\\\\)/maintenance/templates/page.tsx 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls \"/Users/samuel/code/ga/app/\\(dashboard\\)/maintenance/templates/[id]/page.tsx\" 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls \"/Users/samuel/code/ga/app/\\(dashboard\\)/maintenance/schedules/[id]/page.tsx\" 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls /Users/samuel/code/ga/app/actions/template-actions.ts 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\"\nls /Users/samuel/code/ga/app/actions/schedule-actions.ts 2>/dev/null && echo \"EXISTS\" || echo \"MISSING\")",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(head -100 /Users/melfice/code/ga/app/\\\\\\(dashboard\\\\\\)/jobs/[id]/page.tsx)",
+      "Bash(find /Users/melfice/code/ga/app /Users/melfice/code/ga/components -type f \\\\\\(-name *.tsx -o -name *.jsx \\\\\\) ! -path */node_modules/* -exec grep [.*,.*] {} +)",
+      "Bash(head -100 /Users/melfice/code/ga/app/\\\\\\(dashboard\\\\\\)/inventory/[id]/page.tsx)",
+      "Bash(grep -r \"\\\\.max\\(\" /Users/melfice/code/ga/lib/validations/*.ts)",
+      "Bash(grep -n \"as unknown as\" /Users/melfice/code/ga/app/\\\\\\(dashboard\\\\\\)/requests/[id]/page.tsx)",
+      "Bash(find /Users/melfice/code/ga/app /Users/melfice/code/ga/components -type f \\\\\\(-name *.tsx -o -name *.jsx \\\\\\) ! -path */node_modules/* -exec grep -nE \"[^-]\\(sm|md|lg|xl|2xl\\):\" {} +)",
+      "Bash(grep -n \"LinkedJobRow\\\\|interface.*Row\\\\|type.*Row\" /Users/melfice/code/ga/app/\\\\\\(dashboard\\\\\\)/requests/[id]/page.tsx)"
     ]
   },
   "outputStyle": "Explanatory"
