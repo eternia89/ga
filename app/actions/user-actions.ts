@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createUserSchema, updateUserSchema } from '@/lib/validations/user-schema';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { assertCompanyAccess } from '@/lib/auth/company-access';
 
 // Get users with joined data
 export const getUsers = adminActionClient
@@ -50,17 +51,7 @@ export const createUser = adminActionClient
 
     // Validate admin has access to the target company
     const { profile } = ctx;
-    if (parsedInput.company_id !== profile.company_id) {
-      const { data: access } = await adminSupabase
-        .from('user_company_access')
-        .select('id')
-        .eq('user_id', profile.id)
-        .eq('company_id', parsedInput.company_id)
-        .maybeSingle();
-      if (!access) {
-        throw new Error('You do not have access to the selected company.');
-      }
-    }
+    await assertCompanyAccess(adminSupabase, profile.id, parsedInput.company_id, profile.company_id);
 
     try {
       // 1. Create auth user with Supabase Admin API

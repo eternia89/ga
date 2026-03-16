@@ -9,6 +9,7 @@ import { highestPriority } from '@/lib/jobs/priority';
 import { formatIDR } from '@/lib/utils';
 import { advanceFloatingScheduleCore } from '@/app/actions/pm-job-actions';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { assertCompanyAccess } from '@/lib/auth/company-access';
 
 // ============================================================================
 // createJob — ga_lead, admin, or ga_staff
@@ -27,14 +28,8 @@ export const createJob = authActionClient
     const effectiveCompanyId = parsedInput.company_id ?? profile.company_id;
 
     // Validate extra company access if a different company was selected
-    if (parsedInput.company_id && parsedInput.company_id !== profile.company_id) {
-      const { data: access } = await supabase
-        .from('user_company_access')
-        .select('id')
-        .eq('user_id', profile.id)
-        .eq('company_id', parsedInput.company_id)
-        .maybeSingle();
-      if (!access) throw new Error('You do not have access to the selected company.');
+    if (parsedInput.company_id) {
+      await assertCompanyAccess(supabase, profile.id, parsedInput.company_id, profile.company_id);
     }
 
     // Generate display_id atomically via DB function

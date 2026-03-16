@@ -19,6 +19,7 @@ import {
   deactivateSchedulesForAsset,
 } from '@/app/actions/schedule-actions';
 import { z } from 'zod';
+import { assertCompanyAccess } from '@/lib/auth/company-access';
 
 // ============================================================================
 // createAsset — ga_staff, ga_lead, admin only
@@ -38,14 +39,8 @@ export const createAsset = authActionClient
     const effectiveCompanyId = parsedInput.company_id ?? profile.company_id;
 
     // Validate extra company access if a different company was selected
-    if (parsedInput.company_id && parsedInput.company_id !== profile.company_id) {
-      const { data: access } = await supabase
-        .from('user_company_access')
-        .select('id')
-        .eq('user_id', profile.id)
-        .eq('company_id', parsedInput.company_id)
-        .maybeSingle();
-      if (!access) throw new Error('You do not have access to the selected company.');
+    if (parsedInput.company_id) {
+      await assertCompanyAccess(supabase, profile.id, parsedInput.company_id, profile.company_id);
     }
 
     // Generate display_id atomically via DB function

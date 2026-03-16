@@ -6,6 +6,7 @@ import { scheduleCreateSchema, scheduleEditSchema } from '@/lib/validations/sche
 import { getScheduleDisplayStatus } from '@/lib/constants/schedule-status';
 import type { ChecklistItem } from '@/lib/types/maintenance';
 import { z } from 'zod';
+import { assertCompanyAccess } from '@/lib/auth/company-access';
 
 // ============================================================================
 // createSchedule — ga_lead or admin only
@@ -65,17 +66,8 @@ export const createSchedule = gaLeadActionClient
       companyId = parsedInput.company_id ?? profile.company_id;
 
       // Validate company access when a different company was selected
-      if (parsedInput.company_id && parsedInput.company_id !== profile.company_id) {
-        const { data: access, error: accessError } = await adminSupabase
-          .from('user_company_access')
-          .select('id')
-          .eq('user_id', profile.id)
-          .eq('company_id', parsedInput.company_id)
-          .maybeSingle();
-        if (accessError) throw new Error('Failed to verify company access');
-        if (!access) {
-          throw new Error('You do not have access to the selected company.');
-        }
+      if (parsedInput.company_id) {
+        await assertCompanyAccess(adminSupabase, profile.id, parsedInput.company_id, profile.company_id);
       }
     }
 
@@ -139,19 +131,7 @@ export const updateSchedule = gaLeadActionClient
     }
 
     // Verify user has access to this schedule's company
-    const hasUpdateAccess = existing.company_id === profile.company_id;
-    if (!hasUpdateAccess) {
-      const { data: accessRow, error: accessError } = await adminSupabase
-        .from('user_company_access')
-        .select('id')
-        .eq('user_id', profile.id)
-        .eq('company_id', existing.company_id)
-        .maybeSingle();
-      if (accessError) throw new Error('Failed to verify company access');
-      if (!accessRow) {
-        throw new Error('Schedule not found');
-      }
-    }
+    await assertCompanyAccess(adminSupabase, profile.id, existing.company_id, profile.company_id);
 
     // Recalculate next_due_at if interval changes
     const intervalChanged =
@@ -210,19 +190,7 @@ export const deactivateSchedule = gaLeadActionClient
     }
 
     // Verify user has access to this schedule's company
-    const hasDeactivateAccess = existing.company_id === profile.company_id;
-    if (!hasDeactivateAccess) {
-      const { data: accessRow, error: accessError } = await adminSupabase
-        .from('user_company_access')
-        .select('id')
-        .eq('user_id', profile.id)
-        .eq('company_id', existing.company_id)
-        .maybeSingle();
-      if (accessError) throw new Error('Failed to verify company access');
-      if (!accessRow) {
-        throw new Error('Schedule not found');
-      }
-    }
+    await assertCompanyAccess(adminSupabase, profile.id, existing.company_id, profile.company_id);
 
     if (!existing.is_active) {
       throw new Error('Schedule is already deactivated');
@@ -276,19 +244,7 @@ export const activateSchedule = gaLeadActionClient
     }
 
     // Verify user has access to this schedule's company
-    const hasActivateAccess = existing.company_id === profile.company_id;
-    if (!hasActivateAccess) {
-      const { data: accessRow, error: accessError } = await adminSupabase
-        .from('user_company_access')
-        .select('id')
-        .eq('user_id', profile.id)
-        .eq('company_id', existing.company_id)
-        .maybeSingle();
-      if (accessError) throw new Error('Failed to verify company access');
-      if (!accessRow) {
-        throw new Error('Schedule not found');
-      }
-    }
+    await assertCompanyAccess(adminSupabase, profile.id, existing.company_id, profile.company_id);
 
     if (existing.is_active) {
       throw new Error('Schedule is already active');
@@ -336,19 +292,7 @@ export const deleteSchedule = gaLeadActionClient
     }
 
     // Verify user has access to this schedule's company
-    const hasDeleteAccess = existing.company_id === profile.company_id;
-    if (!hasDeleteAccess) {
-      const { data: accessRow, error: accessError } = await adminSupabase
-        .from('user_company_access')
-        .select('id')
-        .eq('user_id', profile.id)
-        .eq('company_id', existing.company_id)
-        .maybeSingle();
-      if (accessError) throw new Error('Failed to verify company access');
-      if (!accessRow) {
-        throw new Error('Schedule not found');
-      }
-    }
+    await assertCompanyAccess(adminSupabase, profile.id, existing.company_id, profile.company_id);
 
     const { error } = await adminSupabase
       .from('maintenance_schedules')

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ASSET_STATUSES } from '@/lib/constants/asset-status';
+import { isoDateString } from '@/lib/validations/helpers';
 
 // Asset create/edit schema — all text fields capped per CLAUDE.md rules
 export const assetCreateSchema = z.object({
@@ -12,8 +13,8 @@ export const assetCreateSchema = z.object({
   model: z.string().max(100, 'Model must be under 100 characters').optional(),
   serial_number: z.string().max(100, 'Serial number must be under 100 characters').optional(),
   description: z.string().max(200, 'Description must be under 200 characters').optional(),
-  acquisition_date: z.string().min(1, 'Acquisition date is required'),
-  warranty_expiry: z.string().optional(),
+  acquisition_date: isoDateString('Acquisition date must be YYYY-MM-DD'),
+  warranty_expiry: isoDateString().optional(),
   company_id: z.string().uuid({ message: 'Company is required' }),
 });
 

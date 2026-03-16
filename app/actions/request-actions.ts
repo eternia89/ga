@@ -7,6 +7,7 @@ import { feedbackSchema } from '@/lib/validations/job-schema';
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { assertCompanyAccess } from '@/lib/auth/company-access';
 
 // ============================================================================
 // createRequest — any authenticated user, auto-fills division from profile
@@ -25,14 +26,8 @@ export const createRequest = authActionClient
     const effectiveCompanyId = parsedInput.company_id ?? profile.company_id;
 
     // Validate extra company access if a different company was selected
-    if (parsedInput.company_id && parsedInput.company_id !== profile.company_id) {
-      const { data: access } = await supabase
-        .from('user_company_access')
-        .select('id')
-        .eq('user_id', profile.id)
-        .eq('company_id', parsedInput.company_id)
-        .maybeSingle();
-      if (!access) throw new Error('You do not have access to the selected company.');
+    if (parsedInput.company_id) {
+      await assertCompanyAccess(supabase, profile.id, parsedInput.company_id, profile.company_id);
     }
 
     // Generate display_id atomically via DB function
