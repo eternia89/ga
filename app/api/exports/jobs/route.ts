@@ -39,10 +39,18 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Fetch ALL jobs with joined FK names (no filter — export everything)
+    // Fetch user's extra company access for multi-company scoping
+    const { data: companyAccessRows } = await supabase
+      .from('user_company_access')
+      .select('company_id')
+      .eq('user_id', profile.id);
+    const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+    const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
     const { data: jobs, error: fetchError } = await supabase
       .from('jobs')
       .select('*, pic:user_profiles!assigned_to(full_name), created_by_user:user_profiles!created_by(full_name), category:categories(name), location:locations(name)')
+      .in('company_id', allAccessibleCompanyIds)
       .is('deleted_at', null)
       .order('created_at', { ascending: false });
 
