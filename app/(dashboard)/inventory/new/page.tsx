@@ -17,7 +17,7 @@ export default async function NewAssetPage() {
   // Fetch user profile with role
   const { data: profile } = await supabase
     .from('user_profiles')
-    .select('company_id, role, deleted_at')
+    .select('id, company_id, role, deleted_at')
     .eq('id', user.id)
     .single();
 
@@ -30,6 +30,14 @@ export default async function NewAssetPage() {
     redirect('/inventory');
   }
 
+  // Fetch user's extra company access for multi-company scoping
+  const { data: companyAccessRows } = await supabase
+    .from('user_company_access')
+    .select('company_id')
+    .eq('user_id', profile.id);
+  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
   // Fetch asset-type categories only
   const { data: categories } = await supabase
     .from('categories')
@@ -38,12 +46,12 @@ export default async function NewAssetPage() {
     .is('deleted_at', null)
     .order('name');
 
-  // Fetch active locations and primary company name in parallel
+  // Fetch active locations (all accessible companies) and primary company name in parallel
   const [locationsResult, primaryCompanyResult] = await Promise.all([
     supabase
       .from('locations')
       .select('id, name')
-      .eq('company_id', profile.company_id)
+      .in('company_id', allAccessibleCompanyIds)
       .is('deleted_at', null)
       .order('name'),
     supabase

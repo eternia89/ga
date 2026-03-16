@@ -66,20 +66,20 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const [jobsResult, usersResult, locationsResult, allCategoriesResult, allUsersResult, eligibleRequestsResult, budgetThresholdResult, extraCompaniesResult, allLocationsResult, primaryCompanyResult] = await Promise.all([
     jobsQuery,
 
-    // GA Staff/Lead users for PIC filter
+    // GA Staff/Lead users for PIC filter (all accessible companies)
     supabase
       .from('user_profiles')
       .select('id, name:full_name')
-      .eq('company_id', profile.company_id)
+      .in('company_id', allAccessibleCompanyIds)
       .in('role', ['ga_staff', 'ga_lead'])
       .is('deleted_at', null)
       .order('full_name'),
 
-    // Locations for create dialog (primary company)
+    // Locations for create dialog (all accessible companies)
     supabase
       .from('locations')
       .select('id, name')
-      .eq('company_id', profile.company_id)
+      .in('company_id', allAccessibleCompanyIds)
       .is('deleted_at', null)
       .order('name'),
 
@@ -90,19 +90,19 @@ export default async function JobsPage({ searchParams }: PageProps) {
       .is('deleted_at', null)
       .order('name'),
 
-    // All active users for PIC assignment in create dialog
+    // All active users for PIC assignment in create dialog (all accessible companies)
     supabase
       .from('user_profiles')
       .select('id, full_name')
-      .eq('company_id', profile.company_id)
+      .in('company_id', allAccessibleCompanyIds)
       .is('deleted_at', null)
       .order('full_name'),
 
-    // Eligible requests (triaged + in_progress) for create dialog — include assigned_to for PIC filter
+    // Eligible requests (triaged + in_progress) for create dialog (all accessible companies)
     supabase
       .from('requests')
       .select('id, display_id, title, priority, status, location_id, category_id, description, assigned_to')
-      .eq('company_id', profile.company_id)
+      .in('company_id', allAccessibleCompanyIds)
       .in('status', ['triaged', 'in_progress'])
       .is('deleted_at', null)
       .order('created_at', { ascending: false }),

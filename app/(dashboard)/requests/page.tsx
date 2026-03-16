@@ -67,14 +67,14 @@ export default async function RequestsPage({ searchParams }: PageProps) {
     supabase
       .from('user_profiles')
       .select('id, name:full_name')
-      .eq('company_id', profile.company_id)
+      .in('company_id', allAccessibleCompanyIds)
       .is('deleted_at', null)
       .order('full_name'),
-    // Locations for the create dialog (primary company)
+    // Locations for the create dialog (all accessible companies)
     supabase
       .from('locations')
       .select('id, name')
-      .eq('company_id', profile.company_id)
+      .in('company_id', allAccessibleCompanyIds)
       .is('deleted_at', null)
       .order('name'),
     // Companies for multi-company selector (only if user has extra access)
