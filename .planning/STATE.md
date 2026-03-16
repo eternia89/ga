@@ -363,7 +363,7 @@ Recent decisions affecting current work:
 | 87 | Extract shared helpers for company access and date validation | 2026-03-16 | 4a4e1ef | Verified | [80-extract-shared-helpers-for-company-acces](./quick/80-extract-shared-helpers-for-company-acces/) |
 | 88 | Multi-company comprehensive fix: RLS expansion, exports, actions, dropdowns | 2026-03-16 | 93a26f4 | Verified | [81-multi-company-comprehensive-fix-rls-expa](./quick/81-multi-company-comprehensive-fix-rls-expa/) |
 | 89 | Remove warranty_expiry column from asset table | 2026-03-16 | 0a94e11 | Verified | [82-remove-warranty-expiry-from-asset-table-](./quick/82-remove-warranty-expiry-from-asset-table-/) |
-| 90 | Move Transfer button from modal sticky bar to table row actions | 2026-03-16 | 9290332 | Complete | [83-move-transfer-button-out-from-modal-stic](./quick/83-move-transfer-button-out-from-modal-stic/) |
+| 90 | Move Transfer button from modal sticky bar to table row actions | 2026-03-16 | 9290332 | Verified | [83-move-transfer-button-out-from-modal-stic](./quick/83-move-transfer-button-out-from-modal-stic/) |
 
 ## Session Continuity
 
