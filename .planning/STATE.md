@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-16 - Completed quick task 87: Extract shared helpers for company access and date validation
+Last activity: 2026-03-16 - Completed quick task 89: Remove warranty_expiry column from asset table
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -362,7 +362,7 @@ Recent decisions affecting current work:
 | 86 | Fix 7 security/correctness bugs: RFC 4122 UUIDs, .maybeSingle(), duplicate email, company access | 2026-03-16 | 53352a7 | Verified | [79-fix-7-security-correctness-bugs-rfc4122-](./quick/79-fix-7-security-correctness-bugs-rfc4122-/) |
 | 87 | Extract shared helpers for company access and date validation | 2026-03-16 | 4a4e1ef | Verified | [80-extract-shared-helpers-for-company-acces](./quick/80-extract-shared-helpers-for-company-acces/) |
 | 88 | Multi-company comprehensive fix: RLS expansion, exports, actions, dropdowns | 2026-03-16 | 93a26f4 | Verified | [81-multi-company-comprehensive-fix-rls-expa](./quick/81-multi-company-comprehensive-fix-rls-expa/) |
-| 89 | Remove warranty_expiry column from asset table | 2026-03-16 | 0a94e11 | Complete | [82-remove-warranty-expiry-from-asset-table-](./quick/82-remove-warranty-expiry-from-asset-table-/) |
+| 89 | Remove warranty_expiry column from asset table | 2026-03-16 | 0a94e11 | Verified | [82-remove-warranty-expiry-from-asset-table-](./quick/82-remove-warranty-expiry-from-asset-table-/) |
 
 ## Session Continuity
 
