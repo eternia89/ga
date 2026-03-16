@@ -33,11 +33,19 @@ export default async function InventoryPage({ searchParams }: PageProps) {
     redirect('/login');
   }
 
-  // Fetch all active assets for this company with relations
+  // Fetch user's extra company access (must be before main queries)
+  const { data: companyAccessRows } = await supabase
+    .from('user_company_access')
+    .select('company_id')
+    .eq('user_id', profile.id);
+  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
+  // Fetch all active assets for accessible companies with relations
   const { data: assets } = await supabase
     .from('inventory_items')
     .select('*, category:categories(name), location:locations(name)')
-    .eq('company_id', profile.company_id)
+    .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
@@ -68,14 +76,6 @@ export default async function InventoryPage({ searchParams }: PageProps) {
       }
     }
   }
-
-  // Fetch user's extra company access
-  const { data: companyAccessRows } = await supabase
-    .from('user_company_access')
-    .select('company_id')
-    .eq('user_id', profile.id);
-  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
 
   // Fetch asset-type categories for filter dropdown
   const { data: categories } = await supabase

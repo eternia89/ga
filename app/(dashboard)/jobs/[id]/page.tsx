@@ -103,11 +103,11 @@ export default async function JobDetailPage({ params }: PageProps) {
       .is('deleted_at', null)
       .order('created_at', { ascending: true }),
 
-    // Active users in same company for action dialogs
+    // Active users in same company for action dialogs (use job's company)
     supabase
       .from('user_profiles')
       .select('id, name:full_name')
-      .eq('company_id', profile.company_id)
+      .eq('company_id', job.company_id)
       .is('deleted_at', null)
       .order('full_name'),
 
@@ -125,11 +125,11 @@ export default async function JobDetailPage({ params }: PageProps) {
       .is('deleted_at', null)
       .order('name'),
 
-    // Locations for inline editing
+    // Locations for inline editing (use job's company)
     supabase
       .from('locations')
       .select('id, name')
-      .eq('company_id', profile.company_id)
+      .eq('company_id', job.company_id)
       .is('deleted_at', null)
       .order('name'),
 
@@ -142,11 +142,11 @@ export default async function JobDetailPage({ params }: PageProps) {
       .is('deleted_at', null)
       .order('sort_order', { ascending: true }),
 
-    // Company name for disabled Company field on detail page
+    // Company name for disabled Company field on detail page (use job's company)
     supabase
       .from('companies')
       .select('name')
-      .eq('id', profile.company_id)
+      .eq('id', job.company_id)
       .single(),
   ]);
 

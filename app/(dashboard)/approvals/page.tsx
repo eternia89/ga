@@ -36,6 +36,14 @@ export default async function ApprovalsPage({ searchParams }: PageProps) {
     redirect('/');
   }
 
+  // Fetch user's extra company access (must be before main queries)
+  const { data: companyAccessRows } = await supabase
+    .from('user_company_access')
+    .select('company_id')
+    .eq('user_id', profile.id);
+  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
   // Fetch ALL jobs that are pending budget approval OR have a budget decision (approved/rejected)
   // OR pending completion approval OR have a completion decision
   // NOTE: FK join hints for approved_by / approval_rejected_by / completion_approved_by /
@@ -70,7 +78,7 @@ export default async function ApprovalsPage({ searchParams }: PageProps) {
     .or(
       'status.eq.pending_approval,status.eq.pending_completion_approval,approved_at.not.is.null,approval_rejected_at.not.is.null,completion_approved_at.not.is.null,completion_rejected_at.not.is.null'
     )
-    .eq('company_id', profile.company_id)
+    .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 

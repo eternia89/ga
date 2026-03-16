@@ -38,7 +38,6 @@ export default async function AssetDetailPage({ params }: PageProps) {
       '*, category:categories(name), location:locations(name), company:companies(name)'
     )
     .eq('id', id)
-    .eq('company_id', profile.company_id)
     .is('deleted_at', null)
     .single();
 
@@ -112,19 +111,19 @@ export default async function AssetDetailPage({ params }: PageProps) {
       .is('deleted_at', null)
       .order('name'),
 
-    // Locations for edit form and transfer
+    // Locations for edit form and transfer (use asset's company, not user's primary)
     supabase
       .from('locations')
       .select('id, name')
-      .eq('company_id', profile.company_id)
+      .eq('company_id', asset.company_id)
       .is('deleted_at', null)
       .order('name'),
 
-    // GA Staff/Lead users for transfer receiver selection (with location_id for auto-derive)
+    // GA Staff/Lead users for transfer receiver selection (use asset's company)
     supabase
       .from('user_profiles')
       .select('id, name:full_name, location_id')
-      .eq('company_id', profile.company_id)
+      .eq('company_id', asset.company_id)
       .in('role', ['ga_staff', 'ga_lead', 'admin'])
       .is('deleted_at', null)
       .order('full_name'),

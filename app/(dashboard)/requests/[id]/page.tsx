@@ -77,19 +77,19 @@ export default async function RequestDetailPage({ params }: PageProps) {
         .is('deleted_at', null)
         .order('name'),
 
-      // Active users in same company for PIC
+      // Active users in same company for PIC (use request's company)
       supabase
         .from('user_profiles')
         .select('id, name:full_name')
-        .eq('company_id', profile.company_id)
+        .eq('company_id', request.company_id)
         .is('deleted_at', null)
         .order('full_name'),
 
-      // Locations for edit form
+      // Locations for edit form (use request's company)
       supabase
         .from('locations')
         .select('id, name')
-        .eq('company_id', profile.company_id)
+        .eq('company_id', request.company_id)
         .is('deleted_at', null)
         .order('name'),
 
@@ -99,11 +99,11 @@ export default async function RequestDetailPage({ params }: PageProps) {
         .select('job:jobs(id, display_id, title, status)')
         .eq('request_id', id),
 
-      // Company name for disabled Company field on detail page
+      // Company name for disabled Company field on detail page (use request's company)
       supabase
         .from('companies')
         .select('name')
-        .eq('id', profile.company_id)
+        .eq('id', request.company_id)
         .single(),
     ]);
 

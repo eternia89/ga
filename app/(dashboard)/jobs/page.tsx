@@ -32,6 +32,14 @@ export default async function JobsPage({ searchParams }: PageProps) {
     redirect('/login');
   }
 
+  // Fetch user's extra company access (must be before main queries)
+  const { data: companyAccessRows } = await supabase
+    .from('user_company_access')
+    .select('company_id')
+    .eq('user_id', profile.id);
+  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+
   // Build jobs query with role-based filtering
   let jobsQuery = supabase
     .from('jobs')
@@ -46,7 +54,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
        maintenance_schedule:maintenance_schedules(id, next_due_at, interval_type, interval_days),
        job_requests(request:requests(id, display_id, title, status))`
     )
-    .eq('company_id', profile.company_id)
+    .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
@@ -54,14 +62,6 @@ export default async function JobsPage({ searchParams }: PageProps) {
   if (['general_user', 'ga_staff'].includes(profile.role)) {
     jobsQuery = jobsQuery.eq('assigned_to', profile.id);
   }
-
-  // Fetch user's extra company access
-  const { data: companyAccessRows } = await supabase
-    .from('user_company_access')
-    .select('company_id')
-    .eq('user_id', profile.id);
-  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
 
   const [jobsResult, usersResult, locationsResult, allCategoriesResult, allUsersResult, eligibleRequestsResult, budgetThresholdResult, extraCompaniesResult, allLocationsResult, primaryCompanyResult] = await Promise.all([
     jobsQuery,
