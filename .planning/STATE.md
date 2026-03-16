@@ -361,7 +361,7 @@ Recent decisions affecting current work:
 | 85 | Standardize text-sm on Created column date spans in asset and schedule tables | 2026-03-14 | fba2a18 | Verified | [78-standardize-text-sm-on-created-column-da](./quick/78-standardize-text-sm-on-created-column-da/) |
 | 86 | Fix 7 security/correctness bugs: RFC 4122 UUIDs, .maybeSingle(), duplicate email, company access | 2026-03-16 | 53352a7 | Verified | [79-fix-7-security-correctness-bugs-rfc4122-](./quick/79-fix-7-security-correctness-bugs-rfc4122-/) |
 | 87 | Extract shared helpers for company access and date validation | 2026-03-16 | 4a4e1ef | Verified | [80-extract-shared-helpers-for-company-acces](./quick/80-extract-shared-helpers-for-company-acces/) |
-| 88 | Multi-company comprehensive fix: RLS expansion, exports, actions, dropdowns | 2026-03-16 | 93a26f4 | Complete | [81-multi-company-comprehensive-fix-rls-expa](./quick/81-multi-company-comprehensive-fix-rls-expa/) |
+| 88 | Multi-company comprehensive fix: RLS expansion, exports, actions, dropdowns | 2026-03-16 | 93a26f4 | Verified | [81-multi-company-comprehensive-fix-rls-expa](./quick/81-multi-company-comprehensive-fix-rls-expa/) |
 
 ## Session Continuity
 

@@ -65,7 +65,7 @@ must_haves:
 Fix 4 multi-company data isolation bugs found during comprehensive audit: (1) export routes leak all companies' data, (2) RLS INSERT/UPDATE policies block multi-company writes, (3) redundant action-level company filters prevent cross-company operations, (4) page dropdowns only show primary company data.
 
 Purpose: Complete multi-company access model so users granted access to multiple companies can fully operate (read, write, export, filter) across all their accessible companies.
-Output: 4 export routes scoped, 1 RLS migration, ~19 redundant filters removed, 4 page components updated.
+Output: 4 export routes scoped, 1 RLS migration, 17 redundant filters removed, 4 page components updated.
 </objective>
 
 <execution_context>
@@ -233,13 +233,14 @@ Remove `.eq('company_id', profile.company_id)` lines from entity-by-ID SELECT qu
 - Line ~118: second action's entity fetch
 - Line ~195: third action's entity fetch
 
-**app/actions/asset-actions.ts** — Remove 4 occurrences:
-- Line ~104: changeAssetStatus (fetch asset)
-- Line ~159: recordAssetDisposal (fetch asset)
-- Line ~232: createInventoryMovement (fetch asset)
-- Line ~574: fetchEntityMedia (fetch media)
+**app/actions/asset-actions.ts** — Remove 2 occurrences:
+- Line ~104: updateAsset (fetch asset) — uses RLS-bound `supabase`
+- Line ~159: changeAssetStatus (fetch asset) — uses RLS-bound `supabase`
 
-Do NOT touch the 3 transfer actions (acceptTransfer/rejectTransfer/cancelTransfer) — those were already fixed in commit 3002cb1.
+Do NOT touch:
+- Line ~232: createTransfer — transfer action, already fixed in commit 3002cb1
+- Line ~574: deleteAssetPhotos — uses `adminSupabase` (service role, bypasses RLS), the company_id filter is a REQUIRED security guard here, not redundant
+- acceptTransfer/rejectTransfer/cancelTransfer — already fixed in commit 3002cb1
 
 **app/actions/approval-actions.ts** — Remove 4 occurrences:
 - Line ~21: first approval action
@@ -253,12 +254,12 @@ Do NOT touch the 3 transfer actions (acceptTransfer/rejectTransfer/cancelTransfe
 
 **app/api/uploads/asset-invoices/route.ts** — Remove 1 occurrence at line ~48.
 
-Total: 19 removals across 7 files.
+Total: 17 removals across 7 files (6 job-actions + 3 pm-job-actions + 2 asset-actions + 4 approval-actions + 1 entity-photos + 1 job-photos).
   </action>
   <verify>
-    <automated>grep -rn "\.eq('company_id', profile\.company_id)" app/actions/job-actions.ts app/actions/pm-job-actions.ts app/actions/asset-actions.ts app/actions/approval-actions.ts app/api/uploads/entity-photos/route.ts app/api/uploads/job-photos/route.ts app/api/uploads/asset-invoices/route.ts | wc -l</automated>
+    <automated>grep -rn "\.eq('company_id', profile\.company_id)" app/actions/job-actions.ts app/actions/pm-job-actions.ts app/actions/approval-actions.ts app/api/uploads/entity-photos/route.ts app/api/uploads/job-photos/route.ts app/api/uploads/asset-invoices/route.ts | wc -l</automated>
   </verify>
-  <done>grep returns 0 lines — all 19 redundant `.eq('company_id', profile.company_id)` filters removed from the 7 specified files. TypeScript compiles cleanly.</done>
+  <done>grep returns 0 lines for the 6 fully-cleaned files. asset-actions.ts retains exactly 1 occurrence (deleteAssetPhotos, adminSupabase — required security guard). TypeScript compiles cleanly.</done>
 </task>
 
 <task type="auto">
@@ -357,7 +358,7 @@ If any errors, fix them in the affected files. Common issues to watch for:
 <success_criteria>
 - Export routes only return data from the user's primary company + granted companies
 - RLS INSERT/UPDATE policies on 8 tables allow writes to granted companies via user_company_access
-- 19 redundant `.eq('company_id', profile.company_id)` filters removed from 7 action/upload files
+- 17 redundant `.eq('company_id', profile.company_id)` filters removed from 7 action/upload files (excluding adminSupabase queries and already-fixed transfer actions)
 - 4 page components fetch dropdown data from all accessible companies
 - TypeScript and ESLint pass cleanly
 - Migration file ready for `supabase db push`
