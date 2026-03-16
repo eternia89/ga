@@ -33,7 +33,7 @@ export const createJob = authActionClient
         .select('id')
         .eq('user_id', profile.id)
         .eq('company_id', parsedInput.company_id)
-        .single();
+        .maybeSingle();
       if (!access) throw new Error('You do not have access to the selected company.');
     }
 

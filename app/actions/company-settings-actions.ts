@@ -55,7 +55,7 @@ export const updateCompanySetting = authActionClient
       .select('id')
       .eq('company_id', profile.company_id)
       .eq('key', parsedInput.key)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       // Update existing row
