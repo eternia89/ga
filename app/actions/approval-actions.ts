@@ -18,7 +18,6 @@ export const approveJob = authActionClient
       .from('jobs')
       .select('id, status, company_id, display_id, created_by, assigned_to')
       .eq('id', parsedInput.job_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -86,7 +85,6 @@ export const rejectJob = authActionClient
       .from('jobs')
       .select('id, status, company_id, display_id, created_by, assigned_to')
       .eq('id', parsedInput.job_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -154,7 +152,6 @@ export const approveCompletion = authActionClient
       .from('jobs')
       .select('id, status, company_id, display_id, created_by, assigned_to')
       .eq('id', parsedInput.job_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -266,7 +263,6 @@ export const rejectCompletion = authActionClient
       .from('jobs')
       .select('id, status, company_id, display_id, created_by, assigned_to')
       .eq('id', parsedInput.job_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 

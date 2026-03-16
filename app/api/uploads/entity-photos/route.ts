@@ -85,12 +85,11 @@ export async function POST(request: NextRequest) {
         );
       }
     } else {
-      // For other entity types: verify entity exists and belongs to user's company
+      // For other entity types: verify entity exists (RLS handles company scoping)
       const { data: entityRecord } = await supabase
         .from(config.table as Parameters<typeof supabase.from>[0])
         .select('id, company_id')
         .eq('id', entityId)
-        .eq('company_id', profile.company_id)
         .is('deleted_at', null)
         .single();
 

@@ -26,7 +26,6 @@ export const savePMChecklistItem = authActionClient
       .from('jobs')
       .select('id, assigned_to, checklist_responses, job_type, status')
       .eq('id', parsedInput.jobId)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -115,7 +114,6 @@ export const savePMChecklistPhoto = authActionClient
       .from('jobs')
       .select('id, assigned_to, checklist_responses, job_type, status')
       .eq('id', parsedInput.jobId)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -192,7 +190,6 @@ export const completePMChecklist = authActionClient
       .from('jobs')
       .select('id, assigned_to, checklist_responses, job_type, status')
       .eq('id', parsedInput.jobId)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 

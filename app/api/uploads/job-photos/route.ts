@@ -51,12 +51,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Not authorized to attach photo to this comment' }, { status: 403 });
     }
 
-    // Verify the job belongs to the user's company
+    // Verify the job exists (RLS handles company scoping)
     const { data: job } = await supabase
       .from('jobs')
       .select('id, company_id, assigned_to')
       .eq('id', comment.job_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 

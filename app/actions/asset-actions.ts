@@ -96,12 +96,11 @@ export const updateAsset = authActionClient
       throw new Error('Insufficient permissions to update assets');
     }
 
-    // Fetch asset — must exist, belong to company, and not be sold_disposed
+    // Fetch asset — must exist and not be sold_disposed (RLS handles company scoping)
     const { data: existing } = await supabase
       .from('inventory_items')
       .select('id, status, company_id')
       .eq('id', parsedInput.asset_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -151,12 +150,11 @@ export const changeAssetStatus = authActionClient
       throw new Error('Insufficient permissions to change asset status');
     }
 
-    // Fetch current asset
+    // Fetch current asset (RLS handles company scoping)
     const { data: asset } = await supabase
       .from('inventory_items')
       .select('id, status, company_id')
       .eq('id', parsedInput.asset_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 

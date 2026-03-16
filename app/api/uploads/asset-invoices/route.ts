@@ -40,12 +40,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
-    // Verify the asset exists and belongs to user's company
+    // Verify the asset exists (RLS handles company scoping)
     const { data: asset } = await supabase
       .from('inventory_items')
       .select('id, company_id')
       .eq('id', assetId)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 

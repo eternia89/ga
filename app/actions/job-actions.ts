@@ -199,7 +199,6 @@ export const updateJob = authActionClient
       .from('jobs')
       .select('id, status, company_id, estimated_cost, approved_at')
       .eq('id', parsedInput.id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -378,7 +377,6 @@ export const assignJob = authActionClient
       .from('jobs')
       .select('id, status, display_id')
       .eq('id', parsedInput.id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -442,7 +440,6 @@ export const updateJobStatus = authActionClient
       .from('jobs')
       .select('id, status, assigned_to, company_id, created_by, display_id, estimated_cost, job_type, maintenance_schedule_id')
       .eq('id', parsedInput.id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -635,7 +632,6 @@ export const cancelJob = authActionClient
       .from('jobs')
       .select('id, status, assigned_to, display_id, company_id')
       .eq('id', parsedInput.id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -703,7 +699,6 @@ export const addJobComment = authActionClient
       .from('jobs')
       .select('id, assigned_to, company_id')
       .eq('id', parsedInput.job_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -772,7 +767,6 @@ export const deleteJobAttachment = authActionClient
       .from('jobs')
       .select('id')
       .eq('id', attachment.entity_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
