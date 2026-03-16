@@ -359,10 +359,11 @@ Recent decisions affecting current work:
 | 83 | Add .max(10) to unbounded start_date string in scheduleCreateSchema | 2026-03-14 | 2b9510e | Verified | [76-add-max-10-to-unbounded-start-date-strin](./quick/76-add-max-10-to-unbounded-start-date-strin/) |
 | 84 | E2E tests for schedule non-asset path, auto_create_days_before, and RLS cross-company INSERT | 2026-03-14 | 6f40606 | Verified | [77-extend-schedule-e2e-tests-no-asset-path-](./quick/77-extend-schedule-e2e-tests-no-asset-path-/) |
 | 85 | Standardize text-sm on Created column date spans in asset and schedule tables | 2026-03-14 | fba2a18 | Verified | [78-standardize-text-sm-on-created-column-da](./quick/78-standardize-text-sm-on-created-column-da/) |
+| 86 | Fix 7 security/correctness bugs: RFC 4122 UUIDs, .maybeSingle(), duplicate email, company access | 2026-03-16 | 53352a7 | Complete | [79-fix-7-security-correctness-bugs-rfc4122-](./quick/79-fix-7-security-correctness-bugs-rfc4122-/) |
 
 ## Session Continuity
 
-Last session: 2026-03-14T16:44:51Z
-Stopped at: Completed quick task 78: Standardize text-sm on Created column date spans
+Last session: 2026-03-16T02:06:16Z
+Stopped at: Completed quick task 79: Fix 7 security/correctness bugs
 Resume file: None
 Next: Ready for next task
