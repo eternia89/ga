@@ -147,18 +147,6 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
     size: 160,
   },
   {
-    accessorKey: 'warranty_expiry',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Warranty Expiry" />
-    ),
-    cell: ({ row }) => {
-      const date = row.getValue('warranty_expiry') as string | null;
-      if (!date) return <span className="text-muted-foreground">—</span>;
-      return <span>{format(new Date(date), 'dd-MM-yyyy')}</span>;
-    },
-    size: 130,
-  },
-  {
     accessorKey: 'created_at',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created" />
