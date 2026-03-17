@@ -206,6 +206,7 @@ export interface InventoryItem {
   id: string;
   company_id: string;
   location_id: string | null;
+  holder_id: string | null;
   category_id: string | null;
   display_id: string;
   name: string;
@@ -226,6 +227,7 @@ export interface InventoryItemWithRelations extends InventoryItem {
   category: { name: string } | null;
   location: { name: string } | null;
   company: { name: string } | null;
+  holder: { full_name: string; division: { name: string } | null; location: { name: string } | null } | null;
 }
 
 export interface InventoryMovement {

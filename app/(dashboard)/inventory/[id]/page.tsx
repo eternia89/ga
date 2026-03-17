@@ -35,7 +35,7 @@ export default async function AssetDetailPage({ params }: PageProps) {
   const { data: asset } = await supabase
     .from('inventory_items')
     .select(
-      '*, category:categories(name), location:locations(name), company:companies(name)'
+      '*, category:categories(name), location:locations(name), company:companies(name), holder:user_profiles!holder_id(full_name, division:divisions(name), location:locations(name))'
     )
     .eq('id', id)
     .is('deleted_at', null)

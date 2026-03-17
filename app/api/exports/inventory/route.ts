@@ -48,7 +48,7 @@ export async function GET() {
 
     const { data: items, error: fetchError } = await supabase
       .from('inventory_items')
-      .select('*, category:categories(name), location:locations(name)')
+      .select('*, category:categories(name), location:locations(name), holder:user_profiles!holder_id(full_name)')
       .in('company_id', allAccessibleCompanyIds)
       .is('deleted_at', null)
       .order('created_at', { ascending: false });
@@ -71,6 +71,7 @@ export async function GET() {
       { header: 'Name', key: 'name', width: 40 },
       { header: 'Category', key: 'category_name', width: 25 },
       { header: 'Location', key: 'location_name', width: 25 },
+      { header: 'Holder', key: 'holder_name', width: 25 },
       { header: 'Status', key: 'status', width: 18 },
       { header: 'Warranty Expiry', key: 'warranty_expiry', width: 16 },
       { header: 'Purchase Date', key: 'purchase_date', width: 14 },
@@ -82,12 +83,14 @@ export async function GET() {
     for (const item of items ?? []) {
       const category = item.category as { name: string } | null;
       const location = item.location as { name: string } | null;
+      const holder = item.holder as { full_name: string } | null;
 
       sheet.addRow({
         display_id: item.display_id,
         name: item.name ?? '',
         category_name: category?.name ?? '',
         location_name: location?.name ?? '',
+        holder_name: holder?.full_name ?? '',
         status: STATUS_DISPLAY[item.status] ?? item.status ?? '',
         warranty_expiry: item.warranty_expiry
           ? format(new Date(item.warranty_expiry), 'dd-MM-yyyy')

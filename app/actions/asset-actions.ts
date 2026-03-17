@@ -362,10 +362,10 @@ export const acceptTransfer = authActionClient
       throw new Error(movementError.message);
     }
 
-    // Move asset to destination location
+    // Move asset to destination location and set holder to the receiver
     const { error: itemError } = await supabase
       .from('inventory_items')
-      .update({ location_id: movement.to_location_id })
+      .update({ location_id: movement.to_location_id, holder_id: profile.id })
       .eq('id', movement.item_id);
 
     if (itemError) {

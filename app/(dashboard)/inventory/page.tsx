@@ -60,26 +60,20 @@ export default async function InventoryPage({ searchParams }: PageProps) {
   // Fetch assets — scoped for general users, all for operational roles
   let assetsQuery = supabase
     .from('inventory_items')
-    .select('*, category:categories(name), location:locations(name)')
+    .select('*, category:categories(name), location:locations(name), holder:user_profiles!holder_id(full_name)')
     .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
   if (isGeneralUser) {
-    if (inTransitAssetIds.length > 0 && profile.location_id) {
-      // Assets at user's location OR in transit to them
+    if (inTransitAssetIds.length > 0) {
+      // Assets held by user OR in transit to them
       assetsQuery = assetsQuery.or(
-        `location_id.eq.${profile.location_id},id.in.(${inTransitAssetIds.join(',')})`
+        `holder_id.eq.${profile.id},id.in.(${inTransitAssetIds.join(',')})`
       );
-    } else if (inTransitAssetIds.length > 0) {
-      // No location assigned, but has pending transfers
-      assetsQuery = assetsQuery.in('id', inTransitAssetIds);
-    } else if (profile.location_id) {
-      // Only assets at user's location (no pending transfers)
-      assetsQuery = assetsQuery.eq('location_id', profile.location_id);
     } else {
-      // No location, no transfers — no assets visible
-      assetsQuery = assetsQuery.eq('id', '00000000-0000-4000-a000-000000000000');
+      // Only assets held by user (no pending transfers)
+      assetsQuery = assetsQuery.eq('holder_id', profile.id);
     }
   }
 
