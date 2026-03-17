@@ -99,8 +99,8 @@ export function AssetDetailActions({
 
           {canCancel && (
             <Button variant="outline" onClick={() => { setRespondVariant('admin'); setShowRespondModal(true); }}>
-              <Ban className="mr-2 h-4 w-4 text-destructive" />
-              <span className="text-destructive">Cancel Transfer</span>
+              <Truck className="mr-2 h-4 w-4" />
+              Edit Transfer
             </Button>
           )}
         </div>
