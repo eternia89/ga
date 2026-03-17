@@ -48,7 +48,7 @@ export function PhotoLightbox({ photos, initialIndex = 0, onClose }: PhotoLightb
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90"
+      className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-black/90"
       role="dialog"
       aria-modal="true"
       aria-label="Photo lightbox"
