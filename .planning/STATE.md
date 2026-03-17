@@ -377,10 +377,11 @@ Recent decisions affecting current work:
 | 100 | Consolidate respond components: switch view modal and detail page to AssetTransferRespondModal | 2026-03-17 | 02576da | Verified | [260317-g4o-consolidate-respond-components-switch-vi](./quick/260317-g4o-consolidate-respond-components-switch-vi/) |
 | 101 | Validate receiver is active in createTransfer and acceptTransfer | 2026-03-17 | c63825e | Verified | [260317-gf7-validate-receiver-is-active-in-accepttra](./quick/260317-gf7-validate-receiver-is-active-in-accepttra/) |
 | 102 | Add initialMode prop to respond modal to skip redundant mode selection | 2026-03-17 | d529054 | Verified | [260317-l6v-add-initialmode-prop-to-assettransferres](./quick/260317-l6v-add-initialmode-prop-to-assettransferres/) |
+| 103 | Replace generic success message with action-specific messages in asset table | 2026-03-17 | a65d447 | Verified | [260317-ldp-replace-generic-success-message-with-act](./quick/260317-ldp-replace-generic-success-message-with-act/) |
 
 ## Session Continuity
 
-Last session: 2026-03-17T08:22:00.000Z
-Stopped at: Completed quick task 102: initialMode prop
+Last session: 2026-03-17T08:27:00.000Z
+Stopped at: Completed quick task 103: Action-specific success messages
 Resume file: None
 Next: Ready for next task
