@@ -263,6 +263,23 @@ export const createTransfer = authActionClient
       throw new Error('Destination location is the same as the current location');
     }
 
+    // Validate receiver is active (not deactivated) when transferring to a user
+    if (parsedInput.receiver_id) {
+      const { data: receiver } = await supabase
+        .from('user_profiles')
+        .select('id, deleted_at')
+        .eq('id', parsedInput.receiver_id)
+        .single();
+
+      if (!receiver) {
+        throw new Error('Receiver not found');
+      }
+
+      if (receiver.deleted_at) {
+        throw new Error('Cannot transfer to a deactivated user');
+      }
+    }
+
     const isLocationOnly = !parsedInput.receiver_id;
 
     const { data, error } = await supabase
@@ -324,6 +341,11 @@ export const acceptTransfer = authActionClient
 
     if (!isReceiver) {
       throw new Error('Only the designated receiver can accept this transfer');
+    }
+
+    // Verify receiver is still active (defense-in-depth — deactivated users can't normally log in)
+    if (profile.deleted_at) {
+      throw new Error('Your account has been deactivated. Cannot accept transfer.');
     }
 
     // Update movement to accepted
