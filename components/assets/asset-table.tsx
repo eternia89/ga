@@ -19,7 +19,7 @@ interface AssetTableProps {
   data: InventoryItemWithRelations[];
   pendingTransfers: Record<string, PendingTransfer>;
   categories: { id: string; name: string }[];
-  locations: { id: string; name: string }[];
+  locations: { id: string; name: string; company_id?: string }[];
   gaUsers: GAUserWithLocation[];
   currentUserId: string;
   currentUserRole: string;
@@ -164,18 +164,25 @@ export function AssetTable({
       />
 
       {/* Transfer dialog (from table row action) */}
-      {transferAsset && (
-        <AssetTransferDialog
-          open={!!transferAsset}
-          onOpenChange={(open) => { if (!open) setTransferAsset(null); }}
-          asset={transferAsset}
-          currentLocationName={transferAsset.location?.name ?? ''}
-          gaUsers={gaUsers}
-          currentUserId={currentUserId}
-          locationNames={locationNames}
-          onSuccess={handleModalActionSuccess}
-        />
-      )}
+      {transferAsset && (() => {
+        const filteredGaUsers = gaUsers.filter(u => u.company_id === transferAsset.company_id);
+        const filteredLocations = locations.filter(l => l.company_id === transferAsset.company_id);
+        const filteredLocationNames = Object.fromEntries(
+          filteredLocations.map(l => [l.id, l.name])
+        );
+        return (
+          <AssetTransferDialog
+            open={!!transferAsset}
+            onOpenChange={(open) => { if (!open) setTransferAsset(null); }}
+            asset={transferAsset}
+            currentLocationName={transferAsset.location?.name ?? ''}
+            gaUsers={filteredGaUsers}
+            currentUserId={currentUserId}
+            locationNames={filteredLocationNames}
+            onSuccess={handleModalActionSuccess}
+          />
+        );
+      })()}
 
       {/* Change Status dialog (from table row action) */}
       {statusChangeAsset && (

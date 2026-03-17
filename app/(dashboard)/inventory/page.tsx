@@ -88,7 +88,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
   // Fetch locations for all accessible companies for filter dropdown + create dialog
   const { data: locations } = await supabase
     .from('locations')
-    .select('id, name')
+    .select('id, name, company_id')
     .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
     .order('name');
@@ -131,7 +131,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
   // Fetch GA users with location_id for transfer dialog (all accessible companies)
   const { data: gaUsersData } = await supabase
     .from('user_profiles')
-    .select('id, full_name, location_id')
+    .select('id, full_name, location_id, company_id')
     .in('company_id', allAccessibleCompanyIds)
     .in('role', ['ga_staff', 'ga_lead', 'admin'])
     .is('deleted_at', null)
@@ -141,6 +141,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
     id: u.id,
     name: u.full_name,
     location_id: u.location_id,
+    company_id: u.company_id,
   }));
 
   // Batch-fetch condition photos for all assets

@@ -22,6 +22,7 @@ export interface GAUserWithLocation {
   id: string;
   name: string;
   location_id: string | null;
+  company_id?: string;
 }
 
 type TransferMode = 'user' | 'location';
