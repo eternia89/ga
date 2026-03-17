@@ -166,7 +166,6 @@ export default async function InventoryPage({ searchParams }: PageProps) {
     .from('user_profiles')
     .select('id, full_name, location_id, company_id')
     .in('company_id', allAccessibleCompanyIds)
-    .in('role', ['ga_staff', 'ga_lead', 'admin'])
     .is('deleted_at', null)
     .order('full_name');
 

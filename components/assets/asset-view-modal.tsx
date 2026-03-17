@@ -210,7 +210,6 @@ export function AssetViewModal({
           .from('user_profiles')
           .select('id, name:full_name, location_id')
           .eq('company_id', companyId)
-          .in('role', ['ga_staff', 'ga_lead', 'admin'])
           .is('deleted_at', null)
           .order('full_name'),
       ]);
