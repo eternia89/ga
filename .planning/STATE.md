@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: "Completed quick-260317-mhw: Add holder_id to inventory_items"
 last_updated: "2026-03-17T09:26:34.496Z"
-last_activity: "2026-03-16 - Completed quick task 89: Remove warranty_expiry column from asset table"
+last_activity: "2026-03-17 - Completed quick task 109: Add holder_id for custody tracking"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -383,11 +383,12 @@ Recent decisions affecting current work:
 | 105 | Fix photo lightbox z-index stacking behind modals | 2026-03-17 | 15c7cc1 | Verified | [260317-lqo-fix-photo-lightbox-z-index-stacking-behi](./quick/260317-lqo-fix-photo-lightbox-z-index-stacking-behi/) |
 | 106 | Add consistent asset info header to Change Status and Transfer dialogs | 2026-03-17 | 5c8a30d | Verified | [260317-lu3-add-consistent-asset-info-header-to-chan](./quick/260317-lu3-add-consistent-asset-info-header-to-chan/) |
 | 107 | Remove Edit Transfer from view modal, brand/model/serial in 1 row | 2026-03-17 | 50f7b61 | Verified | — |
-| 108 | Filter inventory for general users: only assets at their location or in transit to them | 2026-03-17 | 45b4a45 | Verified | [260317-lxl-filter-inventory-page-for-general-users-](./quick/260317-lxl-filter-inventory-page-for-general-users-/) |
+| 108 | Filter inventory for general users: only assets at their location or in transit to them | 2026-03-17 | 45b4a45 | Superseded | [260317-lxl-filter-inventory-page-for-general-users-](./quick/260317-lxl-filter-inventory-page-for-general-users-/) |
+| 109 | Add holder_id to inventory_items for asset custody tracking | 2026-03-17 | c96f57e | Verified | [260317-mhw-add-holder-id-to-inventory-items-for-ass](./quick/260317-mhw-add-holder-id-to-inventory-items-for-ass/) |
 
 ## Session Continuity
 
-Last session: 2026-03-17T09:26:29.964Z
-Stopped at: Completed quick-260317-mhw: Add holder_id to inventory_items
+Last session: 2026-03-17T09:30:00.000Z
+Stopped at: Completed quick task 109: Add holder_id for custody tracking
 Resume file: None
 Next: Ready for next task
