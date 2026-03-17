@@ -154,3 +154,119 @@ No new commits since the last review (14-Mar-2026 was the last commit day). This
 | 5 | Columns | Create shared `CreatedAtCell` component to enforce `text-sm` on date spans across all entity tables |
 | 6 | Testing | Set up vitest for server action unit tests with mock Supabase — would catch `.single()` vs `.maybeSingle()` bugs |
 | 7 | Logging | Replace raw `console.error/log` in API routes with structured logger (e.g., pino) before production |
+
+---
+
+## 17-Mar-2026
+
+### Commits Summary (Last 24h)
+
+| Task | Commits | What Changed |
+|------|---------|-------------|
+| quick-79 | 4 commits | Fixed 7 security/correctness bugs: RFC-4122 UUIDs, `.single()` → `.maybeSingle()`, duplicate email on reactivate, company access on create |
+| quick-80 | 3 commits | Extracted `assertCompanyAccess` + `isoDateString` shared helpers; replaced 8 inline patterns across 5 action files |
+| quick-81 | 5 commits | Multi-company comprehensive fix: RLS migration for writes, removed 17 redundant company filters, scoped exports, updated dropdowns |
+| quick-82 | 2 commits | Removed `warranty_expiry` column from asset table |
+| quick-83 | 2 commits | Moved Transfer button from modal sticky bar to table row actions |
+| standalone fixes | 4 commits | Multi-company data isolation for supporting tables, UI fixes (primary company checkbox, schedule columns, transfer filters) |
+| GSD update | 1 commit | Framework tooling update (UI agents, autonomous workflow, stats) |
+
+**Total: ~30 commits, ~50 files changed**
+
+---
+
+### Resolved from Previous Reviews
+
+| # | Original Date | Original Issue | Resolution |
+|---|---------------|---------------|------------|
+| 1 | 16-Mar #1 (CRITICAL) | RLS fallback UUID violates RFC 4122 | **FIXED** in quick-79 (`cda120b`) — replaced with valid v4 format |
+| 2 | 16-Mar #2 (HIGH) | Company access check uses `.single()` | **FIXED** in quick-79 (`f5a399a`) — standardized to `.maybeSingle()` |
+| 3 | 16-Mar #3 (HIGH) | `reactivateUser` missing duplicate email check | **FIXED** in quick-79 (`53352a7`) — added check before reactivation |
+| 4 | 16-Mar #4 (MEDIUM) | `createUser` missing company access validation | **FIXED** in quick-79 + quick-80 — uses `assertCompanyAccess` |
+| 5 | 16-Mar Scalability #1 | Extract `assertCompanyAccess` shared helper | **DONE** in quick-80 — `lib/auth/company-access.ts`, 8 call sites across 5 action files |
+| 6 | 16-Mar Scalability #3-4 | Create `optionalUuid()` + `isoDateString()` helpers | **PARTIALLY DONE** — `isoDateString()` created in quick-80; `optionalUuid()` still pending |
+| 7 | 16-Mar #7 (LOW) | Invalid UUIDs in `reset-database.sql` | **FIXED** in quick-79 (`cda120b`) |
+
+---
+
+### Risky Patterns & Security (New Findings)
+
+| # | Severity | File | Issue | Recommendation |
+|---|----------|------|-------|----------------|
+| 1 | **HIGH** | `app/actions/approval-actions.ts` (5 call sites) | `createNotifications()` called fire-and-forget with **zero error handling** — no `.catch()`, no `await`. If notification creation fails, no one knows. | Add `.catch(err => console.error('Notification failed:', err.message))` to all 5 calls |
+| 2 | **HIGH** | `app/actions/job-actions.ts` (6 call sites) | Same fire-and-forget `createNotifications()` pattern — no error handling at all | Same fix as above for all 6 calls |
+| 3 | **MEDIUM** | `app/actions/request-actions.ts` (4 call sites) | Has `.catch(() => {})` — better than nothing, but silently swallows errors with no logging | Change to `.catch(err => console.error('Notification failed:', err.message))` |
+| 4 | **MEDIUM** | `app/actions/approval-actions.ts`, `template-actions.ts`, `pm-job-actions.ts` | Not using `assertCompanyAccess` shared helper — approval-actions may be intentional (RLS-scoped fetch), but template-actions and pm-job-actions should be audited | Audit whether these actions need company access validation or rely on RLS |
+| 5 | **LOW** | `app/actions/*.ts` (67 total `.single()` calls) | High `.single()` count across action files — most are correct (fetching by ID), but any missing row throws a Supabase PGRST116 error instead of a user-friendly message | Consider wrapping in try/catch with friendly error for user-facing queries |
+
+---
+
+### UI/UX Inconsistencies (New + Persistent)
+
+| # | Status | File | Issue | Fix |
+|---|--------|------|-------|-----|
+| 1 | **PERSISTENT** (15-Mar) | `components/requests/request-columns.tsx:156` | Missing `text-sm` on Created date span | Add `className="text-sm"` |
+| 2 | **PERSISTENT** (15-Mar) | `components/maintenance/template-columns.tsx:74` | Missing `text-sm` on Created date span | Add `className="text-sm"` |
+| 3 | **PERSISTENT** (15-Mar) | `lib/utils.ts:27` | CSV export filename uses `yyyy-MM-dd` instead of `dd-MM-yyyy` | Change format string |
+| 4 | **PERSISTENT** (16-Mar) | `components/maintenance/schedule-columns.tsx:62` | Asset `display_id` missing `font-mono` class | Add `font-mono` to span |
+| 5 | **NEW** | `components/maintenance/schedule-columns.tsx:139` | `last_completed_at` date span missing `text-sm` | Add `className="text-sm"` |
+| 6 | **NEW** | `components/maintenance/schedule-columns.tsx:57` | Asset name link missing `text-blue-600` class | Add `text-blue-600` to link styling |
+| 7 | **NEW** | `components/maintenance/schedule-detail.tsx:150` | Asset `display_id` in Input value not styled with `font-mono` | Render display_id in a `font-mono` span or separate field |
+| 8 | **NEW** | `components/maintenance/schedule-view-modal.tsx:352` | Asset `display_id` in parentheses missing `font-mono` | Add `font-mono` to span |
+| 9 | **NEW** | `components/maintenance/template-view-modal.tsx:308` | Created date span missing `text-sm` | Add `className="text-sm"` |
+| 10 | **NEW** | `components/maintenance/template-detail.tsx:171` | Created date span missing `text-sm` | Add `className="text-sm"` |
+| 11 | **NEW** | `components/maintenance/schedule-detail.tsx:176` | Created date span missing `text-sm` | Add `className="text-sm"` |
+| 12 | **NEW** | `components/maintenance/schedule-view-modal.tsx:345` | Created date span missing `text-sm` | Add `className="text-sm"` |
+| 13 | **NEW** | `components/assets/asset-view-modal.tsx:482` | Created date span missing `text-sm` | Add `className="text-sm"` |
+| 14 | **NEW** | `components/assets/asset-detail-client.tsx:137` | Initiated date span missing `text-sm` | Add `className="text-sm"` |
+
+---
+
+### Schema & Validation Inconsistencies (Updated)
+
+| # | Status | File(s) | Issue | Recommendation |
+|---|--------|---------|-------|----------------|
+| 1 | **PERSISTENT** (15-Mar) | `lib/validations/asset-schema.ts` | Asset `name` max=100, should be 60 per CLAUDE.md | Align to 60 or document exception |
+| 2 | **PERSISTENT** (15-Mar) | `lib/validations/template-schema.ts` | Template `name` max=100, should be 60 | Align to 60 or document exception |
+| 3 | **PERSISTENT** (16-Mar) | `schedule-schema.ts:9`, `user-schema.ts:16-17`, `template-schema.ts:51` | 3 different patterns for optional UUID fields | Create shared `optionalUuid()` helper |
+| 4 | **RESOLVED** | `schedule-schema.ts:15` | `start_date` lacks format validation | **FIXED** — now uses `isoDateString()` helper (quick-80) |
+
+---
+
+### Test Coverage Gaps (Persistent)
+
+*All 8 items from 16-Mar remain open. No new test files added in last 24h. Multi-company RLS write policies (migration 00027) add an additional untested surface:*
+
+| # | Priority | Area | Gap |
+|---|----------|------|-----|
+| 9 | **HIGH** | RLS | New INSERT/UPDATE multi-company policies (migration 00027) completely untested |
+| 10 | **HIGH** | Actions | `assertCompanyAccess` helper has no unit tests — used in 8 critical mutation paths |
+
+---
+
+### Scalability Improvements (Updated)
+
+| # | Status | Category | Suggestion |
+|---|--------|----------|------------|
+| 1 | **DONE** | Actions | ~~Extract `assertCompanyAccess` shared helper~~ — completed in quick-80 |
+| 2 | OPEN | Actions | Standardize response shapes — some return `{ success: true }`, others include counts or IDs |
+| 3 | OPEN | Schema | Create `optionalUuid()` Zod helper to replace 3 divergent patterns |
+| 4 | **DONE** | Schema | ~~Create `isoDateString()` Zod helper~~ — completed in quick-80 |
+| 5 | OPEN | Columns | Create shared `CreatedAtCell` component to enforce `text-sm` on date spans (14 inconsistencies found) |
+| 6 | OPEN | Testing | Set up vitest for server action unit tests — `assertCompanyAccess` and notification helpers are prime candidates |
+| 7 | OPEN | Logging | Replace raw `console.error/log` (35+ occurrences) with structured logger before production |
+| 8 | **NEW** | Notifications | Standardize notification error handling — currently 3 patterns: no handling (11 calls), silent swallow (4 calls), and none use logging |
+| 9 | **NEW** | Display IDs | Create shared `DisplayId` component with `font-mono` baked in — currently 4 locations miss the class |
+
+---
+
+### What's Working Well (Updated)
+
+- **100% responsive design compliance** — zero mobile-first breakpoint violations
+- **100% maxLength compliance** — all Input components match Zod `.max(N)` values
+- **100% date format compliance** — all user-visible dates use `dd-MM-yyyy` (only CSV filename and internal URL params use ISO)
+- **assertCompanyAccess adopted** across 5 action files (8 call sites) — consistent `.maybeSingle()` pattern
+- **isoDateString adopted** across 3 schema files — consistent date validation
+- **Multi-company RLS complete** — SELECT, INSERT, UPDATE policies all handle multi-company access
+- **17 redundant company filters removed** — cleaner action code, RLS handles scoping
+- **Export routes properly scoped** — all 4 exports use `allAccessibleCompanyIds`
