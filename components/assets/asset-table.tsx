@@ -129,8 +129,8 @@ export function AssetTable({
     setLightboxOpen(true);
   };
 
-  const handleModalActionSuccess = () => {
-    setFeedback({ type: 'success', message: 'Action completed successfully' });
+  const handleModalActionSuccess = (message?: string) => {
+    setFeedback({ type: 'success', message: message ?? 'Action completed successfully' });
     router.refresh();
   };
 
@@ -197,7 +197,7 @@ export function AssetTable({
             gaUsers={filteredGaUsers}
             currentUserId={currentUserId}
             locationNames={filteredLocationNames}
-            onSuccess={handleModalActionSuccess}
+            onSuccess={() => handleModalActionSuccess('Transfer initiated successfully')}
           />
         );
       })()}
@@ -208,7 +208,7 @@ export function AssetTable({
           open={!!statusChangeAsset}
           onOpenChange={(open) => { if (!open) setStatusChangeAsset(null); }}
           asset={statusChangeAsset}
-          onSuccess={handleModalActionSuccess}
+          onSuccess={() => handleModalActionSuccess('Status changed successfully')}
         />
       )}
 
@@ -218,7 +218,7 @@ export function AssetTable({
         onOpenChange={(open) => { if (!open) setRespondAsset(null); }}
         asset={respondAsset}
         pendingTransfer={respondAsset ? pendingTransfers[respondAsset.id] : undefined}
-        onSuccess={handleModalActionSuccess}
+        onSuccess={() => handleModalActionSuccess('Transfer response submitted')}
       />
 
       {/* Edit Transfer modal (from table row action for GA lead/admin) */}
@@ -228,7 +228,7 @@ export function AssetTable({
           onOpenChange={(open) => { if (!open) setEditTransferAsset(null); }}
           asset={editTransferAsset}
           pendingTransfer={pendingTransfers[editTransferAsset.id]}
-          onSuccess={handleModalActionSuccess}
+          onSuccess={() => handleModalActionSuccess('Transfer cancelled')}
           variant="admin"
         />
       )}
