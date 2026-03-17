@@ -349,7 +349,7 @@ export const updateJob = authActionClient
           type: 'assignment',
           entityType: 'job',
           entityId: id,
-        });
+        }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
       }
 
     }
@@ -410,7 +410,7 @@ export const assignJob = authActionClient
       type: 'assignment',
       entityType: 'job',
       entityId: parsedInput.id,
-    });
+    }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
 
     revalidatePath('/jobs');
     revalidatePath(`/jobs/${parsedInput.id}`);
@@ -551,7 +551,7 @@ export const updateJobStatus = authActionClient
         type: 'approval',
         entityType: 'job',
         entityId: parsedInput.id,
-      });
+      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
     }
 
     // When directly completing (no completion approval required), move linked requests
@@ -591,7 +591,7 @@ export const updateJobStatus = authActionClient
             type: 'auto_accept_warning',
             entityType: 'job',
             entityId: parsedInput.id,
-          });
+          }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
         }
       }
 
@@ -605,7 +605,7 @@ export const updateJobStatus = authActionClient
         type: 'completion',
         entityType: 'job',
         entityId: parsedInput.id,
-      });
+      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
     }
 
     revalidatePath('/jobs');
@@ -662,7 +662,7 @@ export const cancelJob = authActionClient
         type: 'status_change',
         entityType: 'job',
         entityId: parsedInput.id,
-      });
+      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
     }
 
     // Move linked requests back to triaged

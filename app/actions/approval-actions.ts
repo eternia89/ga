@@ -58,7 +58,7 @@ export const approveJob = authActionClient
         type: 'approval',
         entityType: 'job',
         entityId: parsedInput.job_id,
-      });
+      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
     }
 
     revalidatePath('/jobs');
@@ -129,7 +129,7 @@ export const rejectJob = authActionClient
         type: 'approval',
         entityType: 'job',
         entityId: parsedInput.job_id,
-      });
+      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
     }
 
     revalidatePath('/jobs');
@@ -220,7 +220,7 @@ export const approveCompletion = authActionClient
           type: 'auto_accept_warning',
           entityType: 'job',
           entityId: parsedInput.job_id,
-        });
+        }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
       }
     }
 
@@ -235,7 +235,7 @@ export const approveCompletion = authActionClient
         type: 'approval',
         entityType: 'job',
         entityId: parsedInput.job_id,
-      });
+      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
     }
 
     revalidatePath('/jobs');
@@ -307,7 +307,7 @@ export const rejectCompletion = authActionClient
         type: 'approval',
         entityType: 'job',
         entityId: parsedInput.job_id,
-      });
+      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
     }
 
     revalidatePath('/jobs');
