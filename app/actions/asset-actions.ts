@@ -255,6 +255,10 @@ export const createTransfer = authActionClient
       throw new Error('Asset has a pending transfer. Complete or cancel it first.');
     }
 
+    if (parsedInput.to_location_id === asset.location_id) {
+      throw new Error('Destination location is the same as the current location');
+    }
+
     const isLocationOnly = !parsedInput.receiver_id;
 
     const { data, error } = await supabase

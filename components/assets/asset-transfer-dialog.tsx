@@ -75,10 +75,12 @@ export function AssetTransferDialog({
     .filter((u) => u.id !== currentUserId)
     .map((u) => ({ label: u.name, value: u.id }));
 
-  const locationOptions = Object.entries(locationNames).map(([value, label]) => ({
-    value,
-    label,
-  }));
+  const locationOptions = Object.entries(locationNames)
+    .filter(([value]) => value !== asset.location_id)
+    .map(([value, label]) => ({
+      value,
+      label,
+    }));
 
   // Auto-resolve location from selected receiver (user mode)
   const selectedUser = useMemo(
