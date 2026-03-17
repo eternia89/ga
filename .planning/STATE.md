@@ -379,10 +379,11 @@ Recent decisions affecting current work:
 | 102 | Add initialMode prop to respond modal to skip redundant mode selection | 2026-03-17 | d529054 | Verified | [260317-l6v-add-initialmode-prop-to-assettransferres](./quick/260317-l6v-add-initialmode-prop-to-assettransferres/) |
 | 103 | Replace generic success message with action-specific messages in asset table | 2026-03-17 | a65d447 | Verified | [260317-ldp-replace-generic-success-message-with-act](./quick/260317-ldp-replace-generic-success-message-with-act/) |
 | 104 | UI audit fixes: remove auto-redirect, fix blue shade, improve error messages | 2026-03-17 | 6d823e0 | Verified | — |
+| 105 | Fix photo lightbox z-index stacking behind modals | 2026-03-17 | 15c7cc1 | Verified | [260317-lqo-fix-photo-lightbox-z-index-stacking-behi](./quick/260317-lqo-fix-photo-lightbox-z-index-stacking-behi/) |
 
 ## Session Continuity
 
-Last session: 2026-03-17T08:32:00.000Z
-Stopped at: Completed quick task 104: UI audit minor fixes
+Last session: 2026-03-17T08:42:00.000Z
+Stopped at: Completed quick task 105: Lightbox z-index fix
 Resume file: None
 Next: Ready for next task
