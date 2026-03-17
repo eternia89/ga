@@ -11,6 +11,7 @@ import { AssetFilters, filterParsers } from './asset-filters';
 import { AssetViewModal } from './asset-view-modal';
 import { AssetTransferDialog, type GAUserWithLocation } from './asset-transfer-dialog';
 import { AssetStatusChangeDialog } from './asset-status-change-dialog';
+import { AssetTransferRespondModal } from './asset-transfer-respond-modal';
 import { PhotoLightbox } from '@/components/requests/request-photo-lightbox';
 
 type PhotoItem = { id: string; url: string; fileName: string };
@@ -49,6 +50,9 @@ export function AssetTable({
 
   // Change Status dialog state (triggered from table row)
   const [statusChangeAsset, setStatusChangeAsset] = useState<InventoryItemWithRelations | null>(null);
+
+  // Respond modal state (triggered from table row for transfer receivers)
+  const [respondAsset, setRespondAsset] = useState<InventoryItemWithRelations | null>(null);
 
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -108,6 +112,10 @@ export function AssetTable({
     setStatusChangeAsset(asset);
   };
 
+  const handleRespond = (asset: InventoryItemWithRelations) => {
+    setRespondAsset(asset);
+  };
+
   const handlePhotoClick = (photos: PhotoItem[], index: number) => {
     setLightboxPhotos(photos);
     setLightboxIndex(index);
@@ -145,8 +153,10 @@ export function AssetTable({
           onView: handleView,
           onTransfer: handleTransfer,
           onChangeStatus: handleChangeStatus,
+          onRespond: handleRespond,
           pendingTransfers,
           currentUserRole,
+          currentUserId,
           photosByAsset,
           onPhotoClick: handlePhotoClick,
         }}
@@ -193,6 +203,15 @@ export function AssetTable({
           onSuccess={handleModalActionSuccess}
         />
       )}
+
+      {/* Respond modal (from table row action for transfer receivers) */}
+      <AssetTransferRespondModal
+        open={!!respondAsset}
+        onOpenChange={(open) => { if (!open) setRespondAsset(null); }}
+        asset={respondAsset}
+        pendingTransfer={respondAsset ? pendingTransfers[respondAsset.id] : undefined}
+        onSuccess={handleModalActionSuccess}
+      />
 
       {lightboxOpen && lightboxPhotos.length > 0 && (
         <PhotoLightbox
