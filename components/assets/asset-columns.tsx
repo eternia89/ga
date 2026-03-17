@@ -25,6 +25,7 @@ export type AssetTableMeta = {
   onTransfer?: (asset: InventoryItemWithRelations) => void;
   onChangeStatus?: (asset: InventoryItemWithRelations) => void;
   onRespond?: (asset: InventoryItemWithRelations) => void;
+  onEditTransfer?: (asset: InventoryItemWithRelations) => void;
   pendingTransfers?: Record<string, PendingTransfer>;
   currentUserRole?: string;
   currentUserId?: string;
@@ -176,6 +177,11 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
         !!meta?.currentUserId &&
         pendingTransfer.receiver_id === meta.currentUserId;
 
+      const canEditTransfer =
+        !!pendingTransfer &&
+        meta?.currentUserRole &&
+        ['ga_lead', 'admin'].includes(meta.currentUserRole);
+
       return (
         <div className="flex items-center gap-1">
           <Button
@@ -200,6 +206,19 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
               }}
             >
               Respond
+            </Button>
+          )}
+          {canEditTransfer && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-sm text-blue-600 hover:underline"
+              onClick={(e) => {
+                e.stopPropagation();
+                meta?.onEditTransfer?.(asset);
+              }}
+            >
+              Edit Transfer
             </Button>
           )}
           {canChangeStatus && (

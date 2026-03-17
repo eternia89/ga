@@ -54,6 +54,9 @@ export function AssetTable({
   // Respond modal state (triggered from table row for transfer receivers)
   const [respondAsset, setRespondAsset] = useState<InventoryItemWithRelations | null>(null);
 
+  // Edit Transfer modal state (triggered from table row for GA lead/admin)
+  const [editTransferAsset, setEditTransferAsset] = useState<InventoryItemWithRelations | null>(null);
+
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Lightbox state
@@ -116,6 +119,10 @@ export function AssetTable({
     setRespondAsset(asset);
   };
 
+  const handleEditTransfer = (asset: InventoryItemWithRelations) => {
+    setEditTransferAsset(asset);
+  };
+
   const handlePhotoClick = (photos: PhotoItem[], index: number) => {
     setLightboxPhotos(photos);
     setLightboxIndex(index);
@@ -154,6 +161,7 @@ export function AssetTable({
           onTransfer: handleTransfer,
           onChangeStatus: handleChangeStatus,
           onRespond: handleRespond,
+          onEditTransfer: handleEditTransfer,
           pendingTransfers,
           currentUserRole,
           currentUserId,
@@ -212,6 +220,18 @@ export function AssetTable({
         pendingTransfer={respondAsset ? pendingTransfers[respondAsset.id] : undefined}
         onSuccess={handleModalActionSuccess}
       />
+
+      {/* Edit Transfer modal (from table row action for GA lead/admin) */}
+      {editTransferAsset && (
+        <AssetTransferRespondModal
+          open={!!editTransferAsset}
+          onOpenChange={(open) => { if (!open) setEditTransferAsset(null); }}
+          asset={editTransferAsset}
+          pendingTransfer={pendingTransfers[editTransferAsset.id]}
+          onSuccess={handleModalActionSuccess}
+          variant="admin"
+        />
+      )}
 
       {lightboxOpen && lightboxPhotos.length > 0 && (
         <PhotoLightbox
