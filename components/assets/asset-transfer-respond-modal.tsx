@@ -33,6 +33,8 @@ interface AssetTransferRespondModalProps {
   pendingTransfer?: PendingTransfer;
   onSuccess: () => void;
   variant?: 'respond' | 'admin';
+  /** Pre-select accept/reject mode to skip the default two-button screen */
+  initialMode?: ModalMode;
 }
 
 type ModalMode = 'default' | 'accept' | 'reject' | 'cancel';
@@ -54,6 +56,7 @@ export function AssetTransferRespondModal({
   pendingTransfer,
   onSuccess,
   variant = 'respond',
+  initialMode,
 }: AssetTransferRespondModalProps) {
   const router = useRouter();
 
@@ -64,7 +67,7 @@ export function AssetTransferRespondModal({
 
   // UI states
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState<ModalMode>('default');
+  const [mode, setMode] = useState<ModalMode>(initialMode ?? 'default');
   const [reason, setReason] = useState('');
   const [photos, setPhotos] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -78,7 +81,7 @@ export function AssetTransferRespondModal({
   // Reset state when modal opens/closes
   useEffect(() => {
     if (open && asset && pendingTransfer) {
-      setMode('default');
+      setMode(initialMode ?? 'default');
       setReason('');
       setPhotos([]);
       setFeedback(null);
@@ -88,7 +91,7 @@ export function AssetTransferRespondModal({
       setSenderPhotos([]);
       setAssetPhotos([]);
       setLoading(false);
-      setMode('default');
+      setMode(initialMode ?? 'default');
       setReason('');
       setPhotos([]);
       setFeedback(null);

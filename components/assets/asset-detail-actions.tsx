@@ -35,6 +35,7 @@ export function AssetDetailActions({
 }: AssetDetailActionsProps) {
   const [showRespondModal, setShowRespondModal] = useState(false);
   const [respondVariant, setRespondVariant] = useState<'respond' | 'admin'>('respond');
+  const [respondInitialMode, setRespondInitialMode] = useState<'default' | 'accept' | 'reject' | undefined>(undefined);
 
   const isGaStaffOrHigher = ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole);
   const isTerminal = asset.status === 'sold_disposed';
@@ -79,7 +80,7 @@ export function AssetDetailActions({
 
           {canRespond && (
             <Button
-              onClick={() => { setRespondVariant('respond'); setShowRespondModal(true); }}
+              onClick={() => { setRespondVariant('respond'); setRespondInitialMode('accept'); setShowRespondModal(true); }}
               className="bg-green-600 hover:bg-green-700 text-white"
             >
               <CheckCircle className="mr-2 h-4 w-4" />
@@ -91,14 +92,14 @@ export function AssetDetailActions({
         {/* Right: Secondary actions */}
         <div className="flex flex-wrap gap-2">
           {canRespond && (
-            <Button variant="outline" onClick={() => { setRespondVariant('respond'); setShowRespondModal(true); }}>
+            <Button variant="outline" onClick={() => { setRespondVariant('respond'); setRespondInitialMode('reject'); setShowRespondModal(true); }}>
               <XCircle className="mr-2 h-4 w-4 text-destructive" />
               <span className="text-destructive">Reject Transfer</span>
             </Button>
           )}
 
           {canCancel && (
-            <Button variant="outline" onClick={() => { setRespondVariant('admin'); setShowRespondModal(true); }}>
+            <Button variant="outline" onClick={() => { setRespondVariant('admin'); setRespondInitialMode(undefined); setShowRespondModal(true); }}>
               <Truck className="mr-2 h-4 w-4" />
               Edit Transfer
             </Button>
@@ -127,6 +128,7 @@ export function AssetDetailActions({
           pendingTransfer={pendingTransferForModal}
           onSuccess={onActionSuccess}
           variant={respondVariant}
+          initialMode={respondInitialMode}
         />
       )}
     </>

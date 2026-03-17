@@ -81,6 +81,7 @@ export function AssetViewModal({
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showTransferRespondDialog, setShowTransferRespondDialog] = useState(false);
   const [respondVariant, setRespondVariant] = useState<'respond' | 'admin'>('respond');
+  const [respondInitialMode, setRespondInitialMode] = useState<'default' | 'accept' | 'reject' | undefined>(undefined);
   const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [isEditSubmitting, setIsEditSubmitting] = useState(false);
 
@@ -505,16 +506,16 @@ export function AssetViewModal({
                 )}
                 {pendingTransfer && currentUserId === pendingTransfer.receiver_id && (
                   <>
-                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => { setRespondVariant('respond'); setShowTransferRespondDialog(true); }}>
+                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => { setRespondVariant('respond'); setRespondInitialMode('accept'); setShowTransferRespondDialog(true); }}>
                       Accept Transfer
                     </Button>
-                    <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => { setRespondVariant('respond'); setShowTransferRespondDialog(true); }}>
+                    <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => { setRespondVariant('respond'); setRespondInitialMode('reject'); setShowTransferRespondDialog(true); }}>
                       Reject Transfer
                     </Button>
                   </>
                 )}
                 {pendingTransfer && (pendingTransfer.initiated_by === currentUserId || ['ga_lead', 'admin'].includes(currentUserRole)) && (
-                  <Button variant="outline" size="sm" onClick={() => { setRespondVariant('admin'); setShowTransferRespondDialog(true); }}>
+                  <Button variant="outline" size="sm" onClick={() => { setRespondVariant('admin'); setRespondInitialMode(undefined); setShowTransferRespondDialog(true); }}>
                     Edit Transfer
                   </Button>
                 )}
@@ -545,6 +546,7 @@ export function AssetViewModal({
             pendingTransfer={pendingTransferForModal}
             onSuccess={handleActionSuccess}
             variant={respondVariant}
+            initialMode={respondInitialMode}
           />
         </>
       )}
