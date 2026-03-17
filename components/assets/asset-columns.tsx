@@ -12,6 +12,7 @@ export interface PendingTransfer {
   id: string;
   to_location: { name: string } | null;
   receiver_id: string | null;
+  receiver_name: string | null;
 }
 
 interface PhotoItem {
@@ -136,15 +137,25 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
     id: 'location_name',
     accessorFn: (row) => row.location?.name ?? null,
     header: 'Location',
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const locationName = row.original.location?.name;
+      const meta = table.options.meta as AssetTableMeta | undefined;
+      const pendingTransfer = meta?.pendingTransfers?.[row.original.id];
+      const receiverName = pendingTransfer?.receiver_name;
 
-      return locationName ? (
-        <span className="whitespace-normal break-words" title={locationName}>
-          {locationName}
-        </span>
-      ) : (
-        <span className="text-muted-foreground">—</span>
+      return (
+        <div>
+          {locationName ? (
+            <span className="whitespace-normal break-words" title={locationName}>
+              {locationName}
+            </span>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          )}
+          {receiverName && (
+            <p className="text-xs text-muted-foreground">{receiverName}</p>
+          )}
+        </div>
       );
     },
     size: 160,

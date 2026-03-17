@@ -59,19 +59,23 @@ export default async function InventoryPage({ searchParams }: PageProps) {
 
     const { data: pendingMovements } = await supabase
       .from('inventory_movements')
-      .select('id, item_id, to_location_id, to_location:locations!to_location_id(name), receiver_id')
+      .select('id, item_id, to_location_id, to_location:locations!to_location_id(name), receiver_id, receiver:user_profiles!receiver_id(full_name)')
       .in('item_id', assetIds)
       .eq('status', 'pending')
       .is('deleted_at', null);
 
     if (pendingMovements) {
       for (const movement of pendingMovements) {
+        const receiver = Array.isArray(movement.receiver)
+          ? movement.receiver[0] ?? null
+          : movement.receiver;
         pendingTransfersMap[movement.item_id] = {
           id: movement.id,
           to_location: Array.isArray(movement.to_location)
             ? movement.to_location[0] ?? null
             : movement.to_location,
           receiver_id: movement.receiver_id,
+          receiver_name: receiver?.full_name ?? null,
         };
       }
     }
