@@ -366,10 +366,11 @@ Recent decisions affecting current work:
 | 90 | Move Transfer button from modal sticky bar to table row actions | 2026-03-16 | 9290332 | Verified | [83-move-transfer-button-out-from-modal-stic](./quick/83-move-transfer-button-out-from-modal-stic/) |
 | 91 | Fix asset transfer dialog to only show users/locations from asset's company | 2026-03-17 | 7b5f094 | Verified | [260317-bnu-fix-asset-transfer-to-only-show-users-fr](./quick/260317-bnu-fix-asset-transfer-to-only-show-users-fr/) |
 | 92 | Add Respond action for transfer receiver in asset table | 2026-03-17 | 5b181cf | Needs Review | [260317-byt-add-respond-action-for-transfer-receiver](./quick/260317-byt-add-respond-action-for-transfer-receiver/) |
+| 93 | Fix fire-and-forget createNotifications -- add error logging to all 15 call sites | 2026-03-17 | 060c822 | Complete | [260317-ccy-fix-fire-and-forget-createnotifications-](./quick/260317-ccy-fix-fire-and-forget-createnotifications-/) |
 
 ## Session Continuity
 
-Last session: 2026-03-17T01:46:00.000Z
-Stopped at: Completed quick task 92: Add Respond action for transfer receiver
+Last session: 2026-03-17T01:58:00.000Z
+Stopped at: Completed quick task 93: Fix fire-and-forget createNotifications error logging
 Resume file: None
 Next: Ready for next task
