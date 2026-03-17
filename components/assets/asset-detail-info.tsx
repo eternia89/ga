@@ -106,22 +106,26 @@ export function AssetDetailInfo({
             <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Category</dt>
             <dd className="text-sm mt-0.5">{asset.category?.name ?? <span className="text-muted-foreground">—</span>}</dd>
           </div>
-          {asset.brand && (
-            <div>
-              <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Brand</dt>
-              <dd className="text-sm mt-0.5">{asset.brand}</dd>
-            </div>
-          )}
-          {asset.model && (
-            <div>
-              <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Model</dt>
-              <dd className="text-sm mt-0.5">{asset.model}</dd>
-            </div>
-          )}
-          {asset.serial_number && (
-            <div>
-              <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Serial Number</dt>
-              <dd className="text-sm mt-0.5">{asset.serial_number}</dd>
+          {(asset.brand || asset.model || asset.serial_number) && (
+            <div className="grid grid-cols-3 gap-3 max-md:grid-cols-1">
+              {asset.brand && (
+                <div>
+                  <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Brand</dt>
+                  <dd className="text-sm mt-0.5">{asset.brand}</dd>
+                </div>
+              )}
+              {asset.model && (
+                <div>
+                  <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Model</dt>
+                  <dd className="text-sm mt-0.5">{asset.model}</dd>
+                </div>
+              )}
+              {asset.serial_number && (
+                <div>
+                  <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Serial Number</dt>
+                  <dd className="text-sm mt-0.5">{asset.serial_number}</dd>
+                </div>
+              )}
             </div>
           )}
           {asset.description && (

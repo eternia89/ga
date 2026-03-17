@@ -514,11 +514,6 @@ export function AssetViewModal({
                     </Button>
                   </>
                 )}
-                {pendingTransfer && (pendingTransfer.initiated_by === currentUserId || ['ga_lead', 'admin'].includes(currentUserRole)) && (
-                  <Button variant="outline" size="sm" onClick={() => { setRespondVariant('admin'); setRespondInitialMode(undefined); setShowTransferRespondDialog(true); }}>
-                    Edit Transfer
-                  </Button>
-                )}
               </div>
             </div>
           </>
