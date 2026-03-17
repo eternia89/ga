@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { createClient } from '@/lib/supabase/client';
-import { acceptTransfer, rejectTransfer } from '@/app/actions/asset-actions';
+import { acceptTransfer, rejectTransfer, cancelTransfer } from '@/app/actions/asset-actions';
 import type { InventoryItemWithRelations, InventoryMovementWithRelations } from '@/lib/types/database';
 import type { PendingTransfer } from './asset-columns';
 import { PhotoUpload } from '@/components/media/photo-upload';
@@ -32,9 +32,10 @@ interface AssetTransferRespondModalProps {
   asset: InventoryItemWithRelations | null;
   pendingTransfer?: PendingTransfer;
   onSuccess: () => void;
+  variant?: 'respond' | 'admin';
 }
 
-type ModalMode = 'default' | 'accept' | 'reject';
+type ModalMode = 'default' | 'accept' | 'reject' | 'cancel';
 
 interface ThumbnailPhoto {
   id: string;
@@ -52,6 +53,7 @@ export function AssetTransferRespondModal({
   asset,
   pendingTransfer,
   onSuccess,
+  variant = 'respond',
 }: AssetTransferRespondModalProps) {
   const router = useRouter();
 
@@ -246,6 +248,32 @@ export function AssetTransferRespondModal({
     }
   };
 
+  const handleCancelTransfer = async () => {
+    if (!movement) return;
+
+    setIsSubmitting(true);
+    setFeedback(null);
+
+    try {
+      const result = await cancelTransfer({ movement_id: movement.id });
+      if (result?.serverError) {
+        setFeedback({ type: 'error', message: result.serverError });
+        return;
+      }
+
+      onOpenChange(false);
+      onSuccess();
+      router.refresh();
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: err instanceof Error ? err.message : 'Failed to cancel transfer',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const canSubmit = mode === 'accept' ? true : reason.trim().length > 0;
 
   return (
@@ -253,7 +281,7 @@ export function AssetTransferRespondModal({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Respond to Transfer</DialogTitle>
+            <DialogTitle>{variant === 'admin' ? 'Transfer Details' : 'Respond to Transfer'}</DialogTitle>
           </DialogHeader>
 
           {/* Loading state */}
@@ -414,8 +442,8 @@ export function AssetTransferRespondModal({
                 </div>
               )}
 
-              {/* Mode: Default — show Accept/Reject buttons */}
-              {mode === 'default' && (
+              {/* Mode: Default — show variant-appropriate buttons */}
+              {mode === 'default' && variant === 'respond' && (
                 <div className="flex gap-3 pt-2">
                   <Button
                     className="flex-1 bg-green-600 hover:bg-green-700 text-white"
@@ -429,6 +457,17 @@ export function AssetTransferRespondModal({
                     onClick={() => setMode('reject')}
                   >
                     Reject Transfer
+                  </Button>
+                </div>
+              )}
+              {mode === 'default' && variant === 'admin' && (
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => setMode('cancel')}
+                  >
+                    Cancel Transfer
                   </Button>
                 </div>
               )}
@@ -535,6 +574,40 @@ export function AssetTransferRespondModal({
                       disabled={!canSubmit || isSubmitting}
                     >
                       {isSubmitting ? 'Rejecting...' : 'Reject Transfer'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Mode: Cancel — admin confirmation to cancel pending transfer */}
+              {mode === 'cancel' && (
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Are you sure you want to cancel this pending transfer? The asset will remain at its current location.
+                  </p>
+
+                  {feedback && (
+                    <InlineFeedback
+                      type={feedback.type}
+                      message={feedback.message}
+                      onDismiss={() => setFeedback(null)}
+                    />
+                  )}
+
+                  <div className="flex justify-end gap-3 pt-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => { setMode('default'); setFeedback(null); }}
+                      disabled={isSubmitting}
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleCancelTransfer}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Cancelling...' : 'Cancel Transfer'}
                     </Button>
                   </div>
                 </div>
