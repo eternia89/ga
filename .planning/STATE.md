@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: "Completed quick-260317-g4o: Consolidate respond components"
 last_updated: "2026-03-17T04:45:23.137Z"
-last_activity: "2026-03-17 - Completed quick task 104: UI audit fixes"
+last_activity: "2026-03-17 - Completed quick task 108: General user inventory filter"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -380,10 +380,13 @@ Recent decisions affecting current work:
 | 103 | Replace generic success message with action-specific messages in asset table | 2026-03-17 | a65d447 | Verified | [260317-ldp-replace-generic-success-message-with-act](./quick/260317-ldp-replace-generic-success-message-with-act/) |
 | 104 | UI audit fixes: remove auto-redirect, fix blue shade, improve error messages | 2026-03-17 | 6d823e0 | Verified | — |
 | 105 | Fix photo lightbox z-index stacking behind modals | 2026-03-17 | 15c7cc1 | Verified | [260317-lqo-fix-photo-lightbox-z-index-stacking-behi](./quick/260317-lqo-fix-photo-lightbox-z-index-stacking-behi/) |
+| 106 | Add consistent asset info header to Change Status and Transfer dialogs | 2026-03-17 | 5c8a30d | Verified | [260317-lu3-add-consistent-asset-info-header-to-chan](./quick/260317-lu3-add-consistent-asset-info-header-to-chan/) |
+| 107 | Remove Edit Transfer from view modal, brand/model/serial in 1 row | 2026-03-17 | 50f7b61 | Verified | — |
+| 108 | Filter inventory for general users: only assets at their location or in transit to them | 2026-03-17 | 45b4a45 | Verified | [260317-lxl-filter-inventory-page-for-general-users-](./quick/260317-lxl-filter-inventory-page-for-general-users-/) |
 
 ## Session Continuity
 
-Last session: 2026-03-17T08:42:00.000Z
-Stopped at: Completed quick task 105: Lightbox z-index fix
+Last session: 2026-03-17T08:52:00.000Z
+Stopped at: Completed quick task 108: General user inventory filter
 Resume file: None
 Next: Ready for next task
