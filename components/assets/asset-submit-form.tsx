@@ -175,11 +175,8 @@ export function AssetSubmitForm({ categories, locations, onSuccess, extraCompani
           onSuccess();
         } else {
           setSuccess(
-            `Asset created (${result.data.displayId}), but condition photo upload failed. You can add photos from the detail page.`
+            `Asset created (${result.data.displayId}), but condition photo upload failed. You can add photos from the asset detail page.`
           );
-          setTimeout(() => {
-            router.push(`/inventory/${assetId}`);
-          }, 2000);
         }
         return;
       }
@@ -203,11 +200,8 @@ export function AssetSubmitForm({ categories, locations, onSuccess, extraCompani
             onSuccess();
           } else {
             setSuccess(
-              `Asset created (${result.data.displayId}), but invoice upload failed. You can add invoices from the detail page.`
+              `Asset created (${result.data.displayId}), but invoice upload failed. You can add invoices from the asset detail page.`
             );
-            setTimeout(() => {
-              router.push(`/inventory/${assetId}`);
-            }, 2000);
           }
           return;
         }
@@ -223,7 +217,7 @@ export function AssetSubmitForm({ categories, locations, onSuccess, extraCompani
         router.push(`/inventory/${assetId}`);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to create asset. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

@@ -295,7 +295,7 @@ export function AssetViewModal({
       }
       setInvoices(invoiceUrls);
     } catch {
-      setError('Failed to load asset details');
+      setError('Unable to load asset details. Please close and try again.');
     } finally {
       setLoading(false);
     }

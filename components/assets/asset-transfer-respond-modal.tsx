@@ -173,7 +173,7 @@ export function AssetTransferRespondModal({
         setAssetPhotos([]);
       }
     } catch {
-      // Silently fail — user can close and retry
+      setFeedback({ type: 'error', message: 'Failed to load transfer details. Please close and try again.' });
     } finally {
       setLoading(false);
     }

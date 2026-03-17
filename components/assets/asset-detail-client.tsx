@@ -126,7 +126,7 @@ export function AssetDetailClient({
               <p className="text-blue-600">
                 Receiver: {pendingTransfer.receiver?.full_name ?? '—'}
               </p>
-              <p className="text-blue-500 text-xs mt-0.5">
+              <p className="text-blue-600 text-xs mt-0.5">
                 Initiated: {format(new Date(pendingTransfer.created_at), 'dd-MM-yyyy')}
               </p>
             </div>
