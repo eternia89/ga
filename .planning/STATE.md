@@ -386,10 +386,11 @@ Recent decisions affecting current work:
 | 108 | Filter inventory for general users: only assets at their location or in transit to them | 2026-03-17 | 45b4a45 | Superseded | [260317-lxl-filter-inventory-page-for-general-users-](./quick/260317-lxl-filter-inventory-page-for-general-users-/) |
 | 109 | Add holder_id to inventory_items for asset custody tracking | 2026-03-17 | c96f57e | Verified | [260317-mhw-add-holder-id-to-inventory-items-for-ass](./quick/260317-mhw-add-holder-id-to-inventory-items-for-ass/) |
 | 110 | Update seed data to set holder_id on inventory_items | 2026-03-17 | 81d05ef | Verified | [260317-n9i-update-seed-data-to-set-holder-id-on-inv](./quick/260317-n9i-update-seed-data-to-set-holder-id-on-inv/) |
+| 111 | Allow transferring assets to any user in company, not just GA roles | 2026-03-17 | 94ae114 | Verified | [260317-njk-allow-transferring-assets-to-any-user-in](./quick/260317-njk-allow-transferring-assets-to-any-user-in/) |
 
 ## Session Continuity
 
-Last session: 2026-03-17T09:48:00.000Z
-Stopped at: Completed quick task 110: Seed holder_id data
+Last session: 2026-03-17T10:00:00.000Z
+Stopped at: Completed quick task 111: Transfer to any user
 Resume file: None
 Next: Ready for next task
