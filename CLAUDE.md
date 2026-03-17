@@ -2,6 +2,30 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## GA App Domain Context
+
+This is a **General Affairs (GA) operations tool** for a corporate group (5-15 subsidiaries, 100-500 users). It centralizes internal maintenance requests, job execution, asset management, and preventive maintenance scheduling.
+
+### Business Model
+- A centralized GA team serves multiple subsidiary companies
+- GA staff physically travel between locations to service equipment
+- Assets are physical equipment (ACs, generators, filters) at specific locations, **held by specific people**
+- Transfers move physical custody from one person to another — the receiver must accept
+
+### Role Mental Models
+- **General User:** An office worker who submits maintenance requests and receives/holds company assets. They should ONLY see their own requests and assets they physically hold. They don't manage anything.
+- **GA Staff:** A field technician who handles jobs, manages inventory, and transfers assets. Sees all assets in their company.
+- **GA Lead:** Operations manager who triages, assigns, and oversees. Full operational visibility.
+- **Finance Approver:** CEO-level. Only sees approval queue + dashboards.
+- **Admin:** System administrator. Sees everything.
+
+### Common Sense Checks
+Before implementing any feature, verify it makes sense in this domain:
+- **Visibility:** Would this role realistically need to see this data? A general user doesn't need to see all 100 assets in their building — only the ones in their custody.
+- **Actions:** Would this role realistically perform this action? General users don't transfer or change asset status — only GA staff does.
+- **Scale:** A location might have 100+ assets but only 2-3 assigned to any given person. Filters should reflect individual responsibility, not building proximity.
+- **Physical world:** Assets are physical objects with custody chains. "Transfer" means physical handover. "Location" means where the item sits. "Holder" means who's responsible for it.
+
 ## Commands
 
 - `npm run dev` — Start development server (Next.js)
@@ -47,6 +71,35 @@ Before executing any batch of tasks or multi-step instructions, **always perform
 5. Present findings to the user and resolve before starting execution
 
 This prevents silent misimplementation of conflicting requirements.
+
+## Impact Analysis (MANDATORY)
+
+Before implementing any feature, fix, or refactor, **analyze what existing code could break**:
+
+1. **Blast radius scan:** Identify all files that import, call, or depend on the code being changed. Trace downstream consumers.
+2. **Assumption audit:** Search for hardcoded assumptions about the current state. Example: adding a new role means every `role === 'admin'` check, every role enum, every RLS policy with role checks must be found and evaluated.
+3. **Query filter review:** Any Supabase `.eq()` / `.in()` filter that narrows results by a dimension being expanded (e.g., `company_id`, `role`, `status`) is a potential breakpoint. Flag these.
+4. **Present findings before executing:** If the analysis reveals >2 affected areas, present a summary to the user with severity ratings before proceeding.
+
+### Progressive Enhancement Principle
+
+Code must tolerate future additions without breaking:
+- **Never hardcode dimension filters** (`.eq('company_id', profile.company_id)`) when RLS already enforces scoping. Hardcoded filters silently break when the scoping model expands (e.g., multi-company). Prefer letting RLS handle access control; only add action-level filters when RLS is insufficient or when using `adminSupabase` (service role).
+- **Never use equality checks when a set check is needed.** If a user can have access to N companies, use `.in('company_id', accessibleIds)` not `.eq('company_id', primaryId)`. Design for N from the start, even if N=1 today.
+- **Enum/status expansions:** When adding a new status or type value, grep every switch/case, every conditional, every RLS policy, and every UI badge/filter that references the enum. Missing one creates a silent bug.
+- **Supporting tables follow main tables:** If the main entity (jobs) gets multi-company access, every supporting table (job_comments, job_requests, job_status_changes, media_attachments) must be audited for the same expansion.
+
+### Regression Test Rule
+
+When a task touches any of the following, **add or update a test** (Vitest unit or Playwright e2e) covering the changed behavior:
+- **Access control:** company scoping, role checks, ownership guards, RLS policy changes
+- **Query filters:** `.eq()`, `.in()`, `.is()` modifications on Supabase queries
+- **Status transitions:** lifecycle state changes, approval flows
+- **Business rules:** validation logic, linking rules, duplicate checks, threshold gates
+
+Skip tests for UI-only changes (layout, spacing, colors, copy/terminology, column ordering).
+
+When in doubt, ask: *"If someone changes this code next month, will they know they broke something?"* If the answer is no — write a test.
 
 ## UI Conventions
 
