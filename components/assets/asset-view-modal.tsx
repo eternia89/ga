@@ -10,23 +10,13 @@ import { AssetDetailInfo } from './asset-detail-info';
 import { AssetTimeline } from './asset-timeline';
 import { AssetStatusBadge } from './asset-status-badge';
 import { AssetTransferDialog, type GAUserWithLocation } from './asset-transfer-dialog';
-import { AssetTransferRespondDialog } from './asset-transfer-respond-dialog';
-import { cancelTransfer } from '@/app/actions/asset-actions';
+import { AssetTransferRespondModal } from './asset-transfer-respond-modal';
+import type { PendingTransfer } from './asset-columns';
 import {
   Dialog,
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { InlineFeedback } from '@/components/inline-feedback';
@@ -35,7 +25,6 @@ import {
   RefreshCw,
   ChevronLeft,
   ChevronRight,
-  Ban,
 } from 'lucide-react';
 
 // ============================================================================
@@ -91,14 +80,9 @@ export function AssetViewModal({
   // Asset detail client state (transfer dialogs)
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showTransferRespondDialog, setShowTransferRespondDialog] = useState(false);
-  const [transferRespondMode, setTransferRespondMode] = useState<'accept' | 'reject'>('accept');
+  const [respondVariant, setRespondVariant] = useState<'respond' | 'admin'>('respond');
   const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [isEditSubmitting, setIsEditSubmitting] = useState(false);
-
-  // Cancel Transfer state
-  const [showCancelTransferDialog, setShowCancelTransferDialog] = useState(false);
-  const [cancelTransferLoading, setCancelTransferLoading] = useState(false);
-  const [cancelTransferError, setCancelTransferError] = useState<string | null>(null);
 
   // Navigation
   const currentIndex = assetId ? assetIds.indexOf(assetId) : -1;
@@ -344,29 +328,15 @@ export function AssetViewModal({
     onActionSuccess?.();
   }, [router, onActionSuccess]);
 
-  const openTransferRespond = (mode: 'accept' | 'reject') => {
-    setTransferRespondMode(mode);
-    setShowTransferRespondDialog(true);
-  };
-
-  const handleCancelTransfer = async () => {
-    if (!pendingTransfer) return;
-    setCancelTransferLoading(true);
-    setCancelTransferError(null);
-    try {
-      const result = await cancelTransfer({ movement_id: pendingTransfer.id });
-      if (result?.serverError) {
-        setCancelTransferError(result.serverError);
-        return;
+  // Convert pendingTransfer to PendingTransfer shape for the respond modal
+  const pendingTransferForModal: PendingTransfer | undefined = pendingTransfer
+    ? {
+        id: pendingTransfer.id,
+        to_location: pendingTransfer.to_location,
+        receiver_id: pendingTransfer.receiver_id,
+        receiver_name: pendingTransfer.receiver?.full_name ?? null,
       }
-      setShowCancelTransferDialog(false);
-      handleActionSuccess();
-    } catch (err) {
-      setCancelTransferError(err instanceof Error ? err.message : 'Failed to cancel transfer');
-    } finally {
-      setCancelTransferLoading(false);
-    }
-  };
+    : undefined;
 
   return (
     <Dialog open={!!assetId} onOpenChange={onOpenChange}>
@@ -535,17 +505,16 @@ export function AssetViewModal({
                 )}
                 {pendingTransfer && currentUserId === pendingTransfer.receiver_id && (
                   <>
-                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => openTransferRespond('accept')}>
+                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => { setRespondVariant('respond'); setShowTransferRespondDialog(true); }}>
                       Accept Transfer
                     </Button>
-                    <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => openTransferRespond('reject')}>
+                    <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => { setRespondVariant('respond'); setShowTransferRespondDialog(true); }}>
                       Reject Transfer
                     </Button>
                   </>
                 )}
                 {pendingTransfer && (pendingTransfer.initiated_by === currentUserId || ['ga_lead', 'admin'].includes(currentUserRole)) && (
-                  <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setShowCancelTransferDialog(true)}>
-                    <Ban className="mr-2 h-4 w-4" />
+                  <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => { setRespondVariant('admin'); setShowTransferRespondDialog(true); }}>
                     Cancel Transfer
                   </Button>
                 )}
@@ -569,41 +538,14 @@ export function AssetViewModal({
             locationNames={Object.fromEntries(locations.map((l) => [l.id, l.name]))}
             onSuccess={handleActionSuccess}
           />
-          {pendingTransfer && (
-            <AssetTransferRespondDialog
-              open={showTransferRespondDialog}
-              onOpenChange={setShowTransferRespondDialog}
-              movement={pendingTransfer}
-              mode={transferRespondMode}
-              onSuccess={handleActionSuccess}
-            />
-          )}
-          <AlertDialog open={showCancelTransferDialog} onOpenChange={setShowCancelTransferDialog}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Cancel Transfer</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to cancel this pending transfer? The asset will remain at its current location.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              {cancelTransferError && (
-                <InlineFeedback type="error" message={cancelTransferError} onDismiss={() => setCancelTransferError(null)} />
-              )}
-              <AlertDialogFooter>
-                <AlertDialogCancel disabled={cancelTransferLoading}>Keep Transfer</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleCancelTransfer();
-                  }}
-                  disabled={cancelTransferLoading}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  {cancelTransferLoading ? 'Cancelling...' : 'Cancel Transfer'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <AssetTransferRespondModal
+            open={showTransferRespondDialog}
+            onOpenChange={setShowTransferRespondDialog}
+            asset={asset}
+            pendingTransfer={pendingTransferForModal}
+            onSuccess={handleActionSuccess}
+            variant={respondVariant}
+          />
         </>
       )}
     </Dialog>
