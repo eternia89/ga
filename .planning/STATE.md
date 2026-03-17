@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: "Completed quick task 82: Remove warranty_expiry column from asset table"
 last_updated: "2026-03-16T07:28:00.000Z"
-last_activity: "2026-03-17 - Completed quick task 96: Block under_repair transfer"
+last_activity: "2026-03-17 - Completed quick task 97: Same-location transfer prevention"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -370,10 +370,11 @@ Recent decisions affecting current work:
 | 94 | Asset status badge: in-transit overwrites active status instead of showing both | 2026-03-17 | f8e3bfd | Verified | [260317-ffi-asset-status-badge-in-transit-overwrites](./quick/260317-ffi-asset-status-badge-in-transit-overwrites/) |
 | 95 | Add Edit Transfer button for admins with cancel transfer flow | 2026-03-17 | 076f292 | Verified | [260317-fhv-add-edit-transfer-button-for-admins-with](./quick/260317-fhv-add-edit-transfer-button-for-admins-with/) |
 | 96 | Block asset transfer for under_repair status in UI and server action | 2026-03-17 | 1a429c0 | Verified | [260317-fot-block-asset-transfer-for-under-repair-st](./quick/260317-fot-block-asset-transfer-for-under-repair-st/) |
+| 97 | Prevent moving asset to same location as current in transfer dialog and server action | 2026-03-17 | f7ba2df | Verified | [260317-fri-prevent-moving-asset-to-same-location-as](./quick/260317-fri-prevent-moving-asset-to-same-location-as/) |
 
 ## Session Continuity
 
-Last session: 2026-03-17T04:20:00.000Z
-Stopped at: Completed quick task 96: Block under_repair transfer
+Last session: 2026-03-17T04:23:00.000Z
+Stopped at: Completed quick task 97: Same-location transfer prevention
 Resume file: None
 Next: Ready for next task
