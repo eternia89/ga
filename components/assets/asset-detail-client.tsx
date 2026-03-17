@@ -72,19 +72,12 @@ export function AssetDetailClient({
   const router = useRouter();
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
-  const [showTransferRespondDialog, setShowTransferRespondDialog] = useState(false);
-  const [transferRespondMode, setTransferRespondMode] = useState<'accept' | 'reject'>('accept');
   const [isDirty, setIsDirty] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const FORM_ID = 'asset-edit-form';
 
   const handleActionSuccess = () => {
     router.refresh();
-  };
-
-  const openTransferRespond = (mode: 'accept' | 'reject') => {
-    setTransferRespondMode(mode);
-    setShowTransferRespondDialog(true);
   };
 
   const canChangeStatus =
@@ -165,12 +158,8 @@ export function AssetDetailClient({
             currentUserId={currentUserId}
             currentUserRole={currentUserRole}
             onTransfer={() => setShowTransferDialog(true)}
-            onTransferRespond={openTransferRespond}
             showTransferDialog={showTransferDialog}
             onTransferDialogChange={setShowTransferDialog}
-            showTransferRespondDialog={showTransferRespondDialog}
-            onTransferRespondDialogChange={setShowTransferRespondDialog}
-            transferRespondMode={transferRespondMode}
             locations={locations}
             gaUsers={gaUsers}
             onActionSuccess={handleActionSuccess}
