@@ -141,7 +141,10 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
       const locationName = row.original.location?.name;
       const meta = table.options.meta as AssetTableMeta | undefined;
       const pendingTransfer = meta?.pendingTransfers?.[row.original.id];
-      const receiverName = pendingTransfer?.receiver_name;
+      // When in transit, show pending receiver; otherwise show current holder
+      const holderName = pendingTransfer?.receiver_name
+        ?? (row.original.holder as { full_name: string } | null)?.full_name
+        ?? null;
 
       return (
         <div>
@@ -152,8 +155,8 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
           ) : (
             <span className="text-muted-foreground">—</span>
           )}
-          {receiverName && (
-            <p className="text-xs text-muted-foreground">{receiverName}</p>
+          {holderName && (
+            <p className="text-xs text-muted-foreground">{holderName}</p>
           )}
         </div>
       );

@@ -122,7 +122,7 @@ export function AssetViewModal({
       // Fetch asset with relations
       const { data: assetData, error: assetError } = await supabase
         .from('inventory_items')
-        .select('*, category:categories(name), location:locations(name), company:companies(name)')
+        .select('*, category:categories(name), location:locations(name), company:companies(name), holder:user_profiles!holder_id(full_name, division:divisions(name), location:locations(name))')
         .eq('id', id)
         .is('deleted_at', null)
         .single();
@@ -458,6 +458,25 @@ export function AssetViewModal({
                 {asset.category?.name && ` \u00b7 ${asset.category.name}`}
                 {asset.location?.name && ` \u00b7 ${asset.location.name}`}
               </p>
+              {/* Current Holder section */}
+              {!pendingTransfer && (
+                <div className="mt-3 rounded-md border p-3">
+                  <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Current Holder</h4>
+                  {asset.holder ? (
+                    <div className="text-sm">
+                      <p className="font-medium">{asset.holder.full_name}</p>
+                      {asset.holder.division?.name && (
+                        <p className="text-muted-foreground text-xs">{asset.holder.division.name}</p>
+                      )}
+                      {asset.holder.location?.name && (
+                        <p className="text-muted-foreground text-xs">{asset.holder.location.name}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Unassigned</p>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Split layout: Details left, Timeline right */}

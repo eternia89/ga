@@ -132,6 +132,26 @@ export function AssetDetailClient({
             </div>
           </div>
         )}
+
+        {/* Current Holder section */}
+        {!pendingTransfer && (
+          <div className="rounded-md border p-3">
+            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Current Holder</h4>
+            {asset.holder ? (
+              <div className="text-sm">
+                <p className="font-medium">{asset.holder.full_name}</p>
+                {asset.holder.division?.name && (
+                  <p className="text-muted-foreground text-xs">{asset.holder.division.name}</p>
+                )}
+                {asset.holder.location?.name && (
+                  <p className="text-muted-foreground text-xs">{asset.holder.location.name}</p>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Unassigned</p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Two-column grid */}
