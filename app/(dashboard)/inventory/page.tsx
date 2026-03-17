@@ -25,7 +25,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
   // Fetch user profile with role
   const { data: profile } = await supabase
     .from('user_profiles')
-    .select('id, company_id, role, deleted_at')
+    .select('id, company_id, role, deleted_at, location_id')
     .eq('id', user.id)
     .single();
 
@@ -41,14 +41,49 @@ export default async function InventoryPage({ searchParams }: PageProps) {
   const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
   const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
 
-  // Fetch all active assets for accessible companies with relations
-  const { data: assets } = await supabase
+  // General users: only see assets at their location or in transit to them
+  const isGeneralUser = profile.role === 'general_user';
+  let inTransitAssetIds: string[] = [];
+
+  if (isGeneralUser) {
+    // Pre-fetch asset IDs from pending transfers where user is the receiver
+    const { data: pendingForUser } = await supabase
+      .from('inventory_movements')
+      .select('item_id')
+      .eq('receiver_id', profile.id)
+      .eq('status', 'pending')
+      .is('deleted_at', null);
+
+    inTransitAssetIds = (pendingForUser ?? []).map(m => m.item_id);
+  }
+
+  // Fetch assets — scoped for general users, all for operational roles
+  let assetsQuery = supabase
     .from('inventory_items')
     .select('*, category:categories(name), location:locations(name)')
     .in('company_id', allAccessibleCompanyIds)
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
+  if (isGeneralUser) {
+    if (inTransitAssetIds.length > 0 && profile.location_id) {
+      // Assets at user's location OR in transit to them
+      assetsQuery = assetsQuery.or(
+        `location_id.eq.${profile.location_id},id.in.(${inTransitAssetIds.join(',')})`
+      );
+    } else if (inTransitAssetIds.length > 0) {
+      // No location assigned, but has pending transfers
+      assetsQuery = assetsQuery.in('id', inTransitAssetIds);
+    } else if (profile.location_id) {
+      // Only assets at user's location (no pending transfers)
+      assetsQuery = assetsQuery.eq('location_id', profile.location_id);
+    } else {
+      // No location, no transfers — no assets visible
+      assetsQuery = assetsQuery.eq('id', '00000000-0000-4000-a000-000000000000');
+    }
+  }
+
+  const { data: assets } = await assetsQuery;
   const assetList = assets ?? [];
 
   // Build pending transfers map: assetId -> PendingTransfer
