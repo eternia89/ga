@@ -130,6 +130,7 @@ const pick = <T>(arr: readonly T[], i: number): T => arr[i % arr.length];
 
 const JN_REQUESTERS = [U.ria, U.hadi, U.makmur, U.amil, U.maldini];
 const JN_GA_STAFF   = [U.eva, U.dwiky];
+const JN_ALL_USERS  = [U.agus, U.eva, U.dwiky, U.ria, U.hadi, U.makmur, U.amil, U.maldini, U.rudy];
 const JN_DIVS       = [DIV.ga_jn, DIV.fin_jn, DIV.it_jn, DIV.ops_jn, DIV.mkt_jn, DIV.hr_jn];
 const JN_LOCS       = [LOC.kedoya_jn, LOC.gv_jn, LOC.gdg3_jn];
 
@@ -634,6 +635,8 @@ async function seedJaknotInventory(supabase: SupabaseClient): Promise<{ itemIds:
         purchase_price: pick(COSTS, seq - 1) * 3,
         acquisition_date: new Date(Date.now() - seq * 30 * 86_400_000).toISOString().slice(0, 10),
         created_at:     daysAgo((seq % 90) + 10),
+        // Assign holder round-robin across all Jaknot users (null for sold_disposed)
+        holder_id:      status === 'sold_disposed' ? null : JN_ALL_USERS[(seq - 1) % JN_ALL_USERS.length],
       });
     }
   }
@@ -703,6 +706,15 @@ async function seedInventoryMovements(supabase: SupabaseClient, activeItemIds: s
   for (let i = 0; i < rows.length; i += 20) {
     const { error } = await supabase.from('inventory_movements').insert(rows.slice(i, i + 20));
     if (error) throw new Error(`Movements batch ${i}: ${error.message}`);
+  }
+
+  // Update holder_id for assets with accepted movements (receiver becomes holder)
+  const acceptedRows = rows.filter(r => r.status === 'accepted' && r.receiver_id);
+  for (const row of acceptedRows) {
+    await supabase
+      .from('inventory_items')
+      .update({ holder_id: row.receiver_id })
+      .eq('id', row.item_id);
   }
 }
 
