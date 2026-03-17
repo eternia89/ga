@@ -239,6 +239,10 @@ export const createTransfer = authActionClient
       throw new Error('Cannot transfer a sold/disposed asset');
     }
 
+    if (asset.status === 'under_repair') {
+      throw new Error('Cannot transfer an asset that is under repair');
+    }
+
     // Concurrent transfer guard — check for existing pending movement
     const { count: pendingCount } = await supabase
       .from('inventory_movements')
@@ -407,15 +411,19 @@ export const cancelTransfer = authActionClient
       throw new Error('Transfer not found or not in pending status');
     }
 
-    // Verify user is the initiator OR admin
+    // Verify user is the initiator, ga_lead, or admin
     const isInitiator = movement.initiated_by === profile.id;
-    const isAdmin = profile.role === 'admin';
+    const isLeadOrAdmin = ['ga_lead', 'admin'].includes(profile.role);
 
-    if (!isInitiator && !isAdmin) {
-      throw new Error('Only the transfer initiator or an admin can cancel this transfer');
+    if (!isInitiator && !isLeadOrAdmin) {
+      throw new Error('Only the transfer initiator, GA Lead, or an admin can cancel this transfer');
     }
 
-    const { error } = await supabase
+    // Use admin client (service role) for the update — authorization already verified above,
+    // and RLS UPDATE policies may block the user's client even when they have permission
+    const adminSupabase = createAdminClient();
+
+    const { error } = await adminSupabase
       .from('inventory_movements')
       .update({
         status: 'cancelled',

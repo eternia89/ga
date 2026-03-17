@@ -177,6 +177,10 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
         !!meta?.currentUserId &&
         pendingTransfer.receiver_id === meta.currentUserId;
 
+      const canTransfer =
+        canChangeStatus &&
+        asset.status !== 'under_repair';
+
       const canEditTransfer =
         !!pendingTransfer &&
         meta?.currentUserRole &&
@@ -234,7 +238,7 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
               Change Status
             </Button>
           )}
-          {canChangeStatus && (
+          {canTransfer && (
             <Button
               variant="ghost"
               size="sm"
