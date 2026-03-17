@@ -185,7 +185,7 @@ export const triageRequest = authActionClient
       type: 'status_change',
       entityType: 'request',
       entityId: request.id,
-    }).catch(() => {});
+    }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
 
     revalidatePath('/requests');
     return { success: true };
@@ -235,7 +235,7 @@ export const cancelRequest = authActionClient
         type: 'status_change',
         entityType: 'request',
         entityId: cancelledRequest.id,
-      }).catch(() => {});
+      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
     }
 
     revalidatePath('/requests');
@@ -291,7 +291,7 @@ export const rejectRequest = authActionClient
       type: 'status_change',
       entityType: 'request',
       entityId: request.id,
-    }).catch(() => {});
+    }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
 
     revalidatePath('/requests');
     return { success: true };
@@ -355,7 +355,7 @@ export const completeRequest = authActionClient
       type: 'completion',
       entityType: 'request',
       entityId: request.id,
-    }).catch(() => {});
+    }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
 
     revalidatePath('/requests');
     return { success: true };
