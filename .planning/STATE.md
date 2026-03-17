@@ -368,7 +368,7 @@ Recent decisions affecting current work:
 | 92 | Add Respond action for transfer receiver in asset table | 2026-03-17 | 5b181cf | Needs Review | [260317-byt-add-respond-action-for-transfer-receiver](./quick/260317-byt-add-respond-action-for-transfer-receiver/) |
 | 93 | Fix fire-and-forget createNotifications -- add error logging to all 15 call sites | 2026-03-17 | 060c822 | Verified | [260317-ccy-fix-fire-and-forget-createnotifications-](./quick/260317-ccy-fix-fire-and-forget-createnotifications-/) |
 | 94 | Asset status badge: in-transit overwrites active status instead of showing both | 2026-03-17 | f8e3bfd | Verified | [260317-ffi-asset-status-badge-in-transit-overwrites](./quick/260317-ffi-asset-status-badge-in-transit-overwrites/) |
-| 95 | Add Edit Transfer button for admins with cancel transfer flow | 2026-03-17 | 076f292 | Needs Review | [260317-fhv-add-edit-transfer-button-for-admins-with](./quick/260317-fhv-add-edit-transfer-button-for-admins-with/) |
+| 95 | Add Edit Transfer button for admins with cancel transfer flow | 2026-03-17 | 076f292 | Verified | [260317-fhv-add-edit-transfer-button-for-admins-with](./quick/260317-fhv-add-edit-transfer-button-for-admins-with/) |
 
 ## Session Continuity
 
