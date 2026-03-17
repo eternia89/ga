@@ -179,12 +179,28 @@ export function AssetTransferDialog({
       <DialogContent className="max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Transfer Asset</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Current location: <span className="font-medium text-foreground">{currentLocationName || '—'}</span>
-          </p>
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Asset info */}
+          <div className="rounded-md border bg-muted/30 p-4 space-y-2">
+            <div className="flex items-baseline gap-2">
+              <span className="font-mono text-sm font-medium">{asset.display_id}</span>
+              <span className="text-sm">{asset.name}</span>
+            </div>
+            {(asset.brand || asset.model || asset.serial_number) && (
+              <p className="text-xs text-muted-foreground">
+                {[asset.brand, asset.model, asset.serial_number].filter(Boolean).join(' · ')}
+              </p>
+            )}
+            <div className="flex items-center gap-2 pt-1 border-t">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Current Location
+              </p>
+              <p className="text-sm font-medium">{currentLocationName || '—'}</p>
+            </div>
+          </div>
+
           {/* Mode toggle */}
           <div className="flex gap-2">
             <Button

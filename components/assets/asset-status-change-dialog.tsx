@@ -130,14 +130,25 @@ export function AssetStatusChangeDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Current status */}
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-              Current Status
-            </p>
-            <p className="text-sm font-medium">
-              {ASSET_STATUS_LABELS[currentStatus] ?? currentStatus}
-            </p>
+          {/* Asset info */}
+          <div className="rounded-md border bg-muted/30 p-4 space-y-2">
+            <div className="flex items-baseline gap-2">
+              <span className="font-mono text-sm font-medium">{asset.display_id}</span>
+              <span className="text-sm">{asset.name}</span>
+            </div>
+            {(asset.brand || asset.model || asset.serial_number) && (
+              <p className="text-xs text-muted-foreground">
+                {[asset.brand, asset.model, asset.serial_number].filter(Boolean).join(' · ')}
+              </p>
+            )}
+            <div className="flex items-center gap-2 pt-1 border-t">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Current Status
+              </p>
+              <p className="text-sm font-medium">
+                {ASSET_STATUS_LABELS[currentStatus] ?? currentStatus}
+              </p>
+            </div>
           </div>
 
           {/* New status selector */}
