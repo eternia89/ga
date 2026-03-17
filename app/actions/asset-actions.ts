@@ -243,6 +243,10 @@ export const createTransfer = authActionClient
       throw new Error('Cannot transfer an asset that is under repair');
     }
 
+    if (asset.status === 'broken') {
+      throw new Error('Cannot transfer a broken asset');
+    }
+
     // Concurrent transfer guard — check for existing pending movement
     const { count: pendingCount } = await supabase
       .from('inventory_movements')

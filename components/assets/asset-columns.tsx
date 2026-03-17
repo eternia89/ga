@@ -190,7 +190,8 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
 
       const canTransfer =
         canChangeStatus &&
-        asset.status !== 'under_repair';
+        asset.status !== 'under_repair' &&
+        asset.status !== 'broken';
 
       const canEditTransfer =
         !!pendingTransfer &&
