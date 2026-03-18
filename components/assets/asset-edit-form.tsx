@@ -155,7 +155,7 @@ export function AssetEditForm({
 
     try {
       // Step 1: Update asset fields
-      const result = await updateAsset({ asset_id: asset.id, data });
+      const result = await updateAsset({ asset_id: asset.id, data, updated_at: asset.updated_at });
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
         return;

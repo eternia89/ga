@@ -131,6 +131,7 @@ export function JobDetailInfo({
         priority: editPriority as typeof PRIORITY_ORDER[number],
         assigned_to: editAssignedTo || undefined,
         estimated_cost: costValue,
+        updated_at: job.updated_at,
       });
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });

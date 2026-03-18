@@ -111,7 +111,7 @@ export function RequestEditForm({
 
     try {
       // Step 1: Update description and location
-      const result = await updateRequest({ id: request.id, data });
+      const result = await updateRequest({ id: request.id, data, updated_at: request.updated_at });
       if (result?.serverError) {
         setFeedback({ type: 'error', message: result.serverError });
         return;

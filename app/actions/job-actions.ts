@@ -212,7 +212,8 @@ export const updateJob = authActionClient
       throw new Error('This record was modified by another user. Please refresh the page and re-apply your changes.');
     }
 
-    const { id, linked_request_ids, updated_at: _updatedAt, ...updateFields } = parsedInput;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, linked_request_ids, updated_at: _lockToken, ...updateFields } = parsedInput;
 
     // Block PIC changes once job is past 'assigned' status
     const PIC_EDITABLE_STATUSES = ['created', 'assigned'];
