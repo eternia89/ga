@@ -1,13 +1,13 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
 import { ImageIcon } from 'lucide-react';
 import { RequestWithRelations } from '@/lib/types/database';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { RequestStatusBadge } from './request-status-badge';
 import { PriorityBadge } from '@/components/priority-badge';
+import { CreatedAtCell } from '@/components/data-table/created-at-cell';
 
 interface PhotoItem {
   id: string;
@@ -153,7 +153,7 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
       const creatorName = row.original.requester?.name;
       return (
         <div className="flex flex-col gap-0.5">
-          <span>{format(new Date(date), 'dd-MM-yyyy')}</span>
+          <CreatedAtCell date={date} />
           {creatorName && (
             <span className="text-xs text-muted-foreground">by {creatorName}</span>
           )}

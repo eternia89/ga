@@ -1,13 +1,13 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
 import { ImageIcon } from 'lucide-react';
 import { JobWithRelations } from '@/lib/types/database';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { JobStatusBadge } from './job-status-badge';
 import { PriorityBadge } from '@/components/priority-badge';
+import { CreatedAtCell } from '@/components/data-table/created-at-cell';
 import { OverdueBadge } from '@/components/maintenance/overdue-badge';
 import { PM_BADGE_CLASS } from '@/lib/constants/approval-status';
 
@@ -162,7 +162,7 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
       const creatorName = row.original.created_by_user?.full_name;
       return (
         <div className="flex flex-col gap-0.5">
-          <span className="text-sm">{format(new Date(date), 'dd-MM-yyyy')}</span>
+          <CreatedAtCell date={date} />
           {creatorName && (
             <span className="text-xs text-muted-foreground">by {creatorName}</span>
           )}

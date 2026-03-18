@@ -1,10 +1,10 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import type { MaintenanceTemplate } from '@/lib/types/maintenance';
+import { CreatedAtCell } from '@/components/data-table/created-at-cell';
 
 export type TemplateTableMeta = {
   onView?: (template: MaintenanceTemplate) => void;
@@ -71,7 +71,7 @@ export const templateColumns: ColumnDef<MaintenanceTemplate>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue('created_at') as string;
-      return <span>{format(new Date(date), 'dd-MM-yyyy')}</span>;
+      return <CreatedAtCell date={date} />;
     },
     size: 120,
   },

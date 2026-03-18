@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { ScheduleStatusBadge } from './schedule-status-badge';
+import { CreatedAtCell } from '@/components/data-table/created-at-cell';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 
 export type ScheduleTableMeta = {
@@ -59,7 +60,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
         >
           <span className="font-medium">{asset.name}</span>
           {asset.display_id && (
-            <span className="text-xs text-muted-foreground ml-1">({asset.display_id})</span>
+            <span className="text-xs text-muted-foreground ml-1 font-mono">({asset.display_id})</span>
           )}
         </Link>
       );
@@ -150,7 +151,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue('created_at') as string;
-      return <span className="text-sm">{format(new Date(date), 'dd-MM-yyyy')}</span>;
+      return <CreatedAtCell date={date} />;
     },
     size: 120,
   },

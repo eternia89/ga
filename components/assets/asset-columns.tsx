@@ -1,12 +1,12 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
 import { ImageIcon } from 'lucide-react';
 import { InventoryItemWithRelations } from '@/lib/types/database';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { AssetStatusBadge } from './asset-status-badge';
+import { CreatedAtCell } from '@/components/data-table/created-at-cell';
 
 export interface PendingTransfer {
   id: string;
@@ -170,7 +170,7 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue('created_at') as string;
-      return <span className="text-sm">{format(new Date(date), 'dd-MM-yyyy')}</span>;
+      return <CreatedAtCell date={date} />;
     },
     size: 120,
   },
