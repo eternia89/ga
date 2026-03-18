@@ -26,6 +26,15 @@ Before implementing any feature, verify it makes sense in this domain:
 - **Scale:** A location might have 100+ assets but only 2-3 assigned to any given person. Filters should reflect individual responsibility, not building proximity.
 - **Physical world:** Assets are physical objects with custody chains. "Transfer" means physical handover. "Location" means where the item sits. "Holder" means who's responsible for it.
 
+### PRD Reference (MANDATORY)
+Before executing any task, read `docs/ga-prd-human.md` to validate:
+1. Does this task align with how the system is described?
+2. Does it make sense for the role that would use it?
+3. Are there edge cases the PRD covers that the task description missed?
+4. If the task contradicts the PRD, **ask the user before proceeding**.
+5. If the task is ambiguous, cross-reference the PRD to infer intent. If still unclear, **ask**.
+6. After completing a task that changes system behavior, **update the PRD** to reflect the change.
+
 ## Commands
 
 - `npm run dev` — Start development server (Next.js)

@@ -1,0 +1,317 @@
+# GA Operations Tool — How It Works
+### A guide for humans (and machines that need to think like humans)
+
+> This document describes what the system does, why, how it feels, and what can go wrong.
+> For database schemas and technical specs, see `.planning/PROJECT.md` and `CLAUDE.md`.
+> Claude reads this PRD before every task to validate feasibility and common sense.
+
+---
+
+## The Big Idea
+
+This is an internal operations tool for a corporate group's General Affairs (GA) department. Office workers submit maintenance requests ("the AC is broken in room 301"), GA staff receive and execute jobs, and management has full visibility into what's happening across all subsidiaries.
+
+Everything revolves around **physical things in physical places**: equipment that breaks, assets that move between people, maintenance that needs scheduling. The GA team is a shared service — a small team (5-15 people) serving 5-15 subsidiary companies with 100-500 total users.
+
+Three design rules shape everything:
+
+- **Desktop-first.** This is a back-office tool used on office computers. Mobile is supported but not the primary experience. Default styles target desktop; `max-*` breakpoints override for smaller screens.
+- **Soft delete everything.** Nothing is ever permanently removed. Every "delete" sets `deleted_at`. This preserves audit trails and prevents accidental data loss. FK constraints never fire ON DELETE because rows are never actually removed.
+- **Detail pages ARE edit pages.** No separate "view" and "edit" modes. If you have permission, fields are directly editable. No "edit" button that navigates to a form.
+
+And one more: **every entity is company-scoped.** Every request, job, asset, schedule belongs to a company. Users see data from their primary company plus any secondary companies they've been granted access to. RLS enforces this at the database level.
+
+---
+
+## Who Uses This App
+
+There are five roles. Each sees a different version of the same app.
+
+### The General User
+An office worker. They care about two things: **submitting requests when something breaks** and **receiving company assets**.
+
+They open the app, see the request form, describe the problem ("AC unit in meeting room B not cooling"), attach a photo, and submit. Done. They can track their request's progress, and when the GA team marks the work complete, they get 7 days to accept or reject the result. If they don't respond, it auto-accepts.
+
+On the inventory side, general users only see **assets assigned to them** (where they are the `holder_id`) and **assets being transferred to them** (pending transfers where they are the receiver). They don't see the full inventory — that's for GA staff. When a transfer arrives, they see a "Respond" button on their inventory page, review the asset details and sender's condition photos, then accept or reject.
+
+**What general users can NOT do:**
+- See assets they don't hold
+- Transfer assets (only GA staff initiates transfers)
+- Change asset status
+- Create jobs
+- Triage requests
+- Access admin settings
+
+### The GA Staff
+A field technician who goes to locations and fixes things. They care about **their assigned jobs and the assets they manage**.
+
+They see all requests assigned to them, all jobs they're PIC (Person In Charge) for, and the full inventory of assets in their company. They can:
+- Self-assign submitted requests and start working
+- Create standalone jobs
+- Update job status with GPS capture (proving they were at the location)
+- Transfer assets between any users in the company
+- Change asset status (active, under repair, broken, sold/disposed)
+- Take condition photos when transferring or changing status
+
+**Key rule:** A job cannot be completed without an assigned PIC. Someone must be accountable.
+
+### The GA Lead
+Operations manager. Same capabilities as GA Staff, plus:
+- Triage requests (assign category, priority, PIC)
+- Delegate jobs to GA Staff
+- Cancel transfers
+- Full operational visibility across the company
+
+They're the traffic controller — requests come in, they assign them to the right person, and monitor progress.
+
+### The Finance Approver (CEO)
+They only care about money. When a job's estimated cost exceeds the company's budget threshold, it lands in their approval queue. They approve or reject with a reason. They see:
+- The approval queue (pending budget + completion approvals)
+- The dashboard with KPI metrics
+- Nothing else
+
+### The Admin
+System administrator. Configures everything:
+- Companies, divisions, locations, categories
+- User accounts (admin-only creation, no self-registration)
+- Multi-company access grants
+- Company settings (budget thresholds)
+
+Admins see everything. They manage the system, not the operations.
+
+---
+
+## The Request Flow: From Problem to Resolution
+
+This is the core workflow. Everything else supports it.
+
+### 1. Submit
+A general user describes the problem. Required: description, location, at least one photo. The system auto-generates a human-readable ID (e.g., `RQ-JN26-001` for the first Jaknot request of 2026).
+
+**No title field.** Users don't write titles — that's a GA Lead decision during triage. The description IS the request.
+
+### 2. Triage
+GA Lead reviews new requests. They assign:
+- **Category** (e.g., "Electrical", "Plumbing", "AC/HVAC")
+- **Priority** (low, medium, high, urgent)
+- **PIC** (which GA Staff handles it)
+
+Status moves from `submitted` → `triaged`. GA Staff who self-assign skip this step.
+
+### 3. Job Creation
+A job is created from the request (or standalone for proactive work). Jobs track:
+- Estimated cost (triggers approval if above threshold)
+- Assigned PIC
+- Status progression with GPS on every transition
+- Photo documentation
+- Comment threads
+
+**One request can link to one job.** One-to-one, not many-to-many.
+
+### 4. Budget Approval
+If estimated cost ≥ company's budget threshold, the job goes to `pending_approval`. The Finance Approver reviews and approves/rejects. Rejected jobs return to `assigned` status — the PIC is preserved.
+
+### 5. Execution
+GA Staff works the job. They update status: `assigned` → `in_progress` → `completed`. Each transition captures GPS coordinates (proving they were on-site). They add comments and photos along the way.
+
+### 6. Completion & Acceptance
+When the job is marked complete, linked requests move to `pending_acceptance`. The original requester gets 7 days to accept or reject the work:
+- **Accept:** Request moves to `accepted` → optional feedback → `closed`
+- **Reject:** Requester provides reason + evidence photos. Job returns to the PIC.
+- **No response after 7 days:** Auto-accepted by system cron
+
+### 7. What Can Go Wrong
+- **Requester submits duplicate:** No automated dedup in v1. GA Lead handles manually during triage.
+- **PIC can't reach the location:** They add a comment explaining. GA Lead reassigns.
+- **Budget rejected:** Job stays alive at `assigned`. PIC can adjust estimate and resubmit.
+- **Request cancelled by requester:** Linked job is NOT auto-cancelled (work may have started). GA Lead decides.
+
+---
+
+## The Asset Lifecycle: Physical Custody Chains
+
+Assets are physical equipment — ACs, generators, filters, tools. They sit at locations and are held by specific people.
+
+### Asset States
+| Status | Meaning | Can Transfer? | Can Edit? |
+|--------|---------|---------------|-----------|
+| `active` | Working normally | Yes | Yes |
+| `under_repair` | Being fixed | **No** | Yes |
+| `broken` | Non-functional | **No** | Yes |
+| `sold_disposed` | Gone forever (terminal) | No | No |
+
+### The Holder Model
+Every asset has an optional `holder_id` — the person physically responsible for it. Key rules:
+- **Starts null.** New assets have no holder until someone accepts a transfer.
+- **Set on transfer acceptance.** When a user accepts a transfer, `holder_id` = their user ID.
+- **Cleared on location-only moves.** Moving an asset to a location (without a designated receiver) clears the holder — no specific person is receiving it.
+- **General users see only their assets.** The inventory page filters by `holder_id = current user` OR `pending transfer receiver = current user`.
+
+### Transfers: Moving Physical Custody
+
+Two modes:
+1. **Transfer to User** — Designate a specific receiver. Creates a `pending` movement. Receiver must accept with condition photos. Once accepted: asset location updates, holder updates, custody transferred.
+2. **Move to Location** — No receiver. Auto-accepts immediately. Asset location updates, holder cleared. Used for warehouse storage moves.
+
+**Transfer rules:**
+- Can't transfer `under_repair` or `broken` assets (fix them first)
+- Can't transfer `sold_disposed` assets (they're gone)
+- Can't move to the same location (pointless)
+- Can't transfer to a deactivated user
+- Can't transfer cross-company
+- One pending transfer per asset at a time (DB constraint)
+- Sender must take condition photos (required)
+
+**When an asset is in transit:**
+- Status badge shows "In Transit" (replaces the normal status)
+- "Change Status" and "Transfer" buttons are hidden
+- Table shows receiver name under the location
+- The receiver sees a "Respond" action button to accept/reject
+- Admins see "Edit Transfer" to view details or cancel
+
+**Transfer response (receiver):**
+- Accept: optional condition photos, asset moves to receiver's location, holder updated
+- Reject: required reason + optional evidence photos, asset stays at sender's location
+
+### Status Changes
+- Status changes require condition photos (documenting why)
+- **Cannot change status while a transfer is pending** (cancel the transfer first)
+- `sold_disposed` is terminal — irreversible, auto-pauses all linked maintenance schedules
+- `broken` status auto-pauses linked maintenance schedules and cancels pending PM jobs
+- Returning to `active` from `broken`/`under_repair` resumes auto-paused schedules (but not manually paused ones)
+
+---
+
+## Preventive Maintenance: Keeping Things Running
+
+### Templates
+Reusable checklists for maintenance tasks. **Global** — shared across all companies. Examples:
+- "Monthly APAR Inspection" — check seal, pressure gauge, physical condition
+- "Quarterly AC Filter Replacement" — inspect, clean, replace filter
+
+Templates have a linear checklist (checkbox, text, number fields). GA Staff fills them out during the PM job.
+
+### Schedules
+Link a template to an asset (or run without an asset for general maintenance). Configure:
+- Interval type: `fixed` (cron-based, calendar dates) or `floating` (interval from last completion)
+- Interval days (e.g., 30 for monthly)
+- Auto-create days before due (0-30 — how early to generate the job)
+
+**Schedule lifecycle:**
+- `active` → generates PM jobs automatically
+- `paused` → stops generating (manual or auto-paused by broken/sold asset)
+- `deactivated` → soft-deleted
+
+### PM Job Generation
+A cron function runs periodically. For each active schedule where `next_due_at` is within `auto_create_days_before`:
+- Create a job with `job_type = 'preventive_maintenance'`
+- Copy the checklist from the template
+- Link to the asset (if any)
+- Advance `next_due_at` for fixed schedules (floating waits for completion)
+
+---
+
+## Multi-Company: One Team, Many Subsidiaries
+
+The GA team serves multiple companies. Key mechanics:
+
+### User Company Access
+- Every user has a **primary company** (`company_id` on user_profiles)
+- Admins can grant **secondary company access** via `user_company_access` table
+- RLS policies check both primary and secondary access
+- Multi-company users see a company selector in create modals
+
+### Data Isolation
+- Every entity has `company_id` (NOT NULL)
+- RLS enforces: you can only see/edit data in companies you have access to
+- Categories are **global** (shared across companies)
+- Templates are **global** (shared across companies)
+- Locations, divisions, users are **company-scoped**
+- Transfers cannot cross company boundaries
+
+### UI Behavior
+- Single-company users: company field shown but disabled (read-only)
+- Multi-company users: company field is an interactive dropdown
+- All create modals show the company field for transparency
+
+---
+
+## The Dashboard: Operational Visibility
+
+### KPI Cards (clickable → filtered page)
+- Open Requests (untriaged)
+- Overdue Requests (open > 7 days)
+- Active Jobs
+- Overdue Jobs (in_progress > 7 days)
+- Assets in Transit
+
+### Charts
+- Request status distribution (bar chart, clickable bars)
+- Job status distribution
+
+### Date Range Filter
+- URL-synced via `from` and `to` query params
+- Default: current month
+- Trend comparison: current period vs same-duration previous period
+
+---
+
+## Notifications: Who Needs to Know
+
+Fire-and-forget with error logging (not blocking). Channels:
+- **In-app** bell icon + notification inbox
+- **No email in v1** (future consideration)
+
+| Event | Recipients |
+|-------|-----------|
+| Request triaged | Requester |
+| Job assigned | PIC |
+| Job status change | Requester + PIC |
+| Budget approval needed | Finance Approvers |
+| Budget approved/rejected | Job creator + PIC |
+| Completion approval needed | Finance Approvers |
+| Work completed | Requester |
+| Auto-accept warning | Requester (day 5 of 7) |
+
+Actor (person who triggered the action) is always excluded from notifications.
+
+---
+
+## Excel Exports
+
+Every list page has an Export button. Downloads all data regardless of current filters.
+
+Format: `.xlsx` via ExcelJS (server-side, Node.js runtime only). Columns match the table view plus additional detail fields.
+
+---
+
+## What This System Does NOT Do
+
+- **Payroll calculation** — We track costs, not salaries
+- **Real-time chat** — Comment threads on jobs only
+- **Asset depreciation** — No financial tracking beyond purchase price
+- **Automated scheduling optimization** — Schedules are manual
+- **Self-registration** — Admins create all accounts
+- **Email notifications** — In-app only for v1
+- **Hard deletes** — Everything is soft-deleted
+- **Mobile-first design** — Desktop-first, mobile-responsive
+
+---
+
+## Technical Invariants (Non-Negotiable Rules)
+
+These rules must be preserved across all changes:
+
+1. **Dates:** Always `dd-MM-yyyy` format. Never `MMM d, yyyy`.
+2. **Currency:** IDR with Rp prefix, dot thousands separator.
+3. **Soft delete:** `deleted_at` on all tables. Never `DELETE FROM`.
+4. **Desktop-first:** Default styles = desktop. Use `max-*` breakpoints.
+5. **Display IDs:** Always rendered with `font-mono` class.
+6. **Feedback:** Never auto-dismiss success/error messages. User dismisses manually.
+7. **Forms:** Always react-hook-form + Zod. Never raw useState for form state.
+8. **Actions:** Always next-safe-action with typed client chains.
+9. **Dropdowns:** Use Combobox for large lists, Select for short fixed lists.
+10. **Terminology:** "Deactivate"/"Reactivate" for soft-delete. Never "Delete"/"Restore".
+11. **Auth:** `getUser()` for server-side JWT validation. Never `getSession()`.
+12. **RLS:** Let RLS handle access control where possible. Only use `adminSupabase` when RLS is insufficient and you verify authorization in code first.
+13. **Optimistic locking:** Update actions compare `updated_at` to prevent concurrent edit overwrites.
