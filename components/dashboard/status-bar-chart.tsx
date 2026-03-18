@@ -9,6 +9,7 @@ import {
   Cell,
   ResponsiveContainer,
 } from 'recharts';
+import type { BarRectangleItem } from 'recharts/types/cartesian/Bar';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -28,10 +29,10 @@ interface StatusBarChartProps {
 export function StatusBarChart({ data, entityPath, title }: StatusBarChartProps) {
   const router = useRouter();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleBarClick = (barData: any) => {
-    if (barData && typeof barData.status === 'string') {
-      router.push(`/${entityPath}?status=${barData.status}`);
+  const handleBarClick = (barData: BarRectangleItem) => {
+    const payload = barData?.payload as StatusBarChartItem | undefined;
+    if (payload && typeof payload.status === 'string') {
+      router.push(`/${entityPath}?status=${payload.status}`);
     }
   };
 

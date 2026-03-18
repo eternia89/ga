@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'lucide-react';
 import { createJobSchema, updateJobSchema } from '@/lib/validations/job-schema';
@@ -33,6 +33,20 @@ import { RequestPreviewDialog } from './request-preview-dialog';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
 import { formatNumber } from '@/lib/utils';
 
+
+/** Combined form values type covering both create and edit mode fields */
+interface JobFormValues {
+  id?: string;
+  title: string;
+  description: string;
+  location_id: string;
+  category_id: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  assigned_to?: string;
+  estimated_cost?: number;
+  linked_request_ids: string[];
+  company_id?: string;
+}
 
 const PRIORITY_ORDER = ['low', 'medium', 'high', 'urgent'] as const;
 type Priority = typeof PRIORITY_ORDER[number];
@@ -200,9 +214,8 @@ export function JobForm({
     ? initialData.linked_request_ids
     : (prefillRequest ? [prefillRequest.id] : []);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const form = useForm<any>({
-    resolver: zodResolver(mode === 'edit' ? updateJobSchema : createJobSchema),
+  const form = useForm<JobFormValues>({
+    resolver: zodResolver(mode === 'edit' ? updateJobSchema : createJobSchema) as Resolver<JobFormValues>,
     defaultValues: {
       ...(mode === 'edit' && jobId ? { id: jobId } : {}),
       title: defaultTitle,
@@ -248,8 +261,7 @@ export function JobForm({
     setLinkedRequests((prev) => prev.filter((r) => r.id !== requestId));
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: JobFormValues) => {
     setIsSubmitting(true);
     setError(null);
 
