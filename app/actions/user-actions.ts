@@ -134,8 +134,11 @@ export const createUser = adminActionClient
 // Update user
 export const updateUser = adminActionClient
   .schema(z.object({ id: z.string().uuid() }).merge(updateUserSchema))
-  .action(async ({ parsedInput }): Promise<ActionOk> => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const adminSupabase = createAdminClient();
+
+    // Verify admin has access to the target company
+    await assertCompanyAccess(adminSupabase, ctx.profile.id, parsedInput.company_id, ctx.profile.company_id);
 
     // 1. Update user_profiles row
     const { error: profileError } = await adminSupabase

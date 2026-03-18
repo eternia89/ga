@@ -223,12 +223,11 @@ export const createTransfer = authActionClient
       throw new Error('Insufficient permissions to transfer assets');
     }
 
-    // Fetch asset — must exist, not sold_disposed
+    // Fetch asset — must exist, not sold_disposed (RLS handles company scoping)
     const { data: asset } = await supabase
       .from('inventory_items')
       .select('id, status, location_id, company_id')
       .eq('id', parsedInput.asset_id)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null)
       .single();
 
@@ -290,7 +289,7 @@ export const createTransfer = authActionClient
     const { data, error } = await supabase
       .from('inventory_movements')
       .insert({
-        company_id: profile.company_id,
+        company_id: asset.company_id,
         item_id: parsedInput.asset_id,
         from_location_id: asset.location_id,
         to_location_id: parsedInput.to_location_id,
@@ -618,11 +617,16 @@ export const deleteAssetPhotos = authActionClient
       .from('media_attachments')
       .select('id, file_path, entity_id, company_id')
       .in('id', parsedInput.photo_ids)
-      .eq('company_id', profile.company_id)
       .is('deleted_at', null);
 
     if (fetchError || !attachments || attachments.length === 0) {
       throw new Error('No matching attachments found');
+    }
+
+    // Verify admin has access to the attachment's company
+    const attachmentCompanyIds = [...new Set(attachments.map(a => a.company_id))];
+    for (const companyId of attachmentCompanyIds) {
+      await assertCompanyAccess(adminSupabase, profile.id, companyId, profile.company_id);
     }
 
     // Soft-delete the media_attachments records
