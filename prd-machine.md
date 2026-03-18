@@ -123,16 +123,33 @@ supabase/
 
 ### 17-Mar-2026
 
-**Focus: Multi-company security hardening + shared helpers + UI cleanup**
+**Focus: Asset transfer workflow hardening + custody tracking + multi-company security**
 
 | Task | Key Changes |
 |------|------------|
-| quick-79 (security bugs) | Fixed RFC-4122 UUIDs in seeds. `.single()` → `.maybeSingle()` where 0 rows valid. Duplicate email check on reactivate. Company access check on user create. |
-| quick-80 (shared helpers) | Created `assertCompanyAccess()` in `lib/auth/company-access.ts` — replaces 8 inline patterns across 5 action files. Created `isoDateString()` Zod helper in `lib/validations/helpers.ts`. |
-| quick-81 (multi-company) | RLS migration `00027` for INSERT/UPDATE multi-company policies. Removed 17 redundant action-level `.eq('company_id')` filters. Scoped 4 export routes to accessible companies. Updated page dropdowns to use `.in('company_id', allAccessibleCompanyIds)`. |
-| quick-82 (asset table) | Removed `warranty_expiry` column from asset columns definition. |
-| quick-83 (transfer UX) | Moved Transfer button from modal sticky bar to table row action with `ArrowLeftRight` icon. |
-| Multi-company isolation | RLS migration `00026` for supporting tables. Updated all detail pages and approvals page to use multi-company queries. |
-| UI fixes | Primary company as disabled checkbox in user form. Removed Type/Interval from schedule table. Removed redundant transfer action company filters. |
+| quick-79 (security bugs) | Fixed RFC-4122 UUIDs. `.single()` → `.maybeSingle()`. Duplicate email check on reactivate. Company access on user create. |
+| quick-80 (shared helpers) | `assertCompanyAccess()` in `lib/auth/company-access.ts` (8 call sites). `isoDateString()` in `lib/validations/helpers.ts`. |
+| quick-81 (multi-company) | RLS migration `00027` for INSERT/UPDATE. Removed 17 redundant `.eq('company_id')` filters. Scoped 4 exports. |
+| quick-91 (transfer scoping) | Scoped transfer dialog users/locations to asset's company via `asset.company_id`. |
+| quick-92 (respond flow) | Created `AssetTransferRespondModal` — accept/reject with reason text + photo evidence. |
+| quick-93 (notification logging) | Added `.catch(err => console.error(...))` to all 15 `createNotifications` calls across 3 action files. |
+| quick-94–99 (transfer validation) | In-transit badge overwrite. Edit Transfer for GA lead/admin. Block under_repair + broken transfers. Prevent same-location moves. Show receiver name under location in table. |
+| quick-100 (consolidation) | Replaced old `AssetTransferRespondDialog` with unified `AssetTransferRespondModal`. Deleted 232-line file. |
+| quick-101–105 (UX polish) | Receiver active validation. `initialMode` prop. Action-specific success messages. Lightbox z-index fix. |
+| quick-106–108 (UI audit) | Remove auto-redirect. Fix blue shade. Improve error messages. Add fetch error handling. |
+| quick-109 (holder_id) | Migration `00028`: `holder_id` FK column on `inventory_items`. Backend logic sets `holder_id` on accept. Display in table, view modal, detail page. |
+| quick-110 (seed data) | Round-robin `holder_id` assignment across all Jaknot users in `seed-ops.ts`. |
+| quick-111 (transfer scope) | Allow transfer to any active user in company (removed GA-role-only restriction). |
 
-**30 commits, ~50 files, focused on multi-company correctness and code consolidation.**
+**58 commits, ~80 files. Transfer workflow fully hardened with custody tracking.**
+
+### Asset Transfer Lifecycle (Current)
+
+```
+createTransfer → inventory_movements (status: pending/accepted)
+  ├─ Location-only: auto-accepted, asset location updated
+  └─ With receiver: pending → receiver accepts/rejects
+       ├─ Accept: movement accepted, asset location + holder_id updated
+       └─ Reject: movement rejected with reason + optional photos
+  └─ Cancel: initiator or GA lead/admin can cancel pending transfers
+```

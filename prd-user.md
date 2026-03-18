@@ -60,13 +60,24 @@ Next.js 16 (App Router), TypeScript (strict), React 19, shadcn/ui + Tailwind CSS
 
 ### 17-Mar-2026
 
-**Focus: Multi-company security hardening, shared code extraction, and UI cleanup**
+**Focus: Asset transfer workflow hardening, custody tracking, and multi-company security**
 
-- **Multi-company comprehensive fix (quick-81):** Expanded RLS policies for INSERT/UPDATE to support multi-company access. Removed 17 redundant action-level company_id filters. Scoped all export routes to user's accessible companies. Updated page dropdowns to fetch from all accessible companies.
-- **Security/correctness bug fixes (quick-79):** Fixed non-RFC-4122 UUIDs in seed scripts. Replaced `.single()` with `.maybeSingle()` where 0 rows is valid. Added duplicate email check on user reactivation. Added company access validation on user creation.
-- **Shared helpers extraction (quick-80):** Created `assertCompanyAccess` helper to replace 8 inline company access patterns. Created `isoDateString` Zod helper for date validation. Adopted across 5 action files.
-- **Multi-company data isolation (standalone):** Added RLS policies for supporting tables (comments, status changes, media). Updated all detail pages and supporting queries for multi-company scope.
-- **UI cleanups:** Removed warranty_expiry column from asset table (quick-82). Moved Transfer button from modal sticky bar to table row actions (quick-83). Removed Type/Interval columns from maintenance schedules table. Fixed primary company display in user form.
-- **GSD framework update:** Updated tooling with new UI research/audit agents, autonomous workflow, stats command.
+**Morning — Multi-company & security (quick-79–83):**
+- Expanded RLS write policies (migration 00027). Removed 17 redundant company filters. Scoped exports.
+- Fixed RFC-4122 UUIDs, `.single()` → `.maybeSingle()`, duplicate email on reactivate.
+- Extracted `assertCompanyAccess` + `isoDateString` shared helpers (quick-80).
+- UI cleanups: removed warranty_expiry column, moved Transfer to table row actions.
 
-**Total: ~30 commits, ~50 files changed**
+**Afternoon — Asset transfer hardening (quick-91–111, 20 tasks):**
+- **Transfer scoping (quick-91):** Scoped transfer dialog users/locations to asset's company.
+- **Receiver respond flow (quick-92):** Created `AssetTransferRespondModal` with accept/reject/reason/photos.
+- **Notification logging (quick-93):** Added `.catch()` error logging to all 15 `createNotifications` calls.
+- **Transfer validation (quick-94–99):** In-transit badge overwrite, Edit Transfer for admins, block under_repair/broken transfers, prevent same-location moves, receiver name in table.
+- **Component consolidation (quick-100):** Merged old respond dialog into single `AssetTransferRespondModal`.
+- **UX polish (quick-101–105):** Receiver active validation, initialMode prop, action-specific success messages, lightbox z-index fix.
+- **UI audit fixes (quick-106–108):** Removed auto-redirect, fixed blue shade, improved error messages.
+- **Custody tracking (quick-109):** Added `holder_id` column to `inventory_items` — tracks who physically holds each asset. Display in table, modal, detail page.
+- **Seed data (quick-110):** Set holder_id in seed data (round-robin across Jaknot users).
+- **Transfer to any user (quick-111):** Allow transferring to any user in company, not just GA roles.
+
+**Total: ~58 commits, ~80 files changed**

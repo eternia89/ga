@@ -270,3 +270,143 @@ No new commits since the last review (14-Mar-2026 was the last commit day). This
 - **Multi-company RLS complete** — SELECT, INSERT, UPDATE policies all handle multi-company access
 - **17 redundant company filters removed** — cleaner action code, RLS handles scoping
 - **Export routes properly scoped** — all 4 exports use `allAccessibleCompanyIds`
+
+---
+
+## 18-Mar-2026
+
+### Commits Summary (17-Mar-2026, reviewed 18-Mar)
+
+| Task | Commits | What Changed |
+|------|---------|-------------|
+| quick-91 | 3 commits | Scoped transfer dialog users/locations to asset's company |
+| quick-92 | 4 commits | Created `AssetTransferRespondModal` with accept/reject flow |
+| quick-93 | 3 commits | Added `.catch()` error logging to all 15 `createNotifications` calls |
+| quick-94 | 2 commits | In-transit status badge overwrites active badge instead of showing both |
+| quick-95 | 4 commits | Edit Transfer button for GA lead/admin in asset table |
+| quick-96 | 2 commits | Block asset transfer for `under_repair` status |
+| quick-97 | 2 commits | Prevent moving asset to same location |
+| quick-98 | 2 commits | Show receiver name under location in asset table for in-transit assets |
+| quick-99 | 2 commits | Block asset transfer for `broken` status |
+| quick-100 | 4 commits | Consolidated respond components — deleted old 232-line dialog |
+| quick-101 | 2 commits | Validate receiver is active in `createTransfer` and `acceptTransfer` |
+| quick-102 | 2 commits | `initialMode` prop to skip redundant mode selection |
+| quick-103 | 2 commits | Action-specific success messages in asset table |
+| quick-105 | 2 commits | PhotoLightbox z-index bump to z-[60] above Dialog overlays |
+| quick-106–108 | 2 commits | UI audit fixes: remove auto-redirect, fix blue shade, improve error messages |
+| quick-109 | 4 commits | `holder_id` column on `inventory_items` + display in table/modal/detail |
+| quick-110 | 2 commits | Seed holder_id round-robin across Jaknot users |
+| quick-111 | 2 commits | Allow transfer to any user in company (removed GA-role restriction) |
+| GSD update | 1 commit | New workflows (do, note, help), context monitor hook |
+
+**Total: ~58 commits, ~80 files changed**
+
+---
+
+### Resolved from Previous Reviews
+
+| # | Original Date | Original Issue | Resolution |
+|---|---------------|---------------|------------|
+| 1 | 17-Mar #1 (HIGH) | `createNotifications()` fire-and-forget in approval-actions (5 calls) | **FIXED** in quick-93 — all 5 calls now have `.catch(err => console.error(...))` |
+| 2 | 17-Mar #2 (HIGH) | `createNotifications()` fire-and-forget in job-actions (6 calls) | **FIXED** in quick-93 — all 6 calls now have `.catch()` |
+| 3 | 17-Mar #3 (MEDIUM) | `request-actions` notification `.catch(() => {})` swallows silently | **FIXED** in quick-93 — changed to `.catch(err => console.error(...))` with logging |
+
+---
+
+### Risky Patterns & Security (New Findings)
+
+| # | Severity | File | Issue | Recommendation |
+|---|----------|------|-------|----------------|
+| 1 | **CRITICAL** | `app/actions/asset-actions.ts` (`createTransfer`) | Receiver `receiver_id` validated for existence and active status, but **no company_id check**. Could allow cross-company transfer if RLS on user_profiles doesn't restrict visibility. | Add `.eq('company_id', asset.company_id)` to receiver lookup query, or validate `receiver.company_id` matches asset company |
+| 2 | **CRITICAL** | `app/actions/asset-actions.ts` (`acceptTransfer`) | Two sequential updates (movement + asset) without transactional guarantee. If step 1 succeeds but step 2 fails, movement shows "accepted" but asset location is stale. | Add rollback logic: if asset update fails, revert movement to `pending`. Or use a Postgres function for atomic update |
+| 3 | **HIGH** | `app/actions/asset-actions.ts` (`createTransfer`, location-only branch) | Location-only transfer auto-accepts and updates `location_id` but does **NOT clear `holder_id`**. Stale holder remains on asset after location move. | Add `holder_id: null` to the location-only update query |
+| 4 | **MEDIUM** | `app/actions/asset-actions.ts` (`cancelTransfer`) | Uses `adminSupabase` to update movement but query has no `company_id` filter — only filters by `id`. Defense-in-depth gap. | Add `.eq('company_id', movement.company_id)` to adminSupabase update |
+| 5 | **MEDIUM** | `components/assets/asset-transfer-respond-modal.tsx` (lines 204-237) | Photo upload via `fetch('/api/uploads/...')` after successful accept/reject — **no error handling** on the fetch response. If upload fails, user sees success but photos aren't stored. | Check `response.ok` and show warning if photo upload fails |
+
+---
+
+### Missing Tests (New + Persistent)
+
+| # | Priority | Status | Area | Gap |
+|---|----------|--------|------|-----|
+| 1 | **CRITICAL** | PERSISTENT (17-Mar) | RLS | Multi-company RLS write policies (migration 00027) completely untested |
+| 2 | **HIGH** | PERSISTENT (17-Mar) | Unit | `assertCompanyAccess` helper has no unit tests — used in 8 critical mutation paths |
+| 3 | **HIGH** | NEW | E2E | Transfer accept/reject flow — zero tests for receiver-based transfer lifecycle |
+| 4 | **HIGH** | NEW | E2E | `holder_id` consistency — no tests verifying holder set on accept, cleared on location move |
+| 5 | **HIGH** | NEW | E2E | Cross-company receiver validation — no tests for company boundary enforcement |
+| 6 | **MEDIUM** | PERSISTENT (16-Mar) | E2E | Status transition validation — no invalid transition rejection tests |
+| 7 | **MEDIUM** | PERSISTENT (16-Mar) | E2E | Soft delete cycle — only locations tested; companies, divisions, categories, templates, schedules, users missing |
+| 8 | **MEDIUM** | PERSISTENT (16-Mar) | E2E | Duplicate name rejection — no tests for case-insensitivity or reactivation conflicts |
+| 9 | **MEDIUM** | PERSISTENT (16-Mar) | E2E | Role-based denial — no tests for unauthorized role actions |
+
+---
+
+### UI/UX Inconsistencies (New + Persistent)
+
+| # | Status | File | Issue | Fix |
+|---|--------|------|-------|-----|
+| 1 | **PERSISTENT** (15-Mar) | `components/requests/request-columns.tsx:156` | Missing `text-sm` on Created date span | Add `className="text-sm"` |
+| 2 | **PERSISTENT** (15-Mar) | `components/maintenance/template-columns.tsx:74` | Missing `text-sm` on Created date span | Add `className="text-sm"` |
+| 3 | **PERSISTENT** (15-Mar) | `lib/utils.ts:27` | CSV export filename uses `yyyy-MM-dd` instead of `dd-MM-yyyy` | Change format string |
+| 4 | **PERSISTENT** (16-Mar) | `components/maintenance/schedule-columns.tsx:62` | Asset `display_id` missing `font-mono` | Add `font-mono` to span |
+| 5 | **PERSISTENT** (16-Mar) | `components/audit-trail/audit-trail-columns.tsx:141-160` | Display ID link variant missing `font-mono` | Add `font-mono` to both code paths |
+| 6 | **PERSISTENT** (17-Mar) | `components/maintenance/schedule-columns.tsx:139` | `last_completed_at` date span missing `text-sm` | Add `className="text-sm"` |
+| 7 | **PERSISTENT** (17-Mar) | `components/maintenance/schedule-columns.tsx:57` | Asset name link missing `text-blue-600` | Add `text-blue-600` to link |
+| 8 | **PERSISTENT** (17-Mar) | `components/maintenance/schedule-detail.tsx:150` | Asset `display_id` in Input not `font-mono` | Render display_id in `font-mono` span |
+| 9 | **PERSISTENT** (17-Mar) | `components/maintenance/schedule-view-modal.tsx:352` | Asset `display_id` missing `font-mono` | Wrap with `font-mono` span |
+| 10 | **PERSISTENT** (17-Mar) | `components/maintenance/template-view-modal.tsx:308` | Created date span missing `text-sm` | Add `className="text-sm"` |
+| 11 | **PERSISTENT** (17-Mar) | `components/maintenance/template-detail.tsx:171` | Created date span missing `text-sm` | Add `className="text-sm"` |
+| 12 | **PERSISTENT** (17-Mar) | `components/maintenance/schedule-detail.tsx:176` | Created date span missing `text-sm` | Add `className="text-sm"` |
+| 13 | **PERSISTENT** (17-Mar) | `components/maintenance/schedule-view-modal.tsx:345` | Created date span missing `text-sm` | Add `className="text-sm"` |
+| 14 | **PERSISTENT** (17-Mar) | `components/assets/asset-view-modal.tsx:482` | Created date span missing `text-sm` | Add `className="text-sm"` |
+| 15 | **PERSISTENT** (17-Mar) | `components/assets/asset-detail-client.tsx:137` | Initiated date span missing `text-sm` | Add `className="text-sm"` |
+| 16 | **NEW** | `components/audit-trail/audit-trail-columns.tsx:141` | Link hover uses `text-blue-800` instead of `-700` | Standardize hover to `hover:text-blue-700` |
+| 17 | **NEW** | `components/maintenance/template-columns.tsx` | Link hover uses `text-blue-800` instead of `-700` | Standardize hover to `hover:text-blue-700` |
+| 18 | **NEW** | `components/maintenance/schedule-columns.tsx` | Link hover uses `text-blue-800` instead of `-700` | Standardize hover to `hover:text-blue-700` |
+
+---
+
+### Schema & Validation Inconsistencies (Updated)
+
+| # | Status | File(s) | Issue | Recommendation |
+|---|--------|---------|-------|----------------|
+| 1 | **PERSISTENT** (15-Mar) | `lib/validations/asset-schema.ts` | Asset `name` max=100, should be 60 per CLAUDE.md | Align to 60 or document exception |
+| 2 | **PERSISTENT** (15-Mar) | `lib/validations/template-schema.ts` | Template `name` max=100, should be 60 | Align to 60 or document exception |
+| 3 | **PERSISTENT** (16-Mar) | `schedule-schema.ts`, `user-schema.ts`, `template-schema.ts` | 3 different patterns for optional UUID fields | Create shared `optionalUuid()` helper |
+
+---
+
+### Code Consistency & Scalability Improvements (Updated)
+
+| # | Status | Category | Suggestion |
+|---|--------|----------|------------|
+| 1 | **DONE** | Actions | ~~Extract `assertCompanyAccess` shared helper~~ |
+| 2 | OPEN | Actions | Standardize response shapes — some return `{ success: true }`, others include counts or IDs. Create `ActionResponse<T>` type |
+| 3 | OPEN | Schema | Create `optionalUuid()` Zod helper to replace 3 divergent patterns |
+| 4 | **DONE** | Schema | ~~Create `isoDateString()` Zod helper~~ |
+| 5 | OPEN | Columns | Create shared `CreatedAtCell` component — 15 date spans missing `text-sm` |
+| 6 | OPEN | Testing | Set up vitest for server action unit tests — `assertCompanyAccess` prime candidate |
+| 7 | OPEN | Logging | Replace raw `console.error/log` (35+ occurrences) with structured logger |
+| 8 | **DONE** | Notifications | ~~Standardize notification error handling~~ — all 15 calls now have `.catch()` with logging |
+| 9 | OPEN | Display IDs | Create shared `DisplayId` component with `font-mono` baked in — 4 locations miss the class |
+| 10 | **NEW** | Notifications | Extract `safeCreateNotifications()` helper — 15 identical `.catch(err => console.error(...))` patterns |
+| 11 | **NEW** | Type Safety | Remove `any` types from `job-form.tsx:252` (form submit handler) and `status-bar-chart.tsx:32` (bar click handler) |
+| 12 | **NEW** | Error Handling | Photo upload error handling in modals — `asset-transfer-respond-modal.tsx` and `job-form.tsx` don't check fetch response |
+| 13 | **NEW** | Data Integrity | Add rollback logic to `acceptTransfer` two-step update, or use Postgres function for atomicity |
+| 14 | **NEW** | Link Colors | Standardize all link hover states to `hover:text-blue-700` — 3 files use `-800` |
+
+---
+
+### What's Working Well (Updated)
+
+- **100% responsive design compliance** — zero mobile-first breakpoint violations
+- **100% maxLength compliance** — all Input components match Zod `.max(N)` values
+- **100% date format compliance** — all user-visible dates use `dd-MM-yyyy`
+- **100% notification error handling** — all 15 `createNotifications` calls now have `.catch()` with logging
+- **100% feedback persistence** — no auto-dismiss timers on any success/error message
+- **100% soft-delete terminology** — "Deactivate"/"Reactivate" everywhere
+- **100% Combobox/Select correctness** — large lists use Combobox, small fixed lists use Select
+- **assertCompanyAccess adopted** across 5 action files (8 call sites)
+- **Transfer workflow fully hardened** — 20 quick tasks covering validation, scoping, status blocking, UX
+- **New `AssetTransferRespondModal`** follows all CLAUDE.md patterns (font-mono, date format, InlineFeedback, desktop-first)
+- **Custody tracking (`holder_id`)** — column added, seed data populated, displayed in 3 views
