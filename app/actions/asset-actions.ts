@@ -263,11 +263,11 @@ export const createTransfer = authActionClient
       throw new Error('Destination location is the same as the current location');
     }
 
-    // Validate receiver is active (not deactivated) when transferring to a user
+    // Validate receiver exists, is active, and belongs to the same company as the asset
     if (parsedInput.receiver_id) {
       const { data: receiver } = await supabase
         .from('user_profiles')
-        .select('id, deleted_at')
+        .select('id, deleted_at, company_id')
         .eq('id', parsedInput.receiver_id)
         .single();
 
@@ -277,6 +277,10 @@ export const createTransfer = authActionClient
 
       if (receiver.deleted_at) {
         throw new Error('Cannot transfer to a deactivated user');
+      }
+
+      if (receiver.company_id !== asset.company_id) {
+        throw new Error('Cannot transfer to a user in a different company');
       }
     }
 
@@ -306,7 +310,7 @@ export const createTransfer = authActionClient
     if (isLocationOnly) {
       const { error: itemError } = await supabase
         .from('inventory_items')
-        .update({ location_id: parsedInput.to_location_id })
+        .update({ location_id: parsedInput.to_location_id, holder_id: null })
         .eq('id', parsedInput.asset_id);
       if (itemError) throw new Error(itemError.message);
     }
@@ -369,7 +373,12 @@ export const acceptTransfer = authActionClient
       .eq('id', movement.item_id);
 
     if (itemError) {
-      throw new Error(itemError.message);
+      // Rollback: revert movement back to pending since asset update failed
+      await supabase
+        .from('inventory_movements')
+        .update({ status: 'pending', received_by: null, received_at: null })
+        .eq('id', parsedInput.movement_id);
+      throw new Error('Failed to update asset location. Transfer reverted to pending.');
     }
 
     revalidatePath('/inventory');
@@ -459,7 +468,8 @@ export const cancelTransfer = authActionClient
         status: 'cancelled',
         cancelled_at: new Date().toISOString(),
       })
-      .eq('id', parsedInput.movement_id);
+      .eq('id', parsedInput.movement_id)
+      .eq('company_id', movement.company_id);
 
     if (error) {
       throw new Error(error.message);

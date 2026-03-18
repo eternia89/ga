@@ -208,10 +208,17 @@ export function AssetTransferRespondModal({
           for (const file of photos) {
             formData.append('photos', file);
           }
-          await fetch('/api/uploads/asset-photos', {
+          const uploadRes = await fetch('/api/uploads/asset-photos', {
             method: 'POST',
             body: formData,
           });
+          if (!uploadRes.ok) {
+            // Transfer accepted but photos failed — show warning, don't block
+            setFeedback({ type: 'error', message: 'Transfer accepted, but photo upload failed. You can add photos later.' });
+            onSuccess();
+            router.refresh();
+            return;
+          }
         }
       } else if (mode === 'reject') {
         const result = await rejectTransfer({
@@ -231,10 +238,16 @@ export function AssetTransferRespondModal({
           for (const file of photos) {
             formData.append('photos', file);
           }
-          await fetch('/api/uploads/asset-photos', {
+          const rejectUploadRes = await fetch('/api/uploads/asset-photos', {
             method: 'POST',
             body: formData,
           });
+          if (!rejectUploadRes.ok) {
+            setFeedback({ type: 'error', message: 'Transfer rejected, but evidence photo upload failed.' });
+            onSuccess();
+            router.refresh();
+            return;
+          }
         }
       }
 
