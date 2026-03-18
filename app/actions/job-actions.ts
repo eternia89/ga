@@ -198,7 +198,7 @@ export const updateJob = authActionClient
     // Fetch existing job
     const { data: existing } = await supabase
       .from('jobs')
-      .select('id, status, company_id, estimated_cost, approved_at')
+      .select('id, status, company_id, estimated_cost, approved_at, updated_at')
       .eq('id', parsedInput.id)
       .is('deleted_at', null)
       .single();
@@ -207,7 +207,12 @@ export const updateJob = authActionClient
       throw new Error('Job not found');
     }
 
-    const { id, linked_request_ids, ...updateFields } = parsedInput;
+    // Optimistic locking: reject if entity was modified since the form loaded
+    if (parsedInput.updated_at && existing.updated_at !== parsedInput.updated_at) {
+      throw new Error('This record was modified by another user. Please refresh the page and re-apply your changes.');
+    }
+
+    const { id, linked_request_ids, updated_at: _updatedAt, ...updateFields } = parsedInput;
 
     // Block PIC changes once job is past 'assigned' status
     const PIC_EDITABLE_STATUSES = ['created', 'assigned'];

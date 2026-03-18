@@ -88,7 +88,7 @@ export const createAsset = authActionClient
 // Cannot edit sold_disposed assets
 // ============================================================================
 export const updateAsset = authActionClient
-  .schema(z.object({ asset_id: z.string().uuid(), data: assetEditSchema }))
+  .schema(z.object({ asset_id: z.string().uuid(), data: assetEditSchema, updated_at: z.string().optional() }))
   .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
@@ -100,7 +100,7 @@ export const updateAsset = authActionClient
     // Fetch asset — must exist and not be sold_disposed (RLS handles company scoping)
     const { data: existing } = await supabase
       .from('inventory_items')
-      .select('id, status, company_id')
+      .select('id, status, company_id, updated_at')
       .eq('id', parsedInput.asset_id)
       .is('deleted_at', null)
       .single();
@@ -111,6 +111,11 @@ export const updateAsset = authActionClient
 
     if (existing.status === 'sold_disposed') {
       throw new Error('Cannot edit a sold/disposed asset');
+    }
+
+    // Optimistic locking: reject if entity was modified since the form loaded
+    if (parsedInput.updated_at && existing.updated_at !== parsedInput.updated_at) {
+      throw new Error('This record was modified by another user. Please refresh the page and re-apply your changes.');
     }
 
     const { error } = await supabase

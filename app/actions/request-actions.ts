@@ -73,14 +73,14 @@ export const createRequest = authActionClient
 // updateRequest — requester only, while status = 'submitted'
 // ============================================================================
 export const updateRequest = authActionClient
-  .schema(z.object({ id: z.string().uuid(), data: requestEditSchema }))
+  .schema(z.object({ id: z.string().uuid(), data: requestEditSchema, updated_at: z.string().optional() }))
   .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Fetch the request — must be owned by requester and in submitted status
     const { data: existing } = await supabase
       .from('requests')
-      .select('id, status, requester_id')
+      .select('id, status, requester_id, updated_at')
       .eq('id', parsedInput.id)
       .eq('requester_id', profile.id)
       .eq('status', 'submitted')
@@ -88,6 +88,11 @@ export const updateRequest = authActionClient
 
     if (!existing) {
       throw new Error('Cannot edit — request is not in New status or you are not the requester');
+    }
+
+    // Optimistic locking: reject if entity was modified since the form loaded
+    if (parsedInput.updated_at && existing.updated_at !== parsedInput.updated_at) {
+      throw new Error('This record was modified by another user. Please refresh the page and re-apply your changes.');
     }
 
     // Regenerate title from updated description
