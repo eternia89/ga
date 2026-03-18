@@ -3,13 +3,14 @@
 import { authActionClient } from '@/lib/safe-action';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import type { ActionOk } from '@/lib/types/action-responses';
 
 // Update profile (name only)
 export const updateProfile = authActionClient
   .schema(z.object({
     full_name: z.string().min(1, "Name is required").max(60),
   }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, user } = ctx;
 
     // Update user_profiles where id = current user
@@ -37,7 +38,7 @@ export const changePassword = authActionClient
     currentPassword: z.string().min(1, "Current password is required"),
     newPassword: z.string().min(8, "Password must be at least 8 characters"),
   }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Verify current password by attempting to sign in

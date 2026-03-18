@@ -5,11 +5,13 @@ import { adminActionClient } from '@/lib/safe-action';
 import { companySchema } from '@/lib/validations/company-schema';
 import { emptyToNull } from '@/lib/utils';
 import { z } from 'zod';
+import type { ActionOk, ActionResponse, BulkDeactivateResponse } from '@/lib/types/action-responses';
+import type { Company } from '@/lib/types/database';
 
 // Create company
 export const createCompany = adminActionClient
   .schema(companySchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ data: Company }>> => {
     const { adminSupabase: supabase } = ctx;
 
     // Check for duplicate name (case-insensitive)
@@ -45,7 +47,7 @@ export const updateCompany = adminActionClient
       data: companySchema,
     })
   )
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ data: Company }>> => {
     const { adminSupabase: supabase } = ctx;
     const { id, data } = parsedInput;
 
@@ -79,7 +81,7 @@ export const updateCompany = adminActionClient
 // Deactivate company (soft-delete with dependency check)
 export const deactivateCompany = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
@@ -134,7 +136,7 @@ export const deactivateCompany = adminActionClient
 // Reactivate company
 export const reactivateCompany = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
@@ -177,7 +179,7 @@ export const reactivateCompany = adminActionClient
 // Bulk deactivate companies
 export const bulkDeactivateCompanies = adminActionClient
   .schema(z.object({ ids: z.array(z.string().uuid()) }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<BulkDeactivateResponse> => {
     const { adminSupabase: supabase } = ctx;
     const { ids } = parsedInput;
 

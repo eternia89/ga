@@ -10,13 +10,14 @@ import { formatIDR } from '@/lib/utils';
 import { advanceFloatingScheduleCore } from '@/app/actions/pm-job-actions';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { assertCompanyAccess } from '@/lib/auth/company-access';
+import type { ActionOk, ActionResponse } from '@/lib/types/action-responses';
 
 // ============================================================================
 // createJob — ga_lead, admin, or ga_staff
 // ============================================================================
 export const createJob = authActionClient
   .schema(createJobSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ jobId: string; displayId: string }>> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -186,7 +187,7 @@ export const createJob = authActionClient
 // ============================================================================
 export const updateJob = authActionClient
   .schema(updateJobSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -365,7 +366,7 @@ export const updateJob = authActionClient
 // ============================================================================
 export const assignJob = authActionClient
   .schema(z.object({ id: z.string().uuid(), assigned_to: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -432,7 +433,7 @@ export const updateJobStatus = authActionClient
     longitude: z.number().optional(),
     gpsAccuracy: z.number().optional(),
   }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Fetch job
@@ -620,7 +621,7 @@ export const updateJobStatus = authActionClient
 // ============================================================================
 export const cancelJob = authActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -691,7 +692,7 @@ export const cancelJob = authActionClient
 // ============================================================================
 export const addJobComment = authActionClient
   .schema(jobCommentSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ commentId: string }>> => {
     const { supabase, profile } = ctx;
 
     // Fetch job to verify access
@@ -737,7 +738,7 @@ export const addJobComment = authActionClient
 // ============================================================================
 export const deleteJobAttachment = authActionClient
   .schema(z.object({ attachmentId: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Role check

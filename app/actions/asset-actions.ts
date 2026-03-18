@@ -20,6 +20,7 @@ import {
 } from '@/app/actions/schedule-actions';
 import { z } from 'zod';
 import { assertCompanyAccess } from '@/lib/auth/company-access';
+import type { ActionOk, ActionResponse, PhotosResponse, InvoicesResponse, DeleteAttachmentsResponse } from '@/lib/types/action-responses';
 
 // ============================================================================
 // createAsset — ga_staff, ga_lead, admin only
@@ -27,7 +28,7 @@ import { assertCompanyAccess } from '@/lib/auth/company-access';
 // ============================================================================
 export const createAsset = authActionClient
   .schema(assetCreateSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ assetId: string; displayId: string }>> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -88,7 +89,7 @@ export const createAsset = authActionClient
 // ============================================================================
 export const updateAsset = authActionClient
   .schema(z.object({ asset_id: z.string().uuid(), data: assetEditSchema }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -142,7 +143,7 @@ export const updateAsset = authActionClient
 // ============================================================================
 export const changeAssetStatus = authActionClient
   .schema(assetStatusChangeSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -214,7 +215,7 @@ export const changeAssetStatus = authActionClient
 // ============================================================================
 export const createTransfer = authActionClient
   .schema(assetTransferSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ movementId: string }>> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -325,7 +326,7 @@ export const createTransfer = authActionClient
 // ============================================================================
 export const acceptTransfer = authActionClient
   .schema(transferAcceptSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Fetch movement — must be pending (RLS handles company scoping)
@@ -391,7 +392,7 @@ export const acceptTransfer = authActionClient
 // ============================================================================
 export const rejectTransfer = authActionClient
   .schema(transferRejectSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Fetch movement — must be pending (RLS handles company scoping)
@@ -435,7 +436,7 @@ export const rejectTransfer = authActionClient
 // ============================================================================
 export const cancelTransfer = authActionClient
   .schema(transferCancelSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Fetch movement — must be pending (RLS handles company scoping)
@@ -485,7 +486,7 @@ export const cancelTransfer = authActionClient
 // ============================================================================
 export const getAssetPhotos = authActionClient
   .schema(z.object({ asset_id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<PhotosResponse> => {
     const { supabase } = ctx;
 
     // Fetch asset-level photos (creation and status changes)
@@ -558,7 +559,7 @@ export const getAssetPhotos = authActionClient
 // ============================================================================
 export const getAssetInvoices = authActionClient
   .schema(z.object({ asset_id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<InvoicesResponse> => {
     const { supabase } = ctx;
 
     const { data: attachments } = await supabase
@@ -602,7 +603,7 @@ export const deleteAssetPhotos = authActionClient
     photo_ids: z.array(z.string().uuid()).min(1).max(10),
     bucket: z.enum(['asset-photos', 'asset-invoices']),
   }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<DeleteAttachmentsResponse> => {
     const { profile } = ctx;
 
     if (!['ga_staff', 'ga_lead', 'admin'].includes(profile.role)) {

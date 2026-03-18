@@ -5,6 +5,7 @@ import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
 import { type SupabaseClient } from '@supabase/supabase-js';
 import type { PMJobChecklist, ChecklistResponse } from '@/lib/types/maintenance';
+import type { ActionOk, ChecklistProgressResponse, ChecklistCompleteResponse, AdvanceScheduleResponse } from '@/lib/types/action-responses';
 
 // ============================================================================
 // savePMChecklistItem — save-as-you-go for individual checklist items
@@ -18,7 +19,7 @@ export const savePMChecklistItem = authActionClient
       value: z.union([z.boolean(), z.string().max(1000), z.number(), z.null()]),
     })
   )
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ChecklistProgressResponse> => {
     const { supabase, profile } = ctx;
 
     // Fetch job and verify access (PIC, ga_lead, or admin only)
@@ -106,7 +107,7 @@ export const savePMChecklistPhoto = authActionClient
       photoUrls: z.array(z.string().max(2048)),
     })
   )
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Fetch job and verify access
@@ -183,7 +184,7 @@ export const savePMChecklistPhoto = authActionClient
 // ============================================================================
 export const completePMChecklist = authActionClient
   .schema(z.object({ jobId: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ChecklistCompleteResponse> => {
     const { supabase, profile } = ctx;
 
     const { data: job } = await supabase
@@ -247,7 +248,7 @@ export const completePMChecklist = authActionClient
 // is advanced by the cron at job generation time, per RESEARCH.md Pitfall 2).
 // ============================================================================
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function advanceFloatingScheduleCore(supabaseClient: SupabaseClient<any>, jobId: string) {
+export async function advanceFloatingScheduleCore(supabaseClient: SupabaseClient<any>, jobId: string): Promise<AdvanceScheduleResponse> {
   // Fetch job with schedule relation
   const { data: job } = await supabaseClient
     .from('jobs')
@@ -322,6 +323,6 @@ export async function advanceFloatingScheduleCore(supabaseClient: SupabaseClient
 // ============================================================================
 export const advanceFloatingSchedule = authActionClient
   .schema(z.object({ jobId: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<AdvanceScheduleResponse> => {
     return advanceFloatingScheduleCore(ctx.supabase, parsedInput.jobId);
   });

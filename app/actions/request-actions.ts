@@ -8,13 +8,14 @@ import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { assertCompanyAccess } from '@/lib/auth/company-access';
+import type { ActionOk, ActionResponse } from '@/lib/types/action-responses';
 
 // ============================================================================
 // createRequest — any authenticated user, auto-fills division from profile
 // ============================================================================
 export const createRequest = authActionClient
   .schema(requestSubmitSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ requestId: string; displayId: string }>> => {
     const { supabase, profile } = ctx;
 
     // Guard: user must have a division assigned
@@ -73,7 +74,7 @@ export const createRequest = authActionClient
 // ============================================================================
 export const updateRequest = authActionClient
   .schema(z.object({ id: z.string().uuid(), data: requestEditSchema }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Fetch the request — must be owned by requester and in submitted status
@@ -114,7 +115,7 @@ export const updateRequest = authActionClient
 // ============================================================================
 export const triageRequest = authActionClient
   .schema(z.object({ id: z.string().uuid(), data: triageSchema }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -196,7 +197,7 @@ export const triageRequest = authActionClient
 // ============================================================================
 export const cancelRequest = authActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     const { data, error } = await supabase
@@ -247,7 +248,7 @@ export const cancelRequest = authActionClient
 // ============================================================================
 export const rejectRequest = authActionClient
   .schema(z.object({ id: z.string().uuid(), data: rejectSchema }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -303,7 +304,7 @@ export const rejectRequest = authActionClient
 // ============================================================================
 export const completeRequest = authActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Fetch request
@@ -366,7 +367,7 @@ export const completeRequest = authActionClient
 // ============================================================================
 export const deleteMediaAttachment = authActionClient
   .schema(z.object({ attachmentId: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Fetch the attachment
@@ -419,7 +420,7 @@ export const deleteMediaAttachment = authActionClient
 // ============================================================================
 export const acceptRequest = authActionClient
   .schema(z.object({ request_id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     const { data: request } = await supabase
@@ -461,7 +462,7 @@ export const acceptRequest = authActionClient
 // ============================================================================
 export const rejectCompletedWork = authActionClient
   .schema(z.object({ request_id: z.string().uuid(), reason: z.string().min(1).max(1000) }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     const { data: request } = await supabase
@@ -522,7 +523,7 @@ export const rejectCompletedWork = authActionClient
 // ============================================================================
 export const submitFeedback = authActionClient
   .schema(feedbackSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     const { data: request } = await supabase
@@ -562,7 +563,7 @@ export const submitFeedback = authActionClient
 // ============================================================================
 export const getRequestPhotos = authActionClient
   .schema(z.object({ requestId: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ photos: Array<{ id: string; fileName: string; url: string; mimeType: string | null }> }>> => {
     const { supabase } = ctx;
 
     const { data: attachments } = await supabase

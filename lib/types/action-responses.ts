@@ -8,11 +8,12 @@
  */
 
 /** Base response type — all successful action returns include { success: true }. */
-export type ActionResponse<T extends Record<string, unknown> = Record<string, never>> =
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export type ActionResponse<T extends Record<string, unknown> = {}> =
   { success: true } & T;
 
 /** Shorthand for actions that only return { success: true } */
-export type ActionOk = ActionResponse;
+export type ActionOk = { success: true };
 
 /** Bulk deactivate actions — return count of deactivated and blocked items */
 export type BulkDeactivateResponse = ActionResponse<{

@@ -4,12 +4,13 @@ import { adminActionClient, authActionClient } from '@/lib/safe-action';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import type { ActionOk } from '@/lib/types/action-responses';
 
 // Get all company_ids granted to a user (beyond their primary company)
 // Used by create modals to determine if company selector should show
 export const getUserCompanyAccess = authActionClient
   .schema(z.object({ userId: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<{ companyIds: string[] }> => {
     const { supabase, profile } = ctx;
     // Users can only fetch their own access; admins can fetch any user's
     if (profile.id !== parsedInput.userId && profile.role !== 'admin') {
@@ -30,7 +31,7 @@ export const updateUserCompanyAccess = adminActionClient
     userId: z.string().uuid(),
     companyIds: z.array(z.string().uuid()),
   }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const adminSupabase = createAdminClient();
     const { userId, companyIds } = parsedInput;
 

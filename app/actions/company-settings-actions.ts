@@ -3,13 +3,14 @@
 import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
+import type { ActionOk } from '@/lib/types/action-responses';
 
 // ============================================================================
 // getCompanySettings — returns all company_settings rows as Record<string, string>
 // ============================================================================
 export const getCompanySettings = authActionClient
   .schema(z.object({}))
-  .action(async ({ ctx }) => {
+  .action(async ({ ctx }): Promise<{ settings: Record<string, string> }> => {
     const { supabase, profile } = ctx;
 
     const { data, error } = await supabase
@@ -39,7 +40,7 @@ const updateCompanySettingSchema = z.object({
 
 export const updateCompanySetting = authActionClient
   .schema(updateCompanySettingSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Role check — admin only

@@ -5,11 +5,13 @@ import { adminActionClient } from '@/lib/safe-action';
 import { divisionSchema } from '@/lib/validations/division-schema';
 import { emptyToNull } from '@/lib/utils';
 import { z } from 'zod';
+import type { ActionOk, ActionResponse, BulkDeactivateResponse } from '@/lib/types/action-responses';
+import type { Division } from '@/lib/types/database';
 
 // Get companies for dropdown
 export const getCompanies = adminActionClient
   .schema(z.object({}))
-  .action(async ({ ctx }) => {
+  .action(async ({ ctx }): Promise<ActionResponse<{ data: Array<{ id: string; name: string }> }>> => {
     const { adminSupabase: supabase } = ctx;
 
     const { data, error } = await supabase
@@ -28,7 +30,7 @@ export const getCompanies = adminActionClient
 // Create division
 export const createDivision = adminActionClient
   .schema(divisionSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ data: Division }>> => {
     const { adminSupabase: supabase } = ctx;
 
     // Check for duplicate name within the same company
@@ -65,7 +67,7 @@ export const updateDivision = adminActionClient
       data: divisionSchema,
     })
   )
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ data: Division }>> => {
     const { adminSupabase: supabase } = ctx;
     const { id, data } = parsedInput;
 
@@ -102,7 +104,7 @@ export const updateDivision = adminActionClient
 // Deactivate division (soft-delete with dependency check)
 export const deactivateDivision = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
@@ -138,7 +140,7 @@ export const deactivateDivision = adminActionClient
 // Reactivate division
 export const reactivateDivision = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
@@ -180,7 +182,7 @@ export const reactivateDivision = adminActionClient
 // Bulk deactivate divisions
 export const bulkDeactivateDivisions = adminActionClient
   .schema(z.object({ ids: z.array(z.string().uuid()) }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<BulkDeactivateResponse> => {
     const { adminSupabase: supabase } = ctx;
     const { ids } = parsedInput;
 

@@ -4,6 +4,24 @@ import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { templateCreateSchema, templateEditSchema } from '@/lib/validations/template-schema';
 import { z } from 'zod';
+import type { ActionOk, ActionResponse } from '@/lib/types/action-responses';
+import type { ChecklistItem } from '@/lib/types/maintenance';
+
+/** Shape returned by getTemplates/getTemplateById after joining and transforming DB rows */
+interface TemplateListItem {
+  id: string;
+  company_id: string | null;
+  category_id: string | null;
+  name: string;
+  description: string | null;
+  checklist: ChecklistItem[];
+  is_active: boolean | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+  category: { name: string; type: string } | null;
+  item_count: number;
+}
 
 // ============================================================================
 // createTemplate — ga_lead or admin only
@@ -12,7 +30,7 @@ import { z } from 'zod';
 
 export const createTemplate = authActionClient
   .schema(templateCreateSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ templateId: string }>> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -69,7 +87,7 @@ export const createTemplate = authActionClient
 
 export const updateTemplate = authActionClient
   .schema(z.object({ id: z.string().uuid(), data: templateEditSchema }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -136,7 +154,7 @@ export const updateTemplate = authActionClient
 
 export const deactivateTemplate = authActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -194,7 +212,7 @@ export const deactivateTemplate = authActionClient
 
 export const reactivateTemplate = authActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     // Role check
@@ -238,7 +256,7 @@ export const reactivateTemplate = authActionClient
 
 export const getTemplates = authActionClient
   .schema(z.object({}))
-  .action(async ({ ctx }) => {
+  .action(async ({ ctx }): Promise<ActionResponse<{ templates: TemplateListItem[] }>> => {
     const { supabase } = ctx;
 
     const { data, error } = await supabase
@@ -280,7 +298,7 @@ export const getTemplates = authActionClient
 
 export const getTemplateById = authActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ template: TemplateListItem }>> => {
     const { supabase } = ctx;
 
     const { data, error } = await supabase

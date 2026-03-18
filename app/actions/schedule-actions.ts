@@ -4,9 +4,35 @@ import { revalidatePath } from 'next/cache';
 import { authActionClient, gaLeadActionClient } from '@/lib/safe-action';
 import { scheduleCreateSchema, scheduleEditSchema } from '@/lib/validations/schedule-schema';
 import { getScheduleDisplayStatus } from '@/lib/constants/schedule-status';
-import type { ChecklistItem } from '@/lib/types/maintenance';
+import type { ChecklistItem, ScheduleDisplayStatus } from '@/lib/types/maintenance';
 import { z } from 'zod';
 import { assertCompanyAccess } from '@/lib/auth/company-access';
+import type { ActionOk, ActionResponse } from '@/lib/types/action-responses';
+
+/** Shape returned by getSchedules/getSchedulesByAssetId after joining and transforming DB rows */
+interface ScheduleListItem {
+  id: string;
+  company_id: string;
+  item_id: string | null;
+  template_id: string;
+  assigned_to: string | null;
+  interval_days: number;
+  interval_type: string;
+  auto_create_days_before: number;
+  last_completed_at: string | null;
+  next_due_at: string | null;
+  is_paused: boolean | null;
+  paused_at: string | null;
+  paused_reason: string | null;
+  is_active: boolean | null;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+  template: { name: string; checklist: ChecklistItem[] } | null;
+  asset?: { name: string; display_id: string } | null;
+  category?: unknown;
+  display_status: ScheduleDisplayStatus;
+}
 
 // ============================================================================
 // createSchedule — ga_lead or admin only
@@ -16,7 +42,7 @@ import { assertCompanyAccess } from '@/lib/auth/company-access';
 
 export const createSchedule = gaLeadActionClient
   .schema(scheduleCreateSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ scheduleId: string }>> => {
     const { adminSupabase, profile } = ctx;
 
     // Fetch template — must be active (templates are global)
@@ -115,7 +141,7 @@ export const createSchedule = gaLeadActionClient
 
 export const updateSchedule = gaLeadActionClient
   .schema(z.object({ id: z.string().uuid(), data: scheduleEditSchema }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { adminSupabase, profile } = ctx;
 
     // Verify schedule exists
@@ -174,7 +200,7 @@ export const updateSchedule = gaLeadActionClient
 
 export const deactivateSchedule = gaLeadActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { adminSupabase, profile } = ctx;
 
     // Verify schedule exists
@@ -228,7 +254,7 @@ export const deactivateSchedule = gaLeadActionClient
 
 export const activateSchedule = gaLeadActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { adminSupabase, profile } = ctx;
 
     // Verify schedule exists
@@ -276,7 +302,7 @@ export const activateSchedule = gaLeadActionClient
 
 export const deleteSchedule = gaLeadActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { adminSupabase, profile } = ctx;
 
     // Verify schedule exists
@@ -316,7 +342,7 @@ export const deleteSchedule = gaLeadActionClient
 
 export const getSchedules = authActionClient
   .schema(z.object({}))
-  .action(async ({ ctx }) => {
+  .action(async ({ ctx }): Promise<ActionResponse<{ schedules: ScheduleListItem[] }>> => {
     const { supabase, profile } = ctx;
 
     // Fetch user's extra company access
@@ -387,7 +413,7 @@ export const getSchedules = authActionClient
 
 export const getSchedulesByAssetId = authActionClient
   .schema(z.object({ assetId: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ schedules: ScheduleListItem[] }>> => {
     const { supabase, profile } = ctx;
 
     // Fetch user's extra company access

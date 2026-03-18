@@ -5,13 +5,15 @@ import { adminActionClient } from '@/lib/safe-action';
 import { categorySchema } from '@/lib/validations/category-schema';
 import { emptyToNull } from '@/lib/utils';
 import { z } from 'zod';
+import type { ActionOk, ActionResponse, BulkDeactivateResponse } from '@/lib/types/action-responses';
+import type { Category } from '@/lib/types/database';
 
 // Create category
 // IMPORTANT: Auto-fills company_id from admin's profile for audit purposes only
 // Categories are GLOBAL - not company-scoped for selection/display
 export const createCategory = adminActionClient
   .schema(categorySchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ data: Category }>> => {
     const { adminSupabase: supabase, profile } = ctx;
 
     // Check for duplicate name+type among active categories within the same company
@@ -56,7 +58,7 @@ export const updateCategory = adminActionClient
       data: categorySchema.omit({ type: true }), // Type cannot be changed
     })
   )
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ data: Category }>> => {
     const { adminSupabase: supabase } = ctx;
     const { id, data } = parsedInput;
 
@@ -102,7 +104,7 @@ export const updateCategory = adminActionClient
 // Deactivate category (soft-delete with dependency check)
 export const deactivateCategory = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
@@ -162,7 +164,7 @@ export const deactivateCategory = adminActionClient
 // Reactivate category
 export const reactivateCategory = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
@@ -205,7 +207,7 @@ export const reactivateCategory = adminActionClient
 // Bulk deactivate categories
 export const bulkDeactivateCategories = adminActionClient
   .schema(z.object({ ids: z.array(z.string().uuid()) }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<BulkDeactivateResponse> => {
     const { adminSupabase: supabase } = ctx;
     const { ids } = parsedInput;
 

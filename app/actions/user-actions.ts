@@ -6,10 +6,11 @@ import { createUserSchema, updateUserSchema } from '@/lib/validations/user-schem
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { assertCompanyAccess } from '@/lib/auth/company-access';
+import type { ActionOk, ActionResponse } from '@/lib/types/action-responses';
 
 // Get users with joined data
 export const getUsers = adminActionClient
-  .action(async ({ ctx }) => {
+  .action(async ({ ctx }): Promise<{ users: Array<Record<string, unknown>> }> => {
     const adminSupabase = createAdminClient();
 
     // Fetch all user profiles with joined division and company names
@@ -46,7 +47,7 @@ export const getUsers = adminActionClient
 // Create user
 export const createUser = adminActionClient
   .schema(createUserSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ user: { id: string; email: string; full_name: string; role: string } }>> => {
     const adminSupabase = createAdminClient();
 
     // Validate admin has access to the target company
@@ -133,7 +134,7 @@ export const createUser = adminActionClient
 // Update user
 export const updateUser = adminActionClient
   .schema(z.object({ id: z.string().uuid() }).merge(updateUserSchema))
-  .action(async ({ parsedInput }) => {
+  .action(async ({ parsedInput }): Promise<ActionOk> => {
     const adminSupabase = createAdminClient();
 
     // 1. Update user_profiles row
@@ -181,7 +182,7 @@ export const deactivateUser = adminActionClient
     id: z.string().uuid(),
     reason: z.string().optional(),
   }))
-  .action(async ({ parsedInput }) => {
+  .action(async ({ parsedInput }): Promise<ActionOk> => {
     const adminSupabase = createAdminClient();
 
     // Set deleted_at to deactivate the user
@@ -205,7 +206,7 @@ export const deactivateUser = adminActionClient
 // Reactivate user
 export const reactivateUser = adminActionClient
   .schema(z.object({ id: z.string().uuid(), reason: z.string().max(200).optional() }))
-  .action(async ({ parsedInput }) => {
+  .action(async ({ parsedInput }): Promise<ActionOk> => {
     const adminSupabase = createAdminClient();
 
     // Fetch the user being reactivated to get their email

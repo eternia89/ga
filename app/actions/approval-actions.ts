@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
+import type { ActionOk } from '@/lib/types/action-responses';
 
 // ============================================================================
 // approveJob — job creator only
@@ -11,7 +12,7 @@ import { createNotifications } from '@/lib/notifications/helpers';
 // ============================================================================
 export const approveJob = authActionClient
   .schema(z.object({ job_id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     const { data: job } = await supabase
@@ -78,7 +79,7 @@ export const rejectJob = authActionClient
       .min(1, 'Rejection reason is required')
       .max(1000, 'Reason must be under 1000 characters'),
   }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     const { data: job } = await supabase
@@ -145,7 +146,7 @@ export const rejectJob = authActionClient
 // ============================================================================
 export const approveCompletion = authActionClient
   .schema(z.object({ job_id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     const { data: job } = await supabase
@@ -256,7 +257,7 @@ export const rejectCompletion = authActionClient
       .min(1, 'Rejection reason is required')
       .max(1000, 'Reason must be under 1000 characters'),
   }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 
     const { data: job } = await supabase

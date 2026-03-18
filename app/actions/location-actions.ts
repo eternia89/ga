@@ -5,11 +5,13 @@ import { adminActionClient } from '@/lib/safe-action';
 import { locationSchema } from '@/lib/validations/location-schema';
 import { emptyToNull } from '@/lib/utils';
 import { z } from 'zod';
+import type { ActionOk, ActionResponse, BulkDeactivateResponse } from '@/lib/types/action-responses';
+import type { Location } from '@/lib/types/database';
 
 // Create location
 export const createLocation = adminActionClient
   .schema(locationSchema)
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ data: Location }>> => {
     const { adminSupabase: supabase } = ctx;
 
     // Check for duplicate name within the same company
@@ -46,7 +48,7 @@ export const updateLocation = adminActionClient
       data: locationSchema,
     })
   )
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ data: Location }>> => {
     const { adminSupabase: supabase } = ctx;
     const { id, data } = parsedInput;
 
@@ -83,7 +85,7 @@ export const updateLocation = adminActionClient
 // Deactivate location (soft-delete with dependency check)
 export const deactivateLocation = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
@@ -128,7 +130,7 @@ export const deactivateLocation = adminActionClient
 // Reactivate location
 export const reactivateLocation = adminActionClient
   .schema(z.object({ id: z.string().uuid() }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { adminSupabase: supabase } = ctx;
     const { id } = parsedInput;
 
@@ -170,7 +172,7 @@ export const reactivateLocation = adminActionClient
 // Bulk deactivate locations
 export const bulkDeactivateLocations = adminActionClient
   .schema(z.object({ ids: z.array(z.string().uuid()) }))
-  .action(async ({ parsedInput, ctx }) => {
+  .action(async ({ parsedInput, ctx }): Promise<BulkDeactivateResponse> => {
     const { adminSupabase: supabase } = ctx;
     const { ids } = parsedInput;
 
