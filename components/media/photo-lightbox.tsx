@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export interface PhotoItem {
@@ -18,8 +18,19 @@ interface PhotoLightboxProps {
 
 export function PhotoLightbox({ photos, initialIndex = 0, onClose }: PhotoLightboxProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const previouslyFocusedElement = useRef<Element | null>(null);
 
   const isMulti = photos.length > 1;
+
+  // Store the element that had focus when lightbox opened, restore on unmount
+  useEffect(() => {
+    previouslyFocusedElement.current = document.activeElement;
+    return () => {
+      if (previouslyFocusedElement.current instanceof HTMLElement) {
+        previouslyFocusedElement.current.focus();
+      }
+    };
+  }, []);
 
   const goNext = useCallback(() => {
     setCurrentIndex((i) => (i + 1) % photos.length);

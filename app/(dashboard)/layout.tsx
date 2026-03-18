@@ -46,6 +46,9 @@ export default async function DashboardLayout({
     <NuqsAdapter>
       <AuthProvider initialProfile={profile}>
         <BreadcrumbProvider>
+          <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[70] focus:rounded focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:shadow-lg focus:ring-2 focus:ring-ring">
+            Skip to content
+          </a>
           <div className="flex h-screen">
             {/* Desktop sidebar — hidden on mobile */}
             <div className="max-md:hidden">
@@ -70,7 +73,7 @@ export default async function DashboardLayout({
               </header>
 
               {/* Scrollable content area */}
-              <main className="flex-1 overflow-auto p-6 max-md:p-4 bg-white">
+              <main id="main-content" className="flex-1 overflow-auto p-6 max-md:p-4 bg-white">
                 <div className="max-w-[1300px] mx-auto">
                   {children}
                 </div>

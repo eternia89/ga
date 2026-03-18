@@ -1,7 +1,7 @@
 'use client';
 
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { type ReactNode } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -30,8 +30,6 @@ export function KpiCard({
   icon,
   trendIsGood = true,
 }: KpiCardProps) {
-  const router = useRouter();
-
   const getTrendColor = () => {
     if (!trend || trend.direction === 'flat') return 'text-muted-foreground';
     const isPositiveChange = trend.direction === 'up';
@@ -58,11 +56,9 @@ export function KpiCard({
   const trendColor = getTrendColor();
 
   return (
-    <Card
-      className="cursor-pointer hover:shadow-md transition-shadow duration-200"
-      onClick={() => router.push(href)}
-    >
-      <CardContent className="p-5">
+    <Link href={href} className="block rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none">
+      <Card className="cursor-pointer hover:shadow-md transition-shadow duration-200">
+        <CardContent className="p-5">
         {/* Top row: icon + title */}
         <div className="flex items-center gap-2 mb-3">
           <span className="text-muted-foreground">{icon}</span>
@@ -92,6 +88,7 @@ export function KpiCard({
           <div className="text-xs text-muted-foreground">No comparison data</div>
         )}
       </CardContent>
-    </Card>
+      </Card>
+    </Link>
   );
 }

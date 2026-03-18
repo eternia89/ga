@@ -196,7 +196,7 @@ export function ProfileSheet({ open, onOpenChange }: ProfileSheetProps) {
                             type="button"
                             className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                             onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                            tabIndex={-1}
+                            aria-label="Toggle password visibility"
                           >
                             {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
@@ -220,7 +220,7 @@ export function ProfileSheet({ open, onOpenChange }: ProfileSheetProps) {
                             type="button"
                             className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                             onClick={() => setShowNewPassword(!showNewPassword)}
-                            tabIndex={-1}
+                            aria-label="Toggle password visibility"
                           >
                             {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
@@ -244,7 +244,7 @@ export function ProfileSheet({ open, onOpenChange }: ProfileSheetProps) {
                             type="button"
                             className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            tabIndex={-1}
+                            aria-label="Toggle password visibility"
                           >
                             {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
