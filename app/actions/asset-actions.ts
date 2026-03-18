@@ -173,6 +173,18 @@ export const changeAssetStatus = authActionClient
       throw new Error('Cannot change status of a sold/disposed asset');
     }
 
+    // Block status change if asset has a pending transfer
+    const { count: pendingTransferCount } = await supabase
+      .from('inventory_movements')
+      .select('id', { count: 'exact', head: true })
+      .eq('item_id', parsedInput.asset_id)
+      .eq('status', 'pending')
+      .is('deleted_at', null);
+
+    if ((pendingTransferCount ?? 0) > 0) {
+      throw new Error('Cannot change status while asset has a pending transfer. Cancel the transfer first.');
+    }
+
     // Validate the transition is allowed
     const allowedTargets = ASSET_STATUS_TRANSITIONS[asset.status as keyof typeof ASSET_STATUS_TRANSITIONS];
     if (!allowedTargets.includes(parsedInput.new_status)) {

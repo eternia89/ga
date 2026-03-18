@@ -490,6 +490,11 @@ export const updateJobStatus = authActionClient
     let requiresCompletionApproval = false;
 
     if (parsedInput.status === 'completed') {
+      // Block completion without assigned PIC — require accountability
+      if (!job.assigned_to) {
+        throw new Error('Cannot complete a job without an assigned PIC. Assign someone first.');
+      }
+
       const { data: setting } = await supabase
         .from('company_settings')
         .select('value')
