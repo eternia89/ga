@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: "Completed quick-260318-bnb: Standardize server action response shape"
 last_updated: "2026-03-18T01:45:40.182Z"
-last_activity: "2026-03-16 - Completed quick task 89: Remove warranty_expiry column from asset table"
+last_activity: "2026-03-18 - Completed quick task 113: ActionResponse type system"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -388,6 +388,7 @@ Recent decisions affecting current work:
 | 110 | Update seed data to set holder_id on inventory_items | 2026-03-17 | 81d05ef | Verified | [260317-n9i-update-seed-data-to-set-holder-id-on-inv](./quick/260317-n9i-update-seed-data-to-set-holder-id-on-inv/) |
 | 111 | Allow transferring assets to any user in company, not just GA roles | 2026-03-17 | 94ae114 | Verified | [260317-njk-allow-transferring-assets-to-any-user-in](./quick/260317-njk-allow-transferring-assets-to-any-user-in/) |
 | 112 | Fix 5 security/correctness issues in asset transfer actions | 2026-03-18 | 54a3b7d | Verified | [260318-bah-fix-5-security-and-correctness-issues-in](./quick/260318-bah-fix-5-security-and-correctness-issues-in/) |
+| 113 | Standardize server action response shapes with ActionResponse type | 2026-03-18 | 30970da | Verified | [260318-bnb-standardize-server-action-response-shape](./quick/260318-bnb-standardize-server-action-response-shape/) |
 
 ## Session Continuity
 
