@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: "Completed quick-260318-cbb: Fix 4 UI consistency issues"
 last_updated: "2026-03-18T02:03:37.279Z"
-last_activity: "2026-03-18 - Completed quick task 115: Security audit fixes"
+last_activity: "2026-03-18 - Completed quick task 116: company_settings RLS"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -391,10 +391,11 @@ Recent decisions affecting current work:
 | 113 | Standardize server action response shapes with ActionResponse type | 2026-03-18 | 30970da | Verified | [260318-bnb-standardize-server-action-response-shape](./quick/260318-bnb-standardize-server-action-response-shape/) |
 | 114 | Fix 4 UI consistency: CreatedAtCell, DisplayId, any types, hover colors | 2026-03-18 | 5c2f46a | Verified | [260318-cbb-fix-4-ui-consistency-issues-createdatcel](./quick/260318-cbb-fix-4-ui-consistency-issues-createdatcel/) |
 | 115 | Fix 3 security issues: updateUser company access, createTransfer multi-company, deleteAssetPhotos | 2026-03-18 | 2388ef9 | Verified | [260318-fm0-fix-3-security-issues-updateuser-company](./quick/260318-fm0-fix-3-security-issues-updateuser-company/) |
+| 116 | Expand company_settings RLS for multi-company access | 2026-03-18 | 0f90cb1 | Verified | [260318-fra-fix-company-settings-multi-company-rls-a](./quick/260318-fra-fix-company-settings-multi-company-rls-a/) |
 
 ## Session Continuity
 
-Last session: 2026-03-18T04:18:00.000Z
-Stopped at: Completed quick task 115: Security audit fixes
+Last session: 2026-03-18T04:25:00.000Z
+Stopped at: Completed quick task 116: company_settings RLS
 Resume file: None
-Next: Audit #2 — RLS Policy Completeness
+Next: Audit #3 — Error Boundaries
