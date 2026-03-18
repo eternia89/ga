@@ -146,6 +146,49 @@ export default async function RequestDetailPage({ params }: PageProps) {
     }
   }
 
+  // Pre-scan audit logs to batch-fetch category names and user names needed during timeline processing.
+  // This eliminates N+1 sequential queries inside the loop.
+  const triageCategoryIds: string[] = [];
+  const triageUserIds: string[] = [];
+
+  for (const log of auditLogs) {
+    if (log.operation !== 'UPDATE') continue;
+    const changedFields = log.changed_fields as string[] | null;
+    const newData = log.new_data as Record<string, unknown> | null;
+    if (!changedFields || !newData) continue;
+
+    if (changedFields.includes('category_id') && newData.category_id) {
+      triageCategoryIds.push(newData.category_id as string);
+    }
+    if (changedFields.includes('assigned_to') && newData.assigned_to) {
+      const assignedId = newData.assigned_to as string;
+      if (!userMap[assignedId]) {
+        triageUserIds.push(assignedId);
+      }
+    }
+  }
+
+  // Batch fetch categories and additional users in parallel
+  const uniqueCategoryIds = [...new Set(triageCategoryIds)];
+  const uniqueTriageUserIds = [...new Set(triageUserIds)];
+
+  const [categoryBatchResult, triageUserBatchResult] = await Promise.all([
+    uniqueCategoryIds.length > 0
+      ? supabase.from('categories').select('id, name').in('id', uniqueCategoryIds)
+      : Promise.resolve({ data: [] as { id: string; name: string }[] }),
+    uniqueTriageUserIds.length > 0
+      ? supabase.from('user_profiles').select('id, name:full_name').in('id', uniqueTriageUserIds)
+      : Promise.resolve({ data: [] as { id: string; name: string }[] }),
+  ]);
+
+  const categoryMap: Record<string, string> = {};
+  for (const cat of categoryBatchResult.data ?? []) {
+    categoryMap[cat.id] = cat.name;
+  }
+  for (const u of triageUserBatchResult.data ?? []) {
+    userMap[u.id] = u.name ?? u.id;
+  }
+
   const timelineEvents: TimelineEvent[] = [];
 
   // Internal DB fields that should not appear as generic field updates in the timeline.
@@ -258,18 +301,13 @@ export default async function RequestDetailPage({ params }: PageProps) {
     const triageFields = ['category_id', 'priority', 'assigned_to'];
     const isTriageEvent = triageFields.some((f) => changedFields.includes(f));
     if (isTriageEvent) {
-      // Resolve category and user names
+      // Resolve category and user names from pre-fetched lookup maps
       let categoryName: string | undefined;
       let priorityLabel: string | undefined;
       let picName: string | undefined;
 
       if (changedFields.includes('category_id') && newData?.category_id) {
-        const { data: cat } = await supabase
-          .from('categories')
-          .select('name')
-          .eq('id', newData.category_id as string)
-          .single();
-        categoryName = cat?.name;
+        categoryName = categoryMap[newData.category_id as string];
       }
 
       if (changedFields.includes('priority') && newData?.priority) {
@@ -277,17 +315,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
       }
 
       if (changedFields.includes('assigned_to') && newData?.assigned_to) {
-        const picData = userMap[newData.assigned_to as string];
-        if (picData) {
-          picName = picData;
-        } else {
-          const { data: pic } = await supabase
-            .from('user_profiles')
-            .select('name:full_name')
-            .eq('id', newData.assigned_to as string)
-            .single();
-          picName = pic?.name;
-        }
+        picName = userMap[newData.assigned_to as string];
       }
 
       timelineEvents.push({

@@ -234,32 +234,47 @@ export default async function JobDetailPage({ params }: PageProps) {
     }
   }
 
-  // Resolve approved_by and approval_rejected_by names
-  let approvedByName: string | null = null;
-  let approvalRejectedByName: string | null = null;
+  // Batch-fetch approved_by and approval_rejected_by names if not already in userMap
+  const missingApprovalUserIds = [job.approved_by, job.approval_rejected_by]
+    .filter((id): id is string => Boolean(id))
+    .filter((id) => !userMap[id]);
 
-  if (job.approved_by) {
-    approvedByName = userMap[job.approved_by] ?? null;
-    if (!approvedByName) {
-      const { data: u } = await supabase
-        .from('user_profiles')
-        .select('name:full_name')
-        .eq('id', job.approved_by)
-        .single();
-      approvedByName = u?.name ?? null;
+  if (missingApprovalUserIds.length > 0) {
+    const uniqueMissingIds = [...new Set(missingApprovalUserIds)];
+    const { data: approvalUsers } = await supabase
+      .from('user_profiles')
+      .select('id, name:full_name')
+      .in('id', uniqueMissingIds);
+    approvalUsers?.forEach((u) => { userMap[u.id] = u.name ?? u.id; });
+  }
+
+  const approvedByName = job.approved_by ? (userMap[job.approved_by] ?? null) : null;
+  const approvalRejectedByName = job.approval_rejected_by ? (userMap[job.approval_rejected_by] ?? null) : null;
+
+  // Pre-scan audit logs to batch-fetch user names needed for assignment timeline events.
+  // This eliminates N+1 sequential queries inside the loop.
+  const assignmentUserIds: string[] = [];
+  for (const log of auditLogs) {
+    if (log.operation !== 'UPDATE') continue;
+    const changedFields = log.changed_fields as string[] | null;
+    const newData = log.new_data as Record<string, unknown> | null;
+    const oldData = log.old_data as Record<string, unknown> | null;
+    if (!changedFields || !changedFields.includes('assigned_to')) continue;
+    if (newData?.assigned_to && !userMap[newData.assigned_to as string]) {
+      assignmentUserIds.push(newData.assigned_to as string);
+    }
+    if (oldData?.assigned_to && !userMap[oldData.assigned_to as string]) {
+      assignmentUserIds.push(oldData.assigned_to as string);
     }
   }
 
-  if (job.approval_rejected_by) {
-    approvalRejectedByName = userMap[job.approval_rejected_by] ?? null;
-    if (!approvalRejectedByName) {
-      const { data: u } = await supabase
-        .from('user_profiles')
-        .select('name:full_name')
-        .eq('id', job.approval_rejected_by)
-        .single();
-      approvalRejectedByName = u?.name ?? null;
-    }
+  const uniqueAssignmentUserIds = [...new Set(assignmentUserIds)];
+  if (uniqueAssignmentUserIds.length > 0) {
+    const { data: assignUsers } = await supabase
+      .from('user_profiles')
+      .select('id, name:full_name')
+      .in('id', uniqueAssignmentUserIds);
+    assignUsers?.forEach((u) => { userMap[u.id] = u.name ?? u.id; });
   }
 
   // Process audit logs into timeline events
@@ -377,31 +392,12 @@ export default async function JobDetailPage({ params }: PageProps) {
 
     // Check for assignment (assigned_to changed)
     if (changedFields.includes('assigned_to') && newData?.assigned_to) {
-      // Resolve new PIC name
+      // Resolve PIC names from pre-fetched userMap
       const newPicId = newData.assigned_to as string;
-      let newPicName = userMap[newPicId] ?? null;
-      if (!newPicName) {
-        const { data: picUser } = await supabase
-          .from('user_profiles')
-          .select('name:full_name')
-          .eq('id', newPicId)
-          .single();
-        newPicName = picUser?.name ?? newPicId;
-      }
+      const newPicName = userMap[newPicId] ?? newPicId;
 
       const oldPicId = oldData?.assigned_to as string | null | undefined;
-      let oldPicName: string | null = null;
-      if (oldPicId) {
-        oldPicName = userMap[oldPicId] ?? null;
-        if (!oldPicName) {
-          const { data: oldPicUser } = await supabase
-            .from('user_profiles')
-            .select('name:full_name')
-            .eq('id', oldPicId)
-            .single();
-          oldPicName = oldPicUser?.name ?? oldPicId;
-        }
-      }
+      const oldPicName = oldPicId ? (userMap[oldPicId] ?? oldPicId) : null;
 
       timelineEvents.push({
         type: 'assignment',
