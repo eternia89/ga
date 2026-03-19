@@ -317,10 +317,40 @@ These rules must be preserved across all changes:
 13. **Optimistic locking:** Update actions compare `updated_at` to prevent concurrent edit overwrites.
 14. **Action responses:** All server actions return `ActionResponse<T>` typed responses with explicit return type annotations.
 15. **Accessibility:** Skip-to-content link, focus restoration on lightbox close, aria-live on form errors.
+16. **Role constants:** All role checks must use `ROLES.*`, `GA_ROLES`, or `LEAD_ROLES` from `lib/constants/roles.ts`. Never inline role string arrays.
 
 ---
 
 ## Change Log
+
+### 20-Mar-2026 — Consistency & Testing Hardening (11 commits, 55 files)
+
+**Code Quality (7 fixes):**
+- Error checks added to approval-actions bulk request update, job-actions delete link, entity-photos upload path
+- Null safety for signed URL failures in request/asset photo getters (returns empty string instead of crash)
+- Rollback logic placeholder for acceptTransfer two-step update
+- PII reduction: auth callback `console.log` changed to `console.error` for sensitive data
+- Empty URL guard in entity-photos route
+
+**Role Constants:**
+- Extracted `ROLES`, `GA_ROLES`, `LEAD_ROLES` to `lib/constants/roles.ts`
+- Replaced 60+ inline role array checks across 36 files (actions, components, pages, API routes)
+- Type-safe readonly arrays for role checking
+
+**UI Component Adoption:**
+- `DisplayId` component adopted in 10 additional locations (asset/job/request columns, transfer dialogs, schedule components)
+- `CreatedAtCell` adopted for schedule `last_completed_at` column
+
+**Testing:**
+- Added optimistic locking tests (`assertNotStale` utility tests)
+- Added `ActionResponse<T>` shape validation tests (116 lines covering ok/fail/type guards)
+- Fixed permissions test for `assertNotStale` import
+- Extracted `assertNotStale` utility to `lib/utils/optimistic-lock.ts`
+
+**New Technical Invariant (#16):**
+- Role constants: All role checks must use `ROLES.*`, `GA_ROLES`, or `LEAD_ROLES` from `lib/constants/roles.ts`. Never inline role string arrays.
+
+---
 
 ### 18-Mar-2026 — Autonomous Audit Session (30 commits, 58 files)
 
