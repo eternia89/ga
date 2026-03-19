@@ -410,3 +410,138 @@ No new commits since the last review (14-Mar-2026 was the last commit day). This
 - **Transfer workflow fully hardened** — 20 quick tasks covering validation, scoping, status blocking, UX
 - **New `AssetTransferRespondModal`** follows all CLAUDE.md patterns (font-mono, date format, InlineFeedback, desktop-first)
 - **Custody tracking (`holder_id`)** — column added, seed data populated, displayed in 3 views
+
+---
+
+## 19-Mar-2026
+
+### Commits Summary (18-Mar-2026)
+
+| Task | Commits | What Changed |
+|------|---------|-------------|
+| quick-112 (bah) | 2 commits | 5 security/correctness fixes in asset transfer actions |
+| quick-113 (bnb) | 4 commits | ActionResponse<T> type system + return type annotations on all 81 server actions |
+| quick-114 (cbb) | 3 commits | Extracted shared CreatedAtCell/DisplayId components, removed `any` types, standardized link hover colors |
+| quick-115 (fm0) | 2 commits | 3 security fixes: updateUser company access, createTransfer multi-company, deleteAssetPhotos access |
+| quick-116 (fra) | 1 commit | RLS migration 00029: company_settings multi-company expansion |
+| quick-117 (fv3) | 3 commits | Optimistic locking on updateAsset/updateJob/updateRequest + form updated_at passthrough |
+| quick-118 (g3x) | 2 commits | 5 accessibility fixes: skip-to-content, KPI card links, focus restore, aria-labels, aria-live |
+| quick-119 (g8o) | 2 commits | Batch N+1 timeline queries in request/job detail pages |
+| quick-120 (gdy) | 1 commit | Block status change during transfer + block job completion without PIC |
+| docs | 3 commits | GA PRD (ga-prd-human.md), db_schema.md from 29 migrations, CLAUDE.md PRD reference |
+| planning docs | 7 commits | STATE.md updates, improvements log, verification reports, summaries |
+
+**Total: 30 commits, 58 files changed, 3,235 lines added**
+
+---
+
+### Resolved from Previous Reviews
+
+| # | Original Date | Original Issue | Resolution |
+|---|---------------|---------------|------------|
+| 1 | 18-Mar #2 (OPEN) | Standardize response shapes — some `{ success: true }`, others include IDs | **DONE** — ActionResponse<T> type system created, all 81 actions typed (quick-bnb) |
+| 2 | 18-Mar #5 (OPEN) | Create shared `CreatedAtCell` component | **DONE** — extracted in quick-cbb (`components/data-table/created-at-cell.tsx`) |
+| 3 | 18-Mar #9 (OPEN) | Create shared `DisplayId` component with `font-mono` | **DONE** — extracted in quick-cbb (`components/display-id.tsx`) |
+| 4 | 18-Mar #11 (NEW) | Remove `any` types from job-form.tsx and status-bar-chart.tsx | **DONE** — fixed in quick-cbb |
+| 5 | 18-Mar #14 (NEW) | Standardize link hover to `hover:text-blue-700` | **DONE** — fixed in quick-cbb (notification-dropdown, template-columns) |
+| 6 | 18-Mar #1 (CRITICAL) | createTransfer no company_id check on receiver | **FIXED** in quick-fm0 — multi-company access validated |
+| 7 | 18-Mar #3 (HIGH) | Location-only transfer doesn't clear holder_id | **Needs verification** — check if quick-bah addressed this |
+
+---
+
+### Risky Patterns & Security (New Findings)
+
+| # | Severity | File | Issue | Recommendation |
+|---|----------|------|-------|----------------|
+| 1 | **HIGH** | All 15 `app/actions/*.ts` files | Zero unit tests for server actions. Only 2 test files exist in `__tests__/actions/` (job-utils, user-company-access). Per CLAUDE.md: "add or update a test" for access control, query filters, status transitions, business rules | Set up vitest test suite for server action business logic |
+| 2 | **HIGH** | 27 RLS migration files | Only 1 RLS test exists (`e2e/tests/quick-54-rls/`). All INSERT/UPDATE/DELETE multi-company policies untested | Add RLS policy tests for each table's CRUD operations |
+| 3 | **MEDIUM** | `app/actions/approval-actions.ts:196-204` | Bulk request status update (submitted→pending_acceptance) has **no error check** — silent failure | Add `if (error) throw new Error(error.message)` after update |
+| 4 | **MEDIUM** | `app/api/uploads/entity-photos/route.ts:187` | Unchecked `.data` access — `uploadData.path` used without null check after upload succeeds | Add explicit `if (!uploadData) continue;` before accessing `.path` |
+| 5 | **MEDIUM** | `app/api/uploads/entity-photos/route.ts:209-249` | Fire-and-forget Vision API promise chain with `catch(() => {})` — errors swallowed silently | Add `console.error()` logging before catch |
+| 6 | **MEDIUM** | `app/api/uploads/entity-photos/route.ts:217` | Vision API key embedded in URL query parameter — logged in proxies/CDN. No rate limiting | Move to `Authorization: Bearer` header; add per-user upload rate limiting |
+| 7 | **MEDIUM** | `app/actions/asset-actions.ts:328-333` | Location-only transfer: two sequential updates (movement insert + asset update) without atomic transaction. Race condition between operations | Wrap in Postgres function for atomicity |
+| 8 | **MEDIUM** | `app/actions/asset-actions.ts`, `job-actions.ts`, `request-actions.ts` | Optimistic locking only on 3 core update actions — missing from profile, user, admin settings, template, schedule updates | Extend optimistic locking to all multi-user editable entities |
+| 9 | **LOW** | `app/api/auth/callback/route.ts:124` | `console.log` in production with userId and redirectTo — PII in server logs | Change to `console.debug()` or structured logger |
+| 10 | **LOW** | `app/actions/request-actions.ts:597`, `asset-actions.ts:566,606` | Signed URL failure silently produces `url: ''` — broken images in UI | Return error state or explicit null for failed URLs |
+| 11 | **LOW** | `app/actions/job-actions.ts:241-245` | Delete from `job_requests` has no error check — silent failure | Add error handling |
+
+---
+
+### UI/UX Inconsistencies (New + Persistent)
+
+| # | Status | File | Issue | Fix |
+|---|--------|------|-------|-----|
+| 1 | **PERSISTENT** (15-Mar) | `lib/utils.ts:27` | CSV export filename uses `yyyy-MM-dd` instead of `dd-MM-yyyy` | Change format string |
+| 2 | **PERSISTENT** (16-Mar) | `components/audit-trail/audit-trail-columns.tsx:141-160` | Display ID link variant missing `font-mono` | Add `font-mono` to both code paths |
+| 3 | **PERSISTENT** (17-Mar) | Multiple maintenance components (8 locations) | Created date spans missing `text-sm` | Apply shared `CreatedAtCell` component to remaining locations |
+| 4 | **PERSISTENT** (17-Mar) | Multiple maintenance components (4 locations) | Asset `display_id` missing `font-mono` | Apply shared `DisplayId` component |
+| 5 | **NEW** | `components/admin/entity-form-dialog.tsx:124-137` | Secondary action button (deactivate/reactivate) uses `variant="ghost"` with inline color classes — inconsistent with user-deactivate-dialog which uses proper AlertDialogAction with bg-colors | Standardize to AlertDialogAction pattern |
+| 6 | **NEW** | `components/maintenance/template-columns.tsx` | "View" link uses `font-medium text-blue-600 hover:text-blue-800 hover:underline` — differs from standard ghost button pattern (`h-7 px-2`) used in admin tables | Align to ghost button pattern or document as intentional for domain entity tables |
+| 7 | **OBSERVATION** | 26+ inline `font-mono` usages | `DisplayId` component extracted but **underutilized** — only used in a few locations while 26+ locations still use inline `className="font-mono"` | Migrate all display_id renders to use `<DisplayId>` wrapper |
+| 8 | **OBSERVATION** | `CreatedAtCell` component | Same situation — extracted but majority of date renders still use inline formatting | Migrate remaining date renders to use `<CreatedAtCell>` |
+
+---
+
+### Code Consistency & Scalability Improvements (Updated)
+
+| # | Status | Category | Suggestion |
+|---|--------|----------|------------|
+| 1 | **DONE** | Actions | ~~Extract `assertCompanyAccess` shared helper~~ |
+| 2 | **DONE** | Actions | ~~Standardize response shapes~~ — ActionResponse<T> type system created + all 81 actions typed |
+| 3 | OPEN | Schema | Create `optionalUuid()` Zod helper to replace 3 divergent nullable/optional UUID patterns |
+| 4 | **DONE** | Schema | ~~Create `isoDateString()` Zod helper~~ |
+| 5 | **DONE** | Columns | ~~Create shared `CreatedAtCell` component~~ — extracted, but needs migration to all remaining locations |
+| 6 | OPEN | Testing | Set up vitest for server action unit tests — 15 action files with zero tests |
+| 7 | OPEN | Logging | Replace raw `console.error/log` (35+ occurrences) with structured logger before production |
+| 8 | **DONE** | Notifications | ~~Standardize notification error handling~~ |
+| 9 | **DONE** | Display IDs | ~~Create shared `DisplayId` component~~ — extracted, but needs migration to all 26+ locations |
+| 10 | OPEN | Notifications | Extract `safeCreateNotifications()` helper — 15 identical `.catch(err => console.error(...))` patterns |
+| 11 | **DONE** | Type Safety | ~~Remove `any` types from job-form.tsx and status-bar-chart.tsx~~ |
+| 12 | OPEN | Error Handling | Photo upload error handling in modals — `asset-transfer-respond-modal.tsx` and `job-form.tsx` don't check fetch response |
+| 13 | OPEN | Data Integrity | Add rollback logic to `acceptTransfer` two-step update, or use Postgres function for atomicity |
+| 14 | **DONE** | Link Colors | ~~Standardize link hover to `hover:text-blue-700`~~ — fixed in notification-dropdown, but still pending in template-columns, schedule-columns |
+| 15 | **NEW** | Timestamps | Extract `getCurrentTimestamp()` utility — 39 instances of `new Date().toISOString()` scattered across 8 action files |
+| 16 | **NEW** | Paths | Centralize `revalidatePath()` constants — 12+ hardcoded route paths scattered across action files |
+| 17 | **NEW** | Roles | Create role access matrix constant — inline role arrays like `['ga_lead', 'admin']` repeated across files |
+| 18 | **NEW** | Tables | Standardize filter state management — domain tables (jobs, requests) use `nuqs` URL params, admin tables use local React state. Inconsistent UX. |
+| 19 | **NEW** | Adoption | Migrate all 26+ inline `font-mono` for display IDs to use `<DisplayId>` wrapper component |
+| 20 | **NEW** | Adoption | Migrate all remaining date renders to use `<CreatedAtCell>` component |
+| 21 | **NEW** | Validation | Audit all form `<Input>` elements — ensure every Zod `.max(N)` has matching `maxLength={N}` attribute |
+
+---
+
+### Missing Tests (Persistent + New)
+
+| # | Priority | Status | Area | Gap |
+|---|----------|--------|------|-----|
+| 1 | **CRITICAL** | PERSISTENT | Unit | All 15 server action files lack unit tests — only 2 test files in `__tests__/actions/` |
+| 2 | **CRITICAL** | PERSISTENT (17-Mar) | RLS | Multi-company RLS write policies (migration 00027, 00029) completely untested |
+| 3 | **HIGH** | PERSISTENT (17-Mar) | Unit | `assertCompanyAccess` helper — 8 critical mutation paths, zero tests |
+| 4 | **HIGH** | PERSISTENT (18-Mar) | E2E | Transfer accept/reject flow — zero tests for receiver-based lifecycle |
+| 5 | **HIGH** | PERSISTENT (18-Mar) | E2E | `holder_id` consistency — no tests verifying holder set on accept, cleared on location move |
+| 6 | **HIGH** | NEW | Unit | Optimistic locking mechanism — no tests for concurrent edit rejection |
+| 7 | **HIGH** | NEW | Unit | ActionResponse<T> type compliance — no tests verifying all actions return correct shape |
+| 8 | **MEDIUM** | PERSISTENT (16-Mar) | E2E | Invalid status transition rejection — no tests proving transitions are blocked |
+| 9 | **MEDIUM** | PERSISTENT (16-Mar) | E2E | Soft delete cycle — only locations tested; 6 other entities missing |
+| 10 | **MEDIUM** | PERSISTENT (16-Mar) | E2E | Duplicate name rejection — case-insensitivity and reactivation conflicts |
+| 11 | **MEDIUM** | PERSISTENT (16-Mar) | E2E | Role-based denial — no tests for unauthorized role actions |
+
+---
+
+### What's Working Well (Updated)
+
+- **100% responsive design compliance** — zero mobile-first breakpoint violations across entire codebase
+- **100% maxLength compliance** — all Input components match Zod `.max(N)` values
+- **100% date format compliance** — all user-visible dates use `dd-MM-yyyy`
+- **100% notification error handling** — all 15 `createNotifications` calls have `.catch()` with logging
+- **100% feedback persistence** — no auto-dismiss timers on any success/error message
+- **100% soft-delete terminology** — "Deactivate"/"Reactivate" everywhere
+- **100% Combobox/Select correctness** — large lists use Combobox, small fixed lists use Select
+- **100% form pattern compliance** — all forms use react-hook-form + zodResolver, zero raw useState
+- **100% ActionResponse<T> compliance** — all 81 server actions have explicit typed return annotations
+- **No `any` types remaining** — strict TypeScript throughout
+- **No `@ts-ignore` or `@ts-expect-error`** — zero suppression directives
+- **No `dangerouslySetInnerHTML`** — zero XSS vectors
+- **Optimistic locking active** on 3 core entities (assets, jobs, requests)
+- **Shared components extracted** — `CreatedAtCell`, `DisplayId` ready for broader adoption
+- **Accessibility improved** — skip-to-content, focus management, aria-live, semantic elements

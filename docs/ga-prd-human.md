@@ -315,3 +315,46 @@ These rules must be preserved across all changes:
 11. **Auth:** `getUser()` for server-side JWT validation. Never `getSession()`.
 12. **RLS:** Let RLS handle access control where possible. Only use `adminSupabase` when RLS is insufficient and you verify authorization in code first.
 13. **Optimistic locking:** Update actions compare `updated_at` to prevent concurrent edit overwrites.
+14. **Action responses:** All server actions return `ActionResponse<T>` typed responses with explicit return type annotations.
+15. **Accessibility:** Skip-to-content link, focus restoration on lightbox close, aria-live on form errors.
+
+---
+
+## Change Log
+
+### 18-Mar-2026 — Autonomous Audit Session (30 commits, 58 files)
+
+**Security Hardening (6 fixes):**
+- `updateUser` now validates company access before reassignment
+- `createTransfer` removed hardcoded company filter (relies on RLS), uses `asset.company_id` for movement
+- `deleteAssetPhotos` uses `assertCompanyAccess` instead of hardcoded filter
+- Asset transfer: added concurrent transfer guard, receiver active status validation, company boundary check
+- `company_settings` RLS expanded for multi-company budget threshold lookups (migration 00029)
+
+**Type System:**
+- Created `ActionResponse<T>` type system (`lib/types/action-responses.ts`) with `ActionOk<T>` and `ActionFail` discriminated union
+- Added explicit return type annotations to all 81 server actions across 15 files
+
+**UI Consistency:**
+- Extracted shared `CreatedAtCell` and `DisplayId` components for consistent rendering
+- Removed `any` types from `job-form.tsx` and `status-bar-chart.tsx`
+- Standardized link hover colors to `hover:text-blue-700`
+
+**Data Integrity:**
+- Added optimistic locking (`updated_at` comparison) to `updateAsset`, `updateJob`, `updateRequest`
+- Blocked asset status change while transfer is pending (server-side validation)
+- Blocked job completion without assigned PIC
+
+**Performance:**
+- Batch N+1 sequential DB queries in request/job detail timeline processing
+
+**Accessibility:**
+- Skip-to-content link in dashboard layout
+- KPI cards converted from div+onClick to semantic Link elements
+- PhotoLightbox restores focus on close
+- Password toggle buttons have proper aria-labels
+- Form errors announced to screen readers via aria-live
+
+**Documentation:**
+- Created `docs/ga-prd-human.md` (this document) with mandatory PRD reference in CLAUDE.md
+- Created `docs/db_schema.md` consolidating all 29 migrations into readable format
