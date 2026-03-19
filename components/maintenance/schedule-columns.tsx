@@ -138,7 +138,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
     cell: ({ row }) => {
       const date = row.getValue('last_completed_at') as string | null;
       return date ? (
-        <span>{format(new Date(date), 'dd-MM-yyyy')}</span>
+        <CreatedAtCell date={date} />
       ) : (
         <span className="text-muted-foreground">—</span>
       );
