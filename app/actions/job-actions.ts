@@ -238,11 +238,14 @@ export const updateJob = authActionClient
       const toAdd = [...newIds].filter((rid) => !currentIds.has(rid));
 
       if (toRemove.length > 0) {
-        await supabase
+        const { error: unlinkError } = await supabase
           .from('job_requests')
           .delete()
           .eq('job_id', id)
           .in('request_id', toRemove);
+        if (unlinkError) {
+          throw new Error(`Failed to unlink requests: ${unlinkError.message}`);
+        }
       }
 
       if (toAdd.length > 0) {

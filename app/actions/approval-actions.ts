@@ -193,7 +193,7 @@ export const approveCompletion = authActionClient
 
     if (linkedJobRequests && linkedJobRequests.length > 0) {
       const requestIds = linkedJobRequests.map((jr) => jr.request_id);
-      await supabase
+      const { error: reqUpdateError } = await supabase
         .from('requests')
         .update({
           status: 'pending_acceptance',
@@ -202,6 +202,10 @@ export const approveCompletion = authActionClient
         })
         .in('id', requestIds)
         .neq('status', 'cancelled');
+
+      if (reqUpdateError) {
+        console.error('[approval] Failed to update linked request status:', reqUpdateError.message);
+      }
 
       // Notify requesters with auto-accept warning
       const { data: linkedRequests } = await supabase

@@ -121,8 +121,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Success - response already has redirect URL and session cookies set
-  console.log('[auth/callback] stage=success', {
-    userId: user.id,
+  console.debug('[auth/callback] stage=success', {
     redirectTo: next,
   })
   return response

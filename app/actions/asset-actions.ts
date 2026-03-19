@@ -329,7 +329,14 @@ export const createTransfer = authActionClient
         .from('inventory_items')
         .update({ location_id: parsedInput.to_location_id, holder_id: null })
         .eq('id', parsedInput.asset_id);
-      if (itemError) throw new Error(itemError.message);
+      if (itemError) {
+        // Rollback: delete the movement record since asset update failed
+        await supabase
+          .from('inventory_movements')
+          .delete()
+          .eq('id', data.id);
+        throw new Error('Failed to update asset location. Please try again.');
+      }
     }
 
     revalidatePath('/inventory');
@@ -558,14 +565,16 @@ export const getAssetPhotos = authActionClient
         3600
       );
 
-    const photos = allAttachments.map((attachment, index) => ({
-      id: attachment.id,
-      entity_type: attachment.entity_type,
-      entity_id: attachment.entity_id,
-      file_name: attachment.file_name,
-      url: signedUrls?.[index]?.signedUrl ?? '',
-      created_at: attachment.created_at,
-    }));
+    const photos = allAttachments
+      .map((attachment, index) => ({
+        id: attachment.id,
+        entity_type: attachment.entity_type,
+        entity_id: attachment.entity_id,
+        file_name: attachment.file_name,
+        url: signedUrls?.[index]?.signedUrl ?? '',
+        created_at: attachment.created_at,
+      }))
+      .filter((p) => p.url !== '');
 
     return { success: true, photos };
   });
@@ -598,14 +607,16 @@ export const getAssetInvoices = authActionClient
         3600
       );
 
-    const invoices = attachments.map((attachment, index) => ({
-      id: attachment.id,
-      entity_type: attachment.entity_type,
-      entity_id: attachment.entity_id,
-      file_name: attachment.file_name,
-      url: signedUrls?.[index]?.signedUrl ?? '',
-      created_at: attachment.created_at,
-    }));
+    const invoices = attachments
+      .map((attachment, index) => ({
+        id: attachment.id,
+        entity_type: attachment.entity_type,
+        entity_id: attachment.entity_id,
+        file_name: attachment.file_name,
+        url: signedUrls?.[index]?.signedUrl ?? '',
+        created_at: attachment.created_at,
+      }))
+      .filter((p) => p.url !== '');
 
     return { success: true, invoices };
   });

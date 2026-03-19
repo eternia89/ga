@@ -591,12 +591,14 @@ export const getRequestPhotos = authActionClient
         21600
       );
 
-    const photos = attachments.map((attachment, index) => ({
-      id: attachment.id,
-      fileName: attachment.file_name,
-      url: signedUrls?.[index]?.signedUrl ?? '',
-      mimeType: attachment.mime_type,
-    }));
+    const photos = attachments
+      .map((attachment, index) => ({
+        id: attachment.id,
+        fileName: attachment.file_name,
+        url: signedUrls?.[index]?.signedUrl ?? '',
+        mimeType: attachment.mime_type,
+      }))
+      .filter((p) => p.url !== '');
 
     return { success: true, photos };
   });

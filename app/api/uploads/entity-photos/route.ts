@@ -171,8 +171,8 @@ export async function POST(request: NextRequest) {
           contentType: file.type,
         });
 
-      if (uploadError) {
-        console.error('Upload error:', uploadError.message);
+      if (uploadError || !uploadData) {
+        console.error('Upload error:', uploadError?.message ?? 'No upload data returned');
         continue;
       }
 
@@ -244,9 +244,9 @@ export async function POST(request: NextRequest) {
                     .eq('id', attachmentId);
                 }
               })
-              .catch(() => {});
+              .catch((err: unknown) => { console.error('[vision-api]', err instanceof Error ? err.message : err); });
           })
-          .catch(() => {}); // Truly fire-and-forget
+          .catch((err: unknown) => { console.error('[vision-api] buffer read failed:', err instanceof Error ? err.message : err); });
       }
     }
 
