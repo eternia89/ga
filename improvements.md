@@ -545,3 +545,18 @@ No new commits since the last review (14-Mar-2026 was the last commit day). This
 - **Optimistic locking active** on 3 core entities (assets, jobs, requests)
 - **Shared components extracted** — `CreatedAtCell`, `DisplayId` ready for broader adoption
 - **Accessibility improved** — skip-to-content, focus management, aria-live, semantic elements
+
+---
+
+### Supplementary Findings (Deep Action Analysis)
+
+Additional findings from thorough per-file server action analysis:
+
+| # | Severity | File | Issue | Recommendation |
+|---|----------|------|-------|----------------|
+| 12 | **HIGH** | `app/actions/profile-actions.ts` (`changePassword`) | Schema has unbounded `currentPassword` and `newPassword` string fields — no `.max()` | Add `.max(128)` to both password fields in schema |
+| 13 | **HIGH** | `app/actions/pm-job-actions.ts` | `savePMChecklistItem` `itemId` field uses `.min(1)` but missing `.uuid()` validation; `savePMChecklistPhoto` same issue | Add `.uuid()` to all ID fields |
+| 14 | **MEDIUM** | `app/actions/company-settings-actions.ts` | `getCompanySettings` and `updateCompanySetting` hardcode `.eq('company_id', profile.company_id)` — blocks multi-company admin access to settings | Use `effectiveCompanyId` or `allAccessibleCompanyIds` pattern |
+| 15 | **MEDIUM** | `app/actions/job-actions.ts`, `request-actions.ts` | Notification `company_id` uses `profile.company_id` instead of entity's `company_id` — multi-company user may notify wrong company's users | Use `job.company_id` / `request.company_id` for notification scoping |
+| 16 | **MEDIUM** | `app/actions/user-actions.ts` (`deactivateUser`) | Missing company access check — admin could deactivate user in a company they don't have access to | Add `assertCompanyAccess` before deactivation |
+| 17 | **LOW** | `app/actions/company-settings-actions.ts`, `user-company-access-actions.ts` | GET actions (`getCompanySettings`, `getUserCompanyAccess`) return raw objects instead of `ActionResponse<T>` | Wrap in ActionResponse for consistency |
