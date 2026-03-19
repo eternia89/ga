@@ -21,6 +21,7 @@ import {
 } from '@/app/actions/schedule-actions';
 import { z } from 'zod';
 import { assertCompanyAccess } from '@/lib/auth/company-access';
+import { assertNotStale } from '@/lib/utils/optimistic-lock';
 import type { ActionOk, ActionResponse, PhotosResponse, InvoicesResponse, DeleteAttachmentsResponse } from '@/lib/types/action-responses';
 
 // ============================================================================
@@ -115,9 +116,7 @@ export const updateAsset = authActionClient
     }
 
     // Optimistic locking: reject if entity was modified since the form loaded
-    if (parsedInput.updated_at && existing.updated_at !== parsedInput.updated_at) {
-      throw new Error('This record was modified by another user. Please refresh the page and re-apply your changes.');
-    }
+    assertNotStale(parsedInput.updated_at, existing.updated_at);
 
     const { error } = await supabase
       .from('inventory_items')

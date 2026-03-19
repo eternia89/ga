@@ -24,9 +24,9 @@ describe('hasPermission', () => {
     expect(hasPermission('ga_lead', PERMISSIONS.AUDIT_VIEW)).toBe(true);
   });
 
-  it('ga_staff has JOB_UPDATE_STATUS but not JOB_CREATE', () => {
+  it('ga_staff has JOB_UPDATE_STATUS and JOB_CREATE', () => {
     expect(hasPermission('ga_staff', PERMISSIONS.JOB_UPDATE_STATUS)).toBe(true);
-    expect(hasPermission('ga_staff', PERMISSIONS.JOB_CREATE)).toBe(false);
+    expect(hasPermission('ga_staff', PERMISSIONS.JOB_CREATE)).toBe(true);
   });
 
   it('finance_approver has APPROVAL_DECIDE but not JOB_CREATE', () => {

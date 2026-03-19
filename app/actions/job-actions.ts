@@ -11,6 +11,7 @@ import { formatIDR } from '@/lib/utils';
 import { advanceFloatingScheduleCore } from '@/app/actions/pm-job-actions';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { assertCompanyAccess } from '@/lib/auth/company-access';
+import { assertNotStale } from '@/lib/utils/optimistic-lock';
 import type { ActionOk, ActionResponse } from '@/lib/types/action-responses';
 
 // ============================================================================
@@ -209,9 +210,7 @@ export const updateJob = authActionClient
     }
 
     // Optimistic locking: reject if entity was modified since the form loaded
-    if (parsedInput.updated_at && existing.updated_at !== parsedInput.updated_at) {
-      throw new Error('This record was modified by another user. Please refresh the page and re-apply your changes.');
-    }
+    assertNotStale(parsedInput.updated_at, existing.updated_at);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, linked_request_ids, updated_at: _lockToken, ...updateFields } = parsedInput;

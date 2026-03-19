@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { assertCompanyAccess } from '@/lib/auth/company-access';
+import { assertNotStale } from '@/lib/utils/optimistic-lock';
 import type { ActionOk, ActionResponse } from '@/lib/types/action-responses';
 
 // ============================================================================
@@ -92,9 +93,7 @@ export const updateRequest = authActionClient
     }
 
     // Optimistic locking: reject if entity was modified since the form loaded
-    if (parsedInput.updated_at && existing.updated_at !== parsedInput.updated_at) {
-      throw new Error('This record was modified by another user. Please refresh the page and re-apply your changes.');
-    }
+    assertNotStale(parsedInput.updated_at, existing.updated_at);
 
     // Regenerate title from updated description
     const title = parsedInput.data.description.replace(/\s+/g, ' ').trim().slice(0, 100);
