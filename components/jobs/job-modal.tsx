@@ -49,6 +49,7 @@ import { Label } from '@/components/ui/label';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { Combobox } from '@/components/combobox';
 import { PM_BADGE_CLASS } from '@/lib/constants/approval-status';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 import {
   AlertCircle,
   RefreshCw,
@@ -618,7 +619,7 @@ export function JobModal({
   // Permission checks (view mode)
   // ========================================================================
 
-  const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
+  const isGaLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(currentUserRole);
   const isFinanceApproverOnly = currentUserRole === 'finance_approver';
   const isPIC = job?.assigned_to === currentUserId;
   const isCreator = job?.created_by === currentUserId;
@@ -632,7 +633,7 @@ export function JobModal({
   const canMarkComplete = (isGaLeadOrAdmin || isPIC) && job?.status === 'in_progress';
   const canCancel = isGaLeadOrAdmin && !isFinanceApproverOnly && !['completed', 'cancelled'].includes(job?.status ?? '');
   const canComment =
-    ['ga_lead', 'admin'].includes(currentUserRole) ||
+    (LEAD_ROLES as readonly string[]).includes(currentUserRole) ||
     job?.assigned_to === currentUserId;
 
   // ========================================================================
@@ -1052,7 +1053,7 @@ export function JobModal({
                       checklist={job.checklist_responses}
                       jobStatus={job.status}
                       canEdit={
-                        (['ga_lead', 'admin'].includes(currentUserRole) ||
+                        ((LEAD_ROLES as readonly string[]).includes(currentUserRole) ||
                           job.assigned_to === currentUserId) &&
                         ['assigned', 'in_progress'].includes(job.status)
                       }

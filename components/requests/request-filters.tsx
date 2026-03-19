@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { STATUS_LABELS, PRIORITY_LABELS } from '@/lib/constants/request-status';
+import { GA_ROLES } from '@/lib/constants/roles';
 
 interface RequestFiltersProps {
   categories: { id: string; name: string }[];
@@ -77,7 +78,7 @@ export function RequestFilters({
   }, [setFilters]);
 
   // Only GA Staff/Lead/Admin can use "My Assigned" toggle
-  const canFilterByAssigned = ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole);
+  const canFilterByAssigned = (GA_ROLES as readonly string[]).includes(currentUserRole);
 
   // Derive DateRange from URL filters
   const dateRange: DateRange | undefined =

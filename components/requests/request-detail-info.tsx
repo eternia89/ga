@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/form';
 import { PRIORITY_LABELS } from '@/lib/constants/request-status';
 import { Input } from '@/components/ui/input';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 
 interface PhotoItem {
   id: string;
@@ -81,7 +82,7 @@ export function RequestDetailInfo({
     message: string;
   } | null>(null);
 
-  const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
+  const isGaLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(currentUserRole);
   const isGaStaff = currentUserRole === 'ga_staff';
   const isRequester = request.requester_id === currentUserId;
   const isEditable = isRequester && request.status === 'submitted';

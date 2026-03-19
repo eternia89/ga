@@ -1,6 +1,7 @@
 import { createSafeActionClient } from "next-safe-action";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { LEAD_ROLES } from "@/lib/constants/roles";
 
 export const actionClient = createSafeActionClient({
   handleServerError(e) {
@@ -36,7 +37,7 @@ export const authActionClient = actionClient.use(async ({ next }) => {
 
 // GA operations action client — ga_lead or admin, provides adminSupabase (bypasses RLS)
 export const gaLeadActionClient = authActionClient.use(async ({ ctx, next }) => {
-  if (!['ga_lead', 'admin'].includes(ctx.profile.role)) {
+  if (!(LEAD_ROLES as readonly string[]).includes(ctx.profile.role)) {
     throw new Error("GA Lead or Admin access required");
   }
   const adminSupabase = createAdminClient();

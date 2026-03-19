@@ -13,6 +13,7 @@ import { AssetTimeline } from './asset-timeline';
 import { AssetStatusChangeDialog } from './asset-status-change-dialog';
 import { ASSET_STATUS_TRANSITIONS } from '@/lib/constants/asset-status';
 import type { AssetStatus } from '@/lib/constants/asset-status';
+import { GA_ROLES } from '@/lib/constants/roles';
 import type { GAUserWithLocation } from './asset-transfer-dialog';
 
 export interface ConditionPhoto {
@@ -81,7 +82,7 @@ export function AssetDetailClient({
   };
 
   const canChangeStatus =
-    ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) &&
+    (GA_ROLES as readonly string[]).includes(currentUserRole) &&
     asset.status !== 'sold_disposed';
 
   const isTerminalStatus = asset.status === 'sold_disposed';

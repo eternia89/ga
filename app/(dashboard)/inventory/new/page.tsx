@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { AssetSubmitForm } from '@/components/assets/asset-submit-form';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
+import { GA_ROLES } from '@/lib/constants/roles';
 
 export default async function NewAssetPage() {
   const supabase = await createClient();
@@ -26,7 +27,7 @@ export default async function NewAssetPage() {
   }
 
   // Only ga_staff, ga_lead, and admin can create assets
-  if (!['ga_staff', 'ga_lead', 'admin'].includes(profile.role)) {
+  if (!(GA_ROLES as readonly string[]).includes(profile.role)) {
     redirect('/inventory');
   }
 

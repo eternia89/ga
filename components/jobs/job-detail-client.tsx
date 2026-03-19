@@ -9,6 +9,7 @@ import { JobTimeline, JobTimelineEvent } from './job-timeline';
 import { JobCommentForm } from './job-comment-form';
 import { PMChecklist } from '@/components/maintenance/pm-checklist';
 import { Button } from '@/components/ui/button';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 
 interface PhotoItem {
   id: string;
@@ -54,7 +55,7 @@ export function JobDetailClient({
 
   const FORM_ID = 'job-detail-form';
 
-  const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
+  const isGaLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(currentUserRole);
   const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job.status);
 
   const handleActionSuccess = () => {
@@ -62,7 +63,7 @@ export function JobDetailClient({
   };
 
   const canComment =
-    ['ga_lead', 'admin'].includes(currentUserRole) ||
+    (LEAD_ROLES as readonly string[]).includes(currentUserRole) ||
     job.assigned_to === currentUserId;
 
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -109,7 +110,7 @@ export function JobDetailClient({
             checklist={job.checklist_responses}
             jobStatus={job.status}
             canEdit={
-              (['ga_lead', 'admin'].includes(currentUserRole) ||
+              ((LEAD_ROLES as readonly string[]).includes(currentUserRole) ||
                 job.assigned_to === currentUserId) &&
               ['assigned', 'in_progress'].includes(job.status)
             }

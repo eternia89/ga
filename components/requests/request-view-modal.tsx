@@ -34,6 +34,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 
 // ============================================================================
 // Types
@@ -435,7 +436,7 @@ export function RequestViewModal({
   const [completing, setCompleting] = useState(false);
 
   // Role/permission derivations
-  const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
+  const isGaLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(currentUserRole);
   const isRequester = request?.requester_id === currentUserId;
   const isPic = request?.assigned_to === currentUserId;
 

@@ -12,6 +12,7 @@ import { ScheduleStatusBadge } from './schedule-status-badge';
 import { ScheduleForm } from './schedule-form';
 import { Input } from '@/components/ui/input';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 
 // ============================================================================
 // PM Job reference type for the linked jobs section
@@ -67,7 +68,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const FORM_ID = 'schedule-edit-form';
-  const canManage = ['ga_lead', 'admin'].includes(userRole);
+  const canManage = (LEAD_ROLES as readonly string[]).includes(userRole);
 
   const isAutoPaused = schedule.is_paused && schedule.paused_reason?.startsWith('auto:');
 

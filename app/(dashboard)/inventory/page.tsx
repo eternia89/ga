@@ -5,6 +5,7 @@ import { PendingTransfer } from '@/components/assets/asset-columns';
 import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { AssetCreateDialog } from '@/components/assets/asset-create-dialog';
+import { GA_ROLES } from '@/lib/constants/roles';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -232,10 +233,10 @@ export default async function InventoryPage({ searchParams }: PageProps) {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {['ga_staff', 'ga_lead', 'admin'].includes(profile.role) && (
+          {(GA_ROLES as readonly string[]).includes(profile.role) && (
             <ExportButton exportUrl="/api/exports/inventory" />
           )}
-          {['ga_staff', 'ga_lead', 'admin'].includes(profile.role) && (
+          {(GA_ROLES as readonly string[]).includes(profile.role) && (
             <AssetCreateDialog
               categories={categories ?? []}
               locations={locations ?? []}

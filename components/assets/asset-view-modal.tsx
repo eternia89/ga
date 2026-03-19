@@ -20,6 +20,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { InlineFeedback } from '@/components/inline-feedback';
+import { GA_ROLES } from '@/lib/constants/roles';
 import {
   AlertCircle,
   RefreshCw,
@@ -517,7 +518,7 @@ export function AssetViewModal({
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                {['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) && asset.status !== 'sold_disposed' && !pendingTransfer && (
+                {(GA_ROLES as readonly string[]).includes(currentUserRole) && asset.status !== 'sold_disposed' && !pendingTransfer && (
                   <Button type="submit" form="asset-edit-form" size="sm" disabled={isEditSubmitting}>
                     {isEditSubmitting ? 'Saving...' : 'Save Changes'}
                   </Button>

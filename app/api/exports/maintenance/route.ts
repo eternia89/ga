@@ -6,8 +6,9 @@ import {
   applyStandardStyles,
   generateExcelResponse,
 } from '@/lib/exports/excel-helpers';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 
-const EXPORT_ROLES = ['ga_lead', 'admin'];
+const EXPORT_ROLES: readonly string[] = LEAD_ROLES;
 
 export async function GET() {
   try {

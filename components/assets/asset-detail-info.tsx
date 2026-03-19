@@ -8,6 +8,7 @@ import { AssetEditForm } from './asset-edit-form';
 import { PhotoLightbox } from '@/components/requests/request-photo-lightbox';
 import type { ConditionPhoto, InvoiceItem } from './asset-detail-client';
 import { Input } from '@/components/ui/input';
+import { GA_ROLES } from '@/lib/constants/roles';
 
 interface AssetDetailInfoProps {
   asset: InventoryItemWithRelations;
@@ -40,7 +41,7 @@ export function AssetDetailInfo({
   const [lightboxIndex, setLightboxIndex] = useState<number>(0);
 
   const canEdit =
-    ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole) &&
+    (GA_ROLES as readonly string[]).includes(currentUserRole) &&
     asset.status !== 'sold_disposed';
 
   const openLightbox = (photos: Array<{ id: string; url: string; fileName: string }>, index: number) => {

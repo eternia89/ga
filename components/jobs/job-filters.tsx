@@ -20,6 +20,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { Combobox } from '@/components/combobox';
 import { JOB_STATUS_LABELS, JOB_STATUSES, PRIORITY_LABELS, PRIORITIES } from '@/lib/constants/job-status';
+import { GA_ROLES } from '@/lib/constants/roles';
 
 export const jobFilterParsers = {
   status: parseAsString,
@@ -71,7 +72,7 @@ export function JobFilters({ users, currentUserRole }: JobFiltersProps) {
   }, [setFilters]);
 
   // GA Staff/Lead/Admin can use the "My Assigned" toggle
-  const canFilterByAssigned = ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole);
+  const canFilterByAssigned = (GA_ROLES as readonly string[]).includes(currentUserRole);
 
   const picOptions = users.map((u) => ({ label: u.name, value: u.id }));
 

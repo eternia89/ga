@@ -13,6 +13,7 @@ import {
   transferCancelSchema,
 } from '@/lib/validations/asset-schema';
 import { ASSET_STATUS_TRANSITIONS } from '@/lib/constants/asset-status';
+import { GA_ROLES, LEAD_ROLES } from '@/lib/constants/roles';
 import {
   pauseSchedulesForAsset,
   resumeSchedulesForAsset,
@@ -32,7 +33,7 @@ export const createAsset = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_staff', 'ga_lead', 'admin'].includes(profile.role)) {
+    if (!(GA_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('Insufficient permissions to create assets');
     }
 
@@ -93,7 +94,7 @@ export const updateAsset = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_staff', 'ga_lead', 'admin'].includes(profile.role)) {
+    if (!(GA_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('Insufficient permissions to update assets');
     }
 
@@ -152,7 +153,7 @@ export const changeAssetStatus = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_staff', 'ga_lead', 'admin'].includes(profile.role)) {
+    if (!(GA_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('Insufficient permissions to change asset status');
     }
 
@@ -236,7 +237,7 @@ export const createTransfer = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_staff', 'ga_lead', 'admin'].includes(profile.role)) {
+    if (!(GA_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('Insufficient permissions to transfer assets');
     }
 
@@ -476,7 +477,7 @@ export const cancelTransfer = authActionClient
 
     // Verify user is the initiator, ga_lead, or admin
     const isInitiator = movement.initiated_by === profile.id;
-    const isLeadOrAdmin = ['ga_lead', 'admin'].includes(profile.role);
+    const isLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(profile.role);
 
     if (!isInitiator && !isLeadOrAdmin) {
       throw new Error('Only the transfer initiator, GA Lead, or an admin can cancel this transfer');
@@ -633,7 +634,7 @@ export const deleteAssetPhotos = authActionClient
   .action(async ({ parsedInput, ctx }): Promise<DeleteAttachmentsResponse> => {
     const { profile } = ctx;
 
-    if (!['ga_staff', 'ga_lead', 'admin'].includes(profile.role)) {
+    if (!(GA_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('Insufficient permissions');
     }
 

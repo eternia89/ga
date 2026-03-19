@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user has permission (ga_lead/admin or assigned PIC)
-    const isLead = ['ga_lead', 'admin'].includes(profile.role);
+    const isLead = (LEAD_ROLES as readonly string[]).includes(profile.role);
     const isPIC = job.assigned_to === user.id;
 
     if (!isLead && !isPIC) {

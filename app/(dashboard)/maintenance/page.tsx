@@ -7,6 +7,7 @@ import { ScheduleCreateDialog } from '@/components/maintenance/schedule-create-d
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 import type { TemplateListItem, AssetListItem } from '@/components/maintenance/schedule-form';
 import { getScheduleDisplayStatus } from '@/lib/constants/schedule-status';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -154,10 +155,10 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {['ga_lead', 'admin'].includes(profile.role) && (
+          {(LEAD_ROLES as readonly string[]).includes(profile.role) && (
             <ExportButton exportUrl="/api/exports/maintenance" />
           )}
-          {['ga_lead', 'admin'].includes(profile.role) && (
+          {(LEAD_ROLES as readonly string[]).includes(profile.role) && (
             <ScheduleCreateDialog
               templates={templateList}
               assets={assetList}

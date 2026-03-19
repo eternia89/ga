@@ -31,6 +31,7 @@ import { InlineFeedback } from '@/components/inline-feedback';
 import { TemplateBuilder } from './template-builder';
 import { CHECKLIST_TYPES } from '@/lib/constants/checklist-types';
 import type { MaintenanceTemplate, ChecklistItem } from '@/lib/types/maintenance';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 
 const TYPE_COLORS: Record<ChecklistItem['type'], string> = {
   checkbox:  'bg-blue-100 text-blue-700',
@@ -63,7 +64,7 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const canManage = ['ga_lead', 'admin'].includes(userRole);
+  const canManage = (LEAD_ROLES as readonly string[]).includes(userRole);
   const [isDirty, setIsDirty] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);

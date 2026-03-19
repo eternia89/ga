@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 import { type SupabaseClient } from '@supabase/supabase-js';
 import type { PMJobChecklist, ChecklistResponse } from '@/lib/types/maintenance';
 import type { ActionOk, ChecklistProgressResponse, ChecklistCompleteResponse, AdvanceScheduleResponse } from '@/lib/types/action-responses';
@@ -38,7 +39,7 @@ export const savePMChecklistItem = authActionClient
       throw new Error('This action is only for PM jobs');
     }
 
-    const isLead = ['ga_lead', 'admin'].includes(profile.role);
+    const isLead = (LEAD_ROLES as readonly string[]).includes(profile.role);
     const isPIC = job.assigned_to === profile.id;
     if (!isLead && !isPIC) {
       throw new Error('Only GA Lead, Admin, or assigned PIC can update checklist items');
@@ -126,7 +127,7 @@ export const savePMChecklistPhoto = authActionClient
       throw new Error('This action is only for PM jobs');
     }
 
-    const isLead = ['ga_lead', 'admin'].includes(profile.role);
+    const isLead = (LEAD_ROLES as readonly string[]).includes(profile.role);
     const isPIC = job.assigned_to === profile.id;
     if (!isLead && !isPIC) {
       throw new Error('Only GA Lead, Admin, or assigned PIC can update checklist photos');
@@ -202,7 +203,7 @@ export const completePMChecklist = authActionClient
       throw new Error('This action is only for PM jobs');
     }
 
-    const isLead = ['ga_lead', 'admin'].includes(profile.role);
+    const isLead = (LEAD_ROLES as readonly string[]).includes(profile.role);
     const isPIC = job.assigned_to === profile.id;
     if (!isLead && !isPIC) {
       throw new Error('Only GA Lead, Admin, or assigned PIC can complete the checklist');

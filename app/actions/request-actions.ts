@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { requestSubmitSchema, requestEditSchema, triageSchema, rejectSchema } from '@/lib/validations/request-schema';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 import { feedbackSchema } from '@/lib/validations/job-schema';
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
@@ -124,7 +125,7 @@ export const triageRequest = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(profile.role);
+    const isGaLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(profile.role);
     const isGaStaff = profile.role === 'ga_staff';
 
     if (!isGaLeadOrAdmin && !isGaStaff) {
@@ -227,7 +228,7 @@ export const cancelRequest = authActionClient
     const { data: gaUsers } = await supabase
       .from('user_profiles')
       .select('id')
-      .in('role', ['ga_lead', 'admin'])
+      .in('role', [...LEAD_ROLES])
       .eq('company_id', profile.company_id)
       .is('deleted_at', null);
 
@@ -257,7 +258,7 @@ export const rejectRequest = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
+    if (!(LEAD_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('Triage access required');
     }
 
@@ -325,7 +326,7 @@ export const completeRequest = authActionClient
 
     // Permission check: must be PIC or GA Lead/Admin
     const isPic = request.assigned_to === profile.id;
-    const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(profile.role);
+    const isGaLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(profile.role);
 
     if (!isPic && !isGaLeadOrAdmin) {
       throw new Error('Only the assigned PIC or GA Lead can complete this request.');

@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { templateCreateSchema, templateEditSchema } from '@/lib/validations/template-schema';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 import { z } from 'zod';
 import type { ActionOk, ActionResponse } from '@/lib/types/action-responses';
 import type { ChecklistItem } from '@/lib/types/maintenance';
@@ -34,7 +35,7 @@ export const createTemplate = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
+    if (!(LEAD_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('Only GA Lead or Admin can create maintenance templates');
     }
 
@@ -91,7 +92,7 @@ export const updateTemplate = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
+    if (!(LEAD_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('Only GA Lead or Admin can update maintenance templates');
     }
 
@@ -158,7 +159,7 @@ export const deactivateTemplate = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
+    if (!(LEAD_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('Only GA Lead or Admin can deactivate maintenance templates');
     }
 
@@ -216,7 +217,7 @@ export const reactivateTemplate = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
+    if (!(LEAD_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('Only GA Lead or Admin can reactivate maintenance templates');
     }
 

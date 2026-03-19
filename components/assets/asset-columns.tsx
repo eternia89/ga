@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { AssetStatusBadge } from './asset-status-badge';
 import { CreatedAtCell } from '@/components/data-table/created-at-cell';
+import { GA_ROLES, LEAD_ROLES } from '@/lib/constants/roles';
 
 export interface PendingTransfer {
   id: string;
@@ -182,7 +183,7 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
       const pendingTransfer = meta?.pendingTransfers?.[row.original.id];
       const canChangeStatus =
         meta?.currentUserRole &&
-        ['ga_staff', 'ga_lead', 'admin'].includes(meta.currentUserRole) &&
+        (GA_ROLES as readonly string[]).includes(meta.currentUserRole) &&
         asset.status !== 'sold_disposed' &&
         !pendingTransfer;
 
@@ -199,7 +200,7 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
       const canEditTransfer =
         !!pendingTransfer &&
         meta?.currentUserRole &&
-        ['ga_lead', 'admin'].includes(meta.currentUserRole);
+        (LEAD_ROLES as readonly string[]).includes(meta.currentUserRole);
 
       return (
         <div className="flex items-center gap-1">

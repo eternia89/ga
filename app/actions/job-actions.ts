@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { createJobSchema, updateJobSchema, jobCommentSchema } from '@/lib/validations/job-schema';
+import { GA_ROLES, LEAD_ROLES } from '@/lib/constants/roles';
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
 import { highestPriority } from '@/lib/jobs/priority';
@@ -21,7 +22,7 @@ export const createJob = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_lead', 'admin', 'ga_staff'].includes(profile.role)) {
+    if (!(GA_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('GA Lead or Admin access required');
     }
 
@@ -191,7 +192,7 @@ export const updateJob = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
+    if (!(LEAD_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('GA Lead or Admin access required');
     }
 
@@ -379,7 +380,7 @@ export const assignJob = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
+    if (!(LEAD_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('GA Lead or Admin access required');
     }
 
@@ -457,7 +458,7 @@ export const updateJobStatus = authActionClient
       throw new Error('Job not found');
     }
 
-    const isLead = ['ga_lead', 'admin'].includes(profile.role);
+    const isLead = (LEAD_ROLES as readonly string[]).includes(profile.role);
     const isPIC = job.assigned_to === profile.id;
 
     if (!isLead && !isPIC) {
@@ -639,7 +640,7 @@ export const cancelJob = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
+    if (!(LEAD_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('GA Lead or Admin access required');
     }
 
@@ -721,7 +722,7 @@ export const addJobComment = authActionClient
       throw new Error('Job not found');
     }
 
-    const isLead = ['ga_lead', 'admin'].includes(profile.role);
+    const isLead = (LEAD_ROLES as readonly string[]).includes(profile.role);
     const isPIC = job.assigned_to === profile.id;
 
     if (!isLead && !isPIC) {
@@ -756,7 +757,7 @@ export const deleteJobAttachment = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check
-    if (!['ga_lead', 'admin'].includes(profile.role)) {
+    if (!(LEAD_ROLES as readonly string[]).includes(profile.role)) {
       throw new Error('Only GA Lead or Admin can delete job photos');
     }
 

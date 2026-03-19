@@ -6,6 +6,7 @@ import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { PhotoUpload, ExistingPhoto } from '@/components/media/photo-upload';
 import { RequestPreviewDialog } from './request-preview-dialog';
 import { PRIORITY_LABELS } from '@/lib/constants/job-status';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -82,7 +83,7 @@ export function JobDetailInfo({
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const isGaLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
+  const isGaLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(currentUserRole);
 
   // canEdit: GA Lead/Admin can edit any non-terminal job
   const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job.status);

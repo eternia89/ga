@@ -8,6 +8,7 @@ import { templateColumns } from './template-columns';
 import { TemplateViewModal } from './template-view-modal';
 import { deactivateTemplate, reactivateTemplate } from '@/app/actions/template-actions';
 import type { MaintenanceTemplate } from '@/lib/types/maintenance';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 import type { TemplateTableMeta } from './template-columns';
 
 interface TemplateListProps {
@@ -24,7 +25,7 @@ export function TemplateList({ templates, userRole, initialViewId }: TemplateLis
   // View modal state
   const [viewTemplateId, setViewTemplateId] = useState<string | null>(initialViewId ?? null);
 
-  const canManage = ['ga_lead', 'admin'].includes(userRole);
+  const canManage = (LEAD_ROLES as readonly string[]).includes(userRole);
 
   function handleDeactivate(id: string) {
     setFeedback(null);

@@ -4,6 +4,7 @@ import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { TemplateList } from '@/components/maintenance/template-list';
 import { TemplateCreateDialog } from '@/components/maintenance/template-create-dialog';
 import type { MaintenanceTemplate } from '@/lib/types/maintenance';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -79,7 +80,7 @@ export default async function MaintenanceTemplatesPage({ searchParams }: PagePro
             Define reusable maintenance checklists for assets
           </p>
         </div>
-        {['ga_lead', 'admin'].includes(profile.role) && (
+        {(LEAD_ROLES as readonly string[]).includes(profile.role) && (
           <TemplateCreateDialog
             categories={assetCategories ?? []}
             initialOpen={action === 'create'}

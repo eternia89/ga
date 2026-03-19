@@ -7,6 +7,7 @@ import type { InventoryItemWithRelations, InventoryMovementWithRelations } from 
 import { AssetTransferDialog, type GAUserWithLocation } from './asset-transfer-dialog';
 import { AssetTransferRespondModal } from './asset-transfer-respond-modal';
 import type { PendingTransfer } from './asset-columns';
+import { GA_ROLES, LEAD_ROLES } from '@/lib/constants/roles';
 
 interface AssetDetailActionsProps {
   asset: InventoryItemWithRelations;
@@ -37,7 +38,7 @@ export function AssetDetailActions({
   const [respondVariant, setRespondVariant] = useState<'respond' | 'admin'>('respond');
   const [respondInitialMode, setRespondInitialMode] = useState<'default' | 'accept' | 'reject' | undefined>(undefined);
 
-  const isGaStaffOrHigher = ['ga_staff', 'ga_lead', 'admin'].includes(currentUserRole);
+  const isGaStaffOrHigher = (GA_ROLES as readonly string[]).includes(currentUserRole);
   const isTerminal = asset.status === 'sold_disposed';
 
   // Transfer: GA Staff or higher on non-terminal assets with no pending transfer
@@ -49,7 +50,7 @@ export function AssetDetailActions({
 
   // Cancel: initiator of pending transfer, ga_lead, or admin
   const isInitiator = pendingTransfer && pendingTransfer.initiated_by === currentUserId;
-  const isLeadOrAdmin = ['ga_lead', 'admin'].includes(currentUserRole);
+  const isLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(currentUserRole);
   const canCancel = pendingTransfer && (isInitiator || isLeadOrAdmin);
 
   const hasAnyAction = canTransfer || canRespond || canCancel;

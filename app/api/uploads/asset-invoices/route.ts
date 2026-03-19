@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { GA_ROLES } from '@/lib/constants/roles';
 
 const MAX_FILES = 5;
 const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Role check — only ga_staff, ga_lead, admin can upload invoices
-    if (!['ga_staff', 'ga_lead', 'admin'].includes(profile.role)) {
+    if (!(GA_ROLES as readonly string[]).includes(profile.role)) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 

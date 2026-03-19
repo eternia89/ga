@@ -22,6 +22,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import { LEAD_ROLES } from '@/lib/constants/roles';
 
 const TYPE_COLORS: Record<ChecklistItem['type'], string> = {
   checkbox:  'bg-blue-100 text-blue-700',
@@ -167,7 +168,7 @@ export function TemplateViewModal({
   // Sticky bar action state
   const [actionPending, startActionTransition] = useTransition();
   const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const canManage = ['ga_lead', 'admin'].includes(userRole);
+  const canManage = (LEAD_ROLES as readonly string[]).includes(userRole);
 
   // Action success handler
   const handleActionSuccess = useCallback(() => {
