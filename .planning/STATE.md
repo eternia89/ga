@@ -398,6 +398,7 @@ Recent decisions affecting current work:
 | 119 | Fix N+1 timeline queries in request and job detail pages | 2026-03-18 | 49a41b1 | Verified | [260318-g8o-fix-n-1-timeline-queries-in-request-and-](./quick/260318-g8o-fix-n-1-timeline-queries-in-request-and-/) |
 | 120 | Fix 2 data integrity: block status change during transfer + block completion without PIC | 2026-03-18 | 7827974 | Verified | [260318-gdy-fix-2-data-integrity-issues-block-status](./quick/260318-gdy-fix-2-data-integrity-issues-block-status/) |
 | 121 | Fix 7 code quality: error checks, null safety, rollback, PII logging, empty URLs | 2026-03-19 | c6de326 | Verified | [260319-np2-fix-7-code-quality-issues-error-checks-n](./quick/260319-np2-fix-7-code-quality-issues-error-checks-n/) |
+| 122 | Extract role constants, migrate DisplayId and CreatedAtCell adoption | 2026-03-19 | 4b015c6 | Verified | [260319-nye-extract-role-constants-migrate-displayid](./quick/260319-nye-extract-role-constants-migrate-displayid/) |
 
 ## Session Continuity
 
