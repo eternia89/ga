@@ -23,6 +23,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { LEAD_ROLES } from '@/lib/constants/roles';
+import { DisplayId } from '@/components/display-id';
 
 const JOB_STATUS_LABELS: Record<string, string> = {
   created: 'Created', assigned: 'Assigned', in_progress: 'In Progress',
@@ -381,7 +382,7 @@ export function ScheduleViewModal({
                     {pmJobs.map((job) => (
                       <li key={job.id} className="flex items-center justify-between rounded-md border bg-muted/30 px-3 py-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium font-mono">{job.display_id}</span>
+                          <DisplayId className="text-sm font-medium">{job.display_id}</DisplayId>
                           <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${jobStatusColor(job.status)}`}>
                             {JOB_STATUS_LABELS[job.status] ?? job.status}
                           </span>

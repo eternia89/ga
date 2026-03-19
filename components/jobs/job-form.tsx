@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/select';
 import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
+import { DisplayId } from '@/components/display-id';
 import { PhotoUpload } from '@/components/media/photo-upload';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { RequestPreviewDialog } from './request-preview-dialog';
@@ -609,7 +610,7 @@ export function JobForm({
                         key={req.id}
                         className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-sm"
                       >
-                        <span className="font-mono text-xs text-muted-foreground">{req.display_id}</span>
+                        <DisplayId className="text-xs text-muted-foreground">{req.display_id}</DisplayId>
                         <span className="max-w-[180px] truncate">{req.title}</span>
                         {jobLink && (
                           <span className="text-xs text-amber-600">

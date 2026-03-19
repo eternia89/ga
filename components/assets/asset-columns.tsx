@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { AssetStatusBadge } from './asset-status-badge';
 import { CreatedAtCell } from '@/components/data-table/created-at-cell';
+import { DisplayId } from '@/components/display-id';
 import { GA_ROLES, LEAD_ROLES } from '@/lib/constants/roles';
 
 export interface PendingTransfer {
@@ -42,7 +43,7 @@ export const assetColumns: ColumnDef<InventoryItemWithRelations>[] = [
       <DataTableColumnHeader column={column} title="ID" />
     ),
     cell: ({ row }) => (
-      <span className="font-mono text-xs">{row.getValue('display_id')}</span>
+      <DisplayId className="text-xs">{row.getValue('display_id')}</DisplayId>
     ),
     size: 140,
   },

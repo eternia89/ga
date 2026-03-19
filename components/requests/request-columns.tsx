@@ -8,6 +8,7 @@ import { DataTableColumnHeader } from '@/components/data-table/data-table-column
 import { RequestStatusBadge } from './request-status-badge';
 import { PriorityBadge } from '@/components/priority-badge';
 import { CreatedAtCell } from '@/components/data-table/created-at-cell';
+import { DisplayId } from '@/components/display-id';
 
 interface PhotoItem {
   id: string;
@@ -30,7 +31,7 @@ export const requestColumns: ColumnDef<RequestWithRelations>[] = [
       <DataTableColumnHeader column={column} title="ID" />
     ),
     cell: ({ row }) => (
-      <span className="font-mono text-xs">{row.getValue('display_id')}</span>
+      <DisplayId className="text-xs">{row.getValue('display_id')}</DisplayId>
     ),
     size: 160,
   },

@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight } from 'lucide-react';
+import { DisplayId } from '@/components/display-id';
 
 // ============================================================================
 // Types
@@ -330,7 +331,7 @@ export function AssetTransferRespondModal({
               {/* Asset Information */}
               <div className="rounded-md border bg-muted/30 p-4 space-y-3">
                 <div className="flex items-baseline gap-2">
-                  <span className="font-mono text-sm font-medium">{asset.display_id}</span>
+                  <DisplayId className="text-sm font-medium">{asset.display_id}</DisplayId>
                   <span className="text-sm">{asset.name}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-3">

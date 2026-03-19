@@ -8,6 +8,7 @@ import { DataTableColumnHeader } from '@/components/data-table/data-table-column
 import { JobStatusBadge } from './job-status-badge';
 import { PriorityBadge } from '@/components/priority-badge';
 import { CreatedAtCell } from '@/components/data-table/created-at-cell';
+import { DisplayId } from '@/components/display-id';
 import { OverdueBadge } from '@/components/maintenance/overdue-badge';
 import { PM_BADGE_CLASS } from '@/lib/constants/approval-status';
 
@@ -30,7 +31,7 @@ export const jobColumns: ColumnDef<JobWithRelations>[] = [
       <DataTableColumnHeader column={column} title="ID" />
     ),
     cell: ({ row }) => (
-      <span className="font-mono text-xs">{row.getValue('display_id')}</span>
+      <DisplayId className="text-xs">{row.getValue('display_id')}</DisplayId>
     ),
     size: 160,
   },

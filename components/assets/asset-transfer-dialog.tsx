@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { AlertTriangle } from 'lucide-react';
+import { DisplayId } from '@/components/display-id';
 
 export interface GAUserWithLocation {
   id: string;
@@ -185,7 +186,7 @@ export function AssetTransferDialog({
           {/* Asset info */}
           <div className="rounded-md border bg-muted/30 p-4 space-y-2">
             <div className="flex items-baseline gap-2">
-              <span className="font-mono text-sm font-medium">{asset.display_id}</span>
+              <DisplayId className="text-sm font-medium">{asset.display_id}</DisplayId>
               <span className="text-sm">{asset.name}</span>
             </div>
             {(asset.brand || asset.model || asset.serial_number) && (

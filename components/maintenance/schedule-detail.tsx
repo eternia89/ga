@@ -13,6 +13,7 @@ import { ScheduleForm } from './schedule-form';
 import { Input } from '@/components/ui/input';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 import { LEAD_ROLES } from '@/lib/constants/roles';
+import { DisplayId } from '@/components/display-id';
 
 // ============================================================================
 // PM Job reference type for the linked jobs section
@@ -375,9 +376,9 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
                       className="flex items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2.5 hover:bg-muted/50 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-blue-600 font-mono">
+                        <DisplayId className="text-sm font-medium text-blue-600">
                           {job.display_id}
-                        </span>
+                        </DisplayId>
                         <span
                           className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${jobStatusColor(job.status)}`}
                         >

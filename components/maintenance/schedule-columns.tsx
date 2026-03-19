@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { ScheduleStatusBadge } from './schedule-status-badge';
 import { CreatedAtCell } from '@/components/data-table/created-at-cell';
+import { DisplayId } from '@/components/display-id';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 
 export type ScheduleTableMeta = {
@@ -60,7 +61,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
         >
           <span className="font-medium">{asset.name}</span>
           {asset.display_id && (
-            <span className="text-xs text-muted-foreground ml-1 font-mono">({asset.display_id})</span>
+            <DisplayId className="text-xs text-muted-foreground ml-1">({asset.display_id})</DisplayId>
           )}
         </Link>
       );
