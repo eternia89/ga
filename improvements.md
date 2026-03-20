@@ -867,6 +867,11 @@ No new test files were added since the last review. All previous gaps remain:
 | 33 | **NEW** | Data Integrity | Bulk deactivate operations need pre-validation or atomic execution — partial failures leave inconsistent state |
 | 34 | **NEW** | Data Integrity | Cascading request status updates on job completion need state guards to prevent resurrecting cancelled requests |
 | 35 | **NEW** | Security | Approval actions should add `assertCompanyAccess` for defense-in-depth (RLS currently provides the boundary) |
+| 36 | **NEW** | Performance | Missing DB index on `inventory_items.holder_id` — general user asset listing (`.eq('holder_id', profile.id)`) does full table scan. Add composite index `(company_id, holder_id) WHERE deleted_at IS NULL` |
+| 37 | **NEW** | Performance | Unbounded export queries — all 4 export routes (`/api/exports/inventory,requests,jobs,maintenance`) lack `.limit()`. 10K+ rows = memory spikes + timeouts. Add `.limit(10000)` with truncation warning |
+| 38 | **NEW** | Performance | Duplicate company access query in `inventory/page.tsx` — `user_company_access` fetched twice (lines 38-59). Fetch once, reuse result |
+| 39 | **NEW** | Performance | Triple location fetch in `inventory/page.tsx` — locations queried 3 times in parallel block (lines 123-144). Deduplicate to single fetch |
+| 40 | **NEW** | UX | Audit trail `LIMIT 1000` (line 42) has no UI warning when truncated — silently drops entries. Add `hasMore` flag + "Showing first 1000 entries" warning |
 
 ---
 
