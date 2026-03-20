@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-20 - Completed quick task 125: Remove auto-dismissing setTimeout in dialogs
+Last activity: 2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -402,6 +402,7 @@ Recent decisions affecting current work:
 | 123 | Unit tests: optimistic locking, ActionResponse types, fix permissions test | 2026-03-19 | 9b09547 | Verified | [260319-oet-unit-tests-for-optimistic-locking-and-ac](./quick/260319-oet-unit-tests-for-optimistic-locking-and-ac/) |
 | 124 | Fix semantic bug: RequestStatusBadge used for job status — replace with JobStatusBadge | 2026-03-20 | b9a7306 | Verified | [260320-9ki-fix-semantic-bug-requeststatusbadge-used](./quick/260320-9ki-fix-semantic-bug-requeststatusbadge-used/) |
 | 125 | Remove auto-dismissing setTimeout in password-change and triage dialogs | 2026-03-20 | 54dcb47 | Verified | [260320-eww-remove-auto-dismissing-settimeout-in-pas](./quick/260320-eww-remove-auto-dismissing-settimeout-in-pas/) |
+| 126 | Centralize inline role arrays into OPERATIONAL_ROLES constant | 2026-03-20 | c36f229 | Verified | [260320-f5l-centralize-inline-role-arrays-into-lib-c](./quick/260320-f5l-centralize-inline-role-arrays-into-lib-c/) |
 
 ## Session Continuity
 
