@@ -30,9 +30,7 @@ import {
   getMaintenanceSummary,
   getInventoryCounts,
 } from '@/lib/dashboard/queries';
-
-// Operational roles that see the full dashboard
-const OPERATIONAL_ROLES = ['ga_lead', 'admin', 'finance_approver'];
+import { OPERATIONAL_ROLES } from '@/lib/constants/roles';
 
 const KPI_ICONS: Record<string, React.ReactNode> = {
   'open-requests': <FileText className="h-4 w-4" />,
@@ -90,7 +88,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   };
 
   const roleColor = roleColors[profile.role] || roleColors.general_user;
-  const isOperational = OPERATIONAL_ROLES.includes(profile.role);
+  const isOperational = (OPERATIONAL_ROLES as readonly string[]).includes(profile.role);
 
   // Parse date range from searchParams (default: This Month)
   const resolvedParams = await searchParams;

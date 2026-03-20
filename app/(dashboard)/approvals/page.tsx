@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { ApprovalQueue } from '@/components/approvals/approval-queue';
 import type { ApprovalJob } from '@/components/approvals/approval-queue';
+import { OPERATIONAL_ROLES } from '@/lib/constants/roles';
 
 interface PageProps {
   searchParams: Promise<{ view?: string }>;
@@ -32,7 +33,7 @@ export default async function ApprovalsPage({ searchParams }: PageProps) {
   }
 
   // finance_approver, ga_lead, and admin can access this page
-  if (!['finance_approver', 'ga_lead', 'admin'].includes(profile.role)) {
+  if (!(OPERATIONAL_ROLES as readonly string[]).includes(profile.role)) {
     redirect('/');
   }
 

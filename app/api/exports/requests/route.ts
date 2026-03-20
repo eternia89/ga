@@ -7,8 +7,9 @@ import {
   generateExcelResponse,
 } from '@/lib/exports/excel-helpers';
 import { STATUS_LABELS, PRIORITY_LABELS } from '@/lib/constants/request-status';
+import { OPERATIONAL_ROLES } from '@/lib/constants/roles';
 
-const EXPORT_ROLES = ['ga_lead', 'admin', 'finance_approver'];
+const EXPORT_ROLES: readonly string[] = OPERATIONAL_ROLES;
 
 export async function GET() {
   try {

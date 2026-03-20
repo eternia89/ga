@@ -4,6 +4,7 @@ import { RequestTable } from '@/components/requests/request-table';
 import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { RequestCreateDialog } from '@/components/requests/request-create-dialog';
+import { OPERATIONAL_ROLES } from '@/lib/constants/roles';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -168,7 +169,7 @@ export default async function RequestsPage({ searchParams }: PageProps) {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {['ga_lead', 'admin', 'finance_approver'].includes(profile.role) && (
+          {(OPERATIONAL_ROLES as readonly string[]).includes(profile.role) && (
             <ExportButton exportUrl="/api/exports/requests" />
           )}
           <RequestCreateDialog

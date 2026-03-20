@@ -4,6 +4,7 @@ import { JobTable } from '@/components/jobs/job-table';
 import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { JobCreateDialog } from '@/components/jobs/job-create-dialog';
+import { OPERATIONAL_ROLES, GA_ROLES } from '@/lib/constants/roles';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -222,10 +223,10 @@ export default async function JobsPage({ searchParams }: PageProps) {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {['ga_lead', 'admin', 'finance_approver'].includes(profile.role) && (
+          {(OPERATIONAL_ROLES as readonly string[]).includes(profile.role) && (
             <ExportButton exportUrl="/api/exports/jobs" />
           )}
-          {['ga_lead', 'admin', 'ga_staff'].includes(profile.role) && (
+          {(GA_ROLES as readonly string[]).includes(profile.role) && (
             <JobCreateDialog
               locations={formLocations}
               categories={formCategories}
