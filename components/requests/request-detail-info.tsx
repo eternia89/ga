@@ -12,7 +12,7 @@ import { InlineFeedback } from '@/components/inline-feedback';
 import { PhotoLightbox } from './request-photo-lightbox';
 import { RequestEditForm } from './request-edit-form';
 import { FeedbackStarRating } from './feedback-star-rating';
-import { RequestStatusBadge } from './request-status-badge';
+import { JobStatusBadge } from '@/components/jobs/job-status-badge';
 import { ExternalLink } from 'lucide-react';
 import {
   Form,
@@ -365,7 +365,7 @@ export function RequestDetailInfo({
                   >
                     {job.title}
                   </span>
-                  <RequestStatusBadge status={job.status} />
+                  <JobStatusBadge status={job.status} />
                 </li>
               ))}
             </ul>
