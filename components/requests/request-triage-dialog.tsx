@@ -92,10 +92,6 @@ export function RequestTriageDialog({
       }
       setFeedback({ type: 'success', message: 'Request triaged successfully' });
       onSuccess();
-      // Close dialog shortly after success feedback
-      setTimeout(() => {
-        onOpenChange(false);
-      }, 800);
     } catch (err) {
       setFeedback({
         type: 'error',

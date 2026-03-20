@@ -67,10 +67,6 @@ export function PasswordChangeDialog({ open, onOpenChange }: PasswordChangeDialo
       if (result?.data?.success) {
         setFeedback({ type: 'success', message: 'Password changed successfully' });
         form.reset();
-        // Close dialog after brief delay
-        setTimeout(() => {
-          onOpenChange(false);
-        }, 1500);
       } else {
         setFeedback({ type: 'error', message: result?.serverError || 'Failed to change password' });
       }
