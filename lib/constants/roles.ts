@@ -13,3 +13,6 @@ export const GA_ROLES = [ROLES.GA_STAFF, ROLES.GA_LEAD, ROLES.ADMIN] as const;
 
 /** GA Lead, Admin -- leadership roles with elevated permissions */
 export const LEAD_ROLES = [ROLES.GA_LEAD, ROLES.ADMIN] as const;
+
+/** GA Lead, Admin, Finance Approver -- roles with full operational visibility (dashboard, exports, approvals) */
+export const OPERATIONAL_ROLES = [ROLES.GA_LEAD, ROLES.ADMIN, ROLES.FINANCE_APPROVER] as const;
