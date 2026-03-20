@@ -767,6 +767,9 @@ Additional findings from thorough per-file server action analysis:
 | 7 | **MEDIUM** | PERSISTENT (20-Mar) | `app/(auth)/update-password/page.tsx:23` | Only place using `getSession()` instead of `getUser()` — reads local JWT without server validation | Switch to `getUser()` |
 | 8 | **MEDIUM** | NEW | `app/actions/pm-job-actions.ts:108` | `photoUrls: z.array(z.string().max(2048))` — array length is unbounded. Could accept thousands of URLs | Add `.max(20)` on the array |
 | 9 | **LOW** | NEW | 7 files | Link hover color inconsistency: 5 locations use `hover:text-blue-800`, 2 use `hover:text-blue-500`. Standard is `hover:text-blue-700` | Standardize all to `hover:text-blue-700` |
+| 10 | **MEDIUM** | NEW | `app/actions/approval-actions.ts` (4 actions) | `approveJob`, `rejectJob`, `approveCompletion`, `rejectCompletion` fetch job by ID via RLS-scoped supabase but don't explicitly call `assertCompanyAccess`. Defense-in-depth gap | Add company access validation |
+| 11 | **MEDIUM** | NEW | `app/actions/approval-actions.ts:188-209`, `job-actions.ts:573-589` | Cascading request status update: when job completes, linked requests updated to `pending_acceptance` **without checking current state**. Could resurrect cancelled requests | Add `.in('status', ['triaged', 'in_progress'])` filter |
+| 12 | **MEDIUM** | NEW | `app/actions/category-actions.ts`, `company-actions.ts`, `division-actions.ts`, `location-actions.ts` | Bulk deactivate loops delete one-by-one. If one fails mid-loop, partial deletions persist with no rollback — returns `success: true` with partial counts | Pre-validate all items before deleting, or fail on first error |
 
 ---
 
@@ -861,6 +864,9 @@ No new test files were added since the last review. All previous gaps remain:
 | 30 | **NEW** | Status Constants | Extract `REQUEST_TRIAGEABLE_STATUSES` (`['submitted', 'triaged']`) — 5 occurrences across 4 files |
 | 31 | **NEW** | Status Constants | Extract `JOB_ACTIVE_STATUSES` (`['assigned', 'in_progress']`) — 3 occurrences across 3 files |
 | 32 | **NEW** | Auto-dismiss | Remove `setTimeout` auto-close in `password-change-dialog.tsx` and `request-triage-dialog.tsx` |
+| 33 | **NEW** | Data Integrity | Bulk deactivate operations need pre-validation or atomic execution — partial failures leave inconsistent state |
+| 34 | **NEW** | Data Integrity | Cascading request status updates on job completion need state guards to prevent resurrecting cancelled requests |
+| 35 | **NEW** | Security | Approval actions should add `assertCompanyAccess` for defense-in-depth (RLS currently provides the boundary) |
 
 ---
 
