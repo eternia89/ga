@@ -323,6 +323,13 @@ These rules must be preserved across all changes:
 
 ## Change Log
 
+### 21-Mar-2026 — Semantic Bug Fix (2 commits, 1 file)
+
+**Bug Fix:**
+- Fixed `RequestStatusBadge` incorrectly used to render job status in request detail page (`request-detail-info.tsx`). Replaced with `JobStatusBadge` — displays correct colors/labels for job lifecycle states.
+
+---
+
 ### 20-Mar-2026 — Consistency & Testing Hardening (11 commits, 55 files)
 
 **Code Quality (7 fixes):**
