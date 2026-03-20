@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 Phase: 09.1 (UI Improvements) — COMPLETE
 Plan: 5 of 5 in phase complete
 Status: Completed 09.1-04-PLAN.md — CTA and export buttons moved to page headers
-Last activity: 2026-03-16 - Completed quick task 89: Remove warranty_expiry column from asset table
+Last activity: 2026-03-20 - Completed quick task 124: Fix semantic bug — RequestStatusBadge used for job status
 
 Progress: [████████████████████████] (Phase 09.1 — 5/5 plans done)
 
@@ -400,6 +400,7 @@ Recent decisions affecting current work:
 | 121 | Fix 7 code quality: error checks, null safety, rollback, PII logging, empty URLs | 2026-03-19 | c6de326 | Verified | [260319-np2-fix-7-code-quality-issues-error-checks-n](./quick/260319-np2-fix-7-code-quality-issues-error-checks-n/) |
 | 122 | Extract role constants, migrate DisplayId and CreatedAtCell adoption | 2026-03-19 | 4b015c6 | Verified | [260319-nye-extract-role-constants-migrate-displayid](./quick/260319-nye-extract-role-constants-migrate-displayid/) |
 | 123 | Unit tests: optimistic locking, ActionResponse types, fix permissions test | 2026-03-19 | 9b09547 | Verified | [260319-oet-unit-tests-for-optimistic-locking-and-ac](./quick/260319-oet-unit-tests-for-optimistic-locking-and-ac/) |
+| 124 | Fix semantic bug: RequestStatusBadge used for job status — replace with JobStatusBadge | 2026-03-20 | b9a7306 | Verified | [260320-9ki-fix-semantic-bug-requeststatusbadge-used](./quick/260320-9ki-fix-semantic-bug-requeststatusbadge-used/) |
 
 ## Session Continuity
 
