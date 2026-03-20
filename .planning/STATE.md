@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Completed quick-260320-eww: Remove auto-dismissing setTimeout from dialogs"
-last_updated: "2026-03-20T03:52:07.569Z"
-last_activity: "2026-03-20 - Completed quick task 124: Fix semantic bug — RequestStatusBadge used for job status"
+stopped_at: "Completed quick-260320-f5l: Centralize inline role arrays into lib/constants/roles.ts"
+last_updated: "2026-03-20T04:04:58.257Z"
+last_activity: "2026-03-20 - Completed quick task 125: Remove auto-dismissing setTimeout in dialogs"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -405,7 +405,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-20T03:52:07.565Z
-Stopped at: Completed quick-260320-eww: Remove auto-dismissing setTimeout from dialogs
+Last session: 2026-03-20T04:04:58.253Z
+Stopped at: Completed quick-260320-f5l: Centralize inline role arrays into lib/constants/roles.ts
 Resume file: None
 Next: Ready for next task
