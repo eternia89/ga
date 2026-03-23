@@ -894,3 +894,195 @@ No new test files were added since the last review. All previous gaps remain:
 - **Role constants adopted** in 36 files (actions, components, pages, API routes)
 - **Optimistic locking tested** with `assertNotStale` unit tests
 - **ActionResponse shape tested** with 116-line type validation suite
+
+---
+
+## 23-Mar-2026
+
+### Commits Summary (20-Mar-2026, post-review)
+
+| Task | Commits | What Changed |
+|------|---------|-------------|
+| quick-260320-9ki | 3 commits | Fixed semantic bug: `RequestStatusBadge` → `JobStatusBadge` for linked jobs in request detail |
+| quick-260320-eww | 3 commits | Removed auto-dismissing `setTimeout` from `password-change-dialog.tsx` (1500ms) and `request-triage-dialog.tsx` (800ms) |
+| quick-260320-f5l | 3 commits | Added `OPERATIONAL_ROLES` constant to `lib/constants/roles.ts`; replaced 7 inline role arrays in dashboard, approvals, jobs, requests pages, and 2 export routes |
+| docs | 3 commits | STATE.md updates, verification reports, task summaries |
+
+**Total: 12 commits, ~15 files changed**
+
+---
+
+### Resolved from Previous Reviews
+
+| # | Original Date | Original Issue | Resolution |
+|---|---------------|---------------|------------|
+| 1 | 21-Mar #1 (HIGH) | Auto-dismiss `setTimeout` in password-change-dialog (1500ms) | **DONE** — Removed in quick-260320-eww |
+| 2 | 21-Mar #2 (HIGH) | Auto-dismiss `setTimeout` in request-triage-dialog (800ms) | **DONE** — Removed in quick-260320-eww |
+| 3 | 21-Mar #5 (MEDIUM) | Hardcoded `OPERATIONAL_ROLES` in dashboard `page.tsx:35` | **DONE** — Added to `lib/constants/roles.ts` in quick-260320-f5l |
+| 4 | 21-Mar #6 (MEDIUM) | 8 inline role arrays in approvals, jobs, requests pages + export routes | **DONE** — 7 replaced with `OPERATIONAL_ROLES`/`GA_ROLES` imports in quick-260320-f5l |
+| 5 | 21-Mar #32 (NEW) | Remove setTimeout auto-close in 2 dialogs | **DONE** — Same as #1/#2 above |
+| 6 | 21-Mar #17 (PARTIAL) | Role constant adoption — needed `OPERATIONAL_ROLES` | **DONE** — Constant created and adopted in 6 files |
+
+---
+
+### Risky Patterns & Security (New + Persistent)
+
+| # | Severity | Status | File | Issue | Recommendation |
+|---|----------|--------|------|-------|----------------|
+| 1 | **HIGH** | NEW | `app/api/vision/describe/route.ts:95-106` | Vision API updates `media_attachments` by ID without verifying user's company access. Cross-company attachment description poisoning possible if attacker knows UUID | Fetch attachment first, validate `company_id` matches user's accessible companies before updating |
+| 2 | **HIGH** | PERSISTENT (19-Mar) | `app/actions/profile-actions.ts:38-39` | Password schema fields `currentPassword` and `newPassword` have no `.max()` — unbounded strings can cause memory exhaustion | Add `.max(255)` to both |
+| 3 | **HIGH** | PERSISTENT (19-Mar) | `app/actions/pm-job-actions.ts:19,107` | `itemId` field uses `z.string()` without `.uuid()` validation | Add `.uuid()` |
+| 4 | **MEDIUM** | NEW | `lib/validations/job-schema.ts:17,41` | `linked_request_ids` array has no `.max()` — could accept thousands of IDs causing N+1 queries | Add `.max(50)` |
+| 5 | **MEDIUM** | NEW | `lib/validations/template-schema.ts:52` | `checklist` array has no `.max()` limit | Add `.max(100)` |
+| 6 | **MEDIUM** | PERSISTENT (21-Mar) | `app/actions/approval-actions.ts` (4 actions) | No `assertCompanyAccess` — RLS provides boundary but no defense-in-depth | Add explicit company access validation |
+| 7 | **MEDIUM** | PERSISTENT (21-Mar) | `approval-actions.ts:188-209`, `job-actions.ts:573-589` | Cascading request status update uses `.neq('status', 'cancelled')` — allows invalid transitions | Replace with `.in('status', ['triaged', 'in_progress'])` |
+| 8 | **MEDIUM** | PERSISTENT (21-Mar) | Bulk deactivate actions (4 admin entity files) | One-by-one loop — partial failures persist with `success: true` | Pre-validate or fail-fast |
+| 9 | **MEDIUM** | PERSISTENT (20-Mar) | `app/(auth)/update-password/page.tsx:23` | Only place using `getSession()` instead of `getUser()` | Switch to `getUser()` |
+| 10 | **MEDIUM** | PERSISTENT (21-Mar) | `app/actions/pm-job-actions.ts:108` | `photoUrls` array length unbounded | Add `.max(20)` |
+| 11 | **LOW** | PERSISTENT (21-Mar) | 7 files | Link hover color inconsistency: 5 use `-800`, 2 use `-500`, standard is `-700` | Standardize all to `hover:text-blue-700` |
+| 12 | **LOW** | NEW | `app/api/vision/describe/route.ts:37` | Profile SELECT missing `company_id` for ownership check | Add `company_id` to SELECT |
+
+---
+
+### UI/UX Inconsistencies (Persistent + New)
+
+| # | Status | File | Issue | Fix |
+|---|--------|------|-------|-----|
+| 1 | **PERSISTENT** (15-Mar) | `lib/utils.ts:27` | CSV export filename uses `yyyy-MM-dd` instead of `dd-MM-yyyy` | Change format string |
+| 2 | **PERSISTENT** (20-Mar) | `components/maintenance/schedule-detail.tsx:291` | Uses `grid-cols-2` instead of standard `grid-cols-[1fr_380px]` | Align to detail page convention |
+| 3 | **PERSISTENT** (20-Mar) | `components/maintenance/template-detail.tsx:347` | Uses `grid-cols-2` instead of standard `grid-cols-[1fr_380px]` | Align to detail page convention |
+| 4 | **PERSISTENT** (20-Mar) | `app/(dashboard)/inventory/new/page.tsx` | Full `/new` page exists alongside modal — violates "no separate `/new` pages" rule | Remove `/new` page |
+| 5 | **PERSISTENT** (20-Mar) | `app/(dashboard)/inventory/[id]/page.tsx:218` | Missing `pb-20` — content obscured by sticky save bar | Add `pb-20` |
+| 6 | **PERSISTENT** (20-Mar) | 19 inline `font-mono` spans vs 9 using `<DisplayId>` | Component exists but underutilized | Migrate all to `<DisplayId>` |
+| 7 | **PERSISTENT** (20-Mar) | 4 files | `roleColors`/`roleDisplay` duplicated in 4 components | Extract to shared constant file |
+| 8 | **PERSISTENT** (16-Mar) | `audit-trail-columns.tsx:147,156` | Display ID link missing `font-mono` | Use `<DisplayId>` |
+| 9 | **PERSISTENT** (20-Mar) | `entity-form-dialog.tsx:124-137` | Deactivate button inconsistent pattern | Standardize to AlertDialogAction |
+| 10 | **NEW** | 3 template components | `TYPE_COLORS` map for checklist item types duplicated in `template-builder-item.tsx`, `template-view-modal.tsx`, `template-detail.tsx` | Extract to `lib/constants/checklist-types.ts` |
+| 11 | **NEW** | 2 schedule components | `JOB_STATUS_LABELS` + `jobStatusColor()` duplicated in `schedule-detail.tsx`, `schedule-view-modal.tsx` | Extract to `lib/constants/job-status-display.ts` |
+| 12 | **NEW** | `components/user-menu.tsx` | Hardcoded `gray-100/200/700` colors instead of semantic tokens | Use `hover:bg-muted`, `text-foreground/80` for dark-mode readiness |
+
+---
+
+### Schema & Validation (Persistent + New)
+
+| # | Status | File(s) | Issue | Recommendation |
+|---|--------|---------|-------|----------------|
+| 1 | **PERSISTENT** (15-Mar) | `lib/validations/asset-schema.ts` | Asset `name` max=100, should be 60 per CLAUDE.md | Align to 60 or document |
+| 2 | **PERSISTENT** (15-Mar) | `lib/validations/template-schema.ts` | Template `name` max=100, should be 60 | Align to 60 or document |
+| 3 | **PERSISTENT** (16-Mar) | `schedule-schema.ts`, `user-schema.ts`, `template-schema.ts` | 3 different patterns for optional UUID fields | Create `optionalUuid()` helper |
+| 4 | **PERSISTENT** (19-Mar) | `app/actions/profile-actions.ts` | `changePassword` unbounded password strings | Add `.max(255)` |
+| 5 | **PERSISTENT** (19-Mar) | `app/actions/pm-job-actions.ts` | `itemId` missing `.uuid()` | Add `.uuid()` |
+| 6 | **PERSISTENT** (21-Mar) | `app/actions/pm-job-actions.ts:108` | `photoUrls` array no max length | Add `.max(20)` |
+| 7 | **NEW** | `lib/validations/job-schema.ts:17,41` | `linked_request_ids` array no max length | Add `.max(50)` |
+| 8 | **NEW** | `lib/validations/template-schema.ts:52` | `checklist` array no max length | Add `.max(100)` |
+
+---
+
+### Test Coverage Gaps (Persistent — No Changes)
+
+No new test files added since last review. All gaps remain:
+
+| # | Priority | Status | Area | Gap |
+|---|----------|--------|------|-----|
+| 1 | **CRITICAL** | PERSISTENT | Unit | 0/15 server action files have tests — ~81 exported functions |
+| 2 | **CRITICAL** | PERSISTENT | RLS | Multi-company write policies (00027, 00029) untested |
+| 3 | **CRITICAL** | PERSISTENT | Unit | `assertCompanyAccess` — 12+ call sites, zero tests |
+| 4 | **HIGH** | PERSISTENT | Unit | Status transition state machines (job + request) untested |
+| 5 | **HIGH** | PERSISTENT | Unit | Transfer ownership guards untested |
+| 6 | **HIGH** | PERSISTENT | E2E | Transfer accept/reject flow — zero E2E tests |
+| 7 | **HIGH** | PERSISTENT | E2E | `holder_id` consistency — not verified on accept/location-move |
+| 8 | **HIGH** | PERSISTENT | Unit | `changePassword` action untested |
+| 9 | **MEDIUM** | PERSISTENT | Unit | `safe-action.ts` middleware chains untested |
+| 10 | **MEDIUM** | PERSISTENT | Unit | Duplicate name checks on create/update/reactivate untested |
+| 11 | **MEDIUM** | PERSISTENT | Unit | Schedule auto-pause/resume on asset status change untested |
+| 12 | **NEW** | MEDIUM | Security | Vision API attachment ownership — not tested (and missing from code) |
+
+**Coverage Summary (unchanged):**
+
+| Category | Items | Tested | Coverage |
+|----------|-------|--------|----------|
+| Action files | 15 | 0 | **0%** |
+| API route files | 12 | 0 | **0%** |
+| Lib utilities | 8 | 4 | **50%** |
+
+---
+
+### Code Consistency & Scalability Improvements (Updated)
+
+| # | Status | Category | Suggestion |
+|---|--------|----------|------------|
+| 1 | **DONE** | Actions | ~~Extract `assertCompanyAccess` shared helper~~ |
+| 2 | **DONE** | Actions | ~~Standardize response shapes~~ — ActionResponse<T> created |
+| 3 | OPEN | Schema | Create `optionalUuid()` Zod helper — 3 divergent patterns |
+| 4 | **DONE** | Schema | ~~Create `isoDateString()` Zod helper~~ |
+| 5 | **PARTIAL** | Columns | `CreatedAtCell` extracted — ~8 inline locations remain |
+| 6 | OPEN | Testing | Set up vitest for server action unit tests — 15 files, 0 tests |
+| 7 | OPEN | Logging | Replace raw `console.*` (280 catch patterns, 208 console calls in 44 files) with structured logger |
+| 8 | **DONE** | Notifications | ~~Standardize notification error handling~~ |
+| 9 | **PARTIAL** | Display IDs | `DisplayId` exists — 19 inline `font-mono` vs 9 using component |
+| 10 | OPEN | Notifications | Extract `safeCreateNotifications()` — 15 identical `.catch()` patterns |
+| 11 | **PARTIAL** | Type Safety | ~~Remove `any` types~~ (4-5 `as any` casts remain in user-form-dialog, profile-sheet, permissions, data-table-toolbar) |
+| 12 | OPEN | Error Handling | Photo upload error handling in respond modal and job-form |
+| 13 | OPEN | Data Integrity | `acceptTransfer` two-step update needs atomicity |
+| 14 | **PARTIAL** | Link Colors | Standard is `hover:text-blue-700` — 7 locations still use `-800` or `-500` |
+| 15 | OPEN | Timestamps | Extract `getCurrentTimestamp()` — **64 instances** in **21 files** (was 47/19) |
+| 16 | OPEN | Paths | Centralize `revalidatePath()` — **109 calls**, 9 unique paths in **15 files** (was 71) |
+| 17 | **DONE** | Roles | ~~Extract role constants~~ — `ROLES`, `GA_ROLES`, `LEAD_ROLES`, `OPERATIONAL_ROLES` all adopted. 0 inline arrays |
+| 18 | OPEN | Tables | Standardize filter state — nuqs vs local state |
+| 19 | **PARTIAL** | Adoption | Migrate remaining 19 inline `font-mono` display IDs to `<DisplayId>` |
+| 20 | **PARTIAL** | Adoption | Migrate remaining inline date renders to `<CreatedAtCell>` |
+| 21 | OPEN | Validation | Audit form `<Input>` elements for missing `maxLength` |
+| 22 | OPEN | Layout | Schedule/template detail pages use `grid-cols-2` instead of `grid-cols-[1fr_380px]` |
+| 23 | OPEN | Convention | Remove `/inventory/new` page — dual create flow |
+| 24 | OPEN | Visual | Add `pb-20` to asset detail page |
+| 25 | OPEN | DRY | Extract `roleColors`/`roleDisplay` maps — 4 components |
+| 26 | OPEN | Auth | Switch `update-password/page.tsx` from `getSession()` to `getUser()` |
+| 27 | OPEN | Dead Code | Remove wrong `assets` table ref in entity-photos; remove dead `template_name` fallback |
+| 28 | OPEN | Status Constants | Extract `JOB_TERMINAL_STATUSES` — 12 occurrences in 8 files |
+| 29 | OPEN | Status Constants | Extract `REQUEST_LINKABLE_STATUSES` — 7 occurrences in 6 files |
+| 30 | OPEN | Status Constants | Extract `REQUEST_TRIAGEABLE_STATUSES` — 5 in 4 files |
+| 31 | OPEN | Status Constants | Extract `JOB_ACTIVE_STATUSES` — 3 in 3 files |
+| 32 | **DONE** | Auto-dismiss | ~~Remove `setTimeout` auto-close in 2 dialogs~~ |
+| 33 | OPEN | Data Integrity | Bulk deactivate needs pre-validation or atomic execution |
+| 34 | OPEN | Data Integrity | Cascading request status updates need state guards |
+| 35 | OPEN | Security | Approval actions need `assertCompanyAccess` for defense-in-depth |
+| 36 | OPEN | Performance | Missing DB index on `inventory_items.holder_id` |
+| 37 | OPEN | Performance | Unbounded export queries — 4 routes lack `.limit()` |
+| 38 | OPEN | Performance | Duplicate company access query in `inventory/page.tsx` |
+| 39 | OPEN | Performance | Duplicate location fetch in `inventory/page.tsx` |
+| 40 | OPEN | UX | Audit trail `LIMIT 1000` — no UI warning when truncated |
+| 41 | **NEW** | DRY | Extract `TYPE_COLORS` for checklist items — duplicated in 3 template components |
+| 42 | **NEW** | DRY | Extract `JOB_STATUS_LABELS`/`jobStatusColor()` — duplicated in 2 schedule components |
+| 43 | **NEW** | DRY | Extract profile fetch helper — same `select('id, company_id, role, deleted_at')` in 7 API routes |
+| 44 | **NEW** | Security | Vision API route lacks attachment ownership check — cross-company risk |
+| 45 | **NEW** | Validation | Add `.max()` to array fields: `linked_request_ids` (.max(50)), `checklist` (.max(100)) |
+| 46 | **NEW** | Type Safety | Remove 4-5 remaining `as any` casts |
+| 47 | **NEW** | Performance | Missing DB index on `job_requests.request_id` |
+| 48 | **NEW** | Design Tokens | Replace hardcoded gray colors in user-menu with semantic tokens for dark-mode readiness |
+
+---
+
+### What's Working Well (Updated)
+
+- **100% responsive design compliance** — zero mobile-first breakpoint violations
+- **100% maxLength compliance** — all Input components match Zod `.max(N)` values
+- **100% date format compliance** — all user-visible dates use `dd-MM-yyyy`
+- **100% notification error handling** — all `createNotifications` calls have `.catch()` with logging
+- **100% feedback persistence** — no auto-dismiss timers remain (both setTimeout violations fixed)
+- **100% soft-delete terminology** — "Deactivate"/"Reactivate" everywhere
+- **100% Combobox/Select correctness** — large lists use Combobox, small fixed lists use Select
+- **100% form pattern compliance** — all forms use react-hook-form + zodResolver
+- **100% ActionResponse<T> compliance** — all 81 server actions typed with explicit returns
+- **100% status badge correctness** — entity-specific badges used correctly
+- **100% role constant adoption** — `ROLES`, `GA_ROLES`, `LEAD_ROLES`, `OPERATIONAL_ROLES` used everywhere; 0 inline arrays
+- **No `@ts-ignore`, no `@ts-expect-error`, no `dangerouslySetInnerHTML`**
+- **Import paths 100% consistent** — all `@/` aliases, zero relative imports
+- **Max-width correctly centralized** — only layout.tsx defines `max-w-[1300px]`
+- **Error boundaries** on all detail pages with entity-specific messaging
+- **API route auth consistent** — all use `getUser()`, check `deleted_at`, proper HTTP codes
+- **Loading states present** — 18 `loading.tsx` files across all route segments
+- **Server component boundaries clean** — all pages are server components
+- **File naming 100% kebab-case** throughout
+- **next-safe-action consistently adopted** — all 15 action files use typed client chains
+- **Optimistic locking tested** with `assertNotStale` unit tests
+- **ActionResponse shape tested** with 116-line type validation suite

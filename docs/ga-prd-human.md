@@ -318,10 +318,25 @@ These rules must be preserved across all changes:
 14. **Action responses:** All server actions return `ActionResponse<T>` typed responses with explicit return type annotations.
 15. **Accessibility:** Skip-to-content link, focus restoration on lightbox close, aria-live on form errors.
 16. **Role constants:** All role checks must use `ROLES.*`, `GA_ROLES`, or `LEAD_ROLES` from `lib/constants/roles.ts`. Never inline role string arrays.
+17. **Operational roles:** Dashboard visibility, approval pages, and export routes must use `OPERATIONAL_ROLES` from `lib/constants/roles.ts`. Never redefine inline.
 
 ---
 
 ## Change Log
+
+### 23-Mar-2026 — Feedback & Role Constant Fixes (6 commits, 10 files)
+
+**Feedback Persistence (2 fixes):**
+- Removed `setTimeout` auto-close from `password-change-dialog.tsx` (was 1500ms) and `request-triage-dialog.tsx` (was 800ms). Both now require manual user dismissal, per Technical Invariant #6.
+
+**Role Constants Expansion:**
+- Added `OPERATIONAL_ROLES` constant to `lib/constants/roles.ts` (ga_lead + admin + finance_approver).
+- Replaced 7 remaining inline role arrays in dashboard, approvals, jobs, requests pages, and 2 export routes with `OPERATIONAL_ROLES`/`GA_ROLES` imports.
+
+**New Technical Invariant (#17):**
+- `OPERATIONAL_ROLES` constant: Dashboard visibility, approval pages, and export routes must use `OPERATIONAL_ROLES` from `lib/constants/roles.ts`. Never redefine inline.
+
+---
 
 ### 21-Mar-2026 — Semantic Bug Fix (2 commits, 1 file)
 
