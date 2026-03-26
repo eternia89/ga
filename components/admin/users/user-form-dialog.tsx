@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { createUserSchema, updateUserSchema } from '@/lib/validations/user-schema';
+import type { ZodType } from 'zod';
+import { createUserSchema, updateUserSchema, type CreateUserFormData } from '@/lib/validations/user-schema';
 import { createUser, updateUser } from '@/app/actions/user-actions';
 import { updateUserCompanyAccess } from '@/app/actions/user-company-access-actions';
 import { extractActionError } from '@/lib/utils';
 import type { Role } from '@/lib/auth/types';
+import type { UserRow } from './user-columns';
 import {
   FormControl,
   FormField,
@@ -40,16 +42,6 @@ type Location = {
   company_id: string;
 };
 
-type UserUserFormInput = {
-  id?: string;
-  email: string;
-  full_name: string;
-  role: Role;
-  company_id: string;
-  division_id: string | null;
-  location_id: string | null;
-};
-
 // Form type that works for both create and edit
 // Email is optional because it's only used in create mode
 type UserFormInput = {
@@ -57,14 +49,14 @@ type UserFormInput = {
   full_name: string;
   role: Role;
   company_id: string;
-  division_id?: string;
-  location_id?: string;
+  division_id: string | null;
+  location_id: string | null;
 };
 
 type UserFormDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user?: UserUserFormInput;
+  user?: UserRow;
   companies: Company[];
   divisions: Division[];
   locations: Location[];
@@ -146,14 +138,14 @@ export function UserFormDialog({
     if (isEditMode && user) {
       // For update, we don't send email
       const { email, ...updateData } = data;
-      const result = await updateUser({ id: user.id!, ...updateData });
+      const result = await updateUser({ id: user.id, ...updateData });
       const error = extractActionError(result);
       if (error) return { error };
       if (!result?.data?.success) return { error: 'Failed to update user' };
 
       // Save multi-company access changes
       const accessResult = await updateUserCompanyAccess({
-        userId: user.id!,
+        userId: user.id,
         companyIds: selectedExtraCompanies,
       });
       const accessError = extractActionError(accessResult);
@@ -161,7 +153,7 @@ export function UserFormDialog({
 
       return {};
     } else {
-      const result = await createUser(data as any);
+      const result = await createUser(data as CreateUserFormData);
       const error = extractActionError(result);
       if (error) return { error };
       if (!result?.data?.success) return { error: 'Failed to create user' };
@@ -174,7 +166,7 @@ export function UserFormDialog({
       key={user?.id || 'create'}
       open={open}
       onOpenChange={onOpenChange}
-      schema={schema as any}
+      schema={schema as ZodType<UserFormInput>}
       defaultValues={defaultValues}
       onSubmit={handleSubmit}
       onSuccess={onSuccess}

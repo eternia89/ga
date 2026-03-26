@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useForm, UseFormReturn, FieldValues, DefaultValues } from "react-hook-form";
+import { useForm, UseFormReturn, FieldValues, DefaultValues, Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ZodType } from "zod";
+import type { ZodType } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -55,7 +55,9 @@ export function EntityFormDialog<T extends FieldValues>({
   } | null>(null);
 
   const form = useForm<T>({
-    resolver: zodResolver(schema as any) as any,
+    // ZodType<T> is correct but zodResolver's overloads use Zod3Type internally;
+    // cast through FieldValues-aware ZodType to bridge the generic gap
+    resolver: zodResolver(schema as ZodType<T, T>) as Resolver<T>,
     defaultValues,
   });
 

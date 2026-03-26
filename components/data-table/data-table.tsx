@@ -41,7 +41,14 @@ interface FilterableColumn {
   options: { label: string; value: string }[];
 }
 
-interface DataTableProps<TData, TValue> {
+interface BaseEntity {
+  id: string;
+  name?: string | null;
+  full_name?: string | null;
+  email?: string | null;
+}
+
+interface DataTableProps<TData extends BaseEntity, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchKey?: string;
@@ -59,7 +66,7 @@ interface DataTableProps<TData, TValue> {
   getRowClassName?: (row: TData) => string;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends BaseEntity, TValue>({
   columns,
   data,
   searchKey,

@@ -240,7 +240,7 @@ export function UserTable({ users, companies, divisions, locations, defaultCompa
             window.history.replaceState({}, '', url.toString());
           }
         }}
-        user={editingUser as any}
+        user={editingUser}
         companies={companies}
         divisions={divisions}
         locations={locations}

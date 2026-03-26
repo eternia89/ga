@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { scheduleCreateSchema, scheduleEditSchema } from '@/lib/validations/schedule-schema';
 import type { ScheduleEditFormData } from '@/lib/validations/schedule-schema';
@@ -149,9 +149,8 @@ function ScheduleCreateForm({ templates, assets, defaultTemplateId, defaultAsset
   const templateLocked = !!defaultTemplateId;
   const assetLocked = !!defaultAssetId;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const form = useForm<ScheduleCreateOutput>({
-    resolver: zodResolver(scheduleCreateSchema) as any,
+    resolver: zodResolver(scheduleCreateSchema) as Resolver<ScheduleCreateOutput>,
     defaultValues: {
       template_id: defaultTemplateId ?? '',
       item_id: defaultAssetId ?? '',

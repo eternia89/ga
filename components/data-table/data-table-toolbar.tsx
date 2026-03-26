@@ -25,13 +25,20 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
+interface BaseEntity {
+  id: string;
+  name?: string | null;
+  full_name?: string | null;
+  email?: string | null;
+}
+
 interface FilterableColumn {
   id: string;
   title: string;
   options: { label: string; value: string }[];
 }
 
-interface DataTableToolbarProps<TData> {
+interface DataTableToolbarProps<TData extends BaseEntity> {
   table: Table<TData>;
   searchKey?: string;
   filterableColumns?: FilterableColumn[];
@@ -43,7 +50,7 @@ interface DataTableToolbarProps<TData> {
   showDeactivated?: boolean;
 }
 
-export function DataTableToolbar<TData>({
+export function DataTableToolbar<TData extends BaseEntity>({
   table,
   searchKey,
   filterableColumns,
@@ -62,8 +69,8 @@ export function DataTableToolbar<TData>({
 
   const handleBulkDeleteClick = () => {
     const selectedRows = table.getFilteredSelectedRowModel().rows;
-    const ids = selectedRows.map((row) => (row.original as any).id);
-    const names = selectedRows.map((row) => (row.original as any).name || (row.original as any).full_name || (row.original as any).email || "Unknown");
+    const ids = selectedRows.map((row) => row.original.id);
+    const names = selectedRows.map((row) => row.original.name || row.original.full_name || row.original.email || "Unknown");
     setBulkDeleteItems({ ids, names });
     setBulkDeleteOpen(true);
   };
@@ -169,7 +176,7 @@ export function DataTableToolbar<TData>({
               size="sm"
               onClick={() => {
                 const selectedRows = table.getFilteredSelectedRowModel().rows;
-                const ids = selectedRows.map((row) => (row.original as any).id);
+                const ids = selectedRows.map((row) => row.original.id);
                 onBulkExport(ids);
               }}
             >

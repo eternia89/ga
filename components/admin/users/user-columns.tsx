@@ -13,7 +13,7 @@ export type UserRow = {
   id: string;
   email: string;
   full_name: string;
-  role: string;
+  role: Role;
   company_id: string;
   division_id: string | null;
   location_id: string | null;
