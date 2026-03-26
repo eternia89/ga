@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: Completed quick-260326-nmx-PLAN.md
 last_updated: "2026-03-26T10:19:00.160Z"
-last_activity: "2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES"
+last_activity: "2026-03-26 - Completed sweep 2 (task 141): Error handling gaps"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -422,6 +422,7 @@ Recent decisions affecting current work:
 | 138 | Extract safeCreateNotifications(): 15 .catch() patterns → shared wrapper | 2026-03-26 | 8de20d3 | Verified | [260326-jfw-extract-safecreatenotifications-helper-t](./quick/260326-jfw-extract-safecreatenotifications-helper-t/) |
 | 139 | Approval actions defense-in-depth: add assertCompanyAccess to 4 actions | 2026-03-26 | 2f828bc | Verified | [260326-jot-approval-actions-defense-in-depth-add-as](./quick/260326-jot-approval-actions-defense-in-depth-add-as/) |
 | 140 | Sweep 1: schema validation gaps — 14 fixes across 16 files | 2026-03-26 | 181ce42 | Verified | [260326-nbd-bug-fix-protocol-sweep-1-schema-validati](./quick/260326-nbd-bug-fix-protocol-sweep-1-schema-validati/) |
+| 141 | Sweep 2: error handling gaps — 18 fixes across 20 files | 2026-03-26 | f821dbb | Verified | [260326-nmx-bug-fix-protocol-sweep-2-error-handling-](./quick/260326-nmx-bug-fix-protocol-sweep-2-error-handling-/) |
 
 ## Session Continuity
 
