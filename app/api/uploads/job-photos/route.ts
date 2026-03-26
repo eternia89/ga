@@ -130,7 +130,10 @@ export async function POST(request: NextRequest) {
     if (insertError) {
       console.error('Insert error:', insertError.message);
       // Clean up uploaded file
-      await adminSupabase.storage.from('job-photos').remove([uploadData.path]);
+      const { error: cleanupError } = await adminSupabase.storage.from('job-photos').remove([uploadData.path]);
+      if (cleanupError) {
+        console.error('[job-photos] Failed to cleanup storage after DB error:', cleanupError.message);
+      }
       return NextResponse.json({ error: 'Failed to save attachment record' }, { status: 500 });
     }
 

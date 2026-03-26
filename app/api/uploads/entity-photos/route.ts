@@ -196,7 +196,10 @@ export async function POST(request: NextRequest) {
       if (insertError) {
         console.error('Insert error:', insertError.message);
         // Clean up uploaded file
-        await adminSupabase.storage.from(config.bucket).remove([uploadData.path]);
+        const { error: cleanupError } = await adminSupabase.storage.from(config.bucket).remove([uploadData.path]);
+        if (cleanupError) {
+          console.error('[entity-photos] Failed to cleanup storage after DB error:', cleanupError.message);
+        }
         continue;
       }
 

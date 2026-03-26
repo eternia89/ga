@@ -677,7 +677,10 @@ export const deleteAssetPhotos = authActionClient
 
     // Remove files from storage
     const filePaths = attachments.map((a) => a.file_path);
-    await adminSupabase.storage.from(parsedInput.bucket).remove(filePaths);
+    const { error: removeError } = await adminSupabase.storage.from(parsedInput.bucket).remove(filePaths);
+    if (removeError) {
+      console.error('[deleteAssetMedia] Failed to remove storage files:', removeError.message);
+    }
 
     return { success: true, deleted: attachments.length };
   });

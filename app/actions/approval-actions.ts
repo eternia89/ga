@@ -215,6 +215,8 @@ export const approveCompletion = authActionClient
         .in('status', [...REQUEST_LINKABLE_STATUSES]);
 
       if (reqUpdateError) {
+        // Intentional: log but don't throw. Approval should succeed even if linked request status update fails.
+        // The request status can be corrected manually; blocking approval would be worse.
         console.error('[approval] Failed to update linked request status:', reqUpdateError.message);
       }
 

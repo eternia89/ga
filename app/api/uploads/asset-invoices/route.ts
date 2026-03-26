@@ -149,14 +149,21 @@ export async function POST(request: NextRequest) {
       if (insertError) {
         console.error('Insert error:', insertError.message);
         // Clean up uploaded file
-        await adminSupabase.storage.from('asset-invoices').remove([uploadData.path]);
+        const { error: cleanupError } = await adminSupabase.storage.from('asset-invoices').remove([uploadData.path]);
+        if (cleanupError) {
+          console.error('[asset-invoices] Failed to cleanup storage after DB error:', cleanupError.message);
+        }
         continue;
       }
 
       uploadedCount++;
     }
 
-    return NextResponse.json({ success: true, count: uploadedCount });
+    return NextResponse.json({
+      success: true,
+      count: uploadedCount,
+      partial: uploadedCount < uniqueFiles.length,
+    });
   } catch (error) {
     console.error('Invoice upload error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
