@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: Completed quick-260326-gck dead code and role literal cleanup
 last_updated: "2026-03-26T05:02:09.172Z"
-last_activity: "2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES"
+last_activity: "2026-03-26 - Completed quick task 133: Dead code + role literal cleanup"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -411,6 +411,7 @@ Recent decisions affecting current work:
 | 130 | Cascading request status guard: .neq(cancelled) → .in(triaged,in_progress) | 2026-03-26 | 265da8a | Verified | [260326-fru-cascading-request-status-guard-replace-n](./quick/260326-fru-cascading-request-status-guard-replace-n/) |
 | 131 | CSV export filename date format: yyyy-MM-dd → dd-MM-yyyy | 2026-03-26 | 5f5eee9 | Verified | [260326-fyl-csv-export-filename-date-format-fix-chan](./quick/260326-fyl-csv-export-filename-date-format-fix-chan/) |
 | 132 | UI consistency: pb-20 on asset detail + standardize hover:text-blue-700 | 2026-03-26 | 38ddc36 | Verified | [260326-g4p-ui-consistency-batch-fix-grid-cols-pb-20](./quick/260326-g4p-ui-consistency-batch-fix-grid-cols-pb-20/) |
+| 133 | Dead code + role literals: fix table name, remove dead fallback, 18 role constants | 2026-03-26 | dd1feef | Verified | [260326-gck-dead-code-and-role-literal-cleanup-fix-w](./quick/260326-gck-dead-code-and-role-literal-cleanup-fix-w/) |
 
 ## Session Continuity
 
