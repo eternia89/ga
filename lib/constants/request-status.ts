@@ -51,3 +51,8 @@ export type RequestStatus = typeof REQUEST_STATUSES[number];
 
 export const PRIORITIES = ['low', 'medium', 'high', 'urgent'] as const;
 export type Priority = typeof PRIORITIES[number];
+
+// Semantic status subsets
+export const REQUEST_LINKABLE_STATUSES = ['triaged', 'in_progress'] as const;
+export const REQUEST_TRIAGEABLE_STATUSES = ['submitted', 'triaged'] as const;
+export const REQUEST_OPEN_STATUSES = ['submitted', 'triaged', 'in_progress'] as const;
