@@ -213,6 +213,7 @@ export const bulkDeactivateCategories = adminActionClient
 
     const blocked: string[] = [];
     const deactivated: string[] = [];
+    const failed: string[] = [];
 
     for (const id of ids) {
       // Check for dependencies
@@ -248,10 +249,13 @@ export const bulkDeactivateCategories = adminActionClient
 
         if (!error) {
           deactivated.push(id);
+        } else {
+          console.error(`[bulkDeactivateCategories] Failed to deactivate ${id}:`, error.message);
+          failed.push(id);
         }
       }
     }
 
     revalidatePath('/admin/settings');
-    return { success: true, deleted: deactivated.length, blocked: blocked.length };
+    return { success: true, deleted: deactivated.length, blocked: blocked.length, failed: failed.length };
   });

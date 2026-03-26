@@ -95,12 +95,13 @@ export function LocationTable({ data, companies }: LocationTableProps) {
       if (result?.serverError) {
         setFeedback({ type: "error", message: result.serverError });
       } else if (result?.data) {
-        const { deleted, blocked } = result.data;
-        if (blocked > 0) {
-          setFeedback({
-            type: "error",
-            message: `Deactivated ${deleted} locations. ${blocked} blocked due to dependencies.`,
-          });
+        const { deleted, blocked, failed } = result.data;
+        if (blocked > 0 || failed > 0) {
+          const parts = [];
+          if (deleted > 0) parts.push(`Deactivated ${deleted}`);
+          if (blocked > 0) parts.push(`${blocked} blocked due to dependencies`);
+          if (failed > 0) parts.push(`${failed} failed due to errors`);
+          setFeedback({ type: "error", message: parts.join(". ") + "." });
         } else {
           setFeedback({
             type: "success",

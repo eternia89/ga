@@ -408,7 +408,7 @@ export const acceptTransfer = authActionClient
         .eq('id', parsedInput.movement_id);
 
       if (rollbackError) {
-        console.error('[rejectTransfer] Rollback failed - could not revert movement to pending:', rollbackError.message);
+        console.error('[acceptTransfer] Rollback failed - could not revert movement to pending:', rollbackError.message);
       }
       throw new Error('Failed to update asset location. Transfer reverted to pending.');
     }

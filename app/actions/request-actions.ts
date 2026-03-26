@@ -519,7 +519,13 @@ export const rejectCompletedWork = authActionClient
         .eq('status', 'completed');
 
       if (revertJobError) {
-        console.error('[rejectWork] Failed to revert linked jobs to in_progress:', revertJobError.message);
+        console.error('[rejectWork] Failed to revert linked jobs, rolling back request status:', revertJobError.message);
+        // Rollback request status to pending_acceptance
+        await supabase
+          .from('requests')
+          .update({ status: 'pending_acceptance', acceptance_rejected_reason: null })
+          .eq('id', parsedInput.request_id);
+        throw new Error('Failed to revert linked jobs. Please try again.');
       }
     }
 

@@ -32,15 +32,17 @@ describe('ActionResponse type system', () => {
     expect(response.movementId).toBe('abc-123');
   });
 
-  it('BulkDeactivateResponse includes deleted and blocked', () => {
+  it('BulkDeactivateResponse includes deleted, blocked, and failed', () => {
     const response: BulkDeactivateResponse = {
       success: true,
       deleted: 3,
       blocked: 1,
+      failed: 0,
     };
     expect(response.success).toBe(true);
     expect(response.deleted).toBe(3);
     expect(response.blocked).toBe(1);
+    expect(response.failed).toBe(0);
   });
 
   it('PhotosResponse includes photos array', () => {

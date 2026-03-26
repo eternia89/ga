@@ -15,10 +15,11 @@ export type ActionResponse<T extends Record<string, unknown> = {}> =
 /** Shorthand for actions that only return { success: true } */
 export type ActionOk = { success: true };
 
-/** Bulk deactivate actions — return count of deactivated and blocked items */
+/** Bulk deactivate actions — return count of deactivated, blocked, and failed items */
 export type BulkDeactivateResponse = ActionResponse<{
   deleted: number;
   blocked: number;
+  failed: number;
 }>;
 
 /** Photo fetch actions — return signed photo URLs (asset photos/invoices) */
