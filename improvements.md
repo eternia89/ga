@@ -1259,6 +1259,13 @@ No new test files added since last review. All gaps remain:
 | 49 | **NEW** | Roles | 4 string literal role checks remain: `company-settings-actions.ts:47` (`!== 'admin'`), `admin/settings/page.tsx:54` (`=== 'admin'`), `inventory/page.tsx:46` (`=== 'general_user'`), `requests/page.tsx:46` (`=== 'general_user'`) — should use `ROLES` constants |
 | 50 | **NEW** | Safety | `.or()` string interpolation in `inventory/page.tsx:72-74` — `holder_id.eq.${profile.id},id.in.(${inTransitAssetIds.join(',')})` is fragile; refactor to separate queries or helper |
 | 51 | **NEW** | DRY | Extract `getAccessibleCompanyIds()` helper — same 3-line pattern duplicated in requests/page.tsx, inventory/page.tsx, approvals/page.tsx |
+| 52 | **NEW** | Performance | N+1 in `company-actions.ts:189-220` — bulk deactivation loops per-company with 3 dependency queries each. Should batch with `IN` clauses |
+| 53 | **NEW** | Performance | N+1 in `schedule-actions.ts:554+` — loop over `schedulesToResume` with individual UPDATE per schedule. Should batch update |
+| 54 | **NEW** | Performance | Missing compound index on `media_attachments(entity_type, entity_id, sort_order)` — requests/page.tsx photo queries filter by all 3 columns |
+| 55 | **NEW** | Performance | Middleware queries `user_profiles` on every protected route request — should cache `deleted_at` check in JWT or session |
+| 56 | **NEW** | Scalability | No server-side pagination on list pages (requests, jobs, inventory) — loads all records into memory. Fine at 500 users but breaks at scale |
+| 57 | **NEW** | Components | `job-modal.tsx` (1345 lines), `request-view-modal.tsx` (756 lines) are oversized — split into ViewModal/FormSection/TimelineSection |
+| 58 | **NEW** | Components | `job-modal.tsx` has 10+ props (prop drilling) — consider React Context for reference data (categories, users, locations) |
 
 ---
 
