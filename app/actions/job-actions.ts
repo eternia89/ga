@@ -586,7 +586,7 @@ export const updateJobStatus = authActionClient
             updated_at: now,
           })
           .in('id', requestIds)
-          .neq('status', 'cancelled');
+          .in('status', ['triaged', 'in_progress']);
 
         // Non-blocking notification: notify requesters with auto-accept warning
         const { data: linkedRequests } = await supabase

@@ -201,7 +201,7 @@ export const approveCompletion = authActionClient
           updated_at: now,
         })
         .in('id', requestIds)
-        .neq('status', 'cancelled');
+        .in('status', ['triaged', 'in_progress']);
 
       if (reqUpdateError) {
         console.error('[approval] Failed to update linked request status:', reqUpdateError.message);
