@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: Completed quick-260326-ok9-PLAN.md
 last_updated: "2026-03-26T10:54:21.761Z"
-last_activity: "2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES"
+last_activity: "2026-03-26 - Completed sweep 4 (task 143): Data integrity fixes"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -425,6 +425,7 @@ Recent decisions affecting current work:
 | 140 | Sweep 1: schema validation gaps — 14 fixes across 16 files | 2026-03-26 | 181ce42 | Verified | [260326-nbd-bug-fix-protocol-sweep-1-schema-validati](./quick/260326-nbd-bug-fix-protocol-sweep-1-schema-validati/) |
 | 141 | Sweep 2: error handling gaps — 18 fixes across 20 files | 2026-03-26 | f821dbb | Verified | [260326-nmx-bug-fix-protocol-sweep-2-error-handling-](./quick/260326-nmx-bug-fix-protocol-sweep-2-error-handling-/) |
 | 142 | Sweep 3: adminSupabase security — 7 company-scoping fixes across 8 files | 2026-03-26 | 8a8a446 | Verified | [260326-o5f-bug-fix-protocol-sweep-3-security-admins](./quick/260326-o5f-bug-fix-protocol-sweep-3-security-admins/) |
+| 143 | Sweep 4: data integrity — 10 rollback/error-tracking fixes across 13 files | 2026-03-26 | ff24f65 | Verified | [260326-ok9-bug-fix-protocol-sweep-4-data-integrity-](./quick/260326-ok9-bug-fix-protocol-sweep-4-data-integrity-/) |
 
 ## Session Continuity
 
