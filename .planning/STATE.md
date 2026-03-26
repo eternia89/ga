@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: Completed quick-260326-h9c DRY extractions (roleColors, typeColors, jobStatus, optionalUuid)
 last_updated: "2026-03-26T06:15:44.716Z"
-last_activity: "2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES"
+last_activity: "2026-03-26 - Completed quick task 135: DRY extractions batch"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -413,6 +413,7 @@ Recent decisions affecting current work:
 | 132 | UI consistency: pb-20 on asset detail + standardize hover:text-blue-700 | 2026-03-26 | 38ddc36 | Verified | [260326-g4p-ui-consistency-batch-fix-grid-cols-pb-20](./quick/260326-g4p-ui-consistency-batch-fix-grid-cols-pb-20/) |
 | 133 | Dead code + role literals: fix table name, remove dead fallback, 18 role constants | 2026-03-26 | dd1feef | Verified | [260326-gck-dead-code-and-role-literal-cleanup-fix-w](./quick/260326-gck-dead-code-and-role-literal-cleanup-fix-w/) |
 | 134 | DisplayId migration: 18 inline font-mono → DisplayId wrapper across 16 files | 2026-03-26 | acd4e67 | Verified | [260326-gsg-displayid-component-migration-replace-al](./quick/260326-gsg-displayid-component-migration-replace-al/) |
+| 135 | DRY extractions: roleColors, TYPE_COLORS, job status, optionalUuid into shared constants | 2026-03-26 | 4f87a01 | Verified | [260326-h9c-dry-extractions-rolecolors-type-colors-j](./quick/260326-h9c-dry-extractions-rolecolors-type-colors-j/) |
 
 ## Session Continuity
 
