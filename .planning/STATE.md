@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed quick-260326-nmx-PLAN.md
-last_updated: "2026-03-26T10:19:00.160Z"
-last_activity: "2026-03-26 - Completed sweep 2 (task 141): Error handling gaps"
+stopped_at: Completed quick-260326-o5f-PLAN.md
+last_updated: "2026-03-26T10:37:35.195Z"
+last_activity: "2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -260,6 +260,7 @@ Recent decisions affecting current work:
 - [Phase quick-260326-jfw]: safeCreateNotifications returns void (not Promise<void>) to encode fire-and-forget intent in type system
 - [Phase quick-260326-jot]: Used RLS-bound supabase client (not adminSupabase) for assertCompanyAccess in approval actions since it only needs SELECT on user_company_access
 - [Phase quick-260326-nbd]: Used .max(50) for updated_at tokens as defense-in-depth
+- [Phase quick-260326-o5f]: Use entity-sourced company_id pattern for upload routes (entity's company_id, not profile.company_id)
 
 ### Roadmap Evolution
 
@@ -426,7 +427,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-26T10:19:00.156Z
-Stopped at: Completed quick-260326-nmx-PLAN.md
+Last session: 2026-03-26T10:37:31.158Z
+Stopped at: Completed quick-260326-o5f-PLAN.md
 Resume file: None
 Next: Ready for next task
