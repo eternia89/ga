@@ -10,6 +10,7 @@ import type { JobWithRelations } from '@/lib/types/database';
 import { JOB_STATUS_LABELS } from '@/lib/constants/job-status';
 import { PM_BADGE_CLASS } from '@/lib/constants/approval-status';
 import { ROLES } from '@/lib/constants/roles';
+import { DisplayId } from '@/components/display-id';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -455,8 +456,8 @@ export default async function JobDetailPage({ params }: PageProps) {
       {/* Header */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight font-mono">
-            {job.display_id}
+          <h1 className="text-2xl font-bold tracking-tight">
+            <DisplayId>{job.display_id}</DisplayId>
           </h1>
           <JobStatusBadge status={job.status} />
           {job.priority && <PriorityBadge priority={job.priority} />}

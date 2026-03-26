@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select';
 import { updateJob, deleteJobAttachment } from '@/app/actions/job-actions';
 import { formatIDR, formatNumber, formatDateTime, formatDate } from '@/lib/utils';
+import { DisplayId } from '@/components/display-id';
 
 const PRIORITY_ORDER = ['low', 'medium', 'high', 'urgent'] as const;
 
@@ -485,9 +486,9 @@ export function JobDetailInfo({
                 className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm hover:bg-muted/40 transition-colors w-full text-left cursor-pointer"
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-mono text-xs font-semibold text-muted-foreground shrink-0">
+                  <DisplayId className="text-xs font-semibold text-muted-foreground shrink-0">
                     {request.display_id}
-                  </span>
+                  </DisplayId>
                   <span className="truncate text-sm">{request.title}</span>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">

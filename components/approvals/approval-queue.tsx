@@ -16,6 +16,7 @@ import {
 import { formatIDR, formatDate } from '@/lib/utils';
 import { JobViewModal } from '@/components/jobs/job-view-modal';
 import { APPROVAL_TYPE_COLORS, APPROVAL_TYPE_LABELS, APPROVAL_DECISION_COLORS, APPROVAL_DECISION_LABELS } from '@/lib/constants/approval-status';
+import { DisplayId } from '@/components/display-id';
 
 // ============================================================================
 // Types
@@ -171,8 +172,8 @@ export function ApprovalQueue({
 
                 return (
                   <TableRow key={`${job.id}-${job.approval_type}`}>
-                    <TableCell className="font-mono text-sm font-medium">
-                      {job.display_id}
+                    <TableCell>
+                      <DisplayId className="text-sm font-medium">{job.display_id}</DisplayId>
                     </TableCell>
                     <TableCell>
                       <div className="font-medium">{job.title}</div>

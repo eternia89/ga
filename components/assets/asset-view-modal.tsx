@@ -21,6 +21,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { GA_ROLES } from '@/lib/constants/roles';
+import { DisplayId } from '@/components/display-id';
 import {
   AlertCircle,
   RefreshCw,
@@ -440,8 +441,8 @@ export function AssetViewModal({
                   </div>
                 )}
 
-                <h2 className="text-xl font-bold tracking-tight font-mono">
-                  {asset.display_id}
+                <h2 className="text-xl font-bold tracking-tight">
+                  <DisplayId>{asset.display_id}</DisplayId>
                 </h2>
               </div>
               <div className="flex flex-wrap items-center gap-2 mt-1">

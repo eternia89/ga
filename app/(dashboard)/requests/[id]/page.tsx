@@ -7,6 +7,7 @@ import { PriorityBadge } from '@/components/priority-badge';
 import { RequestDetailClient } from '@/components/requests/request-detail-client';
 import type { TimelineEvent } from '@/components/requests/request-timeline';
 import { RequestWithRelations } from '@/lib/types/database';
+import { DisplayId } from '@/components/display-id';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -387,8 +388,8 @@ export default async function RequestDetailPage({ params }: PageProps) {
       {/* Header */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight font-mono">
-            {req.display_id}
+          <h1 className="text-2xl font-bold tracking-tight">
+            <DisplayId>{req.display_id}</DisplayId>
           </h1>
           <RequestStatusBadge status={req.status} />
           {req.priority && <PriorityBadge priority={req.priority} />}

@@ -26,6 +26,7 @@ import {
   approveCompletion,
   rejectCompletion,
 } from '@/app/actions/approval-actions';
+import { DisplayId } from '@/components/display-id';
 import {
   Dialog,
   DialogContent,
@@ -1009,8 +1010,8 @@ export function JobModal({
                     </div>
                   )}
 
-                  <h2 className="text-xl font-bold tracking-tight font-mono">
-                    {job.display_id}
+                  <h2 className="text-xl font-bold tracking-tight">
+                    <DisplayId>{job.display_id}</DisplayId>
                   </h2>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mt-1">

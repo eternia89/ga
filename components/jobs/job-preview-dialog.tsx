@@ -15,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from 'lucide-react';
 import { formatIDR, formatDateTime } from '@/lib/utils';
+import { DisplayId } from '@/components/display-id';
 
 // ============================================================================
 // Types
@@ -158,9 +159,9 @@ export function JobPreviewDialog({ open, onOpenChange, jobId }: JobPreviewDialog
           <>
             <DialogHeader>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-mono text-sm font-semibold text-muted-foreground">
+                <DisplayId className="text-sm font-semibold text-muted-foreground">
                   {job.display_id}
-                </span>
+                </DisplayId>
                 <JobStatusBadge status={job.status} />
                 {job.priority && <PriorityBadge priority={job.priority} />}
               </div>
@@ -231,9 +232,9 @@ export function JobPreviewDialog({ open, onOpenChange, jobId }: JobPreviewDialog
                   <ul className="space-y-1">
                     {job.job_requests.map(({ request }) => (
                       <li key={request.id} className="flex items-center gap-2 text-sm">
-                        <span className="font-mono text-xs font-semibold text-muted-foreground shrink-0">
+                        <DisplayId className="text-xs font-semibold text-muted-foreground shrink-0">
                           {request.display_id}
-                        </span>
+                        </DisplayId>
                         <span className="truncate">{request.title}</span>
                       </li>
                     ))}

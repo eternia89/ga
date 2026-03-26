@@ -23,6 +23,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { completeRequest } from '@/app/actions/request-actions';
+import { DisplayId } from '@/components/display-id';
 import {
   XCircle,
   Ban,
@@ -567,8 +568,8 @@ export function RequestViewModal({
                     </div>
                   )}
 
-                  <h2 className="text-xl font-bold tracking-tight font-mono">
-                    {request.display_id}
+                  <h2 className="text-xl font-bold tracking-tight">
+                    <DisplayId>{request.display_id}</DisplayId>
                   </h2>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mt-1">

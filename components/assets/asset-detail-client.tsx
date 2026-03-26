@@ -15,6 +15,7 @@ import { ASSET_STATUS_TRANSITIONS } from '@/lib/constants/asset-status';
 import type { AssetStatus } from '@/lib/constants/asset-status';
 import { GA_ROLES } from '@/lib/constants/roles';
 import type { GAUserWithLocation } from './asset-transfer-dialog';
+import { DisplayId } from '@/components/display-id';
 
 export interface ConditionPhoto {
   id: string;
@@ -97,8 +98,8 @@ export function AssetDetailClient({
       {/* Page-level header: display ID + status badge */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight font-mono">
-            {asset.display_id}
+          <h1 className="text-2xl font-bold tracking-tight">
+            <DisplayId>{asset.display_id}</DisplayId>
           </h1>
           <AssetStatusBadge
             status={asset.status}
