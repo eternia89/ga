@@ -64,10 +64,13 @@ export async function POST(request: NextRequest) {
     try {
       // Call Google Vision REST API
       const visionResponse = await fetch(
-        `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`,
+        'https://vision.googleapis.com/v1/images:annotate',
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': apiKey,
+          },
           body: JSON.stringify({
             requests: [
               {

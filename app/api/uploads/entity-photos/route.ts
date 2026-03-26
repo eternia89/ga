@@ -220,10 +220,13 @@ export async function POST(request: NextRequest) {
             if (!apiKey) return; // Skip if not configured
 
             return fetch(
-              `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`,
+              'https://vision.googleapis.com/v1/images:annotate',
               {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-goog-api-key': apiKey,
+                },
                 body: JSON.stringify({
                   requests: [
                     {
