@@ -47,7 +47,7 @@ export const checklistItemSchema = z.discriminatedUnion('type', [
 // ============================================================================
 
 export const templateCreateSchema = z.object({
-  name:        z.string().min(1, 'Name is required').max(100),
+  name:        z.string().min(1, 'Name is required').max(60),
   description: z.string().max(200).optional(),
   category_id: optionalUuid(),
   checklist:   z.array(checklistItemSchema).min(1, 'At least one checklist item required').max(100, 'Maximum 100 checklist items'),

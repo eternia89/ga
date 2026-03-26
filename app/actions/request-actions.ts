@@ -76,7 +76,7 @@ export const createRequest = authActionClient
 // updateRequest — requester only, while status = 'submitted'
 // ============================================================================
 export const updateRequest = authActionClient
-  .schema(z.object({ id: z.string().uuid(), data: requestEditSchema, updated_at: z.string().optional() }))
+  .schema(z.object({ id: z.string().uuid(), data: requestEditSchema, updated_at: z.string().max(50).optional() }))
   .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 

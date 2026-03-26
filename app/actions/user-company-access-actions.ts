@@ -30,7 +30,7 @@ export const getUserCompanyAccess = authActionClient
 export const updateUserCompanyAccess = adminActionClient
   .schema(z.object({
     userId: z.string().uuid(),
-    companyIds: z.array(z.string().uuid()),
+    companyIds: z.array(z.string().uuid()).max(50),
   }))
   .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const adminSupabase = createAdminClient();

@@ -108,7 +108,7 @@ export type NotificationFilter = 'all' | 'unread' | 'request' | 'job' | 'invento
 
 const getAllNotificationsSchema = z.object({
   filter: z.enum(['all', 'unread', 'request', 'job', 'inventory', 'maintenance']).optional(),
-  cursor: z.string().optional(),
+  cursor: z.string().max(100).optional(),
   limit: z.number().int().min(1).max(100).optional(),
 });
 

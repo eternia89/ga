@@ -181,7 +181,7 @@ export const reactivateDivision = adminActionClient
 
 // Bulk deactivate divisions
 export const bulkDeactivateDivisions = adminActionClient
-  .schema(z.object({ ids: z.array(z.string().uuid()) }))
+  .schema(z.object({ ids: z.array(z.string().uuid()).max(100) }))
   .action(async ({ parsedInput, ctx }): Promise<BulkDeactivateResponse> => {
     const { adminSupabase: supabase } = ctx;
     const { ids } = parsedInput;

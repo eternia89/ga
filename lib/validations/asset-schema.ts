@@ -6,7 +6,7 @@ import { isoDateString } from '@/lib/validations/helpers';
 export const assetCreateSchema = z.object({
   name: z.string()
     .min(1, 'Name is required')
-    .max(100, 'Name must be under 100 characters'),
+    .max(60, 'Name must be under 60 characters'),
   category_id: z.string().uuid({ message: 'Category is required' }),
   location_id: z.string().uuid({ message: 'Location is required' }),
   brand: z.string().max(100, 'Brand must be under 100 characters').optional(),

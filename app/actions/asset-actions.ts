@@ -90,7 +90,7 @@ export const createAsset = authActionClient
 // Cannot edit sold_disposed assets
 // ============================================================================
 export const updateAsset = authActionClient
-  .schema(z.object({ asset_id: z.string().uuid(), data: assetEditSchema, updated_at: z.string().optional() }))
+  .schema(z.object({ asset_id: z.string().uuid(), data: assetEditSchema, updated_at: z.string().max(50).optional() }))
   .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const { supabase, profile } = ctx;
 

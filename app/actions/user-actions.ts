@@ -183,7 +183,7 @@ export const updateUser = adminActionClient
 export const deactivateUser = adminActionClient
   .schema(z.object({
     id: z.string().uuid(),
-    reason: z.string().optional(),
+    reason: z.string().max(200).optional(),
   }))
   .action(async ({ parsedInput }): Promise<ActionOk> => {
     const adminSupabase = createAdminClient();
