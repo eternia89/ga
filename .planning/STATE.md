@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: "Completed quick-260326-jfw: safeCreateNotifications DRY refactor"
 last_updated: "2026-03-26T07:08:10.963Z"
-last_activity: "2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES"
+last_activity: "2026-03-26 - Completed quick task 138: Extract safeCreateNotifications helper"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -417,6 +417,7 @@ Recent decisions affecting current work:
 | 135 | DRY extractions: roleColors, TYPE_COLORS, job status, optionalUuid into shared constants | 2026-03-26 | 4f87a01 | Verified | [260326-h9c-dry-extractions-rolecolors-type-colors-j](./quick/260326-h9c-dry-extractions-rolecolors-type-colors-j/) |
 | 136 | Status constants: extract 6 duplicated status arrays, replace 36 inline occurrences | 2026-03-26 | fb988b6 | Verified | [260326-ihu-status-constants-extraction-extract-dupl](./quick/260326-ihu-status-constants-extraction-extract-dupl/) |
 | 137 | Fix remaining as any casts: 11 type-unsafe casts → proper types across 10 files | 2026-03-26 | 5d3700e | Verified | [260326-iyi-fix-remaining-as-any-casts-replace-11-ty](./quick/260326-iyi-fix-remaining-as-any-casts-replace-11-ty/) |
+| 138 | Extract safeCreateNotifications(): 15 .catch() patterns → shared wrapper | 2026-03-26 | 8de20d3 | Verified | [260326-jfw-extract-safecreatenotifications-helper-t](./quick/260326-jfw-extract-safecreatenotifications-helper-t/) |
 
 ## Session Continuity
 
