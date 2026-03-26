@@ -1256,6 +1256,9 @@ No new test files added since last review. All gaps remain:
 | 46 | **CORRECTED** | Type Safety | 11 `as any` casts across 7 components — was incorrectly reported as resolved |
 | 47 | OPEN | Performance | Missing DB index on `job_requests.request_id` |
 | 48 | OPEN | Design Tokens | Replace hardcoded gray colors in user-menu with semantic tokens |
+| 49 | **NEW** | Roles | 4 string literal role checks remain: `company-settings-actions.ts:47` (`!== 'admin'`), `admin/settings/page.tsx:54` (`=== 'admin'`), `inventory/page.tsx:46` (`=== 'general_user'`), `requests/page.tsx:46` (`=== 'general_user'`) — should use `ROLES` constants |
+| 50 | **NEW** | Safety | `.or()` string interpolation in `inventory/page.tsx:72-74` — `holder_id.eq.${profile.id},id.in.(${inTransitAssetIds.join(',')})` is fragile; refactor to separate queries or helper |
+| 51 | **NEW** | DRY | Extract `getAccessibleCompanyIds()` helper — same 3-line pattern duplicated in requests/page.tsx, inventory/page.tsx, approvals/page.tsx |
 
 ---
 
@@ -1271,7 +1274,7 @@ No new test files added since last review. All gaps remain:
 - **100% form pattern compliance** — all forms use react-hook-form + zodResolver
 - **100% ActionResponse<T> compliance** — all 81 server actions typed with explicit returns
 - **100% status badge correctness** — entity-specific badges used correctly (`RequestStatusBadge`, `JobStatusBadge`, `AssetStatusBadge`, `ScheduleStatusBadge`)
-- **100% role constant adoption** — `ROLES`, `GA_ROLES`, `LEAD_ROLES`, `OPERATIONAL_ROLES` — 0 inline arrays
+- **Role constant adoption nearly complete** — `ROLES`, `GA_ROLES`, `LEAD_ROLES`, `OPERATIONAL_ROLES` adopted; 0 inline arrays, but 4 string literal equality checks remain (`=== 'admin'`, `=== 'general_user'`)
 - **No `@ts-ignore`, no `@ts-expect-error`, no `dangerouslySetInnerHTML`**
 - **Import paths 100% consistent** — all `@/` aliases, zero relative imports in pages
 - **Max-width correctly centralized** — only layout.tsx defines `max-w-[1300px]`
