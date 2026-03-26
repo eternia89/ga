@@ -271,7 +271,7 @@ export function AssetSubmitForm({ categories, locations, onSuccess, extraCompani
                 <FormControl>
                   <Input
                     placeholder="e.g. Air Conditioner Unit 1"
-                    maxLength={100}
+                    maxLength={60}
                     disabled={isSubmitting}
                     {...field}
                   />

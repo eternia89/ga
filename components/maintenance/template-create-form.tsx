@@ -108,7 +108,7 @@ export function TemplateCreateForm({ categories, onSuccess }: TemplateCreateForm
                 <FormControl>
                   <Input
                     placeholder="e.g. Monthly AC Maintenance"
-                    maxLength={100}
+                    maxLength={60}
                     disabled={isSubmitting}
                     {...field}
                   />

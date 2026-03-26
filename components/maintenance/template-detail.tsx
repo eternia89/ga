@@ -236,7 +236,7 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
                     <FormControl>
                       <Input
                         placeholder="e.g. Monthly AC Maintenance"
-                        maxLength={100}
+                        maxLength={60}
                         disabled={isPending}
                         {...field}
                       />
