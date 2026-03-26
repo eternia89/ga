@@ -144,6 +144,7 @@ export default function UpdatePasswordPage() {
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                   minLength={8}
+                  maxLength={255}
                   className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="At least 8 characters"
                 />
@@ -163,6 +164,7 @@ export default function UpdatePasswordPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   minLength={8}
+                  maxLength={255}
                   className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="Re-enter your password"
                 />

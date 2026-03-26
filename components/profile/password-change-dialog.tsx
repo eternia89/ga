@@ -31,9 +31,9 @@ type PasswordChangeDialogProps = {
 };
 
 const passwordSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  newPassword: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string().min(1, "Please confirm your password"),
+  currentPassword: z.string().min(1, "Current password is required").max(255),
+  newPassword: z.string().min(8, "Password must be at least 8 characters").max(255),
+  confirmPassword: z.string().min(1, "Please confirm your password").max(255),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -107,7 +107,7 @@ export function PasswordChangeDialog({ open, onOpenChange }: PasswordChangeDialo
                 <FormItem>
                   <FormLabel>Current Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input type="password" maxLength={255} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -121,7 +121,7 @@ export function PasswordChangeDialog({ open, onOpenChange }: PasswordChangeDialo
                 <FormItem>
                   <FormLabel>New Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input type="password" maxLength={255} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -135,7 +135,7 @@ export function PasswordChangeDialog({ open, onOpenChange }: PasswordChangeDialo
                 <FormItem>
                   <FormLabel>Confirm New Password</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <Input type="password" maxLength={255} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
