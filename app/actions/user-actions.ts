@@ -185,8 +185,17 @@ export const deactivateUser = adminActionClient
     id: z.string().uuid(),
     reason: z.string().max(200).optional(),
   }))
-  .action(async ({ parsedInput }): Promise<ActionOk> => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const adminSupabase = createAdminClient();
+
+    // Fetch target user's company_id for access validation
+    const { data: targetUser, error: fetchError } = await adminSupabase
+      .from('user_profiles')
+      .select('id, company_id')
+      .eq('id', parsedInput.id)
+      .single();
+    if (fetchError || !targetUser) throw new Error('User not found');
+    await assertCompanyAccess(adminSupabase, ctx.profile.id, targetUser.company_id, ctx.profile.company_id);
 
     // Set deleted_at to deactivate the user
     const { error } = await adminSupabase
@@ -209,19 +218,22 @@ export const deactivateUser = adminActionClient
 // Reactivate user
 export const reactivateUser = adminActionClient
   .schema(z.object({ id: z.string().uuid(), reason: z.string().max(200).optional() }))
-  .action(async ({ parsedInput }): Promise<ActionOk> => {
+  .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const adminSupabase = createAdminClient();
 
-    // Fetch the user being reactivated to get their email
+    // Fetch the user being reactivated to get their email and company_id
     const { data: userToReactivate, error: fetchError } = await adminSupabase
       .from('user_profiles')
-      .select('id, email')
+      .select('id, email, company_id')
       .eq('id', parsedInput.id)
       .single();
 
     if (fetchError || !userToReactivate) {
       throw new Error('User not found');
     }
+
+    // Verify admin has access to the target user's company
+    await assertCompanyAccess(adminSupabase, ctx.profile.id, userToReactivate.company_id, ctx.profile.company_id);
 
     // Check for duplicate email among active users
     const { data: duplicateEmail } = await adminSupabase

@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import type { ActionOk } from '@/lib/types/action-responses';
 import { ROLES } from '@/lib/constants/roles';
+import { assertCompanyAccess } from '@/lib/auth/company-access';
 
 // Get all company_ids granted to a user (beyond their primary company)
 // Used by create modals to determine if company selector should show
@@ -35,6 +36,15 @@ export const updateUserCompanyAccess = adminActionClient
   .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {
     const adminSupabase = createAdminClient();
     const { userId, companyIds } = parsedInput;
+
+    // Validate admin has access to the target user's company
+    const { data: targetUser, error: fetchError } = await adminSupabase
+      .from('user_profiles')
+      .select('id, company_id')
+      .eq('id', userId)
+      .single();
+    if (fetchError || !targetUser) throw new Error('User not found');
+    await assertCompanyAccess(adminSupabase, ctx.profile.id, targetUser.company_id, ctx.profile.company_id);
 
     // Delete all existing access for this user
     const { error: deleteError } = await adminSupabase
