@@ -16,7 +16,7 @@ export const savePMChecklistItem = authActionClient
   .schema(
     z.object({
       jobId: z.string().uuid(),
-      itemId: z.string(),
+      itemId: z.string().uuid(),
       value: z.union([z.boolean(), z.string().max(1000), z.number(), z.null()]),
     })
   )
@@ -104,8 +104,8 @@ export const savePMChecklistPhoto = authActionClient
   .schema(
     z.object({
       jobId: z.string().uuid(),
-      itemId: z.string(),
-      photoUrls: z.array(z.string().max(2048)),
+      itemId: z.string().uuid(),
+      photoUrls: z.array(z.string().max(2048)).max(20),
     })
   )
   .action(async ({ parsedInput, ctx }): Promise<ActionOk> => {

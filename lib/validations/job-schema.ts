@@ -14,7 +14,7 @@ export const createJobSchema = z.object({
   category_id: z.string().uuid({ message: 'Category is required' }),
   priority: z.enum(['low', 'medium', 'high', 'urgent'], { message: 'Priority is required' }),
   estimated_cost: z.number().min(0, 'Cost cannot be negative').optional(),
-  linked_request_ids: z.array(z.string().uuid()).default([]),
+  linked_request_ids: z.array(z.string().uuid()).max(50).default([]),
   company_id: z.string().uuid().optional(),
 });
 
@@ -38,7 +38,7 @@ export const updateJobSchema = z.object({
   priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
   assigned_to: z.string().uuid({ message: 'PIC must be a valid user' }).optional(),
   estimated_cost: z.number().min(0, 'Cost cannot be negative').optional(),
-  linked_request_ids: z.array(z.string().uuid()).optional(),
+  linked_request_ids: z.array(z.string().uuid()).max(50).optional(),
   updated_at: z.string().optional(),
 });
 

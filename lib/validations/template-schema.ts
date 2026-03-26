@@ -49,7 +49,7 @@ export const templateCreateSchema = z.object({
   name:        z.string().min(1, 'Name is required').max(100),
   description: z.string().max(200).optional(),
   category_id: z.string().uuid().or(z.literal('')).optional().nullable().transform(val => val || null),
-  checklist:   z.array(checklistItemSchema).min(1, 'At least one checklist item required'),
+  checklist:   z.array(checklistItemSchema).min(1, 'At least one checklist item required').max(100, 'Maximum 100 checklist items'),
 });
 
 // Templates can be freely edited (same schema for create and edit)
