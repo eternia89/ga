@@ -805,7 +805,7 @@ export const deleteJobAttachment = authActionClient
     // Verify the parent job belongs to user's company and is not deleted
     const { data: job } = await supabase
       .from('jobs')
-      .select('id')
+      .select('id, company_id')
       .eq('id', attachment.entity_id)
       .is('deleted_at', null)
       .single();
@@ -819,7 +819,8 @@ export const deleteJobAttachment = authActionClient
     const { error } = await adminSupabase
       .from('media_attachments')
       .update({ deleted_at: new Date().toISOString() })
-      .eq('id', parsedInput.attachmentId);
+      .eq('id', parsedInput.attachmentId)
+      .eq('company_id', job.company_id);
 
     if (error) {
       throw new Error(error.message);

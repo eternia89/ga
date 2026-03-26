@@ -396,7 +396,7 @@ export const deleteMediaAttachment = authActionClient
     // Verify user owns the parent request and it's in submitted status
     const { data: request } = await supabase
       .from('requests')
-      .select('id, status, requester_id')
+      .select('id, company_id, status, requester_id')
       .eq('id', attachment.entity_id)
       .eq('requester_id', profile.id)
       .eq('status', 'submitted')
@@ -411,7 +411,8 @@ export const deleteMediaAttachment = authActionClient
     const { error } = await adminSupabase
       .from('media_attachments')
       .update({ deleted_at: new Date().toISOString() })
-      .eq('id', parsedInput.attachmentId);
+      .eq('id', parsedInput.attachmentId)
+      .eq('company_id', request.company_id);
 
     if (error) {
       throw new Error(error.message);

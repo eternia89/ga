@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
 
       // Sanitize filename
       const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const storagePath = `${profile.company_id}/${assetId}/${crypto.randomUUID()}-${sanitizedName}`;
+      const storagePath = `${asset.company_id}/${assetId}/${crypto.randomUUID()}-${sanitizedName}`;
 
       // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await adminSupabase.storage
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
       const { error: insertError } = await adminSupabase
         .from('media_attachments')
         .insert({
-          company_id: profile.company_id,
+          company_id: asset.company_id,
           entity_type: 'asset_invoice',
           entity_id: assetId,
           file_name: file.name,

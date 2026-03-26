@@ -83,6 +83,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 
+    // Verify entity exists and get its company_id for storage path and media_attachment insert
+    let entityCompanyId: string;
+    if (isTransferType) {
+      // Transfer types use movement_id as entity_id — fetch from inventory_movements
+      const { data: movement } = await supabase
+        .from('inventory_movements')
+        .select('id, company_id')
+        .eq('id', entityId)
+        .single();
+      if (!movement) {
+        return NextResponse.json({ error: 'Movement not found' }, { status: 400 });
+      }
+      entityCompanyId = movement.company_id;
+    } else {
+      // Asset types use asset_id — fetch from inventory_items
+      const { data: asset } = await supabase
+        .from('inventory_items')
+        .select('id, company_id')
+        .eq('id', entityId)
+        .is('deleted_at', null)
+        .single();
+      if (!asset) {
+        return NextResponse.json({ error: 'Asset not found' }, { status: 400 });
+      }
+      entityCompanyId = asset.company_id;
+    }
+
     // Extract files from form data
     const photoEntries = formData.getAll('photos');
     const files: File[] = photoEntries.filter((entry): entry is File => entry instanceof File);
@@ -145,7 +172,7 @@ export async function POST(request: NextRequest) {
 
       // Sanitize filename
       const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const storagePath = `${profile.company_id}/${entityId}/${crypto.randomUUID()}-${sanitizedName}`;
+      const storagePath = `${entityCompanyId}/${entityId}/${crypto.randomUUID()}-${sanitizedName}`;
 
       // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await adminSupabase.storage
@@ -165,7 +192,7 @@ export async function POST(request: NextRequest) {
       const { error: insertError } = await adminSupabase
         .from('media_attachments')
         .insert({
-          company_id: profile.company_id,
+          company_id: entityCompanyId,
           entity_type: entityType,
           entity_id: entityId,
           file_name: file.name,

@@ -67,7 +67,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Account deactivated' }, { status: 401 });
     }
 
-    // Entity ownership validation
+    // Entity ownership validation — also capture entity's company_id for media insert
+    let entityCompanyId: string;
     if (entityType === 'request') {
       // Requests: requester must own it and status must be submitted
       const { data: requestRecord } = await supabase
@@ -84,6 +85,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+      entityCompanyId = requestRecord.company_id;
     } else {
       // For other entity types: verify entity exists (RLS handles company scoping)
       const { data: entityRecord } = await supabase
@@ -99,6 +101,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+      entityCompanyId = entityRecord.company_id;
     }
 
     // Extract files from form data
@@ -160,7 +163,7 @@ export async function POST(request: NextRequest) {
 
       // Sanitize filename: replace spaces and special chars
       const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const storagePath = `${profile.company_id}/${entityType}/${entityId}/${crypto.randomUUID()}-${sanitizedName}`;
+      const storagePath = `${entityCompanyId}/${entityType}/${entityId}/${crypto.randomUUID()}-${sanitizedName}`;
 
       // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await adminSupabase.storage
@@ -180,7 +183,7 @@ export async function POST(request: NextRequest) {
       const { data: insertedRow, error: insertError } = await adminSupabase
         .from('media_attachments')
         .insert({
-          company_id: profile.company_id,
+          company_id: entityCompanyId,
           entity_type: entityType,
           entity_id: entityId,
           file_name: file.name,
