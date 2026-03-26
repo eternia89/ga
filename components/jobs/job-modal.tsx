@@ -378,19 +378,23 @@ export function JobModal({
           .is('deleted_at', null);
 
         if (mediaAttachments && mediaAttachments.length > 0) {
-          const { data: signedUrls } = await supabase.storage
+          const { data: signedUrls, error: signedUrlError } = await supabase.storage
             .from('job-photos')
             .createSignedUrls(
               mediaAttachments.map((a) => a.file_path),
               21600
             );
 
+          if (signedUrlError) {
+            console.error('[JobModal] Failed to create signed URLs for comment photos:', signedUrlError.message);
+          }
+
           fetchedCommentPhotos = mediaAttachments.map((attachment, index) => ({
             id: attachment.id,
             url: signedUrls?.[index]?.signedUrl ?? '',
             fileName: attachment.file_name,
             commentId: attachment.entity_id,
-          }));
+          })).filter((p) => p.url !== '');
         }
       }
       setCommentPhotos(fetchedCommentPhotos);
@@ -406,17 +410,20 @@ export function JobModal({
 
       let fetchedJobPhotos: ExistingPhoto[] = [];
       if (jobAttachments && jobAttachments.length > 0) {
-        const { data: signedUrls } = await supabase.storage
+        const { data: signedUrls, error: signedUrlError } = await supabase.storage
           .from('job-photos')
           .createSignedUrls(
             jobAttachments.map((a) => a.file_path),
             21600
           );
+        if (signedUrlError) {
+          console.error('[JobModal] Failed to create signed URLs for job photos:', signedUrlError.message);
+        }
         fetchedJobPhotos = jobAttachments.map((attachment, index) => ({
           id: attachment.id,
           url: signedUrls?.[index]?.signedUrl ?? '',
           fileName: attachment.file_name,
-        }));
+        })).filter((p) => p.url !== '');
       }
       setJobPhotoUrls(fetchedJobPhotos);
 

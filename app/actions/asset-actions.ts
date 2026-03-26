@@ -566,12 +566,16 @@ export const getAssetPhotos = authActionClient
     }
 
     // Generate signed URLs with 1-hour expiry
-    const { data: signedUrls } = await supabase.storage
+    const { data: signedUrls, error: signedUrlError } = await supabase.storage
       .from('asset-photos')
       .createSignedUrls(
         allAttachments.map((a) => a.file_path),
         3600
       );
+
+    if (signedUrlError) {
+      console.error('[getAssetPhotos] Failed to create signed URLs:', signedUrlError.message);
+    }
 
     const photos = allAttachments
       .map((attachment, index) => ({
@@ -608,12 +612,16 @@ export const getAssetInvoices = authActionClient
     }
 
     // Generate signed URLs with 1-hour expiry
-    const { data: signedUrls } = await supabase.storage
+    const { data: signedUrls, error: signedUrlError } = await supabase.storage
       .from('asset-invoices')
       .createSignedUrls(
         attachments.map((a) => a.file_path),
         3600
       );
+
+    if (signedUrlError) {
+      console.error('[getAssetInvoices] Failed to create signed URLs:', signedUrlError.message);
+    }
 
     const invoices = attachments
       .map((attachment, index) => ({

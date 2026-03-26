@@ -126,19 +126,23 @@ export default async function RequestsPage({ searchParams }: PageProps) {
       .order('sort_order', { ascending: true });
 
     if (attachments && attachments.length > 0) {
-      const { data: signedUrls } = await supabase.storage
+      const { data: signedUrls, error: signedUrlError } = await supabase.storage
         .from('request-photos')
         .createSignedUrls(
           attachments.map((a) => a.file_path),
           21600
         );
 
+      if (signedUrlError) {
+        console.error('[RequestsPage] Failed to create signed URLs:', signedUrlError.message);
+      }
+
       const photosWithUrls = attachments.map((a, i) => ({
         id: a.id,
         entityId: a.entity_id,
         url: signedUrls?.[i]?.signedUrl ?? '',
         fileName: a.file_name,
-      }));
+      })).filter((p) => p.url !== '');
 
       // Group by request ID
       photosByRequest = {};

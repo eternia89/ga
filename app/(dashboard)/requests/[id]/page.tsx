@@ -113,18 +113,22 @@ export default async function RequestDetailPage({ params }: PageProps) {
   let photoUrls: { id: string; url: string; fileName: string }[] = [];
 
   if (attachments.length > 0) {
-    const { data: signedUrls } = await supabase.storage
+    const { data: signedUrls, error: signedUrlError } = await supabase.storage
       .from('request-photos')
       .createSignedUrls(
         attachments.map((a) => a.file_path),
         21600 // 6 hours
       );
 
+    if (signedUrlError) {
+      console.error('[RequestDetailPage] Failed to create signed URLs:', signedUrlError.message);
+    }
+
     photoUrls = attachments.map((attachment, index) => ({
       id: attachment.id,
       url: signedUrls?.[index]?.signedUrl ?? '',
       fileName: attachment.file_name,
-    }));
+    })).filter((p) => p.url !== '');
   }
 
   // Process audit logs into timeline events

@@ -238,12 +238,15 @@ export function AssetViewModal({
           .order('created_at', { ascending: true });
 
         if (transferPhotoData && transferPhotoData.length > 0) {
-          const { data: signedUrls } = await supabase.storage
+          const { data: signedUrls, error: signedUrlError } = await supabase.storage
             .from('asset-photos')
             .createSignedUrls(
               transferPhotoData.map((a) => a.file_path),
               21600
             );
+          if (signedUrlError) {
+            console.error('[AssetViewModal] Failed to create signed URLs for transfer photos:', signedUrlError.message);
+          }
           fetchedTransferPhotos = transferPhotoData.map((a, i) => ({
             id: a.id,
             entity_type: a.entity_type,
@@ -251,7 +254,7 @@ export function AssetViewModal({
             url: signedUrls?.[i]?.signedUrl ?? '',
             fileName: a.file_name,
             created_at: a.created_at,
-          }));
+          })).filter((p) => p.url !== '');
         }
       }
       setTransferPhotos(fetchedTransferPhotos);
@@ -260,12 +263,15 @@ export function AssetViewModal({
       const statusAttachments = statusPhotosResult.data ?? [];
       let conditionPhotoUrls: ConditionPhoto[] = [];
       if (statusAttachments.length > 0) {
-        const { data: signedUrls } = await supabase.storage
+        const { data: signedUrls, error: signedUrlError } = await supabase.storage
           .from('asset-photos')
           .createSignedUrls(
             statusAttachments.map((a) => a.file_path),
             21600
           );
+        if (signedUrlError) {
+          console.error('[AssetViewModal] Failed to create signed URLs for condition photos:', signedUrlError.message);
+        }
         conditionPhotoUrls = statusAttachments.map((a, i) => ({
           id: a.id,
           entity_type: a.entity_type,
@@ -273,7 +279,7 @@ export function AssetViewModal({
           url: signedUrls?.[i]?.signedUrl ?? '',
           fileName: a.file_name,
           created_at: a.created_at,
-        }));
+        })).filter((p) => p.url !== '');
       }
       setConditionPhotos(conditionPhotoUrls);
 
@@ -281,18 +287,21 @@ export function AssetViewModal({
       const invoiceAttachments = invoicesResult.data ?? [];
       let invoiceUrls: InvoiceItem[] = [];
       if (invoiceAttachments.length > 0) {
-        const { data: signedUrls } = await supabase.storage
+        const { data: signedUrls, error: signedUrlError } = await supabase.storage
           .from('asset-invoices')
           .createSignedUrls(
             invoiceAttachments.map((a) => a.file_path),
             21600
           );
+        if (signedUrlError) {
+          console.error('[AssetViewModal] Failed to create signed URLs for invoices:', signedUrlError.message);
+        }
         invoiceUrls = invoiceAttachments.map((a, i) => ({
           id: a.id,
           url: signedUrls?.[i]?.signedUrl ?? '',
           fileName: a.file_name,
           created_at: a.created_at,
-        }));
+        })).filter((p) => p.url !== '');
       }
       setInvoices(invoiceUrls);
     } catch {

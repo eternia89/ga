@@ -156,12 +156,15 @@ export default async function AssetDetailPage({ params }: PageProps) {
   let conditionPhotoUrls: Array<{ id: string; entity_type: string; entity_id: string; url: string; fileName: string; created_at: string }> = [];
 
   if (statusAttachments.length > 0) {
-    const { data: signedUrls } = await supabase.storage
+    const { data: signedUrls, error: signedUrlError } = await supabase.storage
       .from('asset-photos')
       .createSignedUrls(
         statusAttachments.map((a) => a.file_path),
         21600 // 6 hours
       );
+    if (signedUrlError) {
+      console.error('[AssetDetailPage] Failed to create signed URLs for condition photos:', signedUrlError.message);
+    }
     conditionPhotoUrls = statusAttachments.map((a, i) => ({
       id: a.id,
       entity_type: a.entity_type,
@@ -169,7 +172,7 @@ export default async function AssetDetailPage({ params }: PageProps) {
       url: signedUrls?.[i]?.signedUrl ?? '',
       fileName: a.file_name,
       created_at: a.created_at,
-    }));
+    })).filter((p) => p.url !== '');
   }
 
   // Generate signed URLs for invoices
@@ -177,30 +180,36 @@ export default async function AssetDetailPage({ params }: PageProps) {
   let invoiceUrls: Array<{ id: string; url: string; fileName: string; created_at: string }> = [];
 
   if (invoiceAttachments.length > 0) {
-    const { data: signedUrls } = await supabase.storage
+    const { data: signedUrls, error: signedUrlError } = await supabase.storage
       .from('asset-invoices')
       .createSignedUrls(
         invoiceAttachments.map((a) => a.file_path),
         21600 // 6 hours
       );
+    if (signedUrlError) {
+      console.error('[AssetDetailPage] Failed to create signed URLs for invoices:', signedUrlError.message);
+    }
     invoiceUrls = invoiceAttachments.map((a, i) => ({
       id: a.id,
       url: signedUrls?.[i]?.signedUrl ?? '',
       fileName: a.file_name,
       created_at: a.created_at,
-    }));
+    })).filter((p) => p.url !== '');
   }
 
   // Generate signed URLs for transfer photos
   let transferPhotoUrls: Array<{ id: string; entity_type: string; entity_id: string; url: string; fileName: string; created_at: string }> = [];
 
   if (transferPhotos.length > 0) {
-    const { data: signedUrls } = await supabase.storage
+    const { data: signedUrls, error: signedUrlError } = await supabase.storage
       .from('asset-photos')
       .createSignedUrls(
         transferPhotos.map((a) => a.file_path),
         21600 // 6 hours
       );
+    if (signedUrlError) {
+      console.error('[AssetDetailPage] Failed to create signed URLs for transfer photos:', signedUrlError.message);
+    }
     transferPhotoUrls = transferPhotos.map((a, i) => ({
       id: a.id,
       entity_type: a.entity_type,
@@ -208,7 +217,7 @@ export default async function AssetDetailPage({ params }: PageProps) {
       url: signedUrls?.[i]?.signedUrl ?? '',
       fileName: a.file_name,
       created_at: a.created_at,
-    }));
+    })).filter((p) => p.url !== '');
   }
 
   const assetWithRelations = asset as InventoryItemWithRelations;

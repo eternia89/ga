@@ -174,18 +174,22 @@ export default async function JobDetailPage({ params }: PageProps) {
   let jobPhotoUrls: { id: string; url: string; fileName: string }[] = [];
 
   if (jobAttachments.length > 0) {
-    const { data: signedUrls } = await supabase.storage
+    const { data: signedUrls, error: signedUrlError } = await supabase.storage
       .from('job-photos')
       .createSignedUrls(
         jobAttachments.map((a) => a.file_path),
         21600 // 6 hours
       );
 
+    if (signedUrlError) {
+      console.error('[JobDetailPage] Failed to create signed URLs for job photos:', signedUrlError.message);
+    }
+
     jobPhotoUrls = jobAttachments.map((attachment, index) => ({
       id: attachment.id,
       url: signedUrls?.[index]?.signedUrl ?? '',
       fileName: attachment.file_name,
-    }));
+    })).filter((p) => p.url !== '');
   }
 
   // Fetch comment photos
@@ -201,19 +205,23 @@ export default async function JobDetailPage({ params }: PageProps) {
       .is('deleted_at', null);
 
     if (mediaAttachments && mediaAttachments.length > 0) {
-      const { data: signedUrls } = await supabase.storage
+      const { data: signedUrls, error: signedUrlError } = await supabase.storage
         .from('job-photos')
         .createSignedUrls(
           mediaAttachments.map((a) => a.file_path),
           21600 // 6 hours
         );
 
+      if (signedUrlError) {
+        console.error('[JobDetailPage] Failed to create signed URLs for comment photos:', signedUrlError.message);
+      }
+
       commentPhotos = mediaAttachments.map((attachment, index) => ({
         id: attachment.id,
         url: signedUrls?.[index]?.signedUrl ?? '',
         fileName: attachment.file_name,
         commentId: attachment.entity_id,
-      }));
+      })).filter((p) => p.url !== '');
     }
   }
 

@@ -589,12 +589,16 @@ export const getRequestPhotos = authActionClient
     }
 
     // Generate signed URLs with 6-hour expiry
-    const { data: signedUrls } = await supabase.storage
+    const { data: signedUrls, error: signedUrlError } = await supabase.storage
       .from('request-photos')
       .createSignedUrls(
         attachments.map((a) => a.file_path),
         21600
       );
+
+    if (signedUrlError) {
+      console.error('[getRequestPhotos] Failed to create signed URLs:', signedUrlError.message);
+    }
 
     const photos = attachments
       .map((attachment, index) => ({

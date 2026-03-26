@@ -129,18 +129,21 @@ export function AssetTransferRespondModal({
         .order('created_at', { ascending: true });
 
       if (senderPhotoData && senderPhotoData.length > 0) {
-        const { data: signedUrls } = await supabase.storage
+        const { data: signedUrls, error: signedUrlError } = await supabase.storage
           .from('asset-photos')
           .createSignedUrls(
             senderPhotoData.map((a) => a.file_path),
             21600
           );
+        if (signedUrlError) {
+          console.error('[AssetTransferRespondModal] Failed to create signed URLs for sender photos:', signedUrlError.message);
+        }
         setSenderPhotos(
           senderPhotoData.map((a, i) => ({
             id: a.id,
             url: signedUrls?.[i]?.signedUrl ?? '',
             fileName: a.file_name,
-          }))
+          })).filter((p) => p.url !== '')
         );
       } else {
         setSenderPhotos([]);
@@ -157,18 +160,21 @@ export function AssetTransferRespondModal({
         .limit(4);
 
       if (assetPhotoData && assetPhotoData.length > 0) {
-        const { data: signedUrls } = await supabase.storage
+        const { data: signedUrls, error: signedUrlError } = await supabase.storage
           .from('asset-photos')
           .createSignedUrls(
             assetPhotoData.map((a) => a.file_path),
             21600
           );
+        if (signedUrlError) {
+          console.error('[AssetTransferRespondModal] Failed to create signed URLs for asset photos:', signedUrlError.message);
+        }
         setAssetPhotos(
           assetPhotoData.map((a, i) => ({
             id: a.id,
             url: signedUrls?.[i]?.signedUrl ?? '',
             fileName: a.file_name,
-          }))
+          })).filter((p) => p.url !== '')
         );
       } else {
         setAssetPhotos([]);
