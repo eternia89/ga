@@ -215,7 +215,7 @@ export default async function AssetDetailPage({ params }: PageProps) {
   const pendingTransfer = pendingTransferResult.data as InventoryMovementWithRelations | null;
 
   return (
-    <div className="space-y-6 py-6">
+    <div className="space-y-6 py-6 pb-20">
       <SetBreadcrumbs items={[{ label: 'Assets', href: '/inventory' }, { label: assetWithRelations.display_id }]} />
 
       {/* Two-column layout via client wrapper */}
