@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed quick-260326-fca (Vision API security fix)
-last_updated: "2026-03-26T04:11:16.822Z"
-last_activity: "2026-03-26 - Completed quick task 128: Vision API security fix"
+stopped_at: Completed quick-260326-flu-PLAN.md
+last_updated: "2026-03-26T04:19:30.178Z"
+last_activity: "2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -256,6 +256,7 @@ Recent decisions affecting current work:
 - [Phase quick]: Unified transfer respond UX: AssetTransferRespondModal with variant prop replaces old dialog + AlertDialog across all surfaces
 - [Phase quick-260317-mhw]: holder_id starts NULL, only set on transfer acceptance; general user filter uses holder_id instead of location_id
 - [Phase quick]: Vision describe route: used adminClient for assertCompanyAccess (consistent with schedule-actions.ts); return 403 for cross-company access, return description silently for missing attachments
+- [Phase quick]: All auth checks now use getUser() for server validation -- zero getSession() calls remain in production code
 
 ### Roadmap Evolution
 
@@ -409,7 +410,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-26T04:11:14.274Z
-Stopped at: Completed quick-260326-fca (Vision API security fix)
+Last session: 2026-03-26T04:19:29.040Z
+Stopped at: Completed quick-260326-flu-PLAN.md
 Resume file: None
 Next: Ready for next task
