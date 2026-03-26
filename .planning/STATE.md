@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: "Completed quick-260326-jot: approval-actions defense-in-depth assertCompanyAccess"
-last_updated: "2026-03-26T07:16:59.047Z"
-last_activity: "2026-03-26 - Completed quick task 139: Approval actions defense-in-depth"
+stopped_at: Completed quick-260326-nbd-PLAN.md
+last_updated: "2026-03-26T09:57:30.701Z"
+last_activity: "2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -259,6 +259,7 @@ Recent decisions affecting current work:
 - [Phase quick]: All auth checks now use getUser() for server validation -- zero getSession() calls remain in production code
 - [Phase quick-260326-jfw]: safeCreateNotifications returns void (not Promise<void>) to encode fire-and-forget intent in type system
 - [Phase quick-260326-jot]: Used RLS-bound supabase client (not adminSupabase) for assertCompanyAccess in approval actions since it only needs SELECT on user_company_access
+- [Phase quick-260326-nbd]: Used .max(50) for updated_at tokens as defense-in-depth
 
 ### Roadmap Evolution
 
@@ -423,7 +424,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-26T07:16:52.630Z
-Stopped at: Completed quick-260326-jot: approval-actions defense-in-depth assertCompanyAccess
+Last session: 2026-03-26T09:57:29.356Z
+Stopped at: Completed quick-260326-nbd-PLAN.md
 Resume file: None
 Next: Ready for next task
