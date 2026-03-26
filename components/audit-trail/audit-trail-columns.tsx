@@ -153,7 +153,7 @@ export const auditTrailColumns: ColumnDef<AuditLogRow>[] = [
       return (
         <Link
           href={route}
-          className="font-mono text-xs text-blue-600 hover:underline hover:text-blue-800 transition-colors"
+          className="font-mono text-xs text-blue-600 hover:underline hover:text-blue-700 transition-colors"
           onClick={(e) => e.stopPropagation()}
         >
           {displayText}

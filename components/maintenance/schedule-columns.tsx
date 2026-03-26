@@ -28,7 +28,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
       return name ? (
         <button
           type="button"
-          className="font-medium text-blue-600 hover:text-blue-800 hover:underline whitespace-normal break-words text-left"
+          className="font-medium text-blue-600 hover:text-blue-700 hover:underline whitespace-normal break-words text-left"
           title={name}
           onClick={() => meta?.onView?.(schedule)}
         >

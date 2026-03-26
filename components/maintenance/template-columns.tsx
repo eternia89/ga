@@ -23,7 +23,7 @@ export const templateColumns: ColumnDef<MaintenanceTemplate>[] = [
       return (
         <button
           type="button"
-          className="font-medium text-blue-600 hover:text-blue-800 hover:underline whitespace-normal break-words block text-left"
+          className="font-medium text-blue-600 hover:text-blue-700 hover:underline whitespace-normal break-words block text-left"
           title={name}
           onClick={() => meta?.onView?.(template)}
         >
