@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import type { ReactNode } from 'react';
+import { ROLES } from '@/lib/constants/roles';
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
@@ -25,7 +26,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   }
 
   // Check if user is admin
-  if (profile.role !== 'admin') {
+  if (profile.role !== ROLES.ADMIN) {
     redirect('/unauthorized');
   }
 

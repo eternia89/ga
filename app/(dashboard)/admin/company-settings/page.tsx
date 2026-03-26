@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { CompanySettingsForm } from '@/components/admin/company-settings/company-settings-form';
+import { ROLES } from '@/lib/constants/roles';
 
 export default async function CompanySettingsPage() {
   const supabase = await createClient();
@@ -26,7 +27,7 @@ export default async function CompanySettingsPage() {
   }
 
   // Admin only
-  if (profile.role !== 'admin') {
+  if (profile.role !== ROLES.ADMIN) {
     redirect('/admin');
   }
 

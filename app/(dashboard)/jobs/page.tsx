@@ -4,7 +4,7 @@ import { JobTable } from '@/components/jobs/job-table';
 import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { JobCreateDialog } from '@/components/jobs/job-create-dialog';
-import { OPERATIONAL_ROLES, GA_ROLES } from '@/lib/constants/roles';
+import { OPERATIONAL_ROLES, GA_ROLES, ROLES } from '@/lib/constants/roles';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -60,7 +60,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
     .order('created_at', { ascending: false });
 
   // General users and GA Staff only see jobs assigned to them
-  if (['general_user', 'ga_staff'].includes(profile.role)) {
+  if ([ROLES.GENERAL_USER, ROLES.GA_STAFF].includes(profile.role)) {
     jobsQuery = jobsQuery.eq('assigned_to', profile.id);
   }
 
@@ -72,7 +72,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
       .from('user_profiles')
       .select('id, name:full_name')
       .in('company_id', allAccessibleCompanyIds)
-      .in('role', ['ga_staff', 'ga_lead'])
+      .in('role', [ROLES.GA_STAFF, ROLES.GA_LEAD])
       .is('deleted_at', null)
       .order('full_name'),
 

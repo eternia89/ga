@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
 import type { ActionOk } from '@/lib/types/action-responses';
+import { ROLES } from '@/lib/constants/roles';
 
 // ============================================================================
 // getCompanySettings — returns all company_settings rows as Record<string, string>
@@ -44,7 +45,7 @@ export const updateCompanySetting = authActionClient
     const { supabase, profile } = ctx;
 
     // Role check — admin only
-    if (profile.role !== 'admin') {
+    if (profile.role !== ROLES.ADMIN) {
       throw new Error('Admin access required');
     }
 

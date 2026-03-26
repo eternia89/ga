@@ -47,7 +47,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import { Combobox } from '@/components/combobox';
-import { LEAD_ROLES } from '@/lib/constants/roles';
+import { LEAD_ROLES, ROLES } from '@/lib/constants/roles';
 
 interface JobDetailActionsProps {
   job: JobWithRelations;
@@ -86,7 +86,7 @@ export function JobDetailActions({
   const [assignPicValue, setAssignPicValue] = useState('');
 
   const isGaLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(currentUserRole);
-  const isFinanceApproverOnly = currentUserRole === 'finance_approver';
+  const isFinanceApproverOnly = currentUserRole === ROLES.FINANCE_APPROVER;
   const isPIC = job.assigned_to === currentUserId;
   const isCreator = job.created_by === currentUserId;
 

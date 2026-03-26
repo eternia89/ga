@@ -9,6 +9,7 @@ import type { JobTimelineEvent } from '@/components/jobs/job-timeline';
 import type { JobWithRelations } from '@/lib/types/database';
 import { JOB_STATUS_LABELS } from '@/lib/constants/job-status';
 import { PM_BADGE_CLASS } from '@/lib/constants/approval-status';
+import { ROLES } from '@/lib/constants/roles';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -81,7 +82,7 @@ export default async function JobDetailPage({ params }: PageProps) {
   const job = jobData as JobWithRelations;
 
   // Role-based access: general_user and ga_staff can only view jobs assigned to them
-  if (['general_user', 'ga_staff'].includes(profile.role) && job.assigned_to !== profile.id) {
+  if ([ROLES.GENERAL_USER, ROLES.GA_STAFF].includes(profile.role) && job.assigned_to !== profile.id) {
     notFound();
   }
 

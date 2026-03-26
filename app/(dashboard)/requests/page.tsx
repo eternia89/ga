@@ -4,7 +4,7 @@ import { RequestTable } from '@/components/requests/request-table';
 import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { RequestCreateDialog } from '@/components/requests/request-create-dialog';
-import { OPERATIONAL_ROLES } from '@/lib/constants/roles';
+import { OPERATIONAL_ROLES, ROLES } from '@/lib/constants/roles';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -43,7 +43,7 @@ export default async function RequestsPage({ searchParams }: PageProps) {
     .order('created_at', { ascending: false });
 
   // General users only see their own requests
-  if (profile.role === 'general_user') {
+  if (profile.role === ROLES.GENERAL_USER) {
     requestQuery.eq('requester_id', profile.id);
   }
   // All other roles see all company requests (RLS enforces company isolation)
@@ -163,7 +163,7 @@ export default async function RequestsPage({ searchParams }: PageProps) {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Requests</h1>
           <p className="text-muted-foreground mt-1">
-            {profile.role === 'general_user'
+            {profile.role === ROLES.GENERAL_USER
               ? 'View and manage your submitted requests'
               : 'View and manage all company requests'}
           </p>

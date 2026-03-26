@@ -2,6 +2,7 @@ import { type SupabaseClient } from '@supabase/supabase-js';
 import { subDays, differenceInDays, startOfMonth } from 'date-fns';
 import { STATUS_LABELS, REQUEST_STATUSES } from '@/lib/constants/request-status';
 import { JOB_STATUS_LABELS } from '@/lib/constants/job-status';
+import { ROLES } from '@/lib/constants/roles';
 
 // Hex color palette for status distribution charts (recharts needs hex, not Tailwind classes)
 const STATUS_HEX_COLORS: Record<string, string> = {
@@ -355,7 +356,7 @@ export async function getStaffWorkload(
   const { data: staff, error: staffError } = await supabase
     .from('user_profiles')
     .select('id, full_name')
-    .in('role', ['ga_staff', 'ga_lead'])
+    .in('role', [ROLES.GA_STAFF, ROLES.GA_LEAD])
     .is('deleted_at', null);
 
   if (staffError || !staff || staff.length === 0) return { data: [], hasError: !!staffError };

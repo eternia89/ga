@@ -10,7 +10,7 @@ import { InlineFeedback } from '@/components/inline-feedback';
 import { RequestRejectDialog } from './request-reject-dialog';
 import { RequestCancelDialog } from './request-cancel-dialog';
 import { RequestAcceptanceDialog } from './request-acceptance-dialog';
-import { LEAD_ROLES } from '@/lib/constants/roles';
+import { LEAD_ROLES, ROLES } from '@/lib/constants/roles';
 
 interface RequestDetailActionsProps {
   request: RequestWithRelations;
@@ -35,7 +35,7 @@ export function RequestDetailActions({
   const [completeFeedback, setCompleteFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const isGaLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(currentUserRole);
-  const isGaStaff = currentUserRole === 'ga_staff';
+  const isGaStaff = currentUserRole === ROLES.GA_STAFF;
   const isRequester = request.requester_id === currentUserId;
   const isPic = request.assigned_to === currentUserId;
 

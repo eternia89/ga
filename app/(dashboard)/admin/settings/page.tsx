@@ -3,6 +3,7 @@ import { SettingsContent } from "./settings-content";
 import { Company, Division, Location, Category } from "@/lib/types/database";
 import type { UserRow } from "@/components/admin/users/user-columns";
 import { SetBreadcrumbs } from "@/lib/breadcrumb-context";
+import { ROLES } from "@/lib/constants/roles";
 
 export default async function SettingsPage({
   searchParams,
@@ -51,7 +52,7 @@ export default async function SettingsPage({
     last_sign_in_at: authUserMap.get(profile.id)?.last_sign_in_at || null,
   }));
 
-  const adminProfile = profilesResult.data?.find(p => p.role === 'admin');
+  const adminProfile = profilesResult.data?.find(p => p.role === ROLES.ADMIN);
   const defaultCompanyId = adminProfile?.company_id || companies?.[0]?.id || '';
 
   // Build userCompanyAccessMap: user_id -> company_id[]

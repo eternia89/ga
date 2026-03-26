@@ -4,6 +4,7 @@ import { subDays } from 'date-fns';
 import { AuditTrailTable } from '@/components/audit-trail/audit-trail-table';
 import type { AuditLogRow } from '@/components/audit-trail/audit-trail-columns';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
+import { ROLES } from '@/lib/constants/roles';
 
 export default async function AuditTrailPage() {
   const supabase = await createClient();
@@ -27,7 +28,7 @@ export default async function AuditTrailPage() {
   }
 
   // Only admin and ga_lead can access audit trail
-  if (profile.role !== 'admin' && profile.role !== 'ga_lead') {
+  if (profile.role !== ROLES.ADMIN && profile.role !== ROLES.GA_LEAD) {
     redirect('/unauthorized');
   }
 

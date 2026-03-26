@@ -5,7 +5,7 @@ import { PendingTransfer } from '@/components/assets/asset-columns';
 import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { AssetCreateDialog } from '@/components/assets/asset-create-dialog';
-import { GA_ROLES } from '@/lib/constants/roles';
+import { GA_ROLES, ROLES } from '@/lib/constants/roles';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -43,7 +43,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
   const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
 
   // General users: only see assets at their location or in transit to them
-  const isGeneralUser = profile.role === 'general_user';
+  const isGeneralUser = profile.role === ROLES.GENERAL_USER;
   let inTransitAssetIds: string[] = [];
 
   if (isGeneralUser) {

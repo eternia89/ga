@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { requestSubmitSchema, requestEditSchema, triageSchema, rejectSchema } from '@/lib/validations/request-schema';
-import { LEAD_ROLES } from '@/lib/constants/roles';
+import { LEAD_ROLES, ROLES } from '@/lib/constants/roles';
 import { feedbackSchema } from '@/lib/validations/job-schema';
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
@@ -125,7 +125,7 @@ export const triageRequest = authActionClient
 
     // Role check
     const isGaLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(profile.role);
-    const isGaStaff = profile.role === 'ga_staff';
+    const isGaStaff = profile.role === ROLES.GA_STAFF;
 
     if (!isGaLeadOrAdmin && !isGaStaff) {
       throw new Error('Triage access required');

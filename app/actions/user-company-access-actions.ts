@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import type { ActionOk } from '@/lib/types/action-responses';
+import { ROLES } from '@/lib/constants/roles';
 
 // Get all company_ids granted to a user (beyond their primary company)
 // Used by create modals to determine if company selector should show
@@ -13,7 +14,7 @@ export const getUserCompanyAccess = authActionClient
   .action(async ({ parsedInput, ctx }): Promise<{ companyIds: string[] }> => {
     const { supabase, profile } = ctx;
     // Users can only fetch their own access; admins can fetch any user's
-    if (profile.id !== parsedInput.userId && profile.role !== 'admin') {
+    if (profile.id !== parsedInput.userId && profile.role !== ROLES.ADMIN) {
       throw new Error('Unauthorized');
     }
     const { data, error } = await supabase
