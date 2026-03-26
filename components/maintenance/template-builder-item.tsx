@@ -7,7 +7,7 @@ import { GripVertical, X, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CHECKLIST_TYPES } from '@/lib/constants/checklist-types';
+import { CHECKLIST_TYPES, CHECKLIST_TYPE_COLORS } from '@/lib/constants/checklist-types';
 import type { ChecklistItem } from '@/lib/types/maintenance';
 
 interface TemplateBuilderItemProps {
@@ -15,15 +15,6 @@ interface TemplateBuilderItemProps {
   onUpdate: (item: ChecklistItem) => void;
   onDelete: (id: string) => void;
 }
-
-const TYPE_COLORS: Record<ChecklistItem['type'], string> = {
-  checkbox:  'bg-blue-100 text-blue-700',
-  pass_fail: 'bg-green-100 text-green-700',
-  numeric:   'bg-purple-100 text-purple-700',
-  text:      'bg-orange-100 text-orange-700',
-  photo:     'bg-pink-100 text-pink-700',
-  dropdown:  'bg-yellow-100 text-yellow-700',
-};
 
 export function TemplateBuilderItem({ item, onUpdate, onDelete }: TemplateBuilderItemProps) {
   const {
@@ -94,7 +85,7 @@ export function TemplateBuilderItem({ item, onUpdate, onDelete }: TemplateBuilde
       <span
         className={`
           mt-1 shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
-          ${TYPE_COLORS[item.type]}
+          ${CHECKLIST_TYPE_COLORS[item.type]}
         `}
       >
         {CHECKLIST_TYPES[item.type]}

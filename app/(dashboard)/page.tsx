@@ -31,6 +31,8 @@ import {
   getInventoryCounts,
 } from '@/lib/dashboard/queries';
 import { OPERATIONAL_ROLES } from '@/lib/constants/roles';
+import { ROLE_COLORS, ROLE_DISPLAY } from '@/lib/constants/role-display';
+import type { Role } from '@/lib/constants/roles';
 
 const KPI_ICONS: Record<string, React.ReactNode> = {
   'open-requests': <FileText className="h-4 w-4" />,
@@ -67,10 +69,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   }
 
   // Format role display
-  const roleDisplay = profile.role
-    .split('_')
-    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+  const roleDisplay = ROLE_DISPLAY[profile.role as Role] || profile.role;
 
   // Time-based greeting
   const hour = new Date().getHours();
@@ -78,16 +77,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
   // Role badge color
-  const roleColors: Record<string, string> = {
-    admin: 'bg-purple-100 text-purple-700',
-    ga_lead: 'bg-blue-100 text-blue-700',
-    ga_staff: 'bg-green-100 text-green-700',
-    finance_approver:
-      'bg-yellow-100 text-yellow-700',
-    general_user: 'bg-gray-100 text-gray-700',
-  };
-
-  const roleColor = roleColors[profile.role] || roleColors.general_user;
+  const roleColor = ROLE_COLORS[profile.role as Role] || ROLE_COLORS.general_user;
   const isOperational = (OPERATIONAL_ROLES as readonly string[]).includes(profile.role);
 
   // Parse date range from searchParams (default: This Month)

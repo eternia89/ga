@@ -41,3 +41,17 @@ export const CHECKLIST_TYPE_ORDER: ChecklistItemType[] = [
   'photo',
   'dropdown',
 ];
+
+// ============================================================================
+// Checklist Item Type Badge Colors
+// Maps DB type keys to Tailwind badge color classes
+// ============================================================================
+
+export const CHECKLIST_TYPE_COLORS: Record<ChecklistItemType, string> = {
+  checkbox:  'bg-blue-100 text-blue-700',
+  pass_fail: 'bg-green-100 text-green-700',
+  numeric:   'bg-purple-100 text-purple-700',
+  text:      'bg-orange-100 text-orange-700',
+  photo:     'bg-pink-100 text-pink-700',
+  dropdown:  'bg-yellow-100 text-yellow-700',
+};

@@ -29,18 +29,9 @@ import { PMChecklistPreview } from './pm-checklist-preview';
 import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { TemplateBuilder } from './template-builder';
-import { CHECKLIST_TYPES } from '@/lib/constants/checklist-types';
+import { CHECKLIST_TYPES, CHECKLIST_TYPE_COLORS } from '@/lib/constants/checklist-types';
 import type { MaintenanceTemplate, ChecklistItem } from '@/lib/types/maintenance';
 import { LEAD_ROLES } from '@/lib/constants/roles';
-
-const TYPE_COLORS: Record<ChecklistItem['type'], string> = {
-  checkbox:  'bg-blue-100 text-blue-700',
-  pass_fail: 'bg-green-100 text-green-700',
-  numeric:   'bg-purple-100 text-purple-700',
-  text:      'bg-orange-100 text-orange-700',
-  photo:     'bg-pink-100 text-pink-700',
-  dropdown:  'bg-yellow-100 text-yellow-700',
-};
 
 interface Category {
   id: string;
@@ -388,7 +379,7 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
                       <span
                         className={`
                           shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium mt-0.5
-                          ${TYPE_COLORS[item.type]}
+                          ${CHECKLIST_TYPE_COLORS[item.type]}
                         `}
                       >
                         {CHECKLIST_TYPES[item.type]}

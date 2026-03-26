@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { createClient } from '@/lib/supabase/client';
 import { deactivateTemplate, reactivateTemplate } from '@/app/actions/template-actions';
 import { TemplateDetail } from './template-detail';
-import { CHECKLIST_TYPES } from '@/lib/constants/checklist-types';
+import { CHECKLIST_TYPES, CHECKLIST_TYPE_COLORS } from '@/lib/constants/checklist-types';
 import type { MaintenanceTemplate, ChecklistItem } from '@/lib/types/maintenance';
 import { InlineFeedback } from '@/components/inline-feedback';
 import {
@@ -23,15 +23,6 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { LEAD_ROLES } from '@/lib/constants/roles';
-
-const TYPE_COLORS: Record<ChecklistItem['type'], string> = {
-  checkbox:  'bg-blue-100 text-blue-700',
-  pass_fail: 'bg-green-100 text-green-700',
-  numeric:   'bg-purple-100 text-purple-700',
-  text:      'bg-orange-100 text-orange-700',
-  photo:     'bg-pink-100 text-pink-700',
-  dropdown:  'bg-yellow-100 text-yellow-700',
-};
 
 // ============================================================================
 // Types
@@ -338,7 +329,7 @@ export function TemplateViewModal({
                       .map((item: ChecklistItem, index: number) => (
                         <li key={item.id} className="flex items-start gap-2 text-sm">
                           <span className="text-muted-foreground tabular-nums shrink-0">{index + 1}.</span>
-                          <span className={`shrink-0 inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${TYPE_COLORS[item.type]}`}>
+                          <span className={`shrink-0 inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${CHECKLIST_TYPE_COLORS[item.type]}`}>
                             {CHECKLIST_TYPES[item.type]}
                           </span>
                           <span className="truncate">{item.label || 'No label'}</span>

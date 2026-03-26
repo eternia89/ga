@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Button } from '@/components/ui/button';
+import { ROLE_COLORS, ROLE_DISPLAY } from '@/lib/constants/role-display';
+import type { Role } from '@/lib/constants/roles';
 
 export type UserRow = {
   id: string;
@@ -26,22 +28,6 @@ export type UserRow = {
 export function getUserColumns(
   onEdit: (user: UserRow) => void,
 ): ColumnDef<UserRow>[] {
-  const roleColors: Record<string, string> = {
-    admin: 'bg-purple-100 text-purple-700',
-    ga_lead: 'bg-blue-100 text-blue-700',
-    ga_staff: 'bg-green-100 text-green-700',
-    finance_approver: 'bg-yellow-100 text-yellow-700',
-    general_user: 'bg-gray-100 text-gray-700',
-  };
-
-  const roleDisplay: Record<string, string> = {
-    admin: 'Admin',
-    ga_lead: 'GA Lead',
-    ga_staff: 'GA Staff',
-    finance_approver: 'Finance Approver',
-    general_user: 'General User',
-  };
-
   return [
     {
       id: 'select',
@@ -85,8 +71,8 @@ export function getUserColumns(
       cell: ({ row }) => {
         const value = row.getValue('role') as string;
         return (
-          <Badge variant="secondary" className={roleColors[value] || roleColors.general_user}>
-            {roleDisplay[value] || value}
+          <Badge variant="secondary" className={ROLE_COLORS[value as Role] || ROLE_COLORS.general_user}>
+            {ROLE_DISPLAY[value as Role] || value}
           </Badge>
         );
       },

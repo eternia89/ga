@@ -27,22 +27,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { InlineFeedback } from '@/components/inline-feedback';
 import { Eye, EyeOff } from 'lucide-react';
-
-const roleColors: Record<string, string> = {
-  admin: 'bg-purple-100 text-purple-700',
-  ga_lead: 'bg-blue-100 text-blue-700',
-  ga_staff: 'bg-green-100 text-green-700',
-  finance_approver: 'bg-yellow-100 text-yellow-700',
-  general_user: 'bg-gray-100 text-gray-700',
-};
-
-const roleDisplay: Record<string, string> = {
-  admin: 'Admin',
-  ga_lead: 'GA Lead',
-  ga_staff: 'GA Staff',
-  finance_approver: 'Finance Approver',
-  general_user: 'General User',
-};
+import { ROLE_COLORS, ROLE_DISPLAY } from '@/lib/constants/role-display';
+import type { Role } from '@/lib/constants/roles';
 
 type ProfileSheetProps = {
   open: boolean;
@@ -151,8 +137,8 @@ export function ProfileSheet({ open, onOpenChange }: ProfileSheetProps) {
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-medium truncate">{profile.full_name}</p>
-                <Badge variant="secondary" className={roleColors[profile.role] || roleColors.general_user}>
-                  {roleDisplay[profile.role] || profile.role}
+                <Badge variant="secondary" className={ROLE_COLORS[profile.role as Role] || ROLE_COLORS.general_user}>
+                  {ROLE_DISPLAY[profile.role as Role] || profile.role}
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">{profile.email}</p>
