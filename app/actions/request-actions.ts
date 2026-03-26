@@ -7,7 +7,7 @@ import { LEAD_ROLES, ROLES } from '@/lib/constants/roles';
 import { REQUEST_LINKABLE_STATUSES, REQUEST_TRIAGEABLE_STATUSES } from '@/lib/constants/request-status';
 import { feedbackSchema } from '@/lib/validations/job-schema';
 import { z } from 'zod';
-import { createNotifications } from '@/lib/notifications/helpers';
+import { safeCreateNotifications } from '@/lib/notifications/helpers';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { assertCompanyAccess } from '@/lib/auth/company-access';
 import { assertNotStale } from '@/lib/utils/optimistic-lock';
@@ -183,7 +183,7 @@ export const triageRequest = authActionClient
     const picName = assignedUser?.full_name ?? 'the assigned staff';
 
     // Non-blocking notification: notify requester and PIC (actor excluded automatically)
-    createNotifications({
+    safeCreateNotifications({
       companyId: request.company_id,
       recipientIds: [request.requester_id, parsedInput.data.assigned_to],
       actorId: profile.id,
@@ -192,7 +192,7 @@ export const triageRequest = authActionClient
       type: 'status_change',
       entityType: 'request',
       entityId: request.id,
-    }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+    });
 
     revalidatePath('/requests');
     return { success: true };
@@ -233,7 +233,7 @@ export const cancelRequest = authActionClient
       .is('deleted_at', null);
 
     if (gaUsers && gaUsers.length > 0) {
-      createNotifications({
+      safeCreateNotifications({
         companyId: cancelledRequest.company_id,
         recipientIds: gaUsers.map((u) => u.id),
         actorId: profile.id,
@@ -242,7 +242,7 @@ export const cancelRequest = authActionClient
         type: 'status_change',
         entityType: 'request',
         entityId: cancelledRequest.id,
-      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+      });
     }
 
     revalidatePath('/requests');
@@ -289,7 +289,7 @@ export const rejectRequest = authActionClient
 
     // Non-blocking notification: notify the requester
     const truncatedReason = parsedInput.data.reason.substring(0, 100);
-    createNotifications({
+    safeCreateNotifications({
       companyId: request.company_id,
       recipientIds: [request.requester_id],
       actorId: profile.id,
@@ -298,7 +298,7 @@ export const rejectRequest = authActionClient
       type: 'status_change',
       entityType: 'request',
       entityId: request.id,
-    }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+    });
 
     revalidatePath('/requests');
     return { success: true };
@@ -353,7 +353,7 @@ export const completeRequest = authActionClient
     }
 
     // Non-blocking notification to requester
-    createNotifications({
+    safeCreateNotifications({
       companyId: request.company_id,
       recipientIds: [request.requester_id],
       actorId: profile.id,
@@ -362,7 +362,7 @@ export const completeRequest = authActionClient
       type: 'completion',
       entityType: 'request',
       entityId: request.id,
-    }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+    });
 
     revalidatePath('/requests');
     return { success: true };

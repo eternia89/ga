@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
-import { createNotifications } from '@/lib/notifications/helpers';
+import { safeCreateNotifications } from '@/lib/notifications/helpers';
 import { REQUEST_LINKABLE_STATUSES } from '@/lib/constants/request-status';
 import type { ActionOk } from '@/lib/types/action-responses';
 
@@ -51,7 +51,7 @@ export const approveJob = authActionClient
 
     // Notify PIC if assigned
     if (job.assigned_to) {
-      createNotifications({
+      safeCreateNotifications({
         companyId: job.company_id,
         recipientIds: [job.assigned_to],
         actorId: profile.id,
@@ -60,7 +60,7 @@ export const approveJob = authActionClient
         type: 'approval',
         entityType: 'job',
         entityId: parsedInput.job_id,
-      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+      });
     }
 
     revalidatePath('/jobs');
@@ -122,7 +122,7 @@ export const rejectJob = authActionClient
 
     // Notify PIC if assigned
     if (job.assigned_to) {
-      createNotifications({
+      safeCreateNotifications({
         companyId: job.company_id,
         recipientIds: [job.assigned_to],
         actorId: profile.id,
@@ -131,7 +131,7 @@ export const rejectJob = authActionClient
         type: 'approval',
         entityType: 'job',
         entityId: parsedInput.job_id,
-      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+      });
     }
 
     revalidatePath('/jobs');
@@ -217,7 +217,7 @@ export const approveCompletion = authActionClient
 
       if (linkedRequests && linkedRequests.length > 0) {
         const requesterIds = [...new Set(linkedRequests.map((r) => r.requester_id))];
-        createNotifications({
+        safeCreateNotifications({
           companyId: job.company_id,
           recipientIds: requesterIds,
           actorId: profile.id,
@@ -226,13 +226,13 @@ export const approveCompletion = authActionClient
           type: 'auto_accept_warning',
           entityType: 'job',
           entityId: parsedInput.job_id,
-        }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+        });
       }
     }
 
     // Notify PIC about completion approval
     if (job.assigned_to) {
-      createNotifications({
+      safeCreateNotifications({
         companyId: job.company_id,
         recipientIds: [job.assigned_to],
         actorId: profile.id,
@@ -241,7 +241,7 @@ export const approveCompletion = authActionClient
         type: 'approval',
         entityType: 'job',
         entityId: parsedInput.job_id,
-      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+      });
     }
 
     revalidatePath('/jobs');
@@ -304,7 +304,7 @@ export const rejectCompletion = authActionClient
 
     // Notify PIC about completion rejection
     if (job.assigned_to) {
-      createNotifications({
+      safeCreateNotifications({
         companyId: job.company_id,
         recipientIds: [job.assigned_to],
         actorId: profile.id,
@@ -313,7 +313,7 @@ export const rejectCompletion = authActionClient
         type: 'approval',
         entityType: 'job',
         entityId: parsedInput.job_id,
-      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+      });
     }
 
     revalidatePath('/jobs');

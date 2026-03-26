@@ -6,7 +6,7 @@ import { createJobSchema, updateJobSchema, jobCommentSchema } from '@/lib/valida
 import { GA_ROLES, LEAD_ROLES } from '@/lib/constants/roles';
 import { REQUEST_LINKABLE_STATUSES } from '@/lib/constants/request-status';
 import { z } from 'zod';
-import { createNotifications } from '@/lib/notifications/helpers';
+import { safeCreateNotifications } from '@/lib/notifications/helpers';
 import { highestPriority } from '@/lib/jobs/priority';
 import { formatIDR } from '@/lib/utils';
 import { advanceFloatingScheduleCore } from '@/app/actions/pm-job-actions';
@@ -351,7 +351,7 @@ export const updateJob = authActionClient
           .eq('id', id)
           .single();
 
-        createNotifications({
+        safeCreateNotifications({
           companyId: profile.company_id,
           recipientIds: [fieldsToUpdate.assigned_to as string],
           actorId: profile.id,
@@ -360,7 +360,7 @@ export const updateJob = authActionClient
           type: 'assignment',
           entityType: 'job',
           entityId: id,
-        }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+        });
       }
 
     }
@@ -412,7 +412,7 @@ export const assignJob = authActionClient
     }
 
     // Non-blocking notification: notify the assigned PIC
-    createNotifications({
+    safeCreateNotifications({
       companyId: profile.company_id,
       recipientIds: [parsedInput.assigned_to],
       actorId: profile.id,
@@ -421,7 +421,7 @@ export const assignJob = authActionClient
       type: 'assignment',
       entityType: 'job',
       entityId: parsedInput.id,
-    }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+    });
 
     revalidatePath('/jobs');
     revalidatePath(`/jobs/${parsedInput.id}`);
@@ -558,7 +558,7 @@ export const updateJobStatus = authActionClient
 
     if (requiresCompletionApproval) {
       // Notify job creator that completion approval is needed
-      createNotifications({
+      safeCreateNotifications({
         companyId: job.company_id,
         recipientIds: [job.created_by],
         actorId: profile.id,
@@ -567,7 +567,7 @@ export const updateJobStatus = authActionClient
         type: 'approval',
         entityType: 'job',
         entityId: parsedInput.id,
-      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+      });
     }
 
     // When directly completing (no completion approval required), move linked requests
@@ -598,7 +598,7 @@ export const updateJobStatus = authActionClient
 
         if (linkedRequests && linkedRequests.length > 0) {
           const requesterIds = [...new Set(linkedRequests.map((r) => r.requester_id))];
-          createNotifications({
+          safeCreateNotifications({
             companyId: job.company_id,
             recipientIds: requesterIds,
             actorId: profile.id,
@@ -607,13 +607,13 @@ export const updateJobStatus = authActionClient
             type: 'auto_accept_warning',
             entityType: 'job',
             entityId: parsedInput.id,
-          }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+          });
         }
       }
 
       // Non-blocking notification: notify job creator and assigned PIC about completion
       const completionRecipients = [job.created_by, job.assigned_to].filter(Boolean) as string[];
-      createNotifications({
+      safeCreateNotifications({
         companyId: job.company_id,
         recipientIds: completionRecipients,
         actorId: profile.id,
@@ -621,7 +621,7 @@ export const updateJobStatus = authActionClient
         type: 'completion',
         entityType: 'job',
         entityId: parsedInput.id,
-      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+      });
     }
 
     revalidatePath('/jobs');
@@ -670,7 +670,7 @@ export const cancelJob = authActionClient
 
     // Non-blocking notification: notify the assigned PIC (if any)
     if (job.assigned_to) {
-      createNotifications({
+      safeCreateNotifications({
         companyId: profile.company_id,
         recipientIds: [job.assigned_to],
         actorId: profile.id,
@@ -678,7 +678,7 @@ export const cancelJob = authActionClient
         type: 'status_change',
         entityType: 'job',
         entityId: parsedInput.id,
-      }).catch(err => console.error('[notifications]', err instanceof Error ? err.message : err));
+      });
     }
 
     // Move linked requests back to triaged
