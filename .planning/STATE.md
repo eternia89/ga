@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: Completed quick-260326-ihu status constants extraction
 last_updated: "2026-03-26T06:34:31.078Z"
-last_activity: "2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES"
+last_activity: "2026-03-26 - Completed quick task 136: Status constants extraction"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -414,6 +414,7 @@ Recent decisions affecting current work:
 | 133 | Dead code + role literals: fix table name, remove dead fallback, 18 role constants | 2026-03-26 | dd1feef | Verified | [260326-gck-dead-code-and-role-literal-cleanup-fix-w](./quick/260326-gck-dead-code-and-role-literal-cleanup-fix-w/) |
 | 134 | DisplayId migration: 18 inline font-mono → DisplayId wrapper across 16 files | 2026-03-26 | acd4e67 | Verified | [260326-gsg-displayid-component-migration-replace-al](./quick/260326-gsg-displayid-component-migration-replace-al/) |
 | 135 | DRY extractions: roleColors, TYPE_COLORS, job status, optionalUuid into shared constants | 2026-03-26 | 4f87a01 | Verified | [260326-h9c-dry-extractions-rolecolors-type-colors-j](./quick/260326-h9c-dry-extractions-rolecolors-type-colors-j/) |
+| 136 | Status constants: extract 6 duplicated status arrays, replace 36 inline occurrences | 2026-03-26 | fb988b6 | Verified | [260326-ihu-status-constants-extraction-extract-dupl](./quick/260326-ihu-status-constants-extraction-extract-dupl/) |
 
 ## Session Continuity
 
