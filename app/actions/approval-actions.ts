@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
 import { safeCreateNotifications } from '@/lib/notifications/helpers';
+import { assertCompanyAccess } from '@/lib/auth/company-access';
 import { REQUEST_LINKABLE_STATUSES } from '@/lib/constants/request-status';
 import type { ActionOk } from '@/lib/types/action-responses';
 
@@ -26,6 +27,9 @@ export const approveJob = authActionClient
     if (!job) {
       throw new Error('Job not found');
     }
+
+    // Defense-in-depth: verify company access beyond RLS
+    await assertCompanyAccess(supabase, profile.id, job.company_id, profile.company_id);
 
     // Only the job creator can approve budget
     if (job.created_by !== profile.id) {
@@ -94,6 +98,9 @@ export const rejectJob = authActionClient
       throw new Error('Job not found');
     }
 
+    // Defense-in-depth: verify company access beyond RLS
+    await assertCompanyAccess(supabase, profile.id, job.company_id, profile.company_id);
+
     // Only the job creator can reject budget
     if (job.created_by !== profile.id) {
       throw new Error('Only the job creator can reject the budget');
@@ -160,6 +167,9 @@ export const approveCompletion = authActionClient
     if (!job) {
       throw new Error('Job not found');
     }
+
+    // Defense-in-depth: verify company access beyond RLS
+    await assertCompanyAccess(supabase, profile.id, job.company_id, profile.company_id);
 
     // Only the job creator can approve completion
     if (job.created_by !== profile.id) {
@@ -275,6 +285,9 @@ export const rejectCompletion = authActionClient
     if (!job) {
       throw new Error('Job not found');
     }
+
+    // Defense-in-depth: verify company access beyond RLS
+    await assertCompanyAccess(supabase, profile.id, job.company_id, profile.company_id);
 
     // Only the job creator can reject completion
     if (job.created_by !== profile.id) {
