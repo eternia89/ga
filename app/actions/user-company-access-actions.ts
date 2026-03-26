@@ -46,16 +46,30 @@ export const updateUserCompanyAccess = adminActionClient
     if (fetchError || !targetUser) throw new Error('User not found');
     await assertCompanyAccess(adminSupabase, ctx.profile.id, targetUser.company_id, ctx.profile.company_id);
 
-    // Delete all existing access for this user
-    const { error: deleteError } = await adminSupabase
+    // Fetch current access for diff
+    const { data: currentAccess } = await adminSupabase
       .from('user_company_access')
-      .delete()
+      .select('company_id')
       .eq('user_id', userId);
-    if (deleteError) throw new Error(`Failed to clear company access: ${deleteError.message}`);
+    const currentIds = (currentAccess ?? []).map(r => r.company_id);
 
-    // Insert new access rows if any
-    if (companyIds.length > 0) {
-      const rows = companyIds.map(cid => ({
+    // Compute diff
+    const toAdd = companyIds.filter(id => !currentIds.includes(id));
+    const toRemove = currentIds.filter(id => !companyIds.includes(id));
+
+    // Delete removed access (only specific rows, not all)
+    if (toRemove.length > 0) {
+      const { error: deleteError } = await adminSupabase
+        .from('user_company_access')
+        .delete()
+        .eq('user_id', userId)
+        .in('company_id', toRemove);
+      if (deleteError) throw new Error(`Failed to revoke company access: ${deleteError.message}`);
+    }
+
+    // Insert new access
+    if (toAdd.length > 0) {
+      const rows = toAdd.map(cid => ({
         user_id: userId,
         company_id: cid,
         granted_by: ctx.profile.id,

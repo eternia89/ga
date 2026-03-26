@@ -103,8 +103,11 @@ export const createUser = adminActionClient
         );
 
         if (metadataError) {
-          // Don't rollback for metadata error, just log it
-          console.error('Failed to set app_metadata:', metadataError);
+          // Metadata is critical for RLS — user would see no data without it.
+          // Rollback: delete profile + auth user
+          await adminSupabase.from('user_profiles').delete().eq('id', authUser.user.id);
+          await adminSupabase.auth.admin.deleteUser(authUser.user.id);
+          throw new Error('Failed to set user metadata. User creation rolled back. Please try again.');
         }
 
         revalidatePath('/admin/users');
@@ -140,6 +143,13 @@ export const updateUser = adminActionClient
     // Verify admin has access to the target company
     await assertCompanyAccess(adminSupabase, ctx.profile.id, parsedInput.company_id, ctx.profile.company_id);
 
+    // Snapshot current values for rollback if metadata update fails
+    const { data: currentProfile } = await adminSupabase
+      .from('user_profiles')
+      .select('full_name, role, company_id, division_id, location_id')
+      .eq('id', parsedInput.id)
+      .single();
+
     // 1. Update user_profiles row
     const { error: profileError } = await adminSupabase
       .from('user_profiles')
@@ -170,8 +180,21 @@ export const updateUser = adminActionClient
     );
 
     if (metadataError) {
-      console.error('Failed to update app_metadata:', metadataError);
-      // Don't fail the entire operation for metadata error
+      // Metadata is critical for RLS — rollback profile to previous values
+      if (currentProfile) {
+        await adminSupabase
+          .from('user_profiles')
+          .update({
+            full_name: currentProfile.full_name,
+            role: currentProfile.role,
+            company_id: currentProfile.company_id,
+            division_id: currentProfile.division_id,
+            location_id: currentProfile.location_id,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', parsedInput.id);
+      }
+      throw new Error('Failed to update user metadata. Profile changes rolled back. Please try again.');
     }
 
     revalidatePath('/admin/users');
