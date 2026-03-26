@@ -19,6 +19,14 @@ export type UserProfile = {
   updated_at: string;
 };
 
+// UserProfile extended with joined relation fields (company, division, location names)
+// Used when profile is fetched with Supabase .select() joins in layout.tsx
+export type UserProfileWithJoins = UserProfile & {
+  company?: { name: string } | null;
+  division?: { name: string } | null;
+  location?: { name: string } | null;
+};
+
 // Permission string type - defined here to avoid circular imports
 export type Permission =
   // User management (Phase 3)

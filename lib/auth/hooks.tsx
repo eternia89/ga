@@ -4,13 +4,13 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import type { User } from '@supabase/supabase-js';
-import type { UserProfile, Permission } from './types';
+import type { UserProfileWithJoins, Permission } from './types';
 import { hasPermission } from './permissions';
 
 // Auth context type
 type AuthContextType = {
   user: User | null;
-  profile: UserProfile | null;
+  profile: UserProfileWithJoins | null;
   isLoading: boolean;
 };
 
@@ -19,13 +19,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // AuthProvider props
 type AuthProviderProps = {
-  initialProfile: UserProfile;
+  initialProfile: UserProfileWithJoins;
   children: ReactNode;
 };
 
 // AuthProvider component
 export function AuthProvider({ initialProfile, children }: AuthProviderProps) {
-  const [profile, setProfile] = useState<UserProfile | null>(initialProfile);
+  const [profile, setProfile] = useState<UserProfileWithJoins | null>(initialProfile);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
