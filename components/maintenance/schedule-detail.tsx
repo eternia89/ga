@@ -13,6 +13,7 @@ import { ScheduleForm } from './schedule-form';
 import { Input } from '@/components/ui/input';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 import { LEAD_ROLES } from '@/lib/constants/roles';
+import { JOB_STATUS_LABELS, JOB_STATUS_COLORS } from '@/lib/constants/job-status';
 import { DisplayId } from '@/components/display-id';
 
 // ============================================================================
@@ -24,29 +25,6 @@ export interface PMJobRef {
   display_id: string;
   status: string;
   created_at: string;
-}
-
-// ============================================================================
-// Status label map for PM job status display
-// ============================================================================
-
-const JOB_STATUS_LABELS: Record<string, string> = {
-  created:     'Created',
-  assigned:    'Assigned',
-  in_progress: 'In Progress',
-  completed:   'Completed',
-  cancelled:   'Cancelled',
-};
-
-function jobStatusColor(status: string): string {
-  switch (status) {
-    case 'created':     return 'bg-gray-100 text-gray-700';
-    case 'assigned':    return 'bg-blue-100 text-blue-700';
-    case 'in_progress': return 'bg-yellow-100 text-yellow-700';
-    case 'completed':   return 'bg-green-100 text-green-700';
-    case 'cancelled':   return 'bg-red-100 text-red-700';
-    default:            return 'bg-gray-100 text-gray-700';
-  }
 }
 
 // ============================================================================
@@ -380,7 +358,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
                           {job.display_id}
                         </DisplayId>
                         <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${jobStatusColor(job.status)}`}
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${JOB_STATUS_COLORS[job.status] ?? 'bg-gray-100 text-gray-700'}`}
                         >
                           {JOB_STATUS_LABELS[job.status] ?? job.status}
                         </span>

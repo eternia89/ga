@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { optionalUuid } from "@/lib/validations/helpers";
 
 export const createUserSchema = z.object({
   email: z.string().max(60).email("Valid email is required"),
@@ -13,8 +14,8 @@ export const updateUserSchema = z.object({
   full_name: z.string().min(1, "Name is required").max(60),
   role: z.enum(["general_user", "ga_staff", "ga_lead", "finance_approver", "admin"]),
   company_id: z.string().uuid("Company is required"),
-  division_id: z.string().uuid("Division is required").optional().or(z.literal("")),
-  location_id: z.string().uuid("Location is required").optional().or(z.literal("")),
+  division_id: optionalUuid("Division is required"),
+  location_id: optionalUuid("Location is required"),
 });
 
 export type CreateUserFormData = z.infer<typeof createUserSchema>;

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { optionalUuid } from '@/lib/validations/helpers';
 
 // ============================================================================
 // Checklist Item Base — common fields for all 6 item types
@@ -48,7 +49,7 @@ export const checklistItemSchema = z.discriminatedUnion('type', [
 export const templateCreateSchema = z.object({
   name:        z.string().min(1, 'Name is required').max(100),
   description: z.string().max(200).optional(),
-  category_id: z.string().uuid().or(z.literal('')).optional().nullable().transform(val => val || null),
+  category_id: optionalUuid(),
   checklist:   z.array(checklistItemSchema).min(1, 'At least one checklist item required').max(100, 'Maximum 100 checklist items'),
 });
 

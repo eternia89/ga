@@ -23,23 +23,8 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { LEAD_ROLES } from '@/lib/constants/roles';
+import { JOB_STATUS_LABELS, JOB_STATUS_COLORS } from '@/lib/constants/job-status';
 import { DisplayId } from '@/components/display-id';
-
-const JOB_STATUS_LABELS: Record<string, string> = {
-  created: 'Created', assigned: 'Assigned', in_progress: 'In Progress',
-  completed: 'Completed', cancelled: 'Cancelled',
-};
-
-function jobStatusColor(status: string): string {
-  switch (status) {
-    case 'created': return 'bg-gray-100 text-gray-700';
-    case 'assigned': return 'bg-blue-100 text-blue-700';
-    case 'in_progress': return 'bg-yellow-100 text-yellow-700';
-    case 'completed': return 'bg-green-100 text-green-700';
-    case 'cancelled': return 'bg-red-100 text-red-700';
-    default: return 'bg-gray-100 text-gray-700';
-  }
-}
 
 // ============================================================================
 // Types
@@ -383,7 +368,7 @@ export function ScheduleViewModal({
                       <li key={job.id} className="flex items-center justify-between rounded-md border bg-muted/30 px-3 py-2">
                         <div className="flex items-center gap-2">
                           <DisplayId className="text-sm font-medium">{job.display_id}</DisplayId>
-                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${jobStatusColor(job.status)}`}>
+                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${JOB_STATUS_COLORS[job.status] ?? 'bg-gray-100 text-gray-700'}`}>
                             {JOB_STATUS_LABELS[job.status] ?? job.status}
                           </span>
                         </div>

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { isoDateString } from '@/lib/validations/helpers';
+import { isoDateString, optionalUuid } from '@/lib/validations/helpers';
 
 // ============================================================================
 // scheduleCreateSchema — maintenance schedule creation
@@ -7,7 +7,7 @@ import { isoDateString } from '@/lib/validations/helpers';
 
 export const scheduleCreateSchema = z.object({
   template_id:   z.string().uuid({ message: 'Template is required' }),
-  item_id:       z.string().uuid().nullable().optional(),
+  item_id:       optionalUuid(),
   company_id:    z.string().uuid().optional(),
   interval_days: z.number().int().min(1, 'Minimum 1 day').max(365, 'Maximum 365 days'),
   interval_type: z.enum(['fixed', 'floating']).default('floating'),
