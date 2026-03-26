@@ -19,9 +19,9 @@ export default function UpdatePasswordPage() {
     // Check if user has a valid session from the reset link
     const checkSession = async () => {
       const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setHasSession(!!session)
+        data: { user },
+      } = await supabase.auth.getUser()
+      setHasSession(!!user)
     }
     checkSession()
   }, [supabase.auth])
