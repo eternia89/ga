@@ -508,7 +508,7 @@ export const rejectCompletedWork = authActionClient
 
     if (jobLinks && jobLinks.length > 0) {
       const jobIds = jobLinks.map((jl) => jl.job_id);
-      await supabase
+      const { error: revertJobError } = await supabase
         .from('jobs')
         .update({
           status: 'in_progress',
@@ -516,6 +516,10 @@ export const rejectCompletedWork = authActionClient
         })
         .in('id', jobIds)
         .eq('status', 'completed');
+
+      if (revertJobError) {
+        console.error('[rejectWork] Failed to revert linked jobs to in_progress:', revertJobError.message);
+      }
     }
 
     revalidatePath('/requests');

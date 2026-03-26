@@ -234,12 +234,16 @@ export const deactivateSchedule = gaLeadActionClient
     }
 
     // Cancel open PM jobs linked to this schedule (created, assigned, in_progress)
-    await adminSupabase
+    const { error: cancelJobsError } = await adminSupabase
       .from('jobs')
       .update({ status: 'cancelled' })
       .eq('maintenance_schedule_id', parsedInput.id)
       .in('status', [...JOB_OPEN_STATUSES])
       .is('deleted_at', null);
+
+    if (cancelJobsError) {
+      console.error('[deactivateSchedule] Failed to cancel open PM jobs:', cancelJobsError.message);
+    }
 
     revalidatePath('/maintenance');
     if (existing.item_id) {
@@ -511,12 +515,16 @@ export async function pauseSchedulesForAsset(
   // Cancel open PM jobs for paused schedules (Pitfall 4 mitigation)
   if (pausedCount > 0) {
     const scheduleIds = pausedSchedules!.map((s) => s.id);
-    await supabase
+    const { error: cancelJobsError } = await supabase
       .from('jobs')
       .update({ status: 'cancelled' })
       .in('maintenance_schedule_id', scheduleIds)
       .in('status', [...JOB_OPEN_STATUSES])
       .is('deleted_at', null);
+
+    if (cancelJobsError) {
+      console.error('[pauseSchedules] Failed to cancel open PM jobs for paused schedules:', cancelJobsError.message);
+    }
   }
 
   return { pausedCount };

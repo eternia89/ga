@@ -5,7 +5,10 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient()
 
   // Sign out from all sessions (global scope)
-  await supabase.auth.signOut({ scope: 'global' })
+  const { error } = await supabase.auth.signOut({ scope: 'global' })
+  if (error) {
+    console.error('[signout] Failed to sign out:', error.message)
+  }
 
   const requestUrl = new URL(request.url)
   return NextResponse.redirect(`${requestUrl.origin}/login`)

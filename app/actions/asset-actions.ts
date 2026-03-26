@@ -331,10 +331,14 @@ export const createTransfer = authActionClient
         .eq('id', parsedInput.asset_id);
       if (itemError) {
         // Rollback: delete the movement record since asset update failed
-        await supabase
+        const { error: rollbackError } = await supabase
           .from('inventory_movements')
           .delete()
           .eq('id', data.id);
+
+        if (rollbackError) {
+          console.error('[acceptTransfer] Rollback failed - could not delete movement record:', rollbackError.message);
+        }
         throw new Error('Failed to update asset location. Please try again.');
       }
     }
@@ -398,10 +402,14 @@ export const acceptTransfer = authActionClient
 
     if (itemError) {
       // Rollback: revert movement back to pending since asset update failed
-      await supabase
+      const { error: rollbackError } = await supabase
         .from('inventory_movements')
         .update({ status: 'pending', received_by: null, received_at: null })
         .eq('id', parsedInput.movement_id);
+
+      if (rollbackError) {
+        console.error('[rejectTransfer] Rollback failed - could not revert movement to pending:', rollbackError.message);
+      }
       throw new Error('Failed to update asset location. Transfer reverted to pending.');
     }
 

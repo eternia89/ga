@@ -141,13 +141,17 @@ export const createJob = authActionClient
 
       if (budgetThreshold !== null && parsedInput.estimated_cost >= budgetThreshold) {
         const now = new Date().toISOString();
-        await supabase
+        const { error: approvalError } = await supabase
           .from('jobs')
           .update({
             status: 'pending_approval',
             approval_submitted_at: now,
           })
           .eq('id', job.id);
+
+        if (approvalError) {
+          throw new Error(`Failed to transition job to pending_approval: ${approvalError.message}`);
+        }
       }
     }
 
@@ -287,7 +291,7 @@ export const updateJob = authActionClient
           throw new Error('You can only link requests assigned to you as PIC.');
         }
 
-        await supabase
+        const { error: linkError } = await supabase
           .from('job_requests')
           .insert(toAdd.map((requestId) => ({
             job_id: id,
@@ -296,12 +300,20 @@ export const updateJob = authActionClient
             linked_by: profile.id,
           })));
 
+        if (linkError) {
+          throw new Error(`Failed to create job-request links: ${linkError.message}`);
+        }
+
         // Move triaged newly linked requests to in_progress (skip already in_progress)
-        await supabase
+        const { error: reqStatusError } = await supabase
           .from('requests')
           .update({ status: 'in_progress', updated_at: new Date().toISOString() })
           .in('id', toAdd)
           .in('status', ['triaged']);
+
+        if (reqStatusError) {
+          console.error('[updateJob] Failed to update linked request status to in_progress:', reqStatusError.message);
+        }
       }
 
       // Recalculate priority from all current linked requests
@@ -538,7 +550,7 @@ export const updateJobStatus = authActionClient
     }
 
     // Record GPS status change (REQ-JOB-010)
-    await supabase
+    const { error: auditError } = await supabase
       .from('job_status_changes')
       .insert({
         job_id: parsedInput.id,
@@ -550,6 +562,10 @@ export const updateJobStatus = authActionClient
         longitude: parsedInput.longitude ?? null,
         gps_accuracy: parsedInput.gpsAccuracy ?? null,
       });
+
+    if (auditError) {
+      console.error('[updateJobStatus] Failed to insert job_status_changes GPS record:', auditError.message);
+    }
 
     // Advance floating schedule when completing a PM job
     if (actualStatus === 'completed' && job.job_type === 'preventive_maintenance') {
@@ -579,7 +595,7 @@ export const updateJobStatus = authActionClient
 
       if (linkedJobRequests && linkedJobRequests.length > 0) {
         const requestIds = linkedJobRequests.map((jr) => jr.request_id);
-        await supabase
+        const { error: reqCompleteError } = await supabase
           .from('requests')
           .update({
             status: 'pending_acceptance',
@@ -588,6 +604,10 @@ export const updateJobStatus = authActionClient
           })
           .in('id', requestIds)
           .in('status', [...REQUEST_LINKABLE_STATUSES]);
+
+        if (reqCompleteError) {
+          console.error('[updateJobStatus] Failed to update linked requests to pending_acceptance:', reqCompleteError.message);
+        }
 
         // Non-blocking notification: notify requesters with auto-accept warning
         const { data: linkedRequests } = await supabase
@@ -689,11 +709,15 @@ export const cancelJob = authActionClient
 
     if (linkedJobRequests && linkedJobRequests.length > 0) {
       const requestIds = linkedJobRequests.map((jr) => jr.request_id);
-      await supabase
+      const { error: reqRevertError } = await supabase
         .from('requests')
         .update({ status: 'triaged', updated_at: new Date().toISOString() })
         .in('id', requestIds)
         .in('status', ['in_progress', 'pending_acceptance']);
+
+      if (reqRevertError) {
+        console.error('[cancelJob] Failed to revert linked requests to triaged:', reqRevertError.message);
+      }
     }
 
     revalidatePath('/jobs');
