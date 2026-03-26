@@ -3,6 +3,7 @@
 import { format } from 'date-fns';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { PRIORITY_LABELS } from '@/lib/constants/request-status';
+import { DisplayId } from '@/components/display-id';
 import {
   Dialog,
   DialogContent,
@@ -42,9 +43,9 @@ export function RequestPreviewDialog({
       <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-mono text-sm font-semibold text-muted-foreground">
+            <DisplayId className="text-sm font-semibold text-muted-foreground">
               {request.display_id}
-            </span>
+            </DisplayId>
             <RequestStatusBadge status={request.status} />
           </div>
           <DialogTitle className="text-lg">{request.title}</DialogTitle>

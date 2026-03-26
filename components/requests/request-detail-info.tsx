@@ -14,6 +14,7 @@ import { RequestEditForm } from './request-edit-form';
 import { FeedbackStarRating } from './feedback-star-rating';
 import { JobStatusBadge } from '@/components/jobs/job-status-badge';
 import { ExternalLink } from 'lucide-react';
+import { DisplayId } from '@/components/display-id';
 import {
   Form,
   FormControl,
@@ -353,9 +354,9 @@ export function RequestDetailInfo({
                   <Link
                     href={`/jobs/${job.id}`}
                     target="_blank"
-                    className="text-sm font-mono font-medium text-primary hover:underline inline-flex items-center gap-1"
+                    className="text-sm font-medium text-primary hover:underline inline-flex items-center gap-1"
                   >
-                    {job.display_id}
+                    <DisplayId>{job.display_id}</DisplayId>
                     <ExternalLink className="h-3 w-3" />
                   </Link>
                   <span className="text-sm text-muted-foreground">—</span>

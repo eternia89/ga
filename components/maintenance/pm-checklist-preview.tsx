@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { ChecklistItem, ChecklistResponse } from '@/lib/types/maintenance';
+import { DisplayId } from '@/components/display-id';
 
 // ============================================================================
 // Props
@@ -90,7 +91,7 @@ export function PMChecklistPreview({
             <p className="text-sm font-medium">
               {assetName}
               {assetDisplayId && (
-                <span className="text-muted-foreground font-normal ml-1">({assetDisplayId})</span>
+                <span className="text-muted-foreground font-normal ml-1">(<DisplayId>{assetDisplayId}</DisplayId>)</span>
               )}
             </p>
           </div>

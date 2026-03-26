@@ -351,7 +351,7 @@ export function ScheduleViewModal({
                 {schedule.asset?.name && (
                   <>
                     Asset: {schedule.asset.name}
-                    {schedule.asset.display_id && ` (${schedule.asset.display_id})`}
+                    {schedule.asset.display_id && <> (<DisplayId className="text-sm">{schedule.asset.display_id}</DisplayId>)</>}
                     {' \u00b7 '}
                   </>
                 )}

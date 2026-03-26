@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
 import { getEntityRoute } from '@/lib/constants/entity-routes';
+import { DisplayId } from '@/components/display-id';
 
 export type AuditLogRow = {
   id: string;
@@ -144,19 +145,19 @@ export const auditTrailColumns: ColumnDef<AuditLogRow>[] = [
 
       if (!route || route === '#') {
         return (
-          <span className="font-mono text-xs text-muted-foreground">
+          <DisplayId className="text-xs text-muted-foreground">
             {displayText}
-          </span>
+          </DisplayId>
         );
       }
 
       return (
         <Link
           href={route}
-          className="font-mono text-xs text-blue-600 hover:underline hover:text-blue-700 transition-colors"
+          className="text-xs text-blue-600 hover:underline hover:text-blue-700 transition-colors"
           onClick={(e) => e.stopPropagation()}
         >
-          {displayText}
+          <DisplayId>{displayText}</DisplayId>
         </Link>
       );
     },

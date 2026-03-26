@@ -8,6 +8,7 @@ import { RequestWithRelations } from '@/lib/types/database';
 import { triageRequest } from '@/app/actions/request-actions';
 import { Combobox } from '@/components/combobox';
 import { InlineFeedback } from '@/components/inline-feedback';
+import { DisplayId } from '@/components/display-id';
 import { PhotoLightbox } from './request-photo-lightbox';
 import {
   Dialog,
@@ -119,7 +120,7 @@ export function RequestTriageDialog({
         <DialogContent className="max-w-[600px] max-h-[90vh] overflow-y-auto max-md:h-screen max-md:max-h-screen max-md:w-screen max-md:max-w-screen max-md:rounded-none max-md:border-0">
           <DialogHeader>
             <DialogTitle>
-              Triage Request{request ? ` — ${request.display_id}` : ''}
+              Triage Request{request ? <>{' '}&mdash; <DisplayId>{request.display_id}</DisplayId></> : ''}
             </DialogTitle>
           </DialogHeader>
 
