@@ -1075,12 +1075,21 @@ export function JobModal({
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Photos</p>
                     <PhotoUpload
                       onChange={async (files) => {
+                        let uploadFailed = false;
                         for (const file of files) {
                           const fd = new FormData();
                           fd.append('entity_type', 'job');
                           fd.append('entity_id', job.id);
                           fd.append('photo', file);
-                          await fetch('/api/uploads/entity-photos', { method: 'POST', body: fd });
+                          try {
+                            const res = await fetch('/api/uploads/entity-photos', { method: 'POST', body: fd });
+                            if (!res.ok) uploadFailed = true;
+                          } catch {
+                            uploadFailed = true;
+                          }
+                        }
+                        if (uploadFailed) {
+                          setFeedback({ type: 'error', message: 'Some photos failed to upload. Please try again.' });
                         }
                         handleActionSuccess();
                       }}

@@ -308,7 +308,13 @@ export function JobForm({
 
           if (!uploadResponse.ok) {
             // Photo upload failed — job is still saved, just without photos
-            console.warn('Photo upload failed:', await uploadResponse.text());
+            console.error('Photo upload failed:', await uploadResponse.text());
+            if (onSuccess) {
+              onSuccess();
+            } else {
+              setError('Job created, but photo upload failed. You can add photos by editing the job.');
+            }
+            return;
           }
         }
 

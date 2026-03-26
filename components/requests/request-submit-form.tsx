@@ -97,8 +97,14 @@ export function RequestSubmitForm({ locations, onSuccess, extraCompanies, allLoc
 
         if (!uploadResponse.ok) {
           // Photo upload failed — request is still saved, just without photos
-          // Don't block the user from continuing; they can add photos by editing the request
-          console.warn('Photo upload failed:', await uploadResponse.text());
+          console.error('Photo upload failed:', await uploadResponse.text());
+          setSelectedCompanyId(null);
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            setError('Request created, but photo upload failed. You can add photos by editing the request.');
+          }
+          return;
         }
       }
 
