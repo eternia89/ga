@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: Completed quick-260326-flu-PLAN.md
 last_updated: "2026-03-26T04:19:30.178Z"
-last_activity: "2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES"
+last_activity: "2026-03-26 - Completed quick task 129: Auth security fix getSession to getUser"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -407,6 +407,7 @@ Recent decisions affecting current work:
 | 126 | Centralize inline role arrays into OPERATIONAL_ROLES constant | 2026-03-20 | c36f229 | Verified | [260320-f5l-centralize-inline-role-arrays-into-lib-c](./quick/260320-f5l-centralize-inline-role-arrays-into-lib-c/) |
 | 127 | Schema validation hardening: .max() on passwords, .uuid() on itemId, .max() on arrays | 2026-03-26 | 4c88642 | Verified | [260326-f3u-schema-validation-hardening-add-max-to-p](./quick/260326-f3u-schema-validation-hardening-add-max-to-p/) |
 | 128 | Vision API security fix: add company access validation to vision/describe route | 2026-03-26 | 5cef5d2 | Verified | [260326-fca-vision-api-security-fix-add-company-acce](./quick/260326-fca-vision-api-security-fix-add-company-acce/) |
+| 129 | Auth security fix: switch update-password from getSession() to getUser() | 2026-03-26 | 4ea3c79 | Verified | [260326-flu-auth-security-fix-switch-update-password](./quick/260326-flu-auth-security-fix-switch-update-password/) |
 
 ## Session Continuity
 
