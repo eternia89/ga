@@ -24,7 +24,7 @@ export function downloadCSV(csvContent: string, filenamePrefix: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${filenamePrefix}-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+  a.download = `${filenamePrefix}-${format(new Date(), 'dd-MM-yyyy')}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
