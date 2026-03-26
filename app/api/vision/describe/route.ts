@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { assertCompanyAccess } from '@/lib/auth/company-access';
 
 interface VisionRequestBody {
   imageBase64: string;
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
     // Verify profile exists and is not deactivated
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('id, deleted_at')
+      .select('id, company_id, deleted_at')
       .eq('id', user.id)
       .single();
 
@@ -93,8 +94,25 @@ export async function POST(request: NextRequest) {
           : null;
 
       if (description) {
-        // Update media_attachments.description for the given attachment
+        // Fetch attachment to validate company access before updating
         const adminClient = createAdminClient();
+        const { data: attachment } = await adminClient
+          .from('media_attachments')
+          .select('id, company_id')
+          .eq('id', attachmentId)
+          .is('deleted_at', null)
+          .single();
+
+        if (!attachment) {
+          return NextResponse.json({ description });
+        }
+
+        try {
+          await assertCompanyAccess(adminClient, user.id, attachment.company_id, profile.company_id);
+        } catch {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+
         const { error: updateError } = await adminClient
           .from('media_attachments')
           .update({ description })
