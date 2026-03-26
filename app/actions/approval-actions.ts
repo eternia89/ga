@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
+import { REQUEST_LINKABLE_STATUSES } from '@/lib/constants/request-status';
 import type { ActionOk } from '@/lib/types/action-responses';
 
 // ============================================================================
@@ -201,7 +202,7 @@ export const approveCompletion = authActionClient
           updated_at: now,
         })
         .in('id', requestIds)
-        .in('status', ['triaged', 'in_progress']);
+        .in('status', [...REQUEST_LINKABLE_STATUSES]);
 
       if (reqUpdateError) {
         console.error('[approval] Failed to update linked request status:', reqUpdateError.message);

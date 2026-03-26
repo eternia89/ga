@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { CheckCircle2, ClipboardList } from 'lucide-react';
 import { PMChecklistItem } from './pm-checklist-item';
+import { JOB_TERMINAL_STATUSES } from '@/lib/constants/job-status';
 import type { PMJobChecklist, ChecklistResponse } from '@/lib/types/maintenance';
 
 interface PMChecklistProps {
@@ -49,7 +50,7 @@ export function PMChecklist({ jobId, checklist, jobStatus, canEdit }: PMChecklis
     );
   };
 
-  const isReadOnly = !canEdit || ['completed', 'cancelled'].includes(jobStatus);
+  const isReadOnly = !canEdit || (JOB_TERMINAL_STATUSES as readonly string[]).includes(jobStatus);
 
   return (
     <div className="rounded-lg border p-6 space-y-5">
@@ -101,14 +102,14 @@ export function PMChecklist({ jobId, checklist, jobStatus, canEdit }: PMChecklis
       )}
 
       {/* Read-only banner */}
-      {isReadOnly && !['completed', 'cancelled'].includes(jobStatus) && (
+      {isReadOnly && !(JOB_TERMINAL_STATUSES as readonly string[]).includes(jobStatus) && (
         <div className="rounded-md bg-muted/50 border px-4 py-2">
           <p className="text-xs text-muted-foreground">
             Read-only — only the assigned PIC or a GA Lead can fill out this checklist.
           </p>
         </div>
       )}
-      {['completed', 'cancelled'].includes(jobStatus) && (
+      {(JOB_TERMINAL_STATUSES as readonly string[]).includes(jobStatus) && (
         <div className="rounded-md bg-muted/50 border px-4 py-2">
           <p className="text-xs text-muted-foreground">
             This job is {jobStatus} — checklist is read-only.

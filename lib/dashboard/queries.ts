@@ -1,7 +1,7 @@
 import { type SupabaseClient } from '@supabase/supabase-js';
 import { subDays, differenceInDays, startOfMonth } from 'date-fns';
-import { STATUS_LABELS, REQUEST_STATUSES } from '@/lib/constants/request-status';
-import { JOB_STATUS_LABELS } from '@/lib/constants/job-status';
+import { STATUS_LABELS, REQUEST_STATUSES, REQUEST_OPEN_STATUSES } from '@/lib/constants/request-status';
+import { JOB_STATUS_LABELS, JOB_OPEN_STATUSES } from '@/lib/constants/job-status';
 import { ROLES } from '@/lib/constants/roles';
 
 // Hex color palette for status distribution charts (recharts needs hex, not Tailwind classes)
@@ -107,14 +107,14 @@ export async function getDashboardKpis(
     supabase
       .from('requests')
       .select('id', { count: 'exact', head: true })
-      .in('status', ['submitted', 'triaged', 'in_progress'])
+      .in('status', [...REQUEST_OPEN_STATUSES])
       .is('deleted_at', null),
 
     // Open Requests (previous period — use created_at in range)
     supabase
       .from('requests')
       .select('id', { count: 'exact', head: true })
-      .in('status', ['submitted', 'triaged', 'in_progress'])
+      .in('status', [...REQUEST_OPEN_STATUSES])
       .is('deleted_at', null)
       .gte('created_at', prevFrom)
       .lte('created_at', prevTo),
@@ -157,14 +157,14 @@ export async function getDashboardKpis(
     supabase
       .from('jobs')
       .select('id', { count: 'exact', head: true })
-      .in('status', ['created', 'assigned', 'in_progress'])
+      .in('status', [...JOB_OPEN_STATUSES])
       .is('deleted_at', null),
 
     // Open Jobs (previous period)
     supabase
       .from('jobs')
       .select('id', { count: 'exact', head: true })
-      .in('status', ['created', 'assigned', 'in_progress'])
+      .in('status', [...JOB_OPEN_STATUSES])
       .is('deleted_at', null)
       .gte('created_at', prevFrom)
       .lte('created_at', prevTo),
@@ -395,7 +395,7 @@ export async function getStaffWorkload(
     if (!job.assigned_to || !workload.has(job.assigned_to)) continue;
     const w = workload.get(job.assigned_to)!;
 
-    if (['created', 'assigned', 'in_progress'].includes(job.status)) {
+    if ((JOB_OPEN_STATUSES as readonly string[]).includes(job.status)) {
       w.activeJobs += 1;
       // Overdue: in_progress and older than 7 days
       if (job.status === 'in_progress' && job.created_at < overdueThreshold) {
@@ -442,7 +442,7 @@ export async function getRequestAging(
   const { data, error } = await supabase
     .from('requests')
     .select('created_at')
-    .in('status', ['submitted', 'triaged', 'in_progress'])
+    .in('status', [...REQUEST_OPEN_STATUSES])
     .is('deleted_at', null);
 
   if (error || !data) {

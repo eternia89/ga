@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { requestSubmitSchema, requestEditSchema, triageSchema, rejectSchema } from '@/lib/validations/request-schema';
 import { LEAD_ROLES, ROLES } from '@/lib/constants/roles';
+import { REQUEST_LINKABLE_STATUSES, REQUEST_TRIAGEABLE_STATUSES } from '@/lib/constants/request-status';
 import { feedbackSchema } from '@/lib/validations/job-schema';
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
@@ -138,7 +139,7 @@ export const triageRequest = authActionClient
       .eq('id', parsedInput.id)
       .single();
 
-    if (!request || !['submitted', 'triaged'].includes(request.status)) {
+    if (!request || !(REQUEST_TRIAGEABLE_STATUSES as readonly string[]).includes(request.status)) {
       throw new Error('Request can only be triaged when in New or Triaged status');
     }
 
@@ -268,7 +269,7 @@ export const rejectRequest = authActionClient
       .eq('id', parsedInput.id)
       .single();
 
-    if (!request || !['submitted', 'triaged'].includes(request.status)) {
+    if (!request || !(REQUEST_TRIAGEABLE_STATUSES as readonly string[]).includes(request.status)) {
       throw new Error('Request can only be rejected when in New or Triaged status');
     }
 
@@ -332,7 +333,7 @@ export const completeRequest = authActionClient
     }
 
     // Status check: must be triaged or in_progress
-    if (!['triaged', 'in_progress'].includes(request.status)) {
+    if (!(REQUEST_LINKABLE_STATUSES as readonly string[]).includes(request.status)) {
       throw new Error('Request can only be completed when in Triaged or In Progress status');
     }
 

@@ -36,6 +36,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { LEAD_ROLES } from '@/lib/constants/roles';
+import { REQUEST_LINKABLE_STATUSES, REQUEST_TRIAGEABLE_STATUSES } from '@/lib/constants/request-status';
 
 // ============================================================================
 // Types
@@ -441,9 +442,9 @@ export function RequestViewModal({
   const isRequester = request?.requester_id === currentUserId;
   const isPic = request?.assigned_to === currentUserId;
 
-  const canReject = isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request?.status ?? '');
+  const canReject = isGaLeadOrAdmin && (REQUEST_TRIAGEABLE_STATUSES as readonly string[]).includes(request?.status ?? '');
   const canCancel = isRequester && request?.status === 'submitted';
-  const canComplete = (isPic || isGaLeadOrAdmin) && ['triaged', 'in_progress'].includes(request?.status ?? '');
+  const canComplete = (isPic || isGaLeadOrAdmin) && (REQUEST_LINKABLE_STATUSES as readonly string[]).includes(request?.status ?? '');
   const canAcceptOrReject = isRequester && request?.status === 'pending_acceptance';
   const canGiveFeedback = isRequester && request?.status === 'accepted' && !request?.feedback_rating;
 

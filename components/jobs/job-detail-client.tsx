@@ -10,6 +10,7 @@ import { JobCommentForm } from './job-comment-form';
 import { PMChecklist } from '@/components/maintenance/pm-checklist';
 import { Button } from '@/components/ui/button';
 import { LEAD_ROLES } from '@/lib/constants/roles';
+import { JOB_TERMINAL_STATUSES, JOB_ACTIVE_STATUSES } from '@/lib/constants/job-status';
 
 interface PhotoItem {
   id: string;
@@ -56,7 +57,7 @@ export function JobDetailClient({
   const FORM_ID = 'job-detail-form';
 
   const isGaLeadOrAdmin = (LEAD_ROLES as readonly string[]).includes(currentUserRole);
-  const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job.status);
+  const canEdit = isGaLeadOrAdmin && !(JOB_TERMINAL_STATUSES as readonly string[]).includes(job.status);
 
   const handleActionSuccess = () => {
     router.refresh();
@@ -112,7 +113,7 @@ export function JobDetailClient({
             canEdit={
               ((LEAD_ROLES as readonly string[]).includes(currentUserRole) ||
                 job.assigned_to === currentUserId) &&
-              ['assigned', 'in_progress'].includes(job.status)
+              (JOB_ACTIVE_STATUSES as readonly string[]).includes(job.status)
             }
           />
         )}

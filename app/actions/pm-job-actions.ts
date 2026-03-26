@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { z } from 'zod';
 import { LEAD_ROLES } from '@/lib/constants/roles';
+import { JOB_TERMINAL_STATUSES } from '@/lib/constants/job-status';
 import { type SupabaseClient } from '@supabase/supabase-js';
 import type { PMJobChecklist, ChecklistResponse } from '@/lib/types/maintenance';
 import type { ActionOk, ChecklistProgressResponse, ChecklistCompleteResponse, AdvanceScheduleResponse } from '@/lib/types/action-responses';
@@ -45,7 +46,7 @@ export const savePMChecklistItem = authActionClient
       throw new Error('Only GA Lead, Admin, or assigned PIC can update checklist items');
     }
 
-    if (['completed', 'cancelled'].includes(job.status)) {
+    if ((JOB_TERMINAL_STATUSES as readonly string[]).includes(job.status)) {
       throw new Error('Cannot edit checklist for a completed or cancelled job');
     }
 
@@ -133,7 +134,7 @@ export const savePMChecklistPhoto = authActionClient
       throw new Error('Only GA Lead, Admin, or assigned PIC can update checklist photos');
     }
 
-    if (['completed', 'cancelled'].includes(job.status)) {
+    if ((JOB_TERMINAL_STATUSES as readonly string[]).includes(job.status)) {
       throw new Error('Cannot edit checklist for a completed or cancelled job');
     }
 

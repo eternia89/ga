@@ -5,6 +5,7 @@ import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { JobCreateDialog } from '@/components/jobs/job-create-dialog';
 import { OPERATIONAL_ROLES, GA_ROLES, ROLES } from '@/lib/constants/roles';
+import { REQUEST_LINKABLE_STATUSES } from '@/lib/constants/request-status';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -104,7 +105,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
       .from('requests')
       .select('id, display_id, title, priority, status, location_id, category_id, description, assigned_to')
       .in('company_id', allAccessibleCompanyIds)
-      .in('status', ['triaged', 'in_progress'])
+      .in('status', [...REQUEST_LINKABLE_STATUSES])
       .is('deleted_at', null)
       .order('created_at', { ascending: false }),
 

@@ -11,6 +11,7 @@ import { RequestRejectDialog } from './request-reject-dialog';
 import { RequestCancelDialog } from './request-cancel-dialog';
 import { RequestAcceptanceDialog } from './request-acceptance-dialog';
 import { LEAD_ROLES, ROLES } from '@/lib/constants/roles';
+import { REQUEST_LINKABLE_STATUSES, REQUEST_TRIAGEABLE_STATUSES } from '@/lib/constants/request-status';
 
 interface RequestDetailActionsProps {
   request: RequestWithRelations;
@@ -41,13 +42,13 @@ export function RequestDetailActions({
 
   const canCancel = isRequester && request.status === 'submitted';
   const canTriage =
-    (isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request.status)) ||
+    (isGaLeadOrAdmin && (REQUEST_TRIAGEABLE_STATUSES as readonly string[]).includes(request.status)) ||
     (isGaStaff && request.status === 'submitted');
   const canReject =
     isGaLeadOrAdmin &&
     (request.status === 'submitted' || request.status === 'triaged');
   const canComplete =
-    (isPic || isGaLeadOrAdmin) && ['triaged', 'in_progress'].includes(request.status);
+    (isPic || isGaLeadOrAdmin) && (REQUEST_LINKABLE_STATUSES as readonly string[]).includes(request.status);
 
   // Acceptance actions: only the requester on pending_acceptance
   const canAcceptOrReject =

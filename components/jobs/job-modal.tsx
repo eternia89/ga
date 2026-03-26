@@ -51,6 +51,8 @@ import { InlineFeedback } from '@/components/inline-feedback';
 import { Combobox } from '@/components/combobox';
 import { PM_BADGE_CLASS } from '@/lib/constants/approval-status';
 import { LEAD_ROLES, ROLES } from '@/lib/constants/roles';
+import { JOB_TERMINAL_STATUSES, JOB_ACTIVE_STATUSES } from '@/lib/constants/job-status';
+import { REQUEST_LINKABLE_STATUSES } from '@/lib/constants/request-status';
 import {
   AlertCircle,
   RefreshCw,
@@ -300,7 +302,7 @@ export function JobModal({
           .from('requests')
           .select('id, display_id, title, priority, status, location_id, category_id, description, assigned_to')
           .eq('company_id', companyId)
-          .in('status', ['triaged', 'in_progress'])
+          .in('status', [...REQUEST_LINKABLE_STATUSES])
           .is('deleted_at', null)
           .order('created_at', { ascending: false }),
       ]);
@@ -625,14 +627,14 @@ export function JobModal({
   const isPIC = job?.assigned_to === currentUserId;
   const isCreator = job?.created_by === currentUserId;
 
-  const canEdit = isGaLeadOrAdmin && !['completed', 'cancelled'].includes(job?.status ?? '');
+  const canEdit = isGaLeadOrAdmin && !(JOB_TERMINAL_STATUSES as readonly string[]).includes(job?.status ?? '');
   const picLocked = !!job && !['created', 'assigned'].includes(job.status);
   const canAssignPIC = isGaLeadOrAdmin && job?.status === 'created';
   const canStartWork = isPIC && job?.status === 'assigned';
   const canApproveReject = isCreator && job?.status === 'pending_approval';
   const canApproveCompletion = isCreator && job?.status === 'pending_completion_approval';
   const canMarkComplete = (isGaLeadOrAdmin || isPIC) && job?.status === 'in_progress';
-  const canCancel = isGaLeadOrAdmin && !isFinanceApproverOnly && !['completed', 'cancelled'].includes(job?.status ?? '');
+  const canCancel = isGaLeadOrAdmin && !isFinanceApproverOnly && !(JOB_TERMINAL_STATUSES as readonly string[]).includes(job?.status ?? '');
   const canComment =
     (LEAD_ROLES as readonly string[]).includes(currentUserRole) ||
     job?.assigned_to === currentUserId;
@@ -1056,7 +1058,7 @@ export function JobModal({
                       canEdit={
                         ((LEAD_ROLES as readonly string[]).includes(currentUserRole) ||
                           job.assigned_to === currentUserId) &&
-                        ['assigned', 'in_progress'].includes(job.status)
+                        (JOB_ACTIVE_STATUSES as readonly string[]).includes(job.status)
                       }
                     />
                   )}

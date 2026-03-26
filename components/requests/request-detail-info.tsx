@@ -23,7 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { PRIORITY_LABELS } from '@/lib/constants/request-status';
+import { PRIORITY_LABELS, REQUEST_TRIAGEABLE_STATUSES } from '@/lib/constants/request-status';
 import { Input } from '@/components/ui/input';
 import { LEAD_ROLES, ROLES } from '@/lib/constants/roles';
 
@@ -88,7 +88,7 @@ export function RequestDetailInfo({
   const isRequester = request.requester_id === currentUserId;
   const isEditable = isRequester && request.status === 'submitted';
   const canTriage =
-    (isGaLeadOrAdmin && ['submitted', 'triaged'].includes(request.status)) ||
+    (isGaLeadOrAdmin && (REQUEST_TRIAGEABLE_STATUSES as readonly string[]).includes(request.status)) ||
     (isGaStaff && request.status === 'submitted');
 
   const triageForm = useForm<TriageFormData>({

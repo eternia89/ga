@@ -48,6 +48,7 @@ import {
 } from 'lucide-react';
 import { Combobox } from '@/components/combobox';
 import { LEAD_ROLES, ROLES } from '@/lib/constants/roles';
+import { JOB_TERMINAL_STATUSES } from '@/lib/constants/job-status';
 
 interface JobDetailActionsProps {
   job: JobWithRelations;
@@ -102,7 +103,7 @@ export function JobDetailActions({
   const canCancel =
     isGaLeadOrAdmin &&
     !isFinanceApproverOnly &&
-    !['completed', 'cancelled'].includes(job.status);
+    !(JOB_TERMINAL_STATUSES as readonly string[]).includes(job.status);
 
   const hasAnyAction =
     canAssignPIC ||

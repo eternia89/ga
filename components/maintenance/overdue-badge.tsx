@@ -1,5 +1,7 @@
 'use client';
 
+import { JOB_TERMINAL_STATUSES } from '@/lib/constants/job-status';
+
 interface OverdueBadgeProps {
   nextDueAt: string | null;
   jobStatus: string;
@@ -15,7 +17,7 @@ interface OverdueBadgeProps {
  */
 export function OverdueBadge({ nextDueAt, jobStatus }: OverdueBadgeProps) {
   if (!nextDueAt) return null;
-  if (['completed', 'cancelled'].includes(jobStatus)) return null;
+  if ((JOB_TERMINAL_STATUSES as readonly string[]).includes(jobStatus)) return null;
 
   const isOverdue = new Date(nextDueAt) < new Date();
   if (!isOverdue) return null;

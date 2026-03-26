@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { authActionClient } from '@/lib/safe-action';
 import { createJobSchema, updateJobSchema, jobCommentSchema } from '@/lib/validations/job-schema';
 import { GA_ROLES, LEAD_ROLES } from '@/lib/constants/roles';
+import { REQUEST_LINKABLE_STATUSES } from '@/lib/constants/request-status';
 import { z } from 'zod';
 import { createNotifications } from '@/lib/notifications/helpers';
 import { highestPriority } from '@/lib/jobs/priority';
@@ -60,7 +61,7 @@ export const createJob = authActionClient
         throw new Error('One or more selected requests were not found.');
       }
 
-      const invalidStatus = requestsToLink.filter((r) => !['triaged', 'in_progress'].includes(r.status));
+      const invalidStatus = requestsToLink.filter((r) => !(REQUEST_LINKABLE_STATUSES as readonly string[]).includes(r.status));
       if (invalidStatus.length > 0) {
         throw new Error("Cannot link requests with status 'New'. Only triaged or in-progress requests can be linked.");
       }
@@ -261,7 +262,7 @@ export const updateJob = authActionClient
           throw new Error('One or more selected requests were not found.');
         }
 
-        const invalidStatus = requestsToAdd.filter((r) => !['triaged', 'in_progress'].includes(r.status));
+        const invalidStatus = requestsToAdd.filter((r) => !(REQUEST_LINKABLE_STATUSES as readonly string[]).includes(r.status));
         if (invalidStatus.length > 0) {
           throw new Error("Cannot link requests with status 'New'. Only triaged or in-progress requests can be linked.");
         }
@@ -586,7 +587,7 @@ export const updateJobStatus = authActionClient
             updated_at: now,
           })
           .in('id', requestIds)
-          .in('status', ['triaged', 'in_progress']);
+          .in('status', [...REQUEST_LINKABLE_STATUSES]);
 
         // Non-blocking notification: notify requesters with auto-accept warning
         const { data: linkedRequests } = await supabase

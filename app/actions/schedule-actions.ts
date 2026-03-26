@@ -7,6 +7,7 @@ import { getScheduleDisplayStatus } from '@/lib/constants/schedule-status';
 import type { ChecklistItem, ScheduleDisplayStatus } from '@/lib/types/maintenance';
 import { z } from 'zod';
 import { assertCompanyAccess } from '@/lib/auth/company-access';
+import { JOB_OPEN_STATUSES } from '@/lib/constants/job-status';
 import type { ActionOk, ActionResponse } from '@/lib/types/action-responses';
 
 /** Shape returned by getSchedules/getSchedulesByAssetId after joining and transforming DB rows */
@@ -237,7 +238,7 @@ export const deactivateSchedule = gaLeadActionClient
       .from('jobs')
       .update({ status: 'cancelled' })
       .eq('maintenance_schedule_id', parsedInput.id)
-      .in('status', ['created', 'assigned', 'in_progress'])
+      .in('status', [...JOB_OPEN_STATUSES])
       .is('deleted_at', null);
 
     revalidatePath('/maintenance');
@@ -514,7 +515,7 @@ export async function pauseSchedulesForAsset(
       .from('jobs')
       .update({ status: 'cancelled' })
       .in('maintenance_schedule_id', scheduleIds)
-      .in('status', ['created', 'assigned', 'in_progress'])
+      .in('status', [...JOB_OPEN_STATUSES])
       .is('deleted_at', null);
   }
 

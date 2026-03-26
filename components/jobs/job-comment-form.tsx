@@ -17,6 +17,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { InlineFeedback } from '@/components/inline-feedback';
+import { JOB_TERMINAL_STATUSES } from '@/lib/constants/job-status';
 
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024; // 5 MB
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -37,7 +38,7 @@ interface JobCommentFormProps {
 }
 
 export function JobCommentForm({ jobId, jobStatus, onSuccess }: JobCommentFormProps) {
-  if (jobStatus && ['completed', 'cancelled'].includes(jobStatus)) {
+  if (jobStatus && (JOB_TERMINAL_STATUSES as readonly string[]).includes(jobStatus)) {
     return null;
   }
   const [isSubmitting, setIsSubmitting] = useState(false);
