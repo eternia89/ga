@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: Completed quick-260326-f3u schema validation hardening
 last_updated: "2026-03-26T04:00:14.372Z"
-last_activity: "2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES"
+last_activity: "2026-03-26 - Completed quick task 127: Schema validation hardening"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -403,6 +403,7 @@ Recent decisions affecting current work:
 | 124 | Fix semantic bug: RequestStatusBadge used for job status — replace with JobStatusBadge | 2026-03-20 | b9a7306 | Verified | [260320-9ki-fix-semantic-bug-requeststatusbadge-used](./quick/260320-9ki-fix-semantic-bug-requeststatusbadge-used/) |
 | 125 | Remove auto-dismissing setTimeout in password-change and triage dialogs | 2026-03-20 | 54dcb47 | Verified | [260320-eww-remove-auto-dismissing-settimeout-in-pas](./quick/260320-eww-remove-auto-dismissing-settimeout-in-pas/) |
 | 126 | Centralize inline role arrays into OPERATIONAL_ROLES constant | 2026-03-20 | c36f229 | Verified | [260320-f5l-centralize-inline-role-arrays-into-lib-c](./quick/260320-f5l-centralize-inline-role-arrays-into-lib-c/) |
+| 127 | Schema validation hardening: .max() on passwords, .uuid() on itemId, .max() on arrays | 2026-03-26 | 4c88642 | Verified | [260326-f3u-schema-validation-hardening-add-max-to-p](./quick/260326-f3u-schema-validation-hardening-add-max-to-p/) |
 
 ## Session Continuity
 
