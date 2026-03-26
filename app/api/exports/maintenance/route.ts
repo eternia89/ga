@@ -81,7 +81,7 @@ export async function GET() {
       const template = schedule.template as { name: string } | null;
 
       sheet.addRow({
-        template_name: template?.name ?? schedule.template_name ?? '',
+        template_name: template?.name ?? '',
         asset_name: asset ? `${asset.name} (${asset.display_id})` : '',
         interval_days: schedule.interval_days ?? '',
         interval_type: capitalizeInterval(schedule.interval_type),

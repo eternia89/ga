@@ -17,7 +17,7 @@ interface EntityConfig {
 const ENTITY_CONFIGS: Record<EntityType, EntityConfig> = {
   request: { bucket: 'request-photos', maxFiles: 10, table: 'requests' },
   job: { bucket: 'job-photos', maxFiles: 10, table: 'jobs' },
-  inventory: { bucket: 'inventory-photos', maxFiles: 10, table: 'assets' },
+  inventory: { bucket: 'inventory-photos', maxFiles: 10, table: 'inventory_items' },
   job_comment: { bucket: 'job-photos', maxFiles: 3, table: 'job_comments' },
 };
 
