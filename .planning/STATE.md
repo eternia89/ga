@@ -5,7 +5,7 @@ milestone_name: milestone
 status: completed
 stopped_at: Completed quick-260326-g4p UI consistency batch fix
 last_updated: "2026-03-26T04:43:58.177Z"
-last_activity: "2026-03-20 - Completed quick task 126: Centralize inline role arrays into OPERATIONAL_ROLES"
+last_activity: "2026-03-26 - Completed quick task 132: UI consistency batch fix"
 progress:
   total_phases: 10
   completed_phases: 10
@@ -410,6 +410,7 @@ Recent decisions affecting current work:
 | 129 | Auth security fix: switch update-password from getSession() to getUser() | 2026-03-26 | 4ea3c79 | Verified | [260326-flu-auth-security-fix-switch-update-password](./quick/260326-flu-auth-security-fix-switch-update-password/) |
 | 130 | Cascading request status guard: .neq(cancelled) → .in(triaged,in_progress) | 2026-03-26 | 265da8a | Verified | [260326-fru-cascading-request-status-guard-replace-n](./quick/260326-fru-cascading-request-status-guard-replace-n/) |
 | 131 | CSV export filename date format: yyyy-MM-dd → dd-MM-yyyy | 2026-03-26 | 5f5eee9 | Verified | [260326-fyl-csv-export-filename-date-format-fix-chan](./quick/260326-fyl-csv-export-filename-date-format-fix-chan/) |
+| 132 | UI consistency: pb-20 on asset detail + standardize hover:text-blue-700 | 2026-03-26 | 38ddc36 | Verified | [260326-g4p-ui-consistency-batch-fix-grid-cols-pb-20](./quick/260326-g4p-ui-consistency-batch-fix-grid-cols-pb-20/) |
 
 ## Session Continuity
 
