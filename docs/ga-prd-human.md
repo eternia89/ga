@@ -319,10 +319,63 @@ These rules must be preserved across all changes:
 15. **Accessibility:** Skip-to-content link, focus restoration on lightbox close, aria-live on form errors.
 16. **Role constants:** All role checks must use `ROLES.*`, `GA_ROLES`, or `LEAD_ROLES` from `lib/constants/roles.ts`. Never inline role string arrays.
 17. **Operational roles:** Dashboard visibility, approval pages, and export routes must use `OPERATIONAL_ROLES` from `lib/constants/roles.ts`. Never redefine inline.
+18. **Status constants:** All status arrays (terminal, active, linkable, triageable) must use semantic constants from `lib/constants/job-status.ts` and `lib/constants/request-status.ts`. Never inline status arrays.
+19. **safeCreateNotifications:** All fire-and-forget notification calls must use `safeCreateNotifications()` from `lib/notifications/helpers.ts`. Never use raw `createNotifications().catch()`.
+20. **Schema completeness:** Every `z.string()` must have `.max(N)`, every UUID field must have `.uuid()`, every `z.array()` must have `.max(N)`. No unbounded fields.
 
 ---
 
 ## Change Log
+
+### 27-Mar-2026 — Codebase Hardening Mega-Batch (81 commits, 177 files, ~11K lines)
+
+Largest single-day change batch in project history. 20 separate quick-task sweeps addressed security, validation, error handling, type safety, DRY violations, and UI consistency.
+
+**Security Hardening (4 sweeps):**
+- Vision API route now validates company access before updating attachments; API key moved from URL query param to `x-goog-api-key` header
+- `assertCompanyAccess` added to all 4 approval actions, user/settings/access actions, and media upload routes
+- `getSession()` replaced with `getUser()` for server-validated auth on update-password page
+- Defense-in-depth `company_id` filters added to media mutations and upload routes
+
+**Schema Validation (2 sweeps):**
+- Added missing `.max()` constraints across 12 Zod schemas (profile passwords, pm-job photoUrls/itemIds, job linked_request_ids, template checklist)
+- Added `.uuid()` validation to all UUID-accepting fields
+- Asset and template `name` fields reduced from max=100 to max=60 per convention
+- Created `optionalUuid()` Zod helper — unified 3 divergent optional UUID patterns
+- Synced UI `<Input maxLength>` attributes with schema `.max()` values
+
+**Error Handling (2 sweeps):**
+- Added error handling to 12 fire-and-forget Supabase mutations across 5 action files
+- Added signedUrl error logging and empty-URL filtering across 11 files
+- Added error handling to all 7 storage upload routes
+- Added user-visible error feedback to 4 unchecked fetch calls (export, job form, job modal, request submit)
+
+**Data Integrity (1 sweep):**
+- Added failed tracking to bulk deactivate operations (company, division, location, category)
+- Added rollback logic to `createUser`, `updateUser`, `updateUserCompanyAccess`
+- Cascading request status guards changed from denylist to allowlist using `REQUEST_LINKABLE_STATUSES`
+
+**DRY Extractions (4 sweeps):**
+- Extracted `safeCreateNotifications()` wrapper; converted all 15 notification call sites
+- Extracted 6 semantic status constants (`JOB_TERMINAL_STATUSES`, `JOB_ACTIVE_STATUSES`, `REQUEST_LINKABLE_STATUSES`, etc.) — replaced 36 inline arrays
+- Extracted `roleColors`/`roleDisplay` to `lib/constants/role-display.ts` — deduplicated from 4 components
+- Extracted `TYPE_COLORS` to `lib/constants/checklist-types.ts` — deduplicated from 3 components
+
+**Type Safety (1 sweep):**
+- Removed all 11 `as any` casts across 10 files; added `UserProfileWithJoins` type
+
+**UI Consistency (3 sweeps):**
+- Migrated 18 inline `font-mono` display IDs to `<DisplayId>` component across 16 files
+- Standardized all link hover colors to `hover:text-blue-700`; fixed CSV export date format
+- Added `pb-20` to asset detail page; redirected `/inventory/new` to `?action=create` modal
+
+**Code Cleanup (1 sweep):**
+- Replaced all string literal role checks with `ROLES` constants across 17 files
+- Fixed wrong table name in entity-photos route; removed dead `template_name` fallback
+
+**New Technical Invariants (#18–#20):** Status constants, safeCreateNotifications, schema completeness (see above).
+
+---
 
 ### 23-Mar-2026 — Feedback & Role Constant Fixes (6 commits, 10 files)
 
