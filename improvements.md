@@ -585,6 +585,7 @@ Key verifications:
 |---|--------|------|-------|-----|
 | 1 | FROM 27-Mar | Admin table columns (6 files) | "Edit"/"View" buttons use `text-blue-600 hover:underline` while other links use `text-primary hover:underline` | Standardize to `text-primary hover:underline` |
 | 2 | **NEW** | `components/maintenance/template-columns.tsx:88-89` | Inactive status badge uses hardcoded `bg-gray-100 text-gray-600` instead of semantic tokens | Use `bg-muted text-muted-foreground` for dark-mode readiness |
+| 3 | **NEW** | `app/(dashboard)/jobs/[id]/page.tsx:462` | Breadcrumb uses plain `job.display_id` text without `<DisplayId>` wrapper | Wrap with `<DisplayId>` or render font-mono in breadcrumb label |
 
 ---
 
