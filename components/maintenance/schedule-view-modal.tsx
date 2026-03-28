@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { deactivateSchedule, activateSchedule, deleteSchedule } from '@/app/actions/schedule-actions';
 import { ScheduleDetail, PMJobRef } from './schedule-detail';
@@ -329,7 +329,7 @@ export function ScheduleViewModal({
                   }}
                 />
                 <span className="text-sm text-muted-foreground">
-                  Created {format(new Date(schedule.created_at), 'dd-MM-yyyy')} by {creatorName}
+                  Created {formatDate(schedule.created_at)} by {creatorName}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground mt-0.5">
@@ -372,7 +372,7 @@ export function ScheduleViewModal({
                             {JOB_STATUS_LABELS[job.status] ?? job.status}
                           </span>
                         </div>
-                        <span className="text-xs text-muted-foreground">{format(new Date(job.created_at), 'dd-MM-yyyy')}</span>
+                        <span className="text-xs text-muted-foreground">{formatDate(job.created_at)}</span>
                       </li>
                     ))}
                   </ul>

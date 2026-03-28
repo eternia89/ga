@@ -1,5 +1,5 @@
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 
 export function CreatedAtCell({ date }: { date: string }) {
-  return <span className="text-sm">{format(new Date(date), 'dd-MM-yyyy')}</span>;
+  return <span className="text-sm">{formatDate(date)}</span>;
 }

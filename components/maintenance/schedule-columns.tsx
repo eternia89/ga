@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
@@ -124,7 +124,7 @@ export const scheduleColumns: ColumnDef<MaintenanceSchedule>[] = [
 
       return (
         <span className={isOverdue ? 'text-red-600 font-medium' : ''}>
-          {format(dueDate, 'dd-MM-yyyy')}
+          {formatDate(dueDate.toISOString())}
         </span>
       );
     },

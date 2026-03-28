@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { Check, X, CheckCircle2, AlertTriangle } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -98,7 +98,7 @@ export function PMChecklistPreview({
           <div>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Due Date</p>
             <p className="text-sm font-medium">
-              {nextDueAt ? format(new Date(nextDueAt), 'dd-MM-yyyy') : 'Not scheduled'}
+              {nextDueAt ? formatDate(nextDueAt) : 'Not scheduled'}
             </p>
           </div>
           <div>

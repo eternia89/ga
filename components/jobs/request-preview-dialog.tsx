@@ -1,6 +1,6 @@
 'use client';
 
-import { format } from 'date-fns';
+import { formatDateTime } from '@/lib/utils';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { PRIORITY_LABELS } from '@/lib/constants/request-status';
 import { DisplayId } from '@/components/display-id';
@@ -91,7 +91,7 @@ export function RequestPreviewDialog({
             <div>
               <dt className="text-xs font-medium text-muted-foreground">Created</dt>
               <dd className="text-sm mt-0.5">
-                {format(new Date(request.created_at), 'dd-MM-yyyy, HH:mm:ss')}
+                {formatDateTime(request.created_at)}
               </dd>
             </div>
           </dl>

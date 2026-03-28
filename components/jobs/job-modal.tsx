@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { JobWithRelations, JobComment } from '@/lib/types/database';
 import type { JobTimelineEvent } from './job-timeline';
@@ -1032,7 +1032,7 @@ export function JobModal({
                     </span>
                   )}
                   <span className="text-sm text-muted-foreground">
-                    Created {format(new Date(job.created_at), 'dd-MM-yyyy')} by {job.created_by_user?.full_name ?? 'Unknown'}
+                    Created {formatDate(job.created_at)} by {job.created_by_user?.full_name ?? 'Unknown'}
                   </span>
                 </div>
               </div>

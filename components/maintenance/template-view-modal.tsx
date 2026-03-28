@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { deactivateTemplate, reactivateTemplate } from '@/app/actions/template-actions';
 import { TemplateDetail } from './template-detail';
@@ -297,7 +297,7 @@ export function TemplateViewModal({
                   </span>
                 )}
                 <span className="text-sm text-muted-foreground">
-                  Created {format(new Date(template.created_at), 'dd-MM-yyyy')} by {creatorName}
+                  Created {formatDate(template.created_at)} by {creatorName}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground mt-0.5">

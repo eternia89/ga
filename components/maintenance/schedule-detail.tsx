@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { AlertCircle } from 'lucide-react';
 import { deactivateSchedule, activateSchedule, deleteSchedule } from '@/app/actions/schedule-actions';
 import { Button } from '@/components/ui/button';
@@ -153,7 +153,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
             }}
           />
           <span className="text-sm text-muted-foreground">
-            Created {format(new Date(schedule.created_at), 'dd-MM-yyyy')}
+            Created {formatDate(schedule.created_at)}
           </span>
         </div>
 
@@ -314,7 +314,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
                   {!schedule.is_active || schedule.is_paused
                     ? <span className="text-muted-foreground font-normal">N/A</span>
                     : nextDue
-                    ? format(nextDue, 'dd-MM-yyyy')
+                    ? formatDate(nextDue.toISOString())
                     : '—'}
                 </p>
                 {isOverdue && (
@@ -325,7 +325,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Last Completed</p>
                 <p className="text-sm">
                   {schedule.last_completed_at
-                    ? format(new Date(schedule.last_completed_at), 'dd-MM-yyyy')
+                    ? formatDate(schedule.last_completed_at)
                     : <span className="text-muted-foreground">Never</span>}
                 </p>
               </div>
@@ -364,7 +364,7 @@ export function ScheduleDetail({ schedule, pmJobs, userRole, companyName }: Sche
                         </span>
                       </div>
                       <span className="text-xs text-muted-foreground">
-                        {format(new Date(job.created_at), 'dd-MM-yyyy')}
+                        {formatDate(job.created_at)}
                       </span>
                     </a>
                   </li>

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import {
   createStyledWorkbook,
   applyStandardStyles,
@@ -83,20 +83,20 @@ export async function GET() {
         interval_type: capitalizeInterval(schedule.interval_type),
         is_active: schedule.is_active ? 'Yes' : 'No',
         next_due_at: schedule.next_due_at
-          ? format(new Date(schedule.next_due_at), 'dd-MM-yyyy')
+          ? formatDate(schedule.next_due_at)
           : '',
         last_completed_at: schedule.last_completed_at
-          ? format(new Date(schedule.last_completed_at), 'dd-MM-yyyy')
+          ? formatDate(schedule.last_completed_at)
           : '',
         created_at: schedule.created_at
-          ? format(new Date(schedule.created_at), 'dd-MM-yyyy')
+          ? formatDate(schedule.created_at)
           : '',
       });
     }
 
     applyStandardStyles(sheet);
 
-    const today = format(new Date(), 'dd-MM-yyyy');
+    const today = formatDate(new Date().toISOString());
     return generateExcelResponse(workbook, `maintenance-export-${today}.xlsx`);
   } catch (error) {
     console.error('Maintenance export error:', error);

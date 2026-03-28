@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { JobDetailClient } from '@/components/jobs/job-detail-client';
 import { JobStatusBadge } from '@/components/jobs/job-status-badge';
@@ -476,7 +476,7 @@ export default async function JobDetailPage({ params }: PageProps) {
         </div>
         <p className="text-sm text-muted-foreground">
           {job.created_by_user?.full_name ?? 'Unknown'}
-          {' \u00b7 '}Created {format(new Date(job.created_at), 'dd-MM-yyyy')}
+          {' \u00b7 '}Created {formatDate(job.created_at)}
         </p>
       </div>
 

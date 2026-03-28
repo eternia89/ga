@@ -1,6 +1,5 @@
-import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 import { type MaintenanceItem } from '@/lib/dashboard/queries';
 
 interface MaintenanceSummaryProps {
@@ -54,7 +53,7 @@ export function MaintenanceSummary({ data }: MaintenanceSummaryProps) {
                     {item.templateName}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    Due: {format(new Date(item.dueDate), 'dd-MM-yyyy')}
+                    Due: {formatDate(item.dueDate)}
                   </p>
                 </div>
                 <span

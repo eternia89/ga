@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import {
   createStyledWorkbook,
   applyStandardStyles,
@@ -90,24 +90,24 @@ export async function GET() {
         holder_name: holder?.full_name ?? '',
         status: STATUS_DISPLAY[item.status] ?? item.status ?? '',
         warranty_expiry: item.warranty_expiry
-          ? format(new Date(item.warranty_expiry), 'dd-MM-yyyy')
+          ? formatDate(item.warranty_expiry)
           : '',
         purchase_date: item.purchase_date
-          ? format(new Date(item.purchase_date), 'dd-MM-yyyy')
+          ? formatDate(item.purchase_date)
           : '',
         condition: item.condition ?? '',
         created_at: item.created_at
-          ? format(new Date(item.created_at), 'dd-MM-yyyy')
+          ? formatDate(item.created_at)
           : '',
         updated_at: item.updated_at
-          ? format(new Date(item.updated_at), 'dd-MM-yyyy')
+          ? formatDate(item.updated_at)
           : '',
       });
     }
 
     applyStandardStyles(sheet);
 
-    const today = format(new Date(), 'dd-MM-yyyy');
+    const today = formatDate(new Date().toISOString());
     return generateExcelResponse(workbook, `inventory-export-${today}.xlsx`);
   } catch (error) {
     console.error('Inventory export error:', error);

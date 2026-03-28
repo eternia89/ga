@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
+import { formatDateTime } from '@/lib/utils';
 import Link from 'next/link';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
 import { Badge } from '@/components/ui/badge';
@@ -87,7 +87,7 @@ export const auditTrailColumns: ColumnDef<AuditLogRow>[] = [
       const value = row.getValue('performed_at') as string;
       return (
         <span className="font-mono text-xs whitespace-nowrap">
-          {format(new Date(value), 'dd-MM-yyyy, HH:mm:ss')}
+          {formatDateTime(value)}
         </span>
       );
     },

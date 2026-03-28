@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { getRequestPhotos } from '@/app/actions/request-actions';
 import { RequestWithRelations } from '@/lib/types/database';
@@ -577,7 +577,7 @@ export function RequestViewModal({
                   <RequestStatusBadge status={request.status} />
                   {request.priority && <PriorityBadge priority={request.priority} />}
                   <span className="text-sm text-muted-foreground">
-                    Created {format(new Date(request.created_at), 'dd-MM-yyyy')} by {request.requester?.name ?? 'Unknown'}
+                    Created {formatDate(request.created_at)} by {request.requester?.name ?? 'Unknown'}
                     {request.division?.name && ` · ${request.division.name}`}
                   </span>
                 </div>

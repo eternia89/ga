@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { FileText } from 'lucide-react';
 import type { InventoryItemWithRelations } from '@/lib/types/database';
 import { AssetEditForm } from './asset-edit-form';
@@ -139,7 +139,7 @@ export function AssetDetailInfo({
             <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Acquisition Date</dt>
             <dd className="text-sm mt-0.5">
               {asset.acquisition_date
-                ? format(new Date(asset.acquisition_date), 'dd-MM-yyyy')
+                ? formatDate(asset.acquisition_date)
                 : <span className="text-muted-foreground">—</span>}
             </dd>
           </div>
@@ -147,7 +147,7 @@ export function AssetDetailInfo({
             <dt className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Warranty Expiry</dt>
             <dd className="text-sm mt-0.5">
               {asset.warranty_expiry
-                ? format(new Date(asset.warranty_expiry), 'dd-MM-yyyy')
+                ? formatDate(asset.warranty_expiry)
                 : <span className="text-muted-foreground">—</span>}
             </dd>
           </div>

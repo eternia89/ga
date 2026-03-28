@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import {
   createStyledWorkbook,
   applyStandardStyles,
@@ -87,17 +87,17 @@ export async function GET() {
         requester_name: requester?.full_name ?? '',
         pic_name: assignedUser?.full_name ?? '',
         created_at: req.created_at
-          ? format(new Date(req.created_at), 'dd-MM-yyyy')
+          ? formatDate(req.created_at)
           : '',
         updated_at: req.updated_at
-          ? format(new Date(req.updated_at), 'dd-MM-yyyy')
+          ? formatDate(req.updated_at)
           : '',
       });
     }
 
     applyStandardStyles(sheet);
 
-    const today = format(new Date(), 'dd-MM-yyyy');
+    const today = formatDate(new Date().toISOString());
     return generateExcelResponse(workbook, `requests-export-${today}.xlsx`);
   } catch (error) {
     console.error('Requests export error:', error);

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { Truck } from 'lucide-react';
 import type { InventoryItemWithRelations, InventoryMovementWithRelations } from '@/lib/types/database';
 import { Button } from '@/components/ui/button';
@@ -129,7 +129,7 @@ export function AssetDetailClient({
                 Receiver: {pendingTransfer.receiver?.full_name ?? '—'}
               </p>
               <p className="text-blue-600 text-xs mt-0.5">
-                Initiated: {format(new Date(pendingTransfer.created_at), 'dd-MM-yyyy')}
+                Initiated: {formatDate(pendingTransfer.created_at)}
               </p>
             </div>
           </div>

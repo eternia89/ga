@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { RequestStatusBadge } from '@/components/requests/request-status-badge';
 import { PriorityBadge } from '@/components/priority-badge';
@@ -403,7 +403,7 @@ export default async function RequestDetailPage({ params }: PageProps) {
         <p className="text-sm text-muted-foreground">
           {req.requester?.name ?? 'Unknown'}
           {req.division?.name && ` · ${req.division.name}`}
-          {' · '}Created {format(new Date(req.created_at), 'dd-MM-yyyy')}
+          {' · '}Created {formatDate(req.created_at)}
         </p>
 
         {/* Rejection reason callout */}

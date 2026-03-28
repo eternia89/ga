@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { acceptTransfer, rejectTransfer, cancelTransfer } from '@/app/actions/asset-actions';
 import type { InventoryItemWithRelations, InventoryMovementWithRelations } from '@/lib/types/database';
@@ -427,7 +427,7 @@ export function AssetTransferRespondModal({
                       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">
                         Date
                       </p>
-                      <p className="text-sm">{format(new Date(movement.created_at), 'dd-MM-yyyy')}</p>
+                      <p className="text-sm">{formatDate(movement.created_at)}</p>
                     </div>
                   </div>
                   {movement.notes && (

@@ -4,7 +4,7 @@ import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { templateEditSchema, type TemplateEditFormData } from '@/lib/validations/template-schema';
 import { updateTemplate, deactivateTemplate, reactivateTemplate } from '@/app/actions/template-actions';
 import {
@@ -160,7 +160,7 @@ export function TemplateDetail({ template, categories, userRole, formId, onDirty
             {template.item_count ?? template.checklist.length} checklist item{(template.item_count ?? template.checklist.length) !== 1 ? 's' : ''}
           </span>
           <span className="text-sm text-muted-foreground">
-            Created {format(new Date(template.created_at), 'dd-MM-yyyy')}
+            Created {formatDate(template.created_at)}
           </span>
         </div>
 

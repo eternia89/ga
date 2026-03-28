@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import type { InventoryItemWithRelations, InventoryMovementWithRelations } from '@/lib/types/database';
 import type { ConditionPhoto, InvoiceItem, TransferPhoto } from './asset-detail-client';
@@ -460,7 +460,7 @@ export function AssetViewModal({
                   showInTransit={!!pendingTransfer}
                 />
                 <span className="text-sm text-muted-foreground">
-                  Created {format(new Date(asset.created_at), 'dd-MM-yyyy')}
+                  Created {formatDate(asset.created_at)}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground mt-0.5">
