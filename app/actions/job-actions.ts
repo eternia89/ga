@@ -217,7 +217,6 @@ export const updateJob = authActionClient
     // Optimistic locking: reject if entity was modified since the form loaded
     assertNotStale(parsedInput.updated_at, existing.updated_at);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, linked_request_ids, updated_at: _lockToken, ...updateFields } = parsedInput;
 
     // Block PIC changes once job is past 'assigned' status

@@ -137,7 +137,7 @@ export function UserFormDialog({
   const handleSubmit = async (data: UserFormInput) => {
     if (isEditMode && user) {
       // For update, we don't send email
-      const { email, ...updateData } = data;
+      const { email: _email, ...updateData } = data;
       const result = await updateUser({ id: user.id, ...updateData });
       const error = extractActionError(result);
       if (error) return { error };

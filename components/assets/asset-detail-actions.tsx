@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Truck, CheckCircle, XCircle, Ban } from 'lucide-react';
+import { Truck, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { InventoryItemWithRelations, InventoryMovementWithRelations } from '@/lib/types/database';
 import { AssetTransferDialog, type GAUserWithLocation } from './asset-transfer-dialog';

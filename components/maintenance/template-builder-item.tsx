@@ -6,7 +6,6 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, X, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { CHECKLIST_TYPES, CHECKLIST_TYPE_COLORS } from '@/lib/constants/checklist-types';
 import type { ChecklistItem } from '@/lib/types/maintenance';
 
