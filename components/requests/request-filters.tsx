@@ -181,10 +181,10 @@ export function RequestFilters({
             {dateRange?.from ? (
               dateRange.to ? (
                 <>
-                  {formatDate(dateRange.from)} – {formatDate(dateRange.to)}
+                  {formatDate(dateRange.from.toISOString())} – {formatDate(dateRange.to.toISOString())}
                 </>
               ) : (
-                formatDate(dateRange.from)
+                formatDate(dateRange.from.toISOString())
               )
             ) : (
               <span className="text-muted-foreground">Pick date range</span>

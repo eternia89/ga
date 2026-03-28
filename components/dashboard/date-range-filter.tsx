@@ -17,7 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 
 type Preset = 'today' | 'week' | 'month' | 'quarter' | 'custom';
 
@@ -106,11 +106,11 @@ export function DateRangeFilter() {
 
   // Display range text
   const displayFrom = params.from
-    ? format(parseISO(params.from), 'dd-MM-yyyy')
-    : format(startOfMonth(new Date()), 'dd-MM-yyyy');
+    ? formatDate(params.from)
+    : formatDate(startOfMonth(new Date()).toISOString());
   const displayTo = params.to
-    ? format(parseISO(params.to), 'dd-MM-yyyy')
-    : format(endOfMonth(new Date()), 'dd-MM-yyyy');
+    ? formatDate(params.to)
+    : formatDate(endOfMonth(new Date()).toISOString());
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
