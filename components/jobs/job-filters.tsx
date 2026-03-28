@@ -4,6 +4,7 @@ import { useQueryStates, parseAsString } from 'nuqs';
 import { useCallback, useEffect, useState } from 'react';
 import { Search, X, CalendarIcon } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import { formatDate } from '@/lib/utils';
 import { type DateRange } from 'react-day-picker';
 import { Input } from '@/components/ui/input';
 import {
@@ -164,10 +165,10 @@ export function JobFilters({ users, currentUserRole }: JobFiltersProps) {
             {dateRange?.from ? (
               dateRange.to ? (
                 <>
-                  {format(dateRange.from, 'dd-MM-yyyy')} – {format(dateRange.to, 'dd-MM-yyyy')}
+                  {formatDate(dateRange.from)} – {formatDate(dateRange.to)}
                 </>
               ) : (
-                format(dateRange.from, 'dd-MM-yyyy')
+                formatDate(dateRange.from)
               )
             ) : (
               <span className="text-muted-foreground">Pick date range</span>
