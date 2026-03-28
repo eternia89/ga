@@ -596,7 +596,7 @@ Key verifications:
 | 1 | Error Boundaries | `job-modal.tsx`, `request-view-modal.tsx` | Large modal components lack localized error boundaries | Add `<ErrorBoundary>` around modal content |
 | 2 | Logging | 25 console calls in 12 files | `console.error()` calls lack `[ComponentName]` context prefix (55+ calls DO have prefixes) | Add context prefix for debuggability |
 | 3 | DRY | 12 files (pages, actions, API routes) | `getAccessibleCompanyIds` — same 3-line pattern (`user_company_access` query → map → combine) repeated 12 times | Extract to `lib/auth/get-accessible-company-ids.ts` |
-| 4 | Components | `job-form.tsx` (727 lines), `asset-transfer-respond-modal.tsx` (653 lines), `asset-view-modal.tsx` (579 lines), `asset-submit-form.tsx` (570 lines), `asset-edit-form.tsx` (561 lines) | 5 additional components exceeding 500 lines (beyond previously flagged `job-modal.tsx` 1364 + `request-view-modal.tsx` 758) | Split into sub-components |
+| 4 | Components | `job-form.tsx` (727 lines), `schedule-form.tsx` (661 lines), `asset-transfer-respond-modal.tsx` (653 lines), `asset-view-modal.tsx` (579 lines), `asset-submit-form.tsx` (570 lines), `asset-edit-form.tsx` (561 lines) | 6 additional components exceeding 500 lines (beyond previously flagged `job-modal.tsx` 1364 + `request-view-modal.tsx` 758) | Split into sub-components |
 
 ---
 
