@@ -47,7 +47,7 @@ export function SettingsContent({
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
         <p className="text-muted-foreground mt-1">
-          Manage your organization's configuration
+          Manage your organization&apos;s configuration
         </p>
       </div>
 

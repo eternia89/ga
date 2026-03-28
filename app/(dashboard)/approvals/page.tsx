@@ -4,6 +4,7 @@ import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { ApprovalQueue } from '@/components/approvals/approval-queue';
 import type { ApprovalJob } from '@/components/approvals/approval-queue';
 import { OPERATIONAL_ROLES } from '@/lib/constants/roles';
+import { getAccessibleCompanyIds } from '@/lib/auth/company-access';
 
 interface PageProps {
   searchParams: Promise<{ view?: string }>;
@@ -37,13 +38,8 @@ export default async function ApprovalsPage({ searchParams }: PageProps) {
     redirect('/');
   }
 
-  // Fetch user's extra company access (must be before main queries)
-  const { data: companyAccessRows } = await supabase
-    .from('user_company_access')
-    .select('company_id')
-    .eq('user_id', profile.id);
-  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+  // Fetch user's accessible companies (primary + extra via user_company_access)
+  const { allAccessibleCompanyIds } = await getAccessibleCompanyIds(supabase, profile.id, profile.company_id);
 
   // Fetch ALL jobs that are pending budget approval OR have a budget decision (approved/rejected)
   // OR pending completion approval OR have a completion decision

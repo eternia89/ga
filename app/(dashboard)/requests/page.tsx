@@ -5,6 +5,7 @@ import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { RequestCreateDialog } from '@/components/requests/request-create-dialog';
 import { OPERATIONAL_ROLES, ROLES } from '@/lib/constants/roles';
+import { getAccessibleCompanyIds } from '@/lib/auth/company-access';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -48,13 +49,8 @@ export default async function RequestsPage({ searchParams }: PageProps) {
   }
   // All other roles see all company requests (RLS enforces company isolation)
 
-  // Fetch user's extra company access
-  const { data: companyAccessRows } = await supabase
-    .from('user_company_access')
-    .select('company_id')
-    .eq('user_id', profile.id);
-  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+  // Fetch user's accessible companies (primary + extra via user_company_access)
+  const { allAccessibleCompanyIds, extraCompanyIds } = await getAccessibleCompanyIds(supabase, profile.id, profile.company_id);
 
   // Fetch all data in parallel
   const [requestsResult, categoriesResult, usersResult, locationsResult, extraCompaniesResult, allLocationsResult, primaryCompanyResult] = await Promise.all([

@@ -7,6 +7,7 @@ import {
   generateExcelResponse,
 } from '@/lib/exports/excel-helpers';
 import { GA_ROLES } from '@/lib/constants/roles';
+import { getAccessibleCompanyIds } from '@/lib/auth/company-access';
 
 const EXPORT_ROLES: readonly string[] = GA_ROLES;
 
@@ -39,13 +40,8 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Fetch user's extra company access for multi-company scoping
-    const { data: companyAccessRows } = await supabase
-      .from('user_company_access')
-      .select('company_id')
-      .eq('user_id', profile.id);
-    const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-    const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+    // Fetch user's accessible companies (primary + extra via user_company_access)
+    const { allAccessibleCompanyIds } = await getAccessibleCompanyIds(supabase, profile.id, profile.company_id);
 
     const { data: items, error: fetchError } = await supabase
       .from('inventory_items')

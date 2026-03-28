@@ -66,7 +66,7 @@ export function CategoryFormDialog({
   const handleSubmit = async (data: CategoryFormData) => {
     if (category) {
       // Update existing category (without type)
-      const { type, ...updateData } = data;
+      const { type: _type, ...updateData } = data;
       const result = await updateCategory({ id: category.id, data: updateData });
       const error = extractActionError(result);
       if (error) return { error };

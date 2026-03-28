@@ -6,7 +6,7 @@ import { scheduleCreateSchema, scheduleEditSchema } from '@/lib/validations/sche
 import { getScheduleDisplayStatus } from '@/lib/constants/schedule-status';
 import type { ChecklistItem, ScheduleDisplayStatus } from '@/lib/types/maintenance';
 import { z } from 'zod';
-import { assertCompanyAccess } from '@/lib/auth/company-access';
+import { assertCompanyAccess, getAccessibleCompanyIds } from '@/lib/auth/company-access';
 import { JOB_OPEN_STATUSES } from '@/lib/constants/job-status';
 import type { ActionOk, ActionResponse } from '@/lib/types/action-responses';
 
@@ -350,13 +350,8 @@ export const getSchedules = authActionClient
   .action(async ({ ctx }): Promise<ActionResponse<{ schedules: ScheduleListItem[] }>> => {
     const { supabase, profile } = ctx;
 
-    // Fetch user's extra company access
-    const { data: companyAccessRows } = await supabase
-      .from('user_company_access')
-      .select('company_id')
-      .eq('user_id', profile.id);
-    const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-    const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+    // Fetch user's accessible companies (primary + extra via user_company_access)
+    const { allAccessibleCompanyIds } = await getAccessibleCompanyIds(supabase, profile.id, profile.company_id);
 
     const { data, error } = await supabase
       .from('maintenance_schedules')
@@ -421,13 +416,8 @@ export const getSchedulesByAssetId = authActionClient
   .action(async ({ parsedInput, ctx }): Promise<ActionResponse<{ schedules: ScheduleListItem[] }>> => {
     const { supabase, profile } = ctx;
 
-    // Fetch user's extra company access
-    const { data: companyAccessRows } = await supabase
-      .from('user_company_access')
-      .select('company_id')
-      .eq('user_id', profile.id);
-    const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-    const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+    // Fetch user's accessible companies (primary + extra via user_company_access)
+    const { allAccessibleCompanyIds } = await getAccessibleCompanyIds(supabase, profile.id, profile.company_id);
 
     const { data, error } = await supabase
       .from('maintenance_schedules')

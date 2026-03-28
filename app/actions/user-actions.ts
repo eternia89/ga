@@ -10,7 +10,7 @@ import type { ActionOk, ActionResponse } from '@/lib/types/action-responses';
 
 // Get users with joined data
 export const getUsers = adminActionClient
-  .action(async ({ ctx }): Promise<{ users: Array<Record<string, unknown>> }> => {
+  .action(async (): Promise<{ users: Array<Record<string, unknown>> }> => {
     const adminSupabase = createAdminClient();
 
     // Fetch all user profiles with joined division and company names

@@ -8,6 +8,7 @@ import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 import type { TemplateListItem, AssetListItem } from '@/components/maintenance/schedule-form';
 import { getScheduleDisplayStatus } from '@/lib/constants/schedule-status';
 import { LEAD_ROLES } from '@/lib/constants/roles';
+import { getAccessibleCompanyIds } from '@/lib/auth/company-access';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -35,13 +36,8 @@ export default async function MaintenanceSchedulesPage({ searchParams }: PagePro
     redirect('/login');
   }
 
-  // Fetch user's extra company access (must be before main queries)
-  const { data: companyAccessRows } = await supabase
-    .from('user_company_access')
-    .select('company_id')
-    .eq('user_id', profile.id);
-  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+  // Fetch user's accessible companies (primary + extra via user_company_access)
+  const { allAccessibleCompanyIds, extraCompanyIds } = await getAccessibleCompanyIds(supabase, profile.id, profile.company_id);
 
   // Fetch all schedules for all accessible companies with template and asset joins
   const { data: schedules } = await supabase

@@ -4,6 +4,7 @@ import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { ScheduleDetail } from '@/components/maintenance/schedule-detail';
 import type { MaintenanceSchedule } from '@/lib/types/maintenance';
 import type { PMJobRef } from '@/components/maintenance/schedule-detail';
+import { getAccessibleCompanyIds } from '@/lib/auth/company-access';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -31,13 +32,8 @@ export default async function ScheduleDetailPage({ params }: PageProps) {
     redirect('/login');
   }
 
-  // Fetch user's extra company access
-  const { data: companyAccessRows } = await supabase
-    .from('user_company_access')
-    .select('company_id')
-    .eq('user_id', profile.id);
-  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+  // Fetch user's accessible companies (primary + extra via user_company_access)
+  const { allAccessibleCompanyIds } = await getAccessibleCompanyIds(supabase, profile.id, profile.company_id);
 
   // Fetch schedule with template and asset joins (accessible across all companies)
   const { data: scheduleRaw } = await supabase

@@ -6,6 +6,7 @@ import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { JobCreateDialog } from '@/components/jobs/job-create-dialog';
 import { OPERATIONAL_ROLES, GA_ROLES, ROLES } from '@/lib/constants/roles';
 import { REQUEST_LINKABLE_STATUSES } from '@/lib/constants/request-status';
+import { getAccessibleCompanyIds } from '@/lib/auth/company-access';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -34,13 +35,8 @@ export default async function JobsPage({ searchParams }: PageProps) {
     redirect('/login');
   }
 
-  // Fetch user's extra company access (must be before main queries)
-  const { data: companyAccessRows } = await supabase
-    .from('user_company_access')
-    .select('company_id')
-    .eq('user_id', profile.id);
-  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+  // Fetch user's accessible companies (primary + extra via user_company_access)
+  const { allAccessibleCompanyIds, extraCompanyIds } = await getAccessibleCompanyIds(supabase, profile.id, profile.company_id);
 
   // Build jobs query with role-based filtering
   let jobsQuery = supabase
@@ -171,7 +167,7 @@ export default async function JobsPage({ searchParams }: PageProps) {
   const requestJobLinks: Record<string, string> = {};
 
   // Batch-fetch job photos from media_attachments
-  let photosByJob: Record<string, { id: string; url: string; fileName: string }[]> = {};
+  const photosByJob: Record<string, { id: string; url: string; fileName: string }[]> = {};
 
   if (jobs.length > 0) {
     const jobIds = jobs.map((j) => j.id);

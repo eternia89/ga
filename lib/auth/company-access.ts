@@ -1,6 +1,23 @@
 import { type SupabaseClient } from '@supabase/supabase-js';
 
 /**
+ * Returns all company IDs a user can access (primary + extra via user_company_access).
+ * Destructure as `{ allAccessibleCompanyIds, extraCompanyIds }` to preserve existing variable names.
+ */
+export async function getAccessibleCompanyIds(
+  supabase: SupabaseClient,
+  userId: string,
+  primaryCompanyId: string
+): Promise<{ allAccessibleCompanyIds: string[]; extraCompanyIds: string[] }> {
+  const { data: companyAccessRows } = await supabase
+    .from('user_company_access')
+    .select('company_id')
+    .eq('user_id', userId);
+  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
+  return { allAccessibleCompanyIds: [primaryCompanyId, ...extraCompanyIds], extraCompanyIds };
+}
+
+/**
  * Validates that a user has access to the specified company.
  * Skips check if targetCompanyId matches the user's primary company.
  * Throws if no access row found in user_company_access.

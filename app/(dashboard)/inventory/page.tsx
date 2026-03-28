@@ -6,6 +6,7 @@ import { ExportButton } from '@/components/export-button';
 import { SetBreadcrumbs } from '@/lib/breadcrumb-context';
 import { AssetCreateDialog } from '@/components/assets/asset-create-dialog';
 import { GA_ROLES, ROLES } from '@/lib/constants/roles';
+import { getAccessibleCompanyIds } from '@/lib/auth/company-access';
 
 interface PageProps {
   searchParams: Promise<{ view?: string; action?: string }>;
@@ -34,13 +35,8 @@ export default async function InventoryPage({ searchParams }: PageProps) {
     redirect('/login');
   }
 
-  // Fetch user's extra company access (must be before main queries)
-  const { data: companyAccessRows } = await supabase
-    .from('user_company_access')
-    .select('company_id')
-    .eq('user_id', profile.id);
-  const extraCompanyIds = (companyAccessRows ?? []).map(r => r.company_id);
-  const allAccessibleCompanyIds = [profile.company_id, ...extraCompanyIds];
+  // Fetch user's accessible companies (primary + extra via user_company_access)
+  const { allAccessibleCompanyIds, extraCompanyIds } = await getAccessibleCompanyIds(supabase, profile.id, profile.company_id);
 
   // General users: only see assets at their location or in transit to them
   const isGeneralUser = profile.role === ROLES.GENERAL_USER;
@@ -82,7 +78,7 @@ export default async function InventoryPage({ searchParams }: PageProps) {
   const assetList = assets ?? [];
 
   // Build pending transfers map: assetId -> PendingTransfer
-  let pendingTransfersMap: Record<string, PendingTransfer> = {};
+  const pendingTransfersMap: Record<string, PendingTransfer> = {};
 
   if (assetList.length > 0) {
     const assetIds = assetList.map((a) => a.id);

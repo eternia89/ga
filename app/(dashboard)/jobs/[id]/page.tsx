@@ -7,7 +7,6 @@ import { JobStatusBadge } from '@/components/jobs/job-status-badge';
 import { PriorityBadge } from '@/components/priority-badge';
 import type { JobTimelineEvent } from '@/components/jobs/job-timeline';
 import type { JobWithRelations } from '@/lib/types/database';
-import { JOB_STATUS_LABELS } from '@/lib/constants/job-status';
 import { PM_BADGE_CLASS } from '@/lib/constants/approval-status';
 import { ROLES } from '@/lib/constants/roles';
 import { DisplayId } from '@/components/display-id';
