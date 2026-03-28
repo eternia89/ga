@@ -7,12 +7,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a **General Affairs (GA) operations tool** for a corporate group (5-15 subsidiaries, 100-500 users). It centralizes internal maintenance requests, job execution, asset management, and preventive maintenance scheduling.
 
 ### Business Model
+
 - A centralized GA team serves multiple subsidiary companies
 - GA staff physically travel between locations to service equipment
 - Assets are physical equipment (ACs, generators, filters) at specific locations, **held by specific people**
 - Transfers move physical custody from one person to another — the receiver must accept
 
+### Bug Fix Protocol
+
+When fixing any bug, ALWAYS scan the entire codebase for the same or similar issues before committing.\*\* A bug found once is likely duplicated elsewhere. For example: a wrong route path in one component probably exists in other components too. Grep broadly for the pattern, fix all instances, and include them in the same commit. Each class of bug should only need to be reported once.
+
 ### Role Mental Models
+
 - **General User:** An office worker who submits maintenance requests and receives/holds company assets. They should ONLY see their own requests and assets they physically hold. They don't manage anything.
 - **GA Staff:** A field technician who handles jobs, manages inventory, and transfers assets. Sees all assets in their company.
 - **GA Lead:** Operations manager who triages, assigns, and oversees. Full operational visibility.
@@ -20,14 +26,18 @@ This is a **General Affairs (GA) operations tool** for a corporate group (5-15 s
 - **Admin:** System administrator. Sees everything.
 
 ### Common Sense Checks
+
 Before implementing any feature, verify it makes sense in this domain:
+
 - **Visibility:** Would this role realistically need to see this data? A general user doesn't need to see all 100 assets in their building — only the ones in their custody.
 - **Actions:** Would this role realistically perform this action? General users don't transfer or change asset status — only GA staff does.
 - **Scale:** A location might have 100+ assets but only 2-3 assigned to any given person. Filters should reflect individual responsibility, not building proximity.
 - **Physical world:** Assets are physical objects with custody chains. "Transfer" means physical handover. "Location" means where the item sits. "Holder" means who's responsible for it.
 
 ### PRD Reference (MANDATORY)
+
 Before executing any task, read `docs/ga-prd-human.md` to validate:
+
 1. Does this task align with how the system is described?
 2. Does it make sense for the role that would use it?
 3. Are there edge cases the PRD covers that the task description missed?
@@ -73,6 +83,7 @@ This is a **Next.js 16** app using the **App Router** (`app/` directory), **Reac
 ## Task Pre-Check (MANDATORY)
 
 Before executing any batch of tasks or multi-step instructions, **always perform a contradiction check first**:
+
 1. Compare each instruction against existing CLAUDE.md rules — flag conflicts
 2. Compare instructions against each other — flag contradictions between tasks
 3. Compare against recent decisions in STATE.md — flag reversals without explicit intent
@@ -93,6 +104,7 @@ Before implementing any feature, fix, or refactor, **analyze what existing code 
 ### Progressive Enhancement Principle
 
 Code must tolerate future additions without breaking:
+
 - **Never hardcode dimension filters** (`.eq('company_id', profile.company_id)`) when RLS already enforces scoping. Hardcoded filters silently break when the scoping model expands (e.g., multi-company). Prefer letting RLS handle access control; only add action-level filters when RLS is insufficient or when using `adminSupabase` (service role).
 - **Never use equality checks when a set check is needed.** If a user can have access to N companies, use `.in('company_id', accessibleIds)` not `.eq('company_id', primaryId)`. Design for N from the start, even if N=1 today.
 - **Enum/status expansions:** When adding a new status or type value, grep every switch/case, every conditional, every RLS policy, and every UI badge/filter that references the enum. Missing one creates a silent bug.
@@ -101,6 +113,7 @@ Code must tolerate future additions without breaking:
 ### Regression Test Rule
 
 When a task touches any of the following, **add or update a test** (Vitest unit or Playwright e2e) covering the changed behavior:
+
 - **Access control:** company scoping, role checks, ownership guards, RLS policy changes
 - **Query filters:** `.eq()`, `.in()`, `.is()` modifications on Supabase queries
 - **Status transitions:** lifecycle state changes, approval flows
@@ -108,7 +121,7 @@ When a task touches any of the following, **add or update a test** (Vitest unit 
 
 Skip tests for UI-only changes (layout, spacing, colors, copy/terminology, column ordering).
 
-When in doubt, ask: *"If someone changes this code next month, will they know they broke something?"* If the answer is no — write a test.
+When in doubt, ask: _"If someone changes this code next month, will they know they broke something?"_ If the answer is no — write a test.
 
 ## UI Conventions
 
@@ -123,26 +136,31 @@ When in doubt, ask: *"If someone changes this code next month, will they know th
 ## UI Patterns & Components
 
 ### Table Row Actions
+
 - Use **ghost buttons** with `text-blue-600 hover:underline` styling for row actions.
 - Domain entity tables (requests, jobs, assets, schedules): Show a single **"View"** button that opens a view modal.
 - Admin settings tables (companies, divisions, locations, categories, users): Show a single **"Edit"** button that opens a form dialog.
 
 ### View Modal + Detail Page (Dual Access)
+
 - Every domain entity (requests, jobs, assets, templates, schedules) has **both** a view modal AND a full detail page (`/[id]`).
 - **View modal:** Quick preview from table row "View" button. Read-only with action buttons in a sticky bottom bar.
 - **Detail page (`/[id]`):** Full editing with inline fields, two-column layout, timeline.
 - Modal opens via URL param `?view={id}` for shareability.
 
 ### Create Flows
+
 - New entities are created via **modal dialogs** triggered by CTA buttons in the page header. No separate `/new` pages.
 - CTA buttons support permalink via `?action=create` URL param for direct linking.
 
 ### Detail Page Layout
+
 - **Two-column grid:** `grid-cols-[1fr_380px] max-lg:grid-cols-1` — left column for content/fields, right column for Activity Timeline.
 - Timeline column has `maxHeight: calc(100vh - 200px)` with internal scroll.
 - Header shows: display ID (font-mono, text-2xl) + status badge + priority badge + creator line ("Name · Created dd-MM-yyyy").
 
 ### Sticky Save Bar
+
 - Detail pages with editable fields show a **sticky bottom bar** fixed to the viewport bottom.
 - Bar only appears when the form has unsaved changes (dirty state).
 - Contains "Unsaved changes" text + Save button.
@@ -150,10 +168,12 @@ When in doubt, ask: *"If someone changes this code next month, will they know th
 - Components expose `formId`, `onDirtyChange`, and `onSubmittingChange` props.
 
 ### Forms
+
 - All forms use **react-hook-form** + **zod** resolver + shadcn `<Form>` / `<FormField>` / `<FormControl>` components.
 - Never use raw `useState` for form state — always use `useForm` with `zodResolver`.
 
 ### Server Actions
+
 - All mutations use **next-safe-action** with typed client chains defined in `lib/safe-action.ts`:
   - `actionClient` — base (no auth)
   - `authActionClient` — requires authenticated user + profile
@@ -161,6 +181,7 @@ When in doubt, ask: *"If someone changes this code next month, will they know th
 - Action files live in `app/actions/`.
 
 ### Shared Components
+
 - **`PhotoUpload`** (`components/media/photo-upload.tsx`): Single consolidated photo upload with compression, annotation, mobile capture. Used for requests, assets, jobs, schedules.
 - **`PriorityBadge`** (`components/priority-badge.tsx`): Single generic priority badge for all entities.
 - **Status badges:** Generic `StatusBadge` base + entity-specific wrappers (`RequestStatusBadge`, `JobStatusBadge`, `AssetStatusBadge`, `ScheduleStatusBadge`).
@@ -168,6 +189,7 @@ When in doubt, ask: *"If someone changes this code next month, will they know th
 - **`DeleteConfirmDialog`** (`components/delete-confirm-dialog.tsx`): Deactivation confirmation with dependency count blocking.
 
 ### Admin Settings Pattern
+
 - Settings page at `/admin/settings` uses a **tabbed interface** (Companies, Divisions, Locations, Categories, Users).
 - Each tab renders a data table with "Edit" row action opening a form dialog.
 - Create via CTA button in tab header → same form dialog in create mode.
