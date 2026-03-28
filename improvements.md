@@ -574,7 +574,7 @@ Key verifications:
 
 | # | Severity | Status | File | Issue | Recommendation |
 |---|----------|--------|------|-------|----------------|
-| 1 | **LOW** | FROM 27-Mar | `app/api/uploads/entity-photos/route.ts:211-259` | Fire-and-forget Vision API call has no `.catch()` logging on outer promise — silent failure possible | Add `.catch(err => console.error('[Entity Photos Vision]', attachmentId, err))` |
+| 1 | **LOW** | **VERIFIED OK** | `app/api/uploads/entity-photos/route.ts:211-259` | ~~Fire-and-forget Vision API call has no `.catch()` logging~~ — **Actually already has `.catch()` at lines 256 and 258** (added in 26-Mar batch `quick-260326-nmx`) | No action needed |
 | 2 | **LOW** | FROM 27-Mar | `app/api/vision/describe/route.ts:86` | Vision API failure returns `{ description: null }` — indistinguishable from "not configured" | Return distinct error states for client differentiation |
 
 ---
@@ -595,8 +595,21 @@ Key verifications:
 |---|----------|---------|-------|----------------|
 | 1 | Error Boundaries | `job-modal.tsx`, `request-view-modal.tsx` | Large modal components lack localized error boundaries | Add `<ErrorBoundary>` around modal content |
 | 2 | Logging | 25 console calls in 12 files | `console.error()` calls lack `[ComponentName]` context prefix (55+ calls DO have prefixes) | Add context prefix for debuggability |
-| 3 | DRY | 12 files (pages, actions, API routes) | `getAccessibleCompanyIds` — same 3-line pattern (`user_company_access` query → map → combine) repeated 12 times | Extract to `lib/auth/get-accessible-company-ids.ts` |
+| 3 | **DONE** | ~~12 files (pages, actions, API routes)~~ | `getAccessibleCompanyIds` — ~~same 3-line pattern repeated 12 times~~ **Extracted to `lib/auth/company-access.ts`** alongside `assertCompanyAccess`. All 12 call sites (6 pages, 4 export routes, 2 schedule action fns) updated | Completed 28-Mar |
 | 4 | Components | `job-form.tsx` (727 lines), `schedule-form.tsx` (661 lines), `asset-transfer-respond-modal.tsx` (653 lines), `asset-view-modal.tsx` (579 lines), `asset-submit-form.tsx` (570 lines), `asset-edit-form.tsx` (561 lines) | 6 additional components exceeding 500 lines (beyond previously flagged `job-modal.tsx` 1364 + `request-view-modal.tsx` 758) | Split into sub-components |
+
+---
+
+### Lint Fixes (28-Mar Automated Run)
+
+| # | File | Fix |
+|---|------|-----|
+| 1 | `inventory/page.tsx:81` | `let pendingTransfersMap` → `const` (prefer-const) |
+| 2 | `jobs/page.tsx:170` | `let photosByJob` → `const` (prefer-const) |
+| 3 | `jobs/[id]/page.tsx:10` | Removed unused `JOB_STATUS_LABELS` import |
+| 4 | `settings-content.tsx:50` | Escaped `'` → `&apos;` (react/no-unescaped-entities) |
+| 5 | `user-actions.ts:13` | Removed unused `ctx` parameter |
+| 6 | `category-form-dialog.tsx:69` | `type` → `_type` for intentionally unused destructured var |
 
 ---
 
