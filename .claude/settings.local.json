@@ -87,7 +87,8 @@
       "Bash(grep -r \"\\\\.max\\(\" /Users/melfice/code/ga/lib/validations/*.ts)",
       "Bash(grep -n \"as unknown as\" /Users/melfice/code/ga/app/\\\\\\(dashboard\\\\\\)/requests/[id]/page.tsx)",
       "Bash(find /Users/melfice/code/ga/app /Users/melfice/code/ga/components -type f \\\\\\(-name *.tsx -o -name *.jsx \\\\\\) ! -path */node_modules/* -exec grep -nE \"[^-]\\(sm|md|lg|xl|2xl\\):\" {} +)",
-      "Bash(grep -n \"LinkedJobRow\\\\|interface.*Row\\\\|type.*Row\" /Users/melfice/code/ga/app/\\\\\\(dashboard\\\\\\)/requests/[id]/page.tsx)"
+      "Bash(grep -n \"LinkedJobRow\\\\|interface.*Row\\\\|type.*Row\" /Users/melfice/code/ga/app/\\\\\\(dashboard\\\\\\)/requests/[id]/page.tsx)",
+      "Bash(npm view:*)"
     ]
   },
   "outputStyle": "Explanatory"
