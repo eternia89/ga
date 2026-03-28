@@ -95,6 +95,90 @@
 
 ---
 
+## 29-Mar-2026 SECURITY — Open redirect in auth callback
+
+**What:** The `/api/auth/callback` route takes a `next` URL parameter and redirects to it after login, but doesn't validate the path. An attacker could craft a link like `/api/auth/callback?next=//evil.com` to redirect users to an external site after they authenticate.
+**Where:** `app/api/auth/callback/route.ts:7,22`
+**Why it matters:** This is a textbook open redirect vulnerability. An attacker sends a phishing link that looks like your real login URL, the user authenticates normally, then gets redirected to a fake version of your app that steals credentials or session tokens.
+**Backend ELI5:** Think of it like a route guard that, after letting you in, sends you to wherever the URL says — even if that's someone else's website. The fix is like adding a whitelist of allowed redirect destinations.
+
+**Suggested fixes:**
+- [ ] Option A — Validate `next` starts with `/` and doesn't contain `//` (prevents protocol-relative URLs like `//evil.com`). Simple regex check before the redirect.
+- [ ] Option B — Whitelist allowed path prefixes (`/`, `/jobs`, `/requests`, `/inventory`, `/maintenance`, `/approvals`, `/admin`, `/notifications`). More restrictive but prevents any future path injection.
+- [ ] Skip — Low risk in practice since the app is internal-only. But trivial to fix.
+
+---
+
+## 29-Mar-2026 LINT — setState in useEffect across 3 components
+
+**What:** Three components call `setState()` synchronously inside `useEffect`, which React 19's compiler flags as causing cascading renders. These are the same class of issue as the `use-geolocation.ts` item from 28-Mar, but in different files.
+**Where:** `app/(auth)/login/page.tsx:45`, `components/admin/users/user-form-dialog.tsx:103`, `components/requests/request-detail-client.tsx:61`
+**Why it matters:** Each synchronous setState in an effect triggers a re-render before the browser paints, which can cause visible flicker and wasted work. React 19's stricter linting treats this as an error.
+
+**Suggested fixes:**
+- [ ] Option A — **login/page.tsx:** Move cookie-based error message into a `useMemo` or `useState` initializer so it runs during render, not in an effect. **user-form-dialog.tsx:** Derive initial state from props using `useMemo` + reset key pattern instead of syncing in useEffect. **request-detail-client.tsx:** Use URL search params check in a `useMemo` or move into an event handler.
+- [ ] Option B — Suppress the lint warnings with inline `// eslint-disable-next-line` comments. The behavior is correct even if the pattern is suboptimal.
+- [ ] Skip — These work correctly today. The React compiler will skip optimizing these components but they'll still render fine.
+
+---
+
+## 29-Mar-2026 LINT — Dead code in schedule-list, template-list, and user-table
+
+**What:** Several components have defined-but-never-used variables, handlers, and state. These look like scaffolded code for features that are either WIP or were never wired up.
+**Where:**
+- `components/maintenance/schedule-list.tsx:22,28,30,45,60` — `isPending`, `canManage`, `handleDeactivate`, `handleActivate`, `handleDelete`
+- `components/maintenance/template-list.tsx:22,28,30,45` — `isPending`, `canManage`, `handleDeactivate`, `handleReactivate`
+- `components/admin/users/user-table.tsx:50` — `isProcessing` (state is set but never read)
+- `components/assets/asset-detail-info.tsx:33` — `currentUserId` prop destructured but unused
+- `components/jobs/job-detail-info.tsx:50` — `currentUserId` prop destructured but unused
+**Why it matters:** Dead code makes it harder to understand what a component actually does and creates false signals in lint output. The unused handlers in list components also import action functions that are never called.
+
+**Suggested fixes:**
+- [ ] Option A — For schedule-list and template-list: if these handlers are meant to be used via table row actions (modal buttons), wire them up through table meta. If not needed, remove them along with the unused imports.
+- [ ] Option B — Remove all dead code. If the handlers are needed later, they can be re-added from git history.
+- [ ] Skip — They're warnings, not errors. The code runs fine. Clean up when touching these files for other reasons.
+
+---
+
+## 29-Mar-2026 LINT — Components created during render in dashboard and checklist
+
+**What:** Three components define sub-components inside the render function body, which React 19's compiler flags as an error. Each render creates a new component identity, resetting any internal state.
+**Where:** `components/dashboard/kpi-card.tsx:45-60`, `components/dashboard/staff-workload-table.tsx:53-60`, `components/maintenance/pm-checklist-item.tsx:72`
+**Why it matters:** React treats `const MyComponent = () => ...` inside a render function as a new component every render. Any state or refs inside these components reset on every parent render, causing bugs and performance issues.
+
+**Suggested fixes:**
+- [ ] Option A — Move the inner components outside the parent component function. If they need access to parent state, pass it as props. This is the React-recommended fix.
+- [ ] Option B — Convert the inner components to plain render functions (not components) by removing JSX element usage and inlining the logic. Works for simple cases.
+- [ ] Skip — These components currently have no internal state, so the re-creation is harmless. But it blocks the React compiler from optimizing these components.
+
+---
+
+## 29-Mar-2026 RLS — finance_approver role missing from database policies
+
+**What:** The `finance_approver` role exists in the application constants (`lib/constants/roles.ts`) and in the database schema's CHECK constraint, but is NOT referenced in any RLS (Row Level Security) policy across all 29 migration files. Users with this role fall back to whatever the "catch-all" policy allows.
+**Where:** `lib/constants/roles.ts:5`, `supabase/migrations/00001_initial_schema.sql:91` (CHECK constraint)
+**Why it matters:** Without explicit RLS policies, `finance_approver` users either see everything (if there's a permissive catch-all) or nothing (if policies only whitelist specific roles). Either way, the access isn't intentionally designed.
+**Backend ELI5:** RLS policies are like invisible if-statements in the database that filter rows by user role. Think of them as server-side route guards — if your role isn't mentioned in the guard, you either get blocked entirely or slip through a gap. The `finance_approver` role has no guards written for it, so the database doesn't know what data to show these users.
+
+**Suggested fixes:**
+- [ ] Option A — Audit all RLS policies and add explicit `finance_approver` rules. They should see: approval-related data (jobs pending cost approval), dashboard metrics, but NOT manage assets, jobs, or maintenance directly.
+- [ ] Option B — Verify that `finance_approver` inherits `general_user` access via catch-all policies (e.g., `current_user_role() != 'general_user'` patterns). If access is already correct by default, document this as intentional.
+- [ ] Skip — If finance approvers are working fine in testing, the existing policy structure handles them implicitly. Document the implicit behavior.
+
+---
+
+## 29-Mar-2026 UI — Select instead of Combobox for large dropdowns in user form
+
+**What:** The user form dialog uses plain `<Select>` components for Company, Division, and Location dropdowns. Per CLAUDE.md, these should use Combobox since the lists can grow large (dozens of companies/divisions/locations).
+**Where:** `components/admin/users/user-form-dialog.tsx:260` (Company), `:311` (Division), `:340` (Location)
+**Why it matters:** With 15+ subsidiaries and many divisions/locations, users have to scroll through a long list instead of typing to filter. Combobox turns the trigger into a search box on click.
+
+**Suggested fixes:**
+- [ ] Option A — Replace all three `<Select>` with the shadcn Combobox pattern already used elsewhere in the app (e.g., asset forms, request forms). Keep the Role selector as a plain Select since it only has 5 options.
+- [ ] Skip — The current Select works. Upgrade when the user form gets its next feature touch.
+
+---
+
 ## Completed
 
 <!-- Items moved here after /do-needs-review executes them -->
